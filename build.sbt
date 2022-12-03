@@ -4,7 +4,7 @@ ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / intellijPluginName := "Scaleda"
 ThisBuild / intellijPlatform   := IntelliJPlatform.IdeaCommunity
 ThisBuild / intellijBuild := "221.5787.30"
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11"))
 Global    / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
@@ -14,7 +14,7 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     Compile / scalaSource := baseDirectory.value / "src",
     Test / scalaSource := baseDirectory.value / "test",
     Compile / resourceDirectory := baseDirectory.value / "resources",
-    Global / javacOptions ++= Seq("-source", "17", "-target", "17"),
+    Global / javacOptions ++= Seq("-source", "11", "-target", "11"),
     Global / scalacOptions ++= Seq(
         "-deprecation",
         "-feature",

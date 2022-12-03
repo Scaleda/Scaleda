@@ -4,14 +4,13 @@
     <version>0.0.1-SNAPSHOT</version>
     <vendor>Hans and Chiro</vendor>
 
-    <description>A scalable EDA framework for IntelliJ platform written in Scala</description>
+    <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
 
     <idea-version since-build="221.0"/>
 
-    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.properties</depends>
+    <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.PluginBundle</resource-bundle>
 
     <actions>
 
@@ -21,7 +20,11 @@
     </applicationListeners>
 
     <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup displayType="BALLOON" id="My Plugin Notification" />
+        <fileType
+                name="Verilog"
+                implementationClass="top.criwits.scaleda.lang.VerilogFileType"
+                language="Verilog"
+                extensions="v" />
     </extensions>
 
 </idea-plugin>
