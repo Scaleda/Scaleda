@@ -1,0 +1,27 @@
+<idea-plugin>
+    <id>top.criwits.scaleda</id>
+    <name>Scaleda</name>
+    <version>0.0.1-SNAPSHOT</version>
+    <vendor>Hans and Chiro</vendor>
+
+    <description>A scalable EDA framework for IntelliJ platform written in Scala</description>
+
+    <idea-version since-build="221.0"/>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.properties</depends>
+
+    <resource-bundle>messages.PluginBundle</resource-bundle>
+
+    <actions>
+
+    </actions>
+
+    <applicationListeners>
+    </applicationListeners>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup displayType="BALLOON" id="My Plugin Notification" />
+    </extensions>
+
+</idea-plugin>
