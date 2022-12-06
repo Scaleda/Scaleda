@@ -22,7 +22,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileType
                 name="Verilog"
-                implementationClass="top.criwits.scaleda.lang.VerilogFileType"
+                implementationClass="main.scala.lang.VerilogFileType"
                 language="Verilog"
                 extensions="v" />
     </extensions>
