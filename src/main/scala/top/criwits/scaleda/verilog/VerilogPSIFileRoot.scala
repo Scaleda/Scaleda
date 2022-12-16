@@ -1,24 +1,16 @@
 package top.criwits.scaleda
 package verilog
 
+import verilog.psi.ScopeNode
 import verilog.psi.factory.nodes.ModuleDeclarationPsiNode
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{FileViewProvider, PsiElement, PsiNamedElement}
-import org.antlr.intellij.adaptor.SymtabUtils
-import org.antlr.intellij.adaptor.psi.ScopeNode
-import org.antlr.jetbrains.sample.SampleLanguage
-import org.antlr.jetbrains.sample.psi.CallSubtree
+import com.intellij.psi.{FileViewProvider, PsiNamedElement}
 
 class VerilogPSIFileRoot(viewProvider: FileViewProvider)
   extends PsiFileBase(viewProvider, VerilogLanguage) with ScopeNode {
-  override def resolve(element: PsiNamedElement): PsiElement = {
-    if (element.getParent.isInstanceOf[CallSubtree])
-      SymtabUtils.resolve(this, SampleLanguage.INSTANCE, element, "/script/function/ID")
-    else SymtabUtils.resolve(this, SampleLanguage.INSTANCE, element, "/script/vardef/ID")
-  }
 
   override def getFileType: FileType = VerilogFileType.instance.asInstanceOf[FileType]
 
@@ -28,11 +20,11 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
 
   override def getContext: ScopeNode = null
 
-  def getAvailableNamedElements: Array[PsiNamedElement] =
+  def getAvailableNamedElementsScala: Array[PsiNamedElement] =
     PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
       .toArray
       .map(x => x.asInstanceOf[PsiNamedElement])
 
-  def getAvailableNamedElementsLists =
+  override def getAvailableNamedElements =
     PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
 }

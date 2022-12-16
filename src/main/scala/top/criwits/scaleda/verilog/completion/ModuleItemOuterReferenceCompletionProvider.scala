@@ -3,6 +3,7 @@ package verilog.completion
 
 import verilog.VerilogFileType
 import verilog.psi.factory.nodes.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
+import verilog.references.ModuleInstantiationPsiNode
 import verilog.utils.FileUtils
 
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionProvider, CompletionResultSet}
@@ -10,7 +11,6 @@ import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode
 
 class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[CompletionParameters] {
   override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
@@ -27,7 +27,7 @@ class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[Comp
       .toSet
     if (element.getProject == null) return
     FileUtils.getAllVerilogFiles(element.getProject)
-      .flatMap(it => it.getAvailableNamedElements)
+      .flatMap(it => it.getAvailableNamedElementsScala)
       .filter(it => it.isInstanceOf[ModuleDeclarationPsiNode])
       .filter(it => !currentModuleInstantiationNames.contains(it.getName))
       .filter(it => it != currentModuleDeclaration)

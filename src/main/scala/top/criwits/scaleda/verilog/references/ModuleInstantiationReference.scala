@@ -10,7 +10,7 @@ class ModuleInstantiationReference(element: ModuleInstantiationPsiNode)
   extends PsiReferenceBase.Poly[ModuleInstantiationPsiNode](element, element.getHoldPsiNodeRelativeTextRange, true) {
   override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] =
     FileUtils.getAllVerilogFiles(myElement.getProject)
-      .flatMap(it => it.getAvailableNamedElements)
+      .flatMap(it => it.getAvailableNamedElementsScala)
       .filter(it => it.isInstanceOf[ModuleDeclarationPsiNode])
       .filter(x => x.getName == myElement.getHoldPsiNode.getName)
       .map(it => new PsiElementResolveResult(it))
