@@ -4,12 +4,13 @@ package verilog
 import verilog.parser._
 import verilog.psi.factory.VerilogPsiNodeFactory
 
+import com.intellij.lang.ParserDefinition.SpaceRequirements
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
-import com.intellij.psi.tree.{IElementType, IFileElementType, TokenSet}
-import com.intellij.psi.{FileViewProvider, PsiElement, PsiFile}
-import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory, TokenIElementType}
+import com.intellij.psi.tree.{IElementType, IFileElementType}
+import com.intellij.psi.{FileViewProvider, PsiFile}
+import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
 
@@ -24,24 +25,19 @@ final class VerilogParserDefinition extends ParserDefinition {
       }
     }
 
-  override def getFileNodeType: IFileElementType = VerilogParserDefinition.FILE
+  override def getWhitespaceTokens = VerilogParserDefinition.WHITESPACE
 
-  override def getCommentTokens: TokenSet = VerilogParserDefinition.COMMENTS
+  override def getFileNodeType = VerilogParserDefinition.FILE
 
-  override def getStringLiteralElements: TokenSet = VerilogParserDefinition.STRING
+  override def getCommentTokens = VerilogParserDefinition.COMMENTS
 
-  override def createElement(node: ASTNode): PsiElement = {
-    // val elType = node.getElementType
-    // if (elType.isInstanceOf[TokenIElementType]) return new ANTLRPsiNode(node)
-    // if (!elType.isInstanceOf[RuleIElementType]) return new ANTLRPsiNode(node)
-    // val ruleElType = elType.asInstanceOf[RuleIElementType]
-    // ruleElType.getRuleIndex match {
-    //   case VerilogParser.RULE_
-    // }
-    VerilogPsiNodeFactory.create(node)
-  }
+  override def getStringLiteralElements = VerilogParserDefinition.STRING
+
+  override def createElement(node: ASTNode) = VerilogPsiNodeFactory.create(node)
 
   override def createFile(viewProvider: FileViewProvider): PsiFile = new VerilogPSIFileRoot(viewProvider)
+
+  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) = SpaceRequirements.MAY
 }
 
 object VerilogParserDefinition {
@@ -51,9 +47,6 @@ object VerilogParserDefinition {
     .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
     .map(x => if (x._2 == null) "<INVALID>" else x._2).toArray
   PSIElementTypeFactory.defineLanguageIElementTypes(VerilogLanguage, tokenNames, VerilogParser.ruleNames)
-  val tokenIElementTypes = PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).toArray
-  // TODO: check ID =?= Simple_identifier
-  val ID = tokenIElementTypes(VerilogLexer.Simple_identifier)
   val FILE = new IFileElementType(VerilogLanguage)
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,
