@@ -8,6 +8,8 @@ import com.intellij.psi.tree.IElementType;
 import org.antlr.intellij.adaptor.lexer.ANTLRLexerAdaptor;
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.intellij.adaptor.lexer.TokenIElementType;
+// import org.antlr.jetbrains.sample.parser.SampleLanguageLexer;
+// import org.antlr.jetbrains.sample.parser.SampleLanguageParser;
 import org.antlr.jetbrains.sample.parser.SampleLanguageLexer;
 import org.antlr.jetbrains.sample.parser.SampleLanguageParser;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +64,9 @@ public class SampleSyntaxHighlighter extends SyntaxHighlighterBase {
 	@NotNull
 	@Override
 	public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-		if ( !(tokenType instanceof TokenIElementType) ) return EMPTY_KEYS;
+		if ( !(tokenType instanceof TokenIElementType) ) {
+			return EMPTY_KEYS;
+		}
 		TokenIElementType myType = (TokenIElementType)tokenType;
 		int ttype = myType.getANTLRTokenType();
 		TextAttributesKey attrKey;
