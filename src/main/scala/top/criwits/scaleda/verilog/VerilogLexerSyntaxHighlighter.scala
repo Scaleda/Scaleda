@@ -19,9 +19,7 @@ class VerilogLexerSyntaxHighlighter extends SyntaxHighlighterBase {
     val tokenIElementType = tokenType.asInstanceOf[TokenIElementType]
     val t = tokenIElementType.getANTLRTokenType
     import VerilogLexerSyntaxHighlighter._
-    // println(s"t = ${t}")
     t match {
-      // TODO: check is this block comments?
       case VerilogLexer.Block_comment => Array(createTextAttributesKey(
         "VERILOG_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT))
       case VerilogLexer.One_line_comment => Array(createTextAttributesKey(
