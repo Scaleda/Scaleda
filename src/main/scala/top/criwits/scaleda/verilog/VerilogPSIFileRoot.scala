@@ -17,7 +17,7 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
     else SymtabUtils.resolve(this, SampleLanguage.INSTANCE, element, "/script/vardef/ID")
   }
 
-  override def getFileType: FileType = VerilogFileType.asInstanceOf[FileType]
+  override def getFileType: FileType = VerilogFileType.instance.asInstanceOf[FileType]
 
   override def toString: String = "Verilog file"
 

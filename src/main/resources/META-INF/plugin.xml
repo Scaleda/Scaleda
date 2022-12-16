@@ -10,7 +10,7 @@
 
 	<depends>com.intellij.properties</depends>
 	<depends>com.intellij.modules.platform</depends>
-
+	<depends>com.intellij.modules.lang</depends>
 
 	<actions>
 
@@ -25,7 +25,10 @@
 				implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
 				language="Verilog"
 				extensions="v" />
-		<lang.parserDefinition language="Verilog" />
+		<lang.parserDefinition language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
+		<lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
+<!--		<lang.syntaxHighlighterFactory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>-->
+
 	</extensions>
 
 </idea-plugin>

@@ -2,19 +2,18 @@ package top.criwits.scaleda
 package verilog
 
 import verilog.parser._
+import verilog.psi.factory.VerilogPsiNodeFactory
 
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.tree.{IElementType, IFileElementType, TokenSet}
 import com.intellij.psi.{FileViewProvider, PsiElement, PsiFile}
-import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory, RuleIElementType, TokenIElementType}
+import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory, TokenIElementType}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
-import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import org.antlr.v4.runtime.Parser
-import top.criwits.scaleda.verilog.psi.factory.VerilogPsiNodeFactory
 
-class VerilogParserDefinition extends ParserDefinition {
+final class VerilogParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =
     new ANTLRLexerAdaptor(VerilogLanguage, new VerilogLexer(null))
 
@@ -46,6 +45,15 @@ class VerilogParserDefinition extends ParserDefinition {
 }
 
 object VerilogParserDefinition {
+  private val vocabulary = VerilogParser.VOCABULARY
+  val tokenNames = (0 until vocabulary.getMaxTokenType)
+    .map(x => (x, vocabulary.getLiteralName(x)))
+    .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
+    .map(x => if (x._2 == null) "<INVALID>" else x._2).toArray
+  PSIElementTypeFactory.defineLanguageIElementTypes(VerilogLanguage, tokenNames, VerilogParser.ruleNames)
+  val tokenIElementTypes = PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).toArray
+  // TODO: check ID =?= SIMPLE_IDENTIFIER
+  val ID = tokenIElementTypes(VerilogLexer.SIMPLE_IDENTIFIER)
   val FILE = new IFileElementType(VerilogLanguage)
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,

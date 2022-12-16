@@ -19,6 +19,7 @@ final class VerilogFileType extends LanguageFileType(VerilogLanguage) {
 object VerilogFileType {
   private final val DefaultExtension = "v"
   final val DefaultIcon = IconLoader.getIcon("/icons/verilog.svg", VerilogFileType.getClass)
+  val instance = new VerilogFileType
 
   def isVerilog(fileType: FileType): Boolean = fileType match {
     case _: VerilogFileType => true
