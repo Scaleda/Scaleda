@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package lang
+package verilog
 
 import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
 import com.intellij.openapi.util.IconLoader
@@ -15,8 +15,8 @@ final class VerilogFileType extends LanguageFileType(VerilogLanguage){
 }
 
 object VerilogFileType {
-  final val DefaultExtension = "v"
-  final val DefaultIcon = IconLoader.getIcon("/icons/verilog.svg", VerilogFileType.getClass)
+  private final val DefaultExtension = "v"
+  private final val DefaultIcon = IconLoader.getIcon("/icons/verilog.svg", VerilogFileType.getClass)
 
   def isVerilog(fileType: FileType): Boolean = fileType match {
     case _: VerilogFileType => true
