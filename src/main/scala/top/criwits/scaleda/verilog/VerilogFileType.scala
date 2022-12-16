@@ -20,7 +20,7 @@ final class VerilogFileType extends LanguageFileType(VerilogLanguage) {
 
 object VerilogFileType {
   private final val DefaultExtension = "v"
-  final val DefaultIcon = IconLoader.getIcon("/icons/verilog", VerilogFileType.getClass)
+  final val DefaultIcon = Icons.verilog
   val instance = new VerilogFileType
 
   Log.warn(s"DefaultIcon size = ${DefaultIcon.getIconWidth}x${DefaultIcon.getIconHeight}")
