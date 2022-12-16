@@ -4,69 +4,95 @@
 <svg
    width="16"
    height="16"
-   viewBox="0 0 4.2333334 4.2333333"
    version="1.1"
    id="svg5"
+   sodipodi:docname="verilog.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview19"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="41.7193"
+     inkscape:cx="-2.0374263"
+     inkscape:cy="6.5197642"
+     inkscape:window-width="2560"
+     inkscape:window-height="1512"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5" />
   <defs
      id="defs2" />
   <g
-     id="layer1"
-     transform="translate(-1.2435949,-0.63555195)">
+     id="g1250"
+     transform="matrix(4.6323193,0,0,4.6323193,-7.5658045,-4.7491554)"
+     style="stroke-width:0.151112;stroke-dasharray:none;image-rendering:auto">
     <g
-       id="g1109"
-       style="fill:none;stroke:#d1ac00;stroke-opacity:1">
+       id="g1252"
+       style="fill:none;stroke:#d1ac00;stroke-width:0.151112;stroke-dasharray:none;stroke-opacity:1">
       <g
-         id="g1012"
-         transform="matrix(1.1471728,0,0,1.1471728,-0.5373141,-0.31405873)">
+         id="g1254"
+         transform="matrix(1.1471728,0,0,1.1471728,-0.5373141,-0.31405873)"
+         style="stroke-width:0.131726;stroke-dasharray:none">
         <g
            aria-label="V"
-           id="text1265"
-           style="font-weight:bold;font-size:1.67323px;font-family:Lato;-inkscape-font-specification:'Lato, Bold';fill:#d1ac00;stroke:none;stroke-width:0.0468794">
+           id="g1256"
+           style="font-weight:bold;font-size:1.67323px;font-family:Lato;-inkscape-font-specification:'Lato, Bold';fill:#d1ac00;stroke:none;stroke-width:0.131726;stroke-dasharray:none">
           <g
-             id="g1187"
-             transform="matrix(1.1282917,0,0,1.1282917,-0.38570836,-0.23885716)">
+             id="g1258"
+             transform="matrix(1.1282917,0,0,1.1282917,-0.38570836,-0.23885716)"
+             style="stroke-width:0.116748;stroke-dasharray:none">
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 4.6188238,2.172976 H 4.265889"
-               id="path1061" />
+               id="path1278" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 4.6188238,2.5806764 H 4.265889"
-               id="path1063" />
+               id="path1276"
+               inkscape:label="path1063" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 4.6188238,2.988377 H 4.265889"
-               id="path1065" />
+               id="path1274" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 2.9453838,1.3149371 V 1.6678719"
-               id="path1015" />
+               id="path1272" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 3.3530842,1.3149371 V 1.6678719"
-               id="path1017" />
+               id="path1270" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 3.7607848,1.3149371 V 1.6678719"
-               id="path1019" />
+               id="path1268" />
             <path
-               id="rect236"
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               id="path1266"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="m 2.945479,1.3149623 v 0.3529726 z m -0.06868,0.4426985 c -0.1921221,0 -0.3466593,0.154728 -0.3466593,0.3468506 v 0.9523563 c 0,0.1921222 0.1545367,0.3468507 0.3466593,0.3468507 h 0.9525479 c 0.1921221,0 0.3468506,-0.154728 0.3468506,-0.3468507 V 2.1045114 c 0,-0.1921221 -0.154728,-0.3468506 -0.3468506,-0.3468506 z m 0.06868,1.7357835 v 0.3529726 z m 0.4076883,0 v 0.3529726 z m 0.4076882,0 v 0.3529726 z" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 2.4402797,2.172976 H 2.0873449"
-               id="path1075" />
+               id="path1264" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 2.4402797,2.5806764 H 2.0873449"
-               id="path1077" />
+               id="path1262" />
             <path
-               style="fill:none;stroke:#d1ac00;stroke-width:0.179554;stroke-dasharray:none;stroke-opacity:1"
+               style="fill:none;stroke:#d1ac00;stroke-width:0.116748;stroke-dasharray:none;stroke-opacity:1"
                d="M 2.4402797,2.988377 H 2.0873449"
-               id="path1079" />
+               id="path1260" />
           </g>
         </g>
       </g>
