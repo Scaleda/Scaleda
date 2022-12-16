@@ -20,6 +20,7 @@ class VerilogCompletionContributor extends CompletionContributor {
     and(PlatformPatterns.psiElement.afterLeaf(";"),
       not(PlatformPatterns.psiElement.inside(classOf[StatementPsiNode]))),
     new ModuleItemOuterReferenceCompletionProvider)
+  // TODO: more contributors
   // private val namedPortConnectionPattern = PlatformPatterns.psiElement()
   //   .inside(classOf[NamedPortConnectionPsiNode])
   //   .inside(classOf[PortIdentifierPsiNode])
