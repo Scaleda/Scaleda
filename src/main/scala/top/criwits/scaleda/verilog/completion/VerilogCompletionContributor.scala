@@ -26,4 +26,5 @@ class VerilogCompletionContributor extends CompletionContributor {
   // extend(CompletionType.BASIC,
   //   namedPortConnectionPattern,
   //   new NamedPortConnectionCompletionProvider)
+  // extend(CompletionType.BASIC, not(namedPortConnectionPattern), new LocalReferenceCompletionProvider)
 }
