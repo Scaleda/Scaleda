@@ -27,7 +27,7 @@
 				extensions="v" />
 		<lang.parserDefinition language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
 		<lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
-<!--		<lang.syntaxHighlighterFactory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>-->
+		<lang.syntaxHighlighterFactory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>
 
 	</extensions>
 
