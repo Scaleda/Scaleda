@@ -22,9 +22,10 @@
 	<extensions defaultExtensionNs="com.intellij">
 		<fileType
 				name="Verilog"
-				implementationClass="main.scala.lang.VerilogFileType"
+				implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
 				language="Verilog"
 				extensions="v" />
+		<lang.parserDefinition language="Verilog" />
 	</extensions>
 
 </idea-plugin>
