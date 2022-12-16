@@ -9,7 +9,7 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiLeafNode;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.criwits.scaleda.verilog.*;
+import top.criwits.scaleda.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.parser.VerilogLexer;
 
 public class IdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifierOwner {
@@ -38,7 +38,7 @@ public class IdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifier
         ASTNode currentChild = this.getNode().getFirstChildNode();
         ASTNode newChild = new ANTLRPsiLeafNode(
                 PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage$.MODULE$)
-                .get(VerilogLexer.SIMPLE_IDENTIFIER),
+                        .get(VerilogLexer.SIMPLE_IDENTIFIER),
                 name
         );
         this.getNode().replaceChild(currentChild, newChild);

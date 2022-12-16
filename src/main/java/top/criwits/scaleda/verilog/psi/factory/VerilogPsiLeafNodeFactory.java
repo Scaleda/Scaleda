@@ -1,14 +1,13 @@
 package top.criwits.scaleda.verilog.psi.factory;
 
-import com.intellij.lang.Language;
 import com.intellij.psi.tree.IElementType;
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.intellij.adaptor.lexer.TokenIElementType;
+import org.antlr.intellij.adaptor.psi.ANTLRPsiLeafNode;
+import org.jetbrains.annotations.NotNull;
 import top.criwits.scaleda.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.parser.VerilogLexer;
 import top.criwits.scaleda.verilog.psi.factory.nodes.SimpleIdentifierPsiLeafNode;
-import org.antlr.intellij.adaptor.psi.ANTLRPsiLeafNode;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ import java.util.Map;
 public class VerilogPsiLeafNodeFactory {
     // private static Language LANGUAGE = ;
 
-    private static Map<IElementType, Class<? extends ANTLRPsiLeafNode>> tokenIElementTypeClassMap =
+    private static final Map<IElementType, Class<? extends ANTLRPsiLeafNode>> tokenIElementTypeClassMap =
             new HashMap<>();
 
     static {
@@ -37,7 +36,8 @@ public class VerilogPsiLeafNodeFactory {
                 return tokenIElementTypeClassMap.get(type)
                         .getConstructor(CharSequence.class)
                         .newInstance(text);
-            } catch (ReflectiveOperationException ignored) {}
+            } catch (ReflectiveOperationException ignored) {
+            }
         }
         return new ANTLRPsiLeafNode(type, text);
     }

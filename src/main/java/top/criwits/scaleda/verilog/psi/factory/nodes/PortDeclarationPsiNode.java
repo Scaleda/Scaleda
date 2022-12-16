@@ -2,9 +2,9 @@ package top.criwits.scaleda.verilog.psi.factory.nodes;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import top.criwits.scaleda.verilog.psi.TypedDeclaration;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
+import top.criwits.scaleda.verilog.psi.TypedDeclaration;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

@@ -3,23 +3,21 @@ package top.criwits.scaleda.verilog.psi.factory;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.psi.tree.IElementType;
-import top.criwits.scaleda.verilog.psi.factory.nodes.*;
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.intellij.adaptor.lexer.RuleIElementType;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import top.criwits.scaleda.verilog.VerilogLanguage$;
-import top.criwits.scaleda.verilog.parser.*;
-import top.criwits.scaleda.verilog.psi.factory.nodes.IdentifierPsiNode;
-import top.criwits.scaleda.verilog.psi.factory.nodes.ModuleOrGenerateItemDeclarationPsiNode;
+import top.criwits.scaleda.verilog.parser.VerilogParser;
+import top.criwits.scaleda.verilog.psi.factory.nodes.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class VerilogPsiNodeFactory {
 
-    private static Language LANGUAGE = VerilogLanguage$.MODULE$;
+    private static final Language LANGUAGE = VerilogLanguage$.MODULE$;
 
-    private static Map<IElementType, Class<? extends ANTLRPsiNode>> ruleIElementTypeClassMap =
+    private static final Map<IElementType, Class<? extends ANTLRPsiNode>> ruleIElementTypeClassMap =
             new HashMap<>();
 
     static {

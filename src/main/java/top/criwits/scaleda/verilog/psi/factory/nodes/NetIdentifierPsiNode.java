@@ -4,11 +4,11 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.util.IncorrectOperationException;
-import top.criwits.scaleda.verilog.parser.VerilogLexer;
-import top.criwits.scaleda.verilog.psi.factory.VerilogPsiLeafNodeFactory;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.criwits.scaleda.verilog.parser.VerilogLexer;
+import top.criwits.scaleda.verilog.psi.factory.VerilogPsiLeafNodeFactory;
 
 public class NetIdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifierOwner {
 

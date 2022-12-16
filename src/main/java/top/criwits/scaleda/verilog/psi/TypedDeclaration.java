@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement;
 /**
  * Used in case when reference has some type
  * (e.g. "input", "parameter", "wire" for Verilog).
- *
+ * <p>
  * Recommended usage is when {@link TypedDeclaration}
  * is a parent of corresponding {@link com.intellij.psi.PsiNamedElement},
  * so when type string is needed it can be found by calling

@@ -1,16 +1,16 @@
 package top.criwits.scaleda.verilog.psi.factory.nodes
 
+//import top.criwits.scaleda.verilog.psi.ScopeNode
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
-//import top.criwits.scaleda.verilog.psi.ScopeNode
-import org.antlr.intellij.adaptor.psi.ScopeNode
-import top.criwits.scaleda.verilog.psi.factory.VerilogPsiLeafNodeFactory
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import org.antlr.intellij.adaptor.psi.ScopeNode
 import top.criwits.scaleda.verilog.parser.VerilogLexer
+import top.criwits.scaleda.verilog.psi.factory.VerilogPsiLeafNodeFactory
 
 class ModuleDeclarationPsiNode(node: ASTNode) : ANTLRPsiNode(node), PsiNameIdentifierOwner, ScopeNode {
     override fun resolve(element: PsiNamedElement?): PsiElement? {
