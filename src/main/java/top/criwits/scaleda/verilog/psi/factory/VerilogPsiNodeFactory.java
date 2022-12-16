@@ -9,6 +9,7 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import top.criwits.scaleda.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.factory.nodes.*;
+import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode;
 
 import java.util.HashMap;
 import java.util.Map;

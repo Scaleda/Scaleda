@@ -1,8 +1,11 @@
 package top.criwits.scaleda
 package verilog
 
+import verilog.psi.factory.nodes.ModuleDeclarationPsiNode
+
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{FileViewProvider, PsiElement, PsiNamedElement}
 import org.antlr.intellij.adaptor.SymtabUtils
 import org.antlr.intellij.adaptor.psi.ScopeNode
@@ -24,4 +27,12 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
   override def getIcon(flags: Int) = VerilogFileType.DefaultIcon
 
   override def getContext: ScopeNode = null
+
+  def getAvailableNamedElements: Array[PsiNamedElement] =
+    PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
+      .toArray
+      .map(x => x.asInstanceOf[PsiNamedElement])
+
+  def getAvailableNamedElementsLists =
+    PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
 }
