@@ -52,23 +52,20 @@ object VerilogParserDefinition {
     .map(x => if (x._2 == null) "<INVALID>" else x._2).toArray
   PSIElementTypeFactory.defineLanguageIElementTypes(VerilogLanguage, tokenNames, VerilogParser.ruleNames)
   val tokenIElementTypes = PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).toArray
-  // TODO: check ID =?= SIMPLE_IDENTIFIER
-  val ID = tokenIElementTypes(VerilogLexer.SIMPLE_IDENTIFIER)
+  // TODO: check ID =?= Simple_identifier
+  val ID = tokenIElementTypes(VerilogLexer.Simple_identifier)
   val FILE = new IFileElementType(VerilogLanguage)
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,
-    VerilogLexer.COMMENT,
-    VerilogLexer.COMMENTS,
-    // TODO: what XXX_NUMBER means?
-    VerilogLexer.COMMENT_5,
+    VerilogLexer.Block_comment,
+    VerilogLexer.One_line_comment,
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,
-    VerilogLexer.WHITE_SPACE,
-    VerilogLexer.WHITE_SPACE_7,
+    VerilogLexer.White_space,
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,
-    VerilogLexer.STRING
+    VerilogLexer.String
   )
 }

@@ -34,7 +34,7 @@ class ModuleDeclarationPsiNode(node: ASTNode) : ANTLRPsiNode(node), PsiNameIdent
     override fun setName(s: String): PsiElement? {
         return PsiTreeUtil
             .findChildOfType(this.nameIdentifier, SimpleIdentifierPsiLeafNode::class.java)
-            ?.replace(VerilogPsiLeafNodeFactory.create(VerilogLexer.SIMPLE_IDENTIFIER, s))
+            ?.replace(VerilogPsiLeafNodeFactory.create(VerilogLexer.Simple_identifier, s))
     }
 
 //    override fun getAvailableNamedElements(): Collection<PsiNamedElement> {

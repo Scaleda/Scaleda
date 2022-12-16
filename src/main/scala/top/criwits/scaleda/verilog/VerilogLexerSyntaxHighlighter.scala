@@ -22,28 +22,30 @@ class VerilogLexerSyntaxHighlighter extends SyntaxHighlighterBase {
     // println(s"t = ${t}")
     t match {
       // TODO: check is this block comments?
-      case VerilogLexer.COMMENTS => Array(createTextAttributesKey(
+      case VerilogLexer.Block_comment => Array(createTextAttributesKey(
         "VERILOG_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT))
-      case VerilogLexer.COMMENT => Array(createTextAttributesKey(
+      case VerilogLexer.One_line_comment => Array(createTextAttributesKey(
         "VERILOG_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT))
       case n if n == getTypeForLiteralName(";") => Array(createTextAttributesKey(
         "VERILOG_SEMICOLON", DefaultLanguageHighlighterColors.SEMICOLON))
       case n if n == getTypeForLiteralName(",") => Array(createTextAttributesKey(
-        "VERILOG_SEMICOLON", DefaultLanguageHighlighterColors.COMMA))
-      // case VerilogLexer.BINARY_NUMBER_MODE | VerilogLexer.BINARY_VALUE | VerilogLexer.BINARY_BASE |
-      //      // VerilogLexer.OCTAL_NUMBER_MODE | VerilogLexer.OCTAL_VALUE | VerilogLexer.OCTAL_BASE |
-      //      // VerilogLexer.HEX_NUMBER_MODE | VerilogLexer.HEX_VALUE | VerilogLexer.HEX_BASE |
-      //      // VerilogLexer.DECIMAL_NUMBER_MODE | VerilogLexer.DECIMAL_BASE |
-      //      VerilogLexer.REAL => Array(createTextAttributesKey(
-      //     "VERILOG_NUMBER", DefaultLanguageHighlighterColors.NUMBER))
-      // TODO: VerilogLexer.Dollar_identifier
+        "VERILOG_COMMA", DefaultLanguageHighlighterColors.COMMA))
+      case
+        VerilogLexer.Binary_number |
+        VerilogLexer.Octal_number |
+        VerilogLexer.Real_number |
+        VerilogLexer.Decimal_number |
+        VerilogLexer.Hex_number
+      => Array(createTextAttributesKey(
+        "VERILOG_NUMBER", DefaultLanguageHighlighterColors.NUMBER))
+      case VerilogLexer.Dollar_identifier => Array(createTextAttributesKey(
+        "VERILOG_DOLLAR_IDENTIFIER", DefaultLanguageHighlighterColors.KEYWORD))
       case n if VerilogKeywords.VERILOG_KEYWORDS.map(name => getTypeForLiteralName(name)).contains(n) =>
         Array(createTextAttributesKey(
           "VERILOG_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD))
-      case VerilogLexer.STRING => Array(createTextAttributesKey(
+      case VerilogLexer.String => Array(createTextAttributesKey(
         "VERILOG_STRING", DefaultLanguageHighlighterColors.STRING))
-      case VerilogLexer.MACRO_IDENTIFIER | VerilogLexer.SIMPLE_IDENTIFIER |
-           VerilogLexer.ESCAPED_IDENTIFIER | VerilogLexer.SYSTEM_TF_IDENTIFIER => Array(createTextAttributesKey(
+      case VerilogLexer.Simple_identifier | VerilogLexer.Time_identifier | VerilogLexer.Escaped_identifier => Array(createTextAttributesKey(
         "VERILOG_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER))
       case _ => Array()
     }

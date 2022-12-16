@@ -20,7 +20,7 @@ public class VerilogPsiLeafNodeFactory {
 
     static {
         tokenIElementTypeClassMap.put(
-                getTokenIElementType(VerilogLexer.SIMPLE_IDENTIFIER),
+                getTokenIElementType(VerilogLexer.Simple_identifier),
                 SimpleIdentifierPsiLeafNode.class
         );
     }

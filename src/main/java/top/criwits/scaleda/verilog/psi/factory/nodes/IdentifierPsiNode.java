@@ -38,7 +38,7 @@ public class IdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifier
         ASTNode currentChild = this.getNode().getFirstChildNode();
         ASTNode newChild = new ANTLRPsiLeafNode(
                 PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage$.MODULE$)
-                        .get(VerilogLexer.SIMPLE_IDENTIFIER),
+                        .get(VerilogLexer.Simple_identifier),
                 name
         );
         this.getNode().replaceChild(currentChild, newChild);

@@ -32,7 +32,7 @@ public class PortIdentifierPsiNode extends ANTLRPsiNode
 
     @Override
     public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
-        return getFirstChild().replace(VerilogPsiLeafNodeFactory.create(VerilogLexer.SIMPLE_IDENTIFIER, s));
+        return getFirstChild().replace(VerilogPsiLeafNodeFactory.create(VerilogLexer.Simple_identifier, s));
     }
 
 }
