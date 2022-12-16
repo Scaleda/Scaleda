@@ -4,7 +4,6 @@ package verilog
 import verilog.VerilogLogger.Log
 
 import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
-import com.intellij.openapi.util.IconLoader
 
 import javax.swing.Icon
 
