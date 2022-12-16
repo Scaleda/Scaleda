@@ -1,34 +1,38 @@
 <idea-plugin>
-	<id>top.criwits.scaleda</id>
-	<name>Scaleda</name>
-	<version>0.0.1-SNAPSHOT</version>
-	<vendor>Hans and Chiro</vendor>
+    <id>top.criwits.scaleda</id>
+    <name>Scaleda</name>
+    <version>0.0.1-SNAPSHOT</version>
+    <vendor>Hans and Chiro</vendor>
 
-	<description>A scalable FPGA EDA framework for IntelliJ platform.</description>
+    <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
 
-	<idea-version since-build="221.0"/>
+    <idea-version since-build="221.0"/>
 
-	<depends>com.intellij.properties</depends>
-	<depends>com.intellij.modules.platform</depends>
-	<depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.properties</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
 
-	<actions>
+    <actions>
 
-	</actions>
+    </actions>
 
-	<applicationListeners>
-	</applicationListeners>
+    <applicationListeners>
+    </applicationListeners>
 
-	<extensions defaultExtensionNs="com.intellij">
-		<fileType
-				name="Verilog"
-				implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
-				language="Verilog"
-				extensions="v" />
-		<lang.parserDefinition language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
-		<lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
-		<lang.syntaxHighlighterFactory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType
+                name="Verilog"
+                implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
+                language="Verilog"
+                extensions="v"/>
+        <lang.parserDefinition language="Verilog"
+                               implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
+        <lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
+        <lang.syntaxHighlighterFactory language="Verilog"
+                                       implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>
+        <completion.contributor language="Verilog"
+                                implementationClass="top.criwits.scaleda.verilog.completion.VerilogCompletionContributor"/>
 
-	</extensions>
+    </extensions>
 
 </idea-plugin>
