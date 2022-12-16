@@ -36,6 +36,8 @@
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.VerilogReferenceAnnotator"/>
+        <lang.commenter language="Verilog"
+                        implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
     </extensions>
 
 </idea-plugin>
