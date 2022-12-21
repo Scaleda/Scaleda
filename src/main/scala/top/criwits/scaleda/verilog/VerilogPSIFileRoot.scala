@@ -9,6 +9,8 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{FileViewProvider, PsiNamedElement}
 
+import javax.swing.Icon
+
 class VerilogPSIFileRoot(viewProvider: FileViewProvider)
   extends PsiFileBase(viewProvider, VerilogLanguage) with ScopeNode {
 
@@ -16,7 +18,7 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
 
   override def toString: String = "Verilog file"
 
-  override def getIcon(flags: Int) = VerilogFileType.DefaultIcon
+  override def getIcon(flags: Int): Icon = VerilogFileType.DefaultIcon
 
   override def getContext: ScopeNode = null
 
