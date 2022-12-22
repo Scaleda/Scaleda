@@ -38,6 +38,13 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.VerilogReferenceAnnotator"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
+        <moduleBuilder
+            builderClass="top.criwits.scaleda.project.wizard.RTLModuleWizardStep"
+            id="RTL_WIZARD"
+            order="first" />
+
+        <projectConfigurable groupId="tools" displayName="EDA Paths" id="pathcfg"
+                             instance="top.criwits.scaleda.config.EDAPathConfig" />
     </extensions>
 
 </idea-plugin>
