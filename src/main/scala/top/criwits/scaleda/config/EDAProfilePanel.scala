@@ -18,6 +18,9 @@ class EDAProfilePanel extends JPanel(new BorderLayout) {
   private val myListModel = new MyListModel
   private val myList = new JBList[EDAProfile](myListModel)
 
+  // Storage
+  private def profiles = EDAProfileState.getInstance.profiles
+
   // Init panel
   initPanel()
   private def initPanel(): Unit = {

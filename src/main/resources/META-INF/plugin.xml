@@ -45,6 +45,7 @@
 
         <projectConfigurable groupId="tools" displayName="EDA Paths" id="pathcfg"
                              instance="top.criwits.scaleda.config.EDAProfileConfigurable" />
+        <applicationService serviceImplementation="top.criwits.scaleda.config.EDAProfileState" />
     </extensions>
 
 </idea-plugin>
