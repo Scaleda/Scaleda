@@ -4,6 +4,7 @@ package config
 import com.intellij.openapi.application.{Application, ApplicationManager}
 import com.intellij.openapi.components.{PersistentStateComponent, ServiceManager, State, Storage}
 import com.intellij.util.xmlb.XmlSerializerUtil
+import top.criwits.scaleda.toolchain.ToolchainProfile
 
 @State(
   name = "top.criwits.scaleda.EDAProfiles",
@@ -11,7 +12,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 )
 class EDAProfileState extends PersistentStateComponent[EDAProfileState] {
   // Profiles
-  val profiles: Seq[EDAProfile] = Seq.empty
+  val profiles: Seq[ToolchainProfile] = Seq.empty
 
   override def getState: EDAProfileState = this
 
@@ -20,5 +21,5 @@ class EDAProfileState extends PersistentStateComponent[EDAProfileState] {
 
 object EDAProfileState {
   def getInstance: EDAProfileState = ApplicationManager.getApplication
-    .getService(EDAProfileState.getClass[EDAProfileState])
+    .getService(classOf[EDAProfileState])
 }
