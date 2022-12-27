@@ -20,6 +20,10 @@
     </applicationListeners>
 
     <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="top.criwits.scaleda.ScaledaMain"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
         <fileType
                 name="Verilog"
                 implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
@@ -39,13 +43,13 @@
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
         <moduleBuilder
-            builderClass="top.criwits.scaleda.project.wizard.RTLModuleWizardStep"
-            id="RTL_WIZARD"
-            order="first" />
+                builderClass="top.criwits.scaleda.project.wizard.RTLModuleWizardStep"
+                id="RTL_WIZARD"
+                order="first"/>
 
         <applicationConfigurable groupId="tools" displayName="EDA Paths" id="pathcfg"
-                             instance="top.criwits.scaleda.config.EDAProfileConfigurable" />
-        <applicationService serviceImplementation="top.criwits.scaleda.config.EDAProfileState" />
+                                 instance="top.criwits.scaleda.config.EDAProfileConfigurable"/>
+        <applicationService serviceImplementation="top.criwits.scaleda.config.EDAProfileState"/>
     </extensions>
 
 </idea-plugin>
