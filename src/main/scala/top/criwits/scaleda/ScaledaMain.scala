@@ -8,6 +8,8 @@ import com.intellij.openapi.startup.StartupActivity
 class ScaledaMain extends DumbAware with StartupActivity {
   override def runActivity(project: Project) = {
     MainLogger.Log.warn("Hi there, it's scaleda! Launching...")
+    // check is having project config
+    if
     MainLogger.Log.warn("Scaleda launched.")
   }
 }

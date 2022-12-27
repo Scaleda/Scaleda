@@ -90,11 +90,10 @@ public class VerilogPsiNodeFactory {
                 getRuleIElementType(VerilogParser.RULE_named_port_connection),
                 NamedPortConnectionPsiNode.class
         );
-        // TODO: directive?
-        // ruleIElementTypeClassMap.put(
-        //         getRuleIElementType(VerilogParser.RULE_directive),
-        //         DirectivePsiNode.class
-        // );
+        ruleIElementTypeClassMap.put(
+                getRuleIElementType(VerilogParser.RULE_directive),
+                DirectivePsiNode.class
+        );
         ruleIElementTypeClassMap.put(
                 getRuleIElementType(VerilogParser.RULE_source_text),
                 SourceTextPsiNode.class
