@@ -37,3 +37,5 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     xml.version = version.value
   }
 )
+
+lazy val scaledaShell = project in file("scaleda-shell")
