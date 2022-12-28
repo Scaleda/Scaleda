@@ -2,8 +2,6 @@ package top.criwits.scaleda.config;
 
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import top.criwits.scaleda.toolchain.ToolchainProfile;
-import top.criwits.scaleda.toolchain.ToolchainType;
-import top.criwits.scaleda.toolchain.ToolchainType$;
 
 import javax.swing.*;
 

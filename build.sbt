@@ -35,5 +35,7 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   packageLibraryMappings := Seq.empty, // allow scala-library
   patchPluginXml := pluginXmlOptions { xml =>
     xml.version = version.value
-  }
+  },
+  assembly / assemblyJarName := "scaleda.jar",
+  assembly / mainClass := Some("top.criwits.scaleda.shell.ScaledaShellMain"),
 )
