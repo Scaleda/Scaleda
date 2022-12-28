@@ -48,7 +48,7 @@
               <text value="Profile name"/>
             </properties>
           </component>
-          <component id="8132" class="javax.swing.JTextField" binding="ProfileName">
+          <component id="8132" class="javax.swing.JTextField" binding="profileName">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -62,7 +62,7 @@
               <text value="Toolchain type"/>
             </properties>
           </component>
-          <component id="8b426" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+          <component id="8b426" class="javax.swing.JComboBox" binding="toolType">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
