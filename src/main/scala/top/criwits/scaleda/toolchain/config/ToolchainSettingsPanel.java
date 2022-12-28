@@ -1,13 +1,11 @@
-package top.criwits.scaleda.config;
+package top.criwits.scaleda.toolchain.config;
 
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import top.criwits.scaleda.toolchain.ToolchainProfile;
-import top.criwits.scaleda.toolchain.ToolchainType;
-import top.criwits.scaleda.toolchain.ToolchainType$;
 
 import javax.swing.*;
 
-public class EDASettingsPanel {
+public class ToolchainSettingsPanel {
     private TextFieldWithBrowseButton EDAInstallPath;
     private JTextField profileName;
     private JComboBox toolType;
@@ -19,6 +17,7 @@ public class EDASettingsPanel {
     }
 
     public void loadToolchainTypes() {
+
     }
 
     public void disableAll() {
@@ -33,6 +32,7 @@ public class EDASettingsPanel {
     public void loadProfile(ToolchainProfile profile) {
         profileName.setText(profile.name());
         profileName.setEnabled(true);
+
 
     }
     public ToolchainProfile getProfile() {

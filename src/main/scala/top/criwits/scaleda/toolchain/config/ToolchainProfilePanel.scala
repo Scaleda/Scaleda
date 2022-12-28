@@ -1,29 +1,38 @@
 package top.criwits.scaleda
-package config
+package toolchain.config
 
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.{AnActionButton, AnActionButtonRunnable, ColoredListCellRenderer, ToolbarDecorator}
 import com.intellij.ui.components.JBList
 import com.intellij.util.ui.JBUI
 import top.criwits.scaleda.toolchain.ToolchainProfile
+import top.criwits.scaleda.toolchain.impl.Vivado
 
 import java.awt.BorderLayout
+import java.io.File
+import java.util.UUID
+import javax.swing.event.ListSelectionEvent
 import javax.swing.{DefaultListModel, JList, JPanel}
 import scala.annotation.nowarn
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 
-class EDAProfilePanel extends JPanel(new BorderLayout) {
+class ToolchainProfilePanel extends JPanel(new BorderLayout) {
   // Right side, setting panel
-  private val mySettingsPanel = new EDASettingsPanel
+  private val mySettingsPanel = new ToolchainSettingsPanel
 
   // Left side, list
   private val myListModel = new MyListModel
   private val myList = new JBList[ToolchainProfile](myListModel)
 
+  private var mySelectedProfile: ToolchainProfile = _
+
   // Storage
-  private def profiles = EDAProfileState.getInstance.profiles
+  private def profiles = ToolchainProfiles.getInstance.getProfiles().getLinkedExternalProjectsSettings
 
   // Init panel
   initPanel()
+  // Load items
+  reloadItems()
   private def initPanel(): Unit = {
     val splitter = new Splitter(false, 0.3f)
     add(splitter, BorderLayout.CENTER)
@@ -32,6 +41,7 @@ class EDAProfilePanel extends JPanel(new BorderLayout) {
     val listPanel = ToolbarDecorator.createDecorator(myList)
       .setAddAction((_: AnActionButton) => addProfile())
       .createPanel()
+    myList.addListSelectionListener(onItemSelected)
     splitter.setFirstComponent(listPanel)
 
     myList.setCellRenderer(new MyCellRenderer)
@@ -39,11 +49,17 @@ class EDAProfilePanel extends JPanel(new BorderLayout) {
     val settingsComponent = mySettingsPanel.getComponent
     settingsComponent.setBorder(JBUI.Borders.emptyLeft(6))
     splitter.setSecondComponent(settingsComponent)
+
+    // test
+  }
+
+  private def onItemSelected(e: ListSelectionEvent): Unit = {
+
   }
 
   private def reloadItems(): Unit = {
     myListModel.clear()
-    profiles.zipWithIndex.foreach(m => myListModel.add(m._2, m._1))
+//    profiles.zipWithIndex.foreach(m => myListModel.add(m._2, m._1))
   }
 
   private def addProfile(): Unit = {

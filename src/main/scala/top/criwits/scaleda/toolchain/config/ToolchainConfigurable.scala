@@ -1,13 +1,13 @@
 package top.criwits.scaleda
-package config
+package toolchain.config
 
 import com.intellij.openapi.options.SearchableConfigurable
 
 import javax.swing.JComponent
 
-class EDAProfileConfigurable
+class ToolchainConfigurable
   extends SearchableConfigurable {
-  private val configUI = new EDAProfilePanel
+  private val configUI = new ToolchainProfilePanel
   override def getId: String = "edaprofile"
 
   override def getDisplayName: String = "edaprofile"
