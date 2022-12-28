@@ -31,6 +31,7 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     "org.antlr" % "antlr4" % "4.11.1",
     "org.antlr" % "antlr4-runtime" % "4.11.1",
     "io.circe" %% "circe-yaml" % "0.14.2",
+    "com.github.scopt" %% "scopt" % "4.1.0",
   ),
   packageLibraryMappings := Seq.empty, // allow scala-library
   patchPluginXml := pluginXmlOptions { xml =>
