@@ -20,6 +20,10 @@
     </applicationListeners>
 
     <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="top.criwits.scaleda.ScaledaMain"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
         <fileType
                 name="Verilog"
                 implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
@@ -45,6 +49,7 @@
 
         <toolWindow id="Scaleda" secondary="false" anchor="right" icon="/icons/logo.png"
                 factoryClass="top.criwits.scaleda.project.ScaledaToolWindowFactory"/>
+
     </extensions>
 
 </idea-plugin>

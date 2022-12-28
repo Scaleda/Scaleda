@@ -29,10 +29,14 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     "com.novocode" % "junit-interface" % junitInterfaceVersion % Test,
     "org.antlr" % "antlr4-intellij-adaptor" % "0.1",
     "org.antlr" % "antlr4" % "4.11.1",
-    "org.antlr" % "antlr4-runtime" % "4.11.1"
+    "org.antlr" % "antlr4-runtime" % "4.11.1",
+    "io.circe" %% "circe-yaml" % "0.14.2",
+    "com.github.scopt" %% "scopt" % "4.1.0",
   ),
   packageLibraryMappings := Seq.empty, // allow scala-library
   patchPluginXml := pluginXmlOptions { xml =>
     xml.version = version.value
-  }
+  },
+  assembly / assemblyJarName := "scaleda.jar",
+  assembly / mainClass := Some("top.criwits.scaleda.shell.ScaledaShellMain"),
 )
