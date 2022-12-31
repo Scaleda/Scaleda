@@ -5,7 +5,7 @@ import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.intellij.adaptor.lexer.TokenIElementType;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiLeafNode;
 import org.jetbrains.annotations.NotNull;
-import top.criwits.scaleda.verilog.VerilogLanguage$;
+import top.criwits.scaleda.idea.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.parser.VerilogLexer;
 import top.criwits.scaleda.verilog.psi.factory.nodes.SimpleIdentifierPsiLeafNode;
 
