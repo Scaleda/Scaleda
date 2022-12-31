@@ -1,15 +1,15 @@
 package top.criwits.scaleda
 package kernel.simulation
 
-import top.criwits.scaleda.kernel.simulation.iverilog.IVerilog
-import top.criwits.scaleda.kernel.simulation.verilator.Verilator
+import top.criwits.scaleda.kernel.toolchain.executor.SimulationExecutor
+import top.criwits.scaleda.kernel.toolchain.impl.{IVerilog, Verilator}
 
 /**
  * Basic Simulator
  *
  * @param config config
  */
-abstract class Simulator(val config: SimulationConfig) {
+abstract class Simulator(val config: SimulationExecutor) {
   /**
    * Run simulation by config
    *
@@ -20,7 +20,7 @@ abstract class Simulator(val config: SimulationConfig) {
 
 object Simulator {
   val simulators = Map(
-    "iverilog" -> ((config: SimulationConfig) => new IVerilog(config)),
-    "verilator" -> ((config: SimulationConfig) => new Verilator(config)),
+    "iverilog" -> ((config: SimulationExecutor) => new IVerilog(config)),
+    "verilator" -> ((config: SimulationExecutor) => new Verilator(config)),
   )
 }

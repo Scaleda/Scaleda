@@ -1,4 +1,4 @@
-package top.criwits.scaleda.kernel.toolchain.config;
+package top.criwits.scaleda.idea.config;
 
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import top.criwits.scaleda.kernel.toolchain.ToolchainProfile;

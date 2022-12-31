@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.{AnActionButton, AnActionButtonRunnable, ColoredListCellRenderer, ToolbarDecorator}
 import com.intellij.ui.components.JBList
 import com.intellij.util.ui.JBUI
+import top.criwits.scaleda.idea.config.ToolchainSettingsPanel
 import top.criwits.scaleda.kernel.toolchain.ToolchainProfile
 import top.criwits.scaleda.kernel.toolchain.impl.Vivado
 

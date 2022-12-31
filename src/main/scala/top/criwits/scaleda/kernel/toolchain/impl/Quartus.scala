@@ -1,9 +1,12 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import top.criwits.scaleda.kernel.toolchain.ToolchainType
+import kernel.toolchain.Toolchain
 
-class Quartus extends ToolchainType{
-  override val userFriendName: String = "Intel Quartus"
+import top.criwits.scaleda.kernel.toolchain.executor.Executor
+
+
+class Quartus(executor: Executor) extends Toolchain(executor: Executor){
+  override val userFriendlyName: String = "Intel Quartus"
   override val internalID: String = "quartus"
 }

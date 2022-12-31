@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package kernel.project.config
+package idea.config
 
 import com.intellij.openapi.externalSystem.settings.ExternalSystemSettingsListener
 
