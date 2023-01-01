@@ -1,12 +1,17 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import kernel.simulation.Simulator
-import kernel.toolchain.executor.{Executor, SimulationExecutor}
+import kernel.toolchain.executor.Executor
+import kernel.toolchain.Toolchain
 
-import top.criwits.scaleda.kernel.toolchain.Toolchain
+import top.criwits.scaleda.kernel.toolchain.impl.IVerilog.{internalID, userFriendlyName}
 
 class IVerilog(executor: Executor) extends Toolchain(executor) {
-  override val userFriendlyName: String = "Icarus Verilog"
-  override val internalID: String = "iverilog"
+  override def getInternalID: String = internalID
+  override def getName: String = userFriendlyName
+}
+
+object IVerilog {
+  val userFriendlyName: String = "Icarus Verilog"
+  val internalID: String = "iverilog"
 }

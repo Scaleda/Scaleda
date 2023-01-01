@@ -1,12 +1,27 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import kernel.toolchain.Toolchain
+import kernel.toolchain.{Toolchain, ToolchainProfile}
 
 import top.criwits.scaleda.kernel.toolchain.executor.Executor
+import top.criwits.scaleda.kernel.toolchain.impl.Vivado.{internalID, userFriendlyName}
 
+import java.io.File
 
+/**
+ * Implementation for EDA toolchain software, Vivado
+ * @param executor An [[Executor]] used to hold information like configurations.
+ */
 class Vivado(executor: Executor) extends Toolchain(executor) {
-  override val userFriendlyName: String = "Xilinx Vivado"
-  override val internalID: String = "vivado"
+  override def getInternalID: String = internalID
+  override def getName: String = userFriendlyName
+}
+
+object Vivado {
+  val userFriendlyName: String = "Xilinx Vivado"
+  val internalID: String = "vivado"
+
+  case class Profile(
+                    toolchainPath: File,
+                    ) extends ToolchainProfile
 }

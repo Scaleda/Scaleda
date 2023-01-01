@@ -10,8 +10,8 @@ import top.criwits.scaleda.kernel.toolchain.impl.{IVerilog, PDS, Quartus, Verila
  * @param executor An [[Executor]] used to hold information like configurations.
  */
 abstract class Toolchain(val executor: Executor) {
-  val userFriendlyName: String
-  val internalID: String
+  def getInternalID: String
+  def getName: String
 
   def simulate(): Unit = ???
   def synthesise(): Unit = ???
@@ -21,11 +21,11 @@ abstract class Toolchain(val executor: Executor) {
 
 object Toolchain {
   val toolchains: Map[String, Executor => Toolchain] = Map(
-    "vivado" -> ((executor: Executor) => new Vivado(executor)),
-    "quartus" -> ((executor: Executor) => new Quartus(executor)),
-    "pds" -> ((executor: Executor) => new PDS(executor)),
-    "verilator" -> ((executor: Executor) => new Verilator(executor)),
-    "iverilog" -> ((executor: Executor) => new IVerilog(executor)),
+    Vivado.internalID -> ((executor: Executor) => new Vivado(executor)),
+    Quartus.internalID -> ((executor: Executor) => new Quartus(executor)),
+    PDS.internalID -> ((executor: Executor) => new PDS(executor)),
+    Verilator.internalID -> ((executor: Executor) => new Verilator(executor)),
+    IVerilog.internalID -> ((executor: Executor) => new IVerilog(executor)),
   )
 
 }

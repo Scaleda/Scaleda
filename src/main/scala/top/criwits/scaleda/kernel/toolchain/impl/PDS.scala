@@ -3,8 +3,14 @@ package kernel.toolchain.impl
 
 import top.criwits.scaleda.kernel.toolchain.Toolchain
 import top.criwits.scaleda.kernel.toolchain.executor.Executor
+import top.criwits.scaleda.kernel.toolchain.impl.PDS.{internalID, userFriendlyName}
 
-class PDS(executor: Executor) extends Toolchain(executor: Executor) {
-  override val userFriendlyName: String = "Pango PDS"
-  override val internalID: String = "pds"
+class PDS(executor: Executor) extends Toolchain(executor) {
+  override def getInternalID: String = internalID
+  override def getName: String = userFriendlyName
+}
+
+object PDS {
+  val userFriendlyName: String = "Pango PDS"
+  val internalID: String = "pds"
 }
