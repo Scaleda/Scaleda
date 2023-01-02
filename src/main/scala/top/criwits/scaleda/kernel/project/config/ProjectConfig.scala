@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-// import org.virtuslab.yaml._
+import com.fasterxml.jackson.module.scala.JacksonModule
 
 case class ProjectConfig
 (
@@ -9,3 +9,5 @@ case class ProjectConfig
   `type`: String = "rtl",
   src: String = ""
 )
+
+// object ProjectConfig extends ProjectConfig

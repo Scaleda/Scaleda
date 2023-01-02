@@ -32,7 +32,9 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     "org.antlr" % "antlr4-runtime" % "4.11.1",
     "io.circe" %% "circe-yaml" % "0.14.2",
     "com.github.scopt" %% "scopt" % "4.1.0",
-  ),
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.1",
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.14.1",
+),
   packageLibraryMappings := Seq.empty, // allow scala-library
   patchPluginXml := pluginXmlOptions { xml =>
     xml.version = version.value
