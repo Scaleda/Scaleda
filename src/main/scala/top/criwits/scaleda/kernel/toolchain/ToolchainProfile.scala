@@ -6,4 +6,5 @@ import java.io.File
 /**
  * Base class for a profile for a specific toolchain
  */
-abstract class ToolchainProfile
+abstract class ToolchainProfile(val profileID: String) {
+}

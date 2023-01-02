@@ -74,7 +74,6 @@ class ToolchainProfilePanel extends JPanel(new BorderLayout) {
   private class MyCellRenderer extends ColoredListCellRenderer[ToolchainProfile] {
     override def customizeCellRenderer(list: JList[_ <: ToolchainProfile], value: ToolchainProfile, index: Int, selected: Boolean,
                                        hasFocus: Boolean): Unit = {
-      append(value.name)
     }
 
   }

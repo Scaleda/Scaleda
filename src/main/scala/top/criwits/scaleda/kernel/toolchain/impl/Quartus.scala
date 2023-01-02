@@ -20,5 +20,5 @@ object Quartus {
 
   case class Profile(
                     toolchainPath: File,
-                    ) extends ToolchainProfile
+                    ) extends ToolchainProfile(internalID)
 }

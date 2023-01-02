@@ -2,7 +2,6 @@ package top.criwits.scaleda
 package kernel.shell
 
 import scopt.OParser
-import top.criwits.scaleda.kernel.simulation.Simulator
 
 import java.io.File
 
@@ -32,7 +31,8 @@ object ScaledaShellMain {
           .children(
             opt[String]('s', "simulator")
               .action((x, c) => c.copy(runSimulation = x))
-              .text(s"Run simulation, available: ${Simulator.simulators.keys.mkString(", ")}"),
+              .text(s"Run simulation"),
+//            .text(s"Run simulation, available: ${Simulator.simulators.keys.mkString(", ")}"),
           ),
         help("help").text("Prints this usage text"),
       )

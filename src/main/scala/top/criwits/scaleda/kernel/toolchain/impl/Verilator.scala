@@ -18,9 +18,9 @@ object Verilator {
   val internalID: String = "verilator"
 
   case class Profile(
-                    installType: String, // "msys2", "cygwin" (for Windows)
-                    toolchainPath: File,
-                    ) extends ToolchainProfile
+                    verilatorPath: File,
+                    gccPath: File
+                    ) extends ToolchainProfile(internalID)
 }
 
 

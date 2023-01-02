@@ -21,7 +21,5 @@ object Vivado {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String = "vivado"
 
-  case class Profile(
-                    toolchainPath: File,
-                    ) extends ToolchainProfile
+  class Profile() extends ToolchainProfile(internalID)
 }
