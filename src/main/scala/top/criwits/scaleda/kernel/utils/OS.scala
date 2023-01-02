@@ -2,14 +2,25 @@ package top.criwits.scaleda
 package kernel.utils
 
 /**
- * OS type detecter
+ * OS-related functions, including OS type detection, user home directory resolver and etc.
  */
 object OS extends Enumeration {
-  private val osName = System.getProperty("os.name").toLowerCase()
+  // Enumeration items for different OSes
   val Windows, Unix, MacOS = Value
-  def getOSType: Value = osName match {
+
+  /**
+   * Get host OS type
+   * @return [[Windows]], [[Unix]] or [[MacOS]]
+   */
+  def getOSType: Value = System.getProperty("os.name").toLowerCase() match {
     case name if (name.indexOf("win") >= 0) => Windows
     case name if (name.indexOf("mac") >= 0) => MacOS
     case _ => Unix
   }
+
+  /**
+   * Get user home directory path, i.e. `~`
+   * @return
+   */
+  def getUserHome: String = System.getProperty("user.home")
 }

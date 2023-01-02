@@ -1,34 +1,26 @@
 package top.criwits.scaleda
-package kernel.toolchain.config
+package idea.settings.toolchains
+
+import kernel.toolchain.ToolchainProfile
 
 import com.intellij.openapi.ui.Splitter
-import com.intellij.ui.{AnActionButton, AnActionButtonRunnable, ColoredListCellRenderer, ToolbarDecorator}
 import com.intellij.ui.components.JBList
+import com.intellij.ui.{AnActionButton, ColoredListCellRenderer, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
-import top.criwits.scaleda.idea.config.ToolchainSettingsPanel
-import top.criwits.scaleda.kernel.toolchain.ToolchainProfile
 import top.criwits.scaleda.kernel.toolchain.impl.Vivado
 
 import java.awt.BorderLayout
-import java.io.File
-import java.util.UUID
 import javax.swing.event.ListSelectionEvent
-import javax.swing.{DefaultListModel, JList, JPanel}
+import javax.swing._
 import scala.annotation.nowarn
-import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 
-class ToolchainProfilePanel extends JPanel(new BorderLayout) {
+class ToolchainsPanel extends JPanel(new BorderLayout) {
   // Right side, setting panel
-  private val mySettingsPanel = new ToolchainSettingsPanel
+  private val mySettingsPanel: JComponent = new JLabel("Test")
 
   // Left side, list
   private val myListModel = new MyListModel
   private val myList = new JBList[ToolchainProfile](myListModel)
-
-  private var mySelectedProfile: ToolchainProfile = _
-
-  // Storage
-  private def profiles = ToolchainProfiles.getInstance.getProfiles().getLinkedExternalProjectsSettings
 
   // Init panel
   initPanel()
@@ -47,11 +39,12 @@ class ToolchainProfilePanel extends JPanel(new BorderLayout) {
 
     myList.setCellRenderer(new MyCellRenderer)
 
-    val settingsComponent = mySettingsPanel.getComponent
+    val settingsComponent = mySettingsPanel
     settingsComponent.setBorder(JBUI.Borders.emptyLeft(6))
     splitter.setSecondComponent(settingsComponent)
 
     // test
+    myListModel.add(0, new Vivado.Profile("1!5!", "HI"))
   }
 
   private def onItemSelected(e: ListSelectionEvent): Unit = {
@@ -67,14 +60,12 @@ class ToolchainProfilePanel extends JPanel(new BorderLayout) {
 
   }
 
-  private class MyListModel extends DefaultListModel[ToolchainProfile] {
+  private class MyListModel extends DefaultListModel[ToolchainProfile]
 
-  }
 
   private class MyCellRenderer extends ColoredListCellRenderer[ToolchainProfile] {
     override def customizeCellRenderer(list: JList[_ <: ToolchainProfile], value: ToolchainProfile, index: Int, selected: Boolean,
-                                       hasFocus: Boolean): Unit = {
-    }
+                                       hasFocus: Boolean): Unit = append(value.profileName)
 
   }
 

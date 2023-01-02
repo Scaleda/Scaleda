@@ -19,6 +19,7 @@ object Quartus {
   val internalID: String = "quartus"
 
   case class Profile(
-                    toolchainPath: File,
-                    ) extends ToolchainProfile(internalID)
+                    override val profileName: String,
+                    path: String,
+                    ) extends ToolchainProfile(internalID, profileName)
 }

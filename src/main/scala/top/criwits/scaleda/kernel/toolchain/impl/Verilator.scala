@@ -18,9 +18,10 @@ object Verilator {
   val internalID: String = "verilator"
 
   case class Profile(
-                    verilatorPath: File,
-                    gccPath: File
-                    ) extends ToolchainProfile(internalID)
+                      override val profileName: String,
+                      verilatorPath: String,
+                      buildToolPath: String
+                    ) extends ToolchainProfile(internalID, profileName)
 }
 
 

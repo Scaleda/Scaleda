@@ -23,6 +23,7 @@
         <postStartupActivity implementation="top.criwits.scaleda.idea.ScaledaMain"/>
     </extensions>
 
+    <!-- Verilog Support -->
     <extensions defaultExtensionNs="com.intellij">
         <fileType
                 name="Verilog"
@@ -43,12 +44,19 @@
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.idea.verilog.commenter.VerilogCommenter"/>
 
-        <applicationConfigurable groupId="build" displayName="Scaleda Toolchains" id="scaleda.toolchains"
-                             instance="top.criwits.scaleda.kernel.toolchain.config.ToolchainConfigurable" />
-        <applicationService serviceImplementation="top.criwits.scaleda.toolchain.config.ToolchainProfileState" />
 
-<!--        <toolWindow id="Scaleda" secondary="false" anchor="right" icon="/icons/logo.png"-->
-<!--                factoryClass="top.criwits.scaleda.idea.panel.ScaledaToolWindowFactory"/>-->
+        <!--        <toolWindow id="Scaleda" secondary="false" anchor="right" icon="/icons/logo.png"-->
+        <!--                factoryClass="top.criwits.scaleda.idea.panel.ScaledaToolWindowFactory"/>-->
+
+    </extensions>
+
+    <!-- Settings -->
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable groupId="build"
+                                 bundle="bundles.ScaledaBundle"
+                                 key="settings.toolchains"
+                                 id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
+                                 instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable" />
 
     </extensions>
 

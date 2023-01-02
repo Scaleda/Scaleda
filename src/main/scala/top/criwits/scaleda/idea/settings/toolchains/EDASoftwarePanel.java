@@ -1,12 +1,11 @@
-package top.criwits.scaleda.idea.config;
+package top.criwits.scaleda.idea.settings.toolchains;
 
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import top.criwits.scaleda.kernel.toolchain.ToolchainProfile;
 import top.criwits.scaleda.kernel.toolchain.ToolchainProfile;
 
 import javax.swing.*;
 
-public class ToolchainSettingsPanel {
+public class EDASoftwarePanel {
     private TextFieldWithBrowseButton EDAInstallPath;
     private JTextField profileName;
     private JComboBox toolType;
