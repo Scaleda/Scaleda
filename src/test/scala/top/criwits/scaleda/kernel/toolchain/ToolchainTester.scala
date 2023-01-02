@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain
 
+import kernel.utils.OS
+
 object ToolchainTester extends App {
-  println("1! 5! Bro here is testing ToolchainLoader for you!")
 }

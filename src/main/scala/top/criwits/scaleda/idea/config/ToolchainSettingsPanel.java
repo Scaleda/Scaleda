@@ -31,8 +31,6 @@ public class ToolchainSettingsPanel {
     }
 
     public void loadProfile(ToolchainProfile profile) {
-        profileName.setText(profile.name());
-        profileName.setEnabled(true);
 
 
     }

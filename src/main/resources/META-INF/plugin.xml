@@ -47,8 +47,8 @@
                              instance="top.criwits.scaleda.kernel.toolchain.config.ToolchainConfigurable" />
         <applicationService serviceImplementation="top.criwits.scaleda.toolchain.config.ToolchainProfileState" />
 
-        <toolWindow id="Scaleda" secondary="false" anchor="right" icon="/icons/logo.png"
-                factoryClass="top.criwits.scaleda.idea.panel.ScaledaToolWindowFactory"/>
+<!--        <toolWindow id="Scaleda" secondary="false" anchor="right" icon="/icons/logo.png"-->
+<!--                factoryClass="top.criwits.scaleda.idea.panel.ScaledaToolWindowFactory"/>-->
 
     </extensions>
 
