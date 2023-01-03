@@ -69,8 +69,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
   }
 
   private def loadItem(profile: ToolchainProfile): Unit = splitter.setSecondComponent(profile.toolchainType match {
-    case "vivado" | "iverilog" => new SinglePathConfigPanel(profile).getComponent
-    case _ => null
+    case _ => new SinglePathConfigPanel(profile).getComponent
   })
 
 
