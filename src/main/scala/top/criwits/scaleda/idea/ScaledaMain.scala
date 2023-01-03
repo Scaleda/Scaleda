@@ -12,10 +12,6 @@ import top.criwits.scaleda.kernel.toolchain.Toolchain
 
 class ScaledaMain extends DumbAware with StartupActivity {
   override def runActivity(project: Project): Unit = {
-
-    // Load toolchains
-    Toolchain.loadToolchainProfiles()
-
     // check is having project config
     var searchedFile: Option[VirtualFile] = None
     ProjectFileIndex.getInstance(project).iterateContent(fileOrDir => {
@@ -25,11 +21,11 @@ class ScaledaMain extends DumbAware with StartupActivity {
       true
     })
     if (searchedFile.isEmpty) {
-      MainLogger.Log.warn("there's no project config")
+      MainLogger.logger.warn("there's no project config")
     } else {
       val f = searchedFile.get
-      MainLogger.Log.info(s"found config: ${f}")
+      MainLogger.logger.info(s"found config: ${f}")
     }
-    MainLogger.Log.info("Scaleda launched.")
+    MainLogger.logger.info("Scaleda launched.")
   }
 }

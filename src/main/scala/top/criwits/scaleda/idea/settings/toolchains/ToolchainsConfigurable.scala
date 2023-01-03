@@ -3,6 +3,7 @@ package idea.settings.toolchains
 
 import com.intellij.openapi.options.SearchableConfigurable
 import top.criwits.scaleda.idea.ScaledaBundle
+import top.criwits.scaleda.kernel.toolchain.Toolchain
 
 import javax.swing.JComponent
 
@@ -14,9 +15,14 @@ class ToolchainsConfigurable
 
   override def createComponent(): JComponent = configUI
 
-  override def isModified: Boolean = true
+  override def isModified: Boolean = configUI.modified()
 
-  override def apply(): Unit = {
-    println("hey")
+  override def reset(): Unit = {
+    configUI.reset()
+    super.reset()
   }
+  override def apply(): Unit = {
+    configUI.apply()
+  }
+
 }

@@ -13,9 +13,4 @@ class PDS(executor: Executor) extends Toolchain(executor) {
 object PDS {
   val userFriendlyName: String = "Pango PDS"
   val internalID: String = "pds"
-
-  case class Profile(
-                      override val profileName: String,
-                      path: String
-                    ) extends ToolchainProfile(internalID, profileName)
 }

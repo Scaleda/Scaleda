@@ -18,8 +18,4 @@ object Quartus {
   val userFriendlyName: String = "Intel Quartus"
   val internalID: String = "quartus"
 
-  case class Profile(
-                    override val profileName: String,
-                    path: String,
-                    ) extends ToolchainProfile(internalID, profileName)
 }

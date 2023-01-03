@@ -1,13 +1,24 @@
 package top.criwits.scaleda
 package kernel.toolchain
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.annotations.Nls
 
 import java.io.File
 
 /**
- * Base class for a profile for a specific toolchain
+ * Class for a profile for a specific toolchain
  */
-abstract class ToolchainProfile(val toolchain: String, @Nls val profileName: String) {
-  var file: File = _
+class ToolchainProfile(var profileName: String,
+                       var toolchainType: String,
+                       var path: String) {
+  /**
+   * Handler to it's yaml file
+   */
+  @JsonIgnore
+  var file: Option[File] = None
+  @JsonIgnore
+  var edited: Boolean = false
+  @JsonIgnore
+  var removed: Boolean = false
 }

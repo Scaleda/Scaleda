@@ -14,9 +14,4 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 object IVerilog {
   val userFriendlyName: String = "Icarus Verilog"
   val internalID: String = "iverilog"
-
-  case class Profile(
-                      override val profileName: String,
-                      path: String
-                    ) extends ToolchainProfile(internalID, profileName)
 }

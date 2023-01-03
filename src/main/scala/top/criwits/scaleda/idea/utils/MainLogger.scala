@@ -6,5 +6,6 @@ import com.intellij.openapi.diagnostic.Logger
 class MainLogger
 
 object MainLogger {
-  val Log = Logger.getInstance(classOf[MainLogger])
+  val logger: Logger = Logger.getInstance(classOf[MainLogger])
+
 }

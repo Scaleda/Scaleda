@@ -16,12 +16,6 @@ class Verilator(executor: Executor) extends Toolchain(executor) {
 object Verilator {
   val userFriendlyName: String = "Verilator"
   val internalID: String = "verilator"
-
-  case class Profile(
-                      override val profileName: String,
-                      verilatorPath: String,
-                      buildToolPath: String
-                    ) extends ToolchainProfile(internalID, profileName)
 }
 
 

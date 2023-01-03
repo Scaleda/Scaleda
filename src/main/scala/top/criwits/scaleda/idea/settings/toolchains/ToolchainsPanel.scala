@@ -1,71 +1,126 @@
 package top.criwits.scaleda
 package idea.settings.toolchains
 
-import kernel.toolchain.ToolchainProfile
+import kernel.toolchain.{Toolchain, ToolchainProfile}
 
+import com.intellij.openapi.actionSystem.{ActionManager, ActionPlaces, ActionPopupMenu, AnAction, AnActionEvent, DefaultActionGroup}
 import com.intellij.openapi.ui.Splitter
-import com.intellij.ui.components.JBList
+import com.intellij.ui.components.{JBList, JBPanelWithEmptyText}
 import com.intellij.ui.{AnActionButton, ColoredListCellRenderer, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
+import org.jetbrains.annotations.Nls
+import top.criwits.scaleda.idea.ScaledaBundle
+import top.criwits.scaleda.idea.settings.toolchains.panel.SinglePathConfigPanel
+import top.criwits.scaleda.idea.utils.MainLogger
 import top.criwits.scaleda.kernel.toolchain.impl.Vivado
 
 import java.awt.BorderLayout
 import javax.swing.event.ListSelectionEvent
 import javax.swing._
 import scala.annotation.nowarn
+import scala.collection.mutable
 
+/**
+ * Settings panel for toolchains
+ */
 class ToolchainsPanel extends JPanel(new BorderLayout) {
-  // Right side, setting panel
-  private val mySettingsPanel: JComponent = new JLabel("Test")
-
   // Left side, list
-  private val myListModel = new MyListModel
-  private val myList = new JBList[ToolchainProfile](myListModel)
+  private val listModel = new MyListModel
+  private val toolchainList = new JBList[ToolchainProfile](listModel)
+  toolchainList.setCellRenderer(new MyCellRenderer)
+  toolchainList.addListSelectionListener(onItemSelected)
 
-  // Init panel
-  initPanel()
-  // Load items
-  reloadItems()
-  private def initPanel(): Unit = {
-    val splitter = new Splitter(false, 0.3f)
-    add(splitter, BorderLayout.CENTER)
+  // Splitter
+  val splitter = new Splitter(false, 0.3f)
+  add(splitter, BorderLayout.CENTER)
 
-    @nowarn("cat=deprecation")
-    val listPanel = ToolbarDecorator.createDecorator(myList)
-      .setAddAction((_: AnActionButton) => addProfile())
-      .createPanel()
-    myList.addListSelectionListener(onItemSelected)
-    splitter.setFirstComponent(listPanel)
+  val listPanel: JPanel = ToolbarDecorator.createDecorator(toolchainList)
+    .setAddAction((e: AnActionButton) => addProfile(e))
+    .setRemoveAction((_: AnActionButton) => removeProfile())
+    .disableUpDownActions()
+    .createPanel()
 
-    myList.setCellRenderer(new MyCellRenderer)
+  splitter.setFirstComponent(listPanel)
 
-    val settingsComponent = mySettingsPanel
-    settingsComponent.setBorder(JBUI.Borders.emptyLeft(6))
-    splitter.setSecondComponent(settingsComponent)
+  val emptyPanel: JBPanelWithEmptyText = new JBPanelWithEmptyText()
+    .withEmptyText(ScaledaBundle.message("settings.no_tool_chain"))
+    .withBorder(JBUI.Borders.emptyLeft(6))
+  splitter.setSecondComponent(emptyPanel)
 
-    // test
-    myListModel.add(0, new Vivado.Profile("1!5!", "HI"))
+  var profiles: mutable.Seq[ToolchainProfile] = _
+
+
+  private def init(): Unit = {
+    profiles = Toolchain.profiles()
+    listModel.clear()
+    profiles.foreach(p => listModel.addElement(p))
+    if (profiles.nonEmpty) {
+      toolchainList.setSelectedIndex(0)
+      loadItem(profiles.head)
+    }
   }
 
   private def onItemSelected(e: ListSelectionEvent): Unit = {
-
+    val index = toolchainList.getSelectedIndex
+    if (index >= 0 && index < profiles.size) {
+      val profile = listModel.get(index)
+      loadItem(profile)
+    }
   }
 
-  private def reloadItems(): Unit = {
-    myListModel.clear()
-//    profiles.zipWithIndex.foreach(m => myListModel.add(m._2, m._1))
+  private def loadItem(profile: ToolchainProfile): Unit = splitter.setSecondComponent(profile.toolchainType match {
+    case "vivado" | "iverilog" => new SinglePathConfigPanel(profile).getComponent
+    case _ => null
+  })
+
+
+  private def addProfile(e: AnActionButton): Unit = {
+    val group = new DefaultActionGroup()
+    Toolchain.toolchains.foreach(m =>
+    group.add(new AnAction(m._2._1) {
+      override def actionPerformed(e: AnActionEvent): Unit = {
+        val newProfile = new ToolchainProfile(m._2._1, m._1, "")
+        newProfile.edited = true
+        profiles :+= newProfile
+        listModel.addElement(newProfile)
+        toolchainList.setSelectedIndex(listModel.indexOf(newProfile))
+      }
+    }))
+    val popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group)
+    popupMenu.getComponent.show(this, e.getContextComponent.getX, e.getContextComponent.getY)
   }
 
-  private def addProfile(): Unit = {
-
+  private def removeProfile(): Unit = {
+    val index = toolchainList.getSelectedIndex
+    if (index >= 0 && index < profiles.size) {
+      val profile = listModel.get(index)
+      profile.edited = true
+      profile.removed = true
+      listModel.remove(index)
+      if (index != 0) {
+        toolchainList.setSelectedIndex(index - 1)
+      } else {
+        splitter.setSecondComponent(emptyPanel)
+      }
+    }
   }
+
+  def modified(): Boolean = if (profiles.isEmpty) false else profiles.map(p => p.edited).reduce(_ || _)
+  def reset(): Unit = { init() }
+  def apply(): Unit = profiles.foreach(p =>  if (p.edited) {
+    Toolchain.syncProfile(p)
+    p.edited = false
+  } )
+
 
   private class MyListModel extends DefaultListModel[ToolchainProfile]
-
-
   private class MyCellRenderer extends ColoredListCellRenderer[ToolchainProfile] {
-    override def customizeCellRenderer(list: JList[_ <: ToolchainProfile], value: ToolchainProfile, index: Int, selected: Boolean,
-                                       hasFocus: Boolean): Unit = append(value.profileName)
+    override def customizeCellRenderer(list: JList[_ <: ToolchainProfile],
+                                       value: ToolchainProfile,
+                                       index: Int,
+                                       selected: Boolean,
+                                       hasFocus: Boolean): Unit =
+      append(s"${value.profileName} [${Toolchain.toolchains.get(value.toolchainType).get._1}]")
 
   }
 
