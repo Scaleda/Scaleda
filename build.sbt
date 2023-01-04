@@ -45,4 +45,7 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   },
   assembly / assemblyJarName := "scaleda.jar",
   assembly / mainClass := Some("top.criwits.scaleda.shell.ScaledaShellMain"),
+  Compile / PB.targets := Seq(
+    scalapb.gen() -> (Compile / sourceManaged).value
+  )
 )
