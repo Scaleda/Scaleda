@@ -6,6 +6,7 @@ import kernel.toolchain.impl._
 import kernel.utils.{KernelLogger, OS, YAMLHelper}
 
 import java.io.{File, FilenameFilter}
+import java.lang
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -48,7 +49,11 @@ object Toolchain {
   def profiles(path: String = defaultConfigDirectory): ListBuffer[ToolchainProfile] = {
     val profiles: ListBuffer[ToolchainProfile] = new ListBuffer[ToolchainProfile]
 
-    val files = new File(path).listFiles(new FilenameFilter {
+    val directory = new File(path)
+    if (directory.isFile) throw new RuntimeException(s"${directory.getAbsolutePath} is a file")
+    if (!directory.exists()) directory.mkdirs()
+
+    val files = directory.listFiles(new FilenameFilter {
       override def accept(dir: File, name: String): Boolean = name.endsWith(".yml")
     })
     files.foreach(f => {
