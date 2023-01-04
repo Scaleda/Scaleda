@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import top.criwits.scaleda.kernel.utils.YAMLHelper
+import kernel.utils.YAMLHelper
 
 import java.io.File
 
@@ -14,6 +14,12 @@ case class ProjectConfig
 
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"
+  var config: Option[ProjectConfig] = None
 
-  def loadConfig(path: String): ProjectConfig = YAMLHelper(new File(path), classOf[ProjectConfig])
+  def loadConfig(path: File): ProjectConfig = YAMLHelper(path, classOf[ProjectConfig])
+
+  def setConfig(path: File) = {
+    val c = loadConfig(path)
+    config = Some(c)
+  }
 }

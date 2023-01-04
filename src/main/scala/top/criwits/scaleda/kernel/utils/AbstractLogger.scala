@@ -5,8 +5,8 @@ object LogLevel extends Enumeration {
   val Debug = Value(2)
   val Info = Value(3)
   val Warn = Value(4)
-  val Error = Value(4)
-  val Critical = Value(5)
+  val Error = Value(5)
+  val Critical = Value(6)
 }
 
 trait AbstractLogger {
