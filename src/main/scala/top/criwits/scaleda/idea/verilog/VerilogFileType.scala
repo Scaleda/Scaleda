@@ -2,8 +2,8 @@ package top.criwits.scaleda
 package idea.verilog
 
 import VerilogLogger.Log
-
 import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
+import top.criwits.scaleda.idea.utils.Icons
 
 import javax.swing.Icon
 
