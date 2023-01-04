@@ -1,12 +1,15 @@
 package top.criwits.scaleda
 package kernel.utils
 
-import com.typesafe.scalalogging.Logger
+// import com.typesafe.scalalogging.Logger
+
+import org.slf4j.LoggerFactory
 
 class KernelLogger
 
 object KernelLogger extends AbstractLogger {
-  val logger: Logger = Logger("Kernel")
+  // val logger: Logger = Logger("Kernel")
+  val logger = LoggerFactory.getLogger("scaleda")
 
   //noinspection DuplicatedCode
   override def log(msg: String, level: LogLevel.Value): Unit = {

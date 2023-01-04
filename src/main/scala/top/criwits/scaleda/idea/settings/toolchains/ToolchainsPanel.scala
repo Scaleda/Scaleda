@@ -119,7 +119,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
                                        index: Int,
                                        selected: Boolean,
                                        hasFocus: Boolean): Unit =
-      append(s"${value.profileName} [${Toolchain.toolchains.get(value.toolchainType).get._1}]")
+      append(s"${value.profileName} [${Toolchain.toolchains(value.toolchainType)._1}]")
 
   }
 

@@ -42,6 +42,8 @@ object Toolchain {
 
   val defaultConfigDirectory: String = OS.getUserHome + "/.scaleda/toolchains"
 
+  private var cachedProfiles = new ListBuffer[ToolchainProfile]
+
   /**
    * Load toolchain profiles from given directory
    * @param path Directory to save profiles
@@ -62,7 +64,8 @@ object Toolchain {
       profiles += newItem
     })
     KernelLogger.info(s"${profiles.size} profiles loaded")
-    profiles
+    cachedProfiles = profiles
+    cachedProfiles
   }
 
   def syncProfile(profile: ToolchainProfile): Unit =
@@ -79,6 +82,4 @@ object Toolchain {
       case Some(f) => f.delete()
       case None => false
     }
-
-
 }

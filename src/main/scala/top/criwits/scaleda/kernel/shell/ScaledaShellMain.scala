@@ -1,13 +1,16 @@
 package top.criwits.scaleda
 package kernel.shell
 
+import kernel.project.config.ProjectConfig
+import kernel.toolchain.Toolchain
+import kernel.utils.KernelLogger
+
 import scopt.OParser
-import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Simulation = Value
+  val None, Simulation, ListProfiles = Value
 }
 
 case class ShellArgs
@@ -27,13 +30,15 @@ object ScaledaShellMain {
         opt[File]('C', "workdir")
           .action((x, c) => c.copy(workingDir = x))
           .text("Working directory"),
+        cmd("profiles")
+          .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
         cmd("sim")
           .action((_, c) => c.copy(runMode = ShellRunMode.Simulation))
           .children(
             opt[String]('s', "simulator")
               .action((x, c) => c.copy(runSimulation = x))
-              // .text(s"Run simulation, available: ${Simulator.simulators.keys.mkString(", ")}"),
-              ,
+            // .text(s"Run simulation, available: ${Simulator.simulators.keys.mkString(", ")}"),
+            ,
             // opt[String]("top")
             //   .action((x, c) => c.copy(simulationConfig = c.simulationConfig.copy(topModule = x)))
             //   .text("Specify top module")
@@ -53,25 +58,31 @@ object ScaledaShellMain {
           import ProjectConfig.config
           ProjectConfig.setConfig(projectConfigFile)
           println(s"project config: ${config}")
-          shellConfig.runMode match {
-            // case ShellRunMode.Simulation => {
-            //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {
-            //     println(s"not supported simulator ${shellConfig.runSimulation}")
-            //   } else {
-            //     val simulator = Simulator.simulators(shellConfig.runSimulation)(
-            //       shellConfig.simulationConfig.copy(
-            //         sourceDir = config.getSourcePath(shellConfig.workingDir),
-            //         workingDir = new File(shellConfig.workingDir.getAbsolutePath, shellConfig.simulationConfig.workingDir.getPath)
-            //       ))
-            //     val returnValue = simulator.simulate()
-            //   }
-            // }
-            case _ => {
-              println("not implemented.")
-            }
-          }
         } else {
           println("no project config detected!")
+        }
+        shellConfig.runMode match {
+          case ShellRunMode.ListProfiles => {
+            KernelLogger.info("profile list:")
+            for (p <- Toolchain.profiles()) {
+              KernelLogger.info(s"${p}")
+            }
+          }
+          // case ShellRunMode.Simulation => {
+          //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {
+          //     println(s"not supported simulator ${shellConfig.runSimulation}")
+          //   } else {
+          //     val simulator = Simulator.simulators(shellConfig.runSimulation)(
+          //       shellConfig.simulationConfig.copy(
+          //         sourceDir = config.getSourcePath(shellConfig.workingDir),
+          //         workingDir = new File(shellConfig.workingDir.getAbsolutePath, shellConfig.simulationConfig.workingDir.getPath)
+          //       ))
+          //     val returnValue = simulator.simulate()
+          //   }
+          // }
+          case _ => {
+            println("not implemented.")
+          }
         }
       }
       case _ => {}
