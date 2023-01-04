@@ -21,11 +21,11 @@ class ScaledaMain extends DumbAware with StartupActivity {
       true
     })
     if (searchedFile.isEmpty) {
-      MainLogger.logger.warn("there's no project config")
+      MainLogger.warn("there's no project config")
     } else {
       val f = searchedFile.get
-      MainLogger.logger.info(s"found config: ${f}")
+      MainLogger.info(s"found config: ${f}")
     }
-    MainLogger.logger.info("Scaleda launched.")
+    MainLogger.info("Scaleda launched.")
   }
 }
