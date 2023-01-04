@@ -51,7 +51,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
 
 
   private def init(): Unit = {
-    profiles = Toolchain.profiles()
+    profiles = Toolchain.profiles(cache = false)
     listModel.clear()
     profiles.foreach(p => listModel.addElement(p))
     if (profiles.nonEmpty) {

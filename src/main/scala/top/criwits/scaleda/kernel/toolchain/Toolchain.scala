@@ -48,7 +48,8 @@ object Toolchain {
    * Load toolchain profiles from given directory
    * @param path Directory to save profiles
    */
-  def profiles(path: String = defaultConfigDirectory): ListBuffer[ToolchainProfile] = {
+  def profiles(path: String = defaultConfigDirectory, cache: Boolean = true): ListBuffer[ToolchainProfile] = {
+    if (cache && cachedProfiles.nonEmpty) return cachedProfiles
     val profiles: ListBuffer[ToolchainProfile] = new ListBuffer[ToolchainProfile]
 
     val directory = new File(path)
