@@ -44,5 +44,5 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     xml.version = version.value
   },
   assembly / assemblyJarName := "scaleda.jar",
-  assembly / mainClass := Some("top.criwits.scaleda.shell.ScaledaShellMain"),
+  assembly / mainClass := Some("top.criwits.scaleda.kernel.shell.ScaledaShellMain"),
 )
