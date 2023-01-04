@@ -47,5 +47,17 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   assembly / mainClass := Some("top.criwits.scaleda.shell.ScaledaShellMain"),
   Compile / PB.targets := Seq(
     scalapb.gen() -> (Compile / sourceManaged).value
-  )
+  ),
+  Compile / sourceGenerators += Def.task {
+    // adapt this for your build:
+    val protoPackage = "org.example.proto.foo"
+    val scalaFile = (Compile / sourceManaged).value / "_ONLY_FOR_INTELLIJ.scala"
+
+    IO.write(scalaFile,
+      s"""package $protoPackage
+         |
+         |private class _ONLY_FOR_INTELLIJ
+         |""".stripMargin)
+    Seq(scalaFile)
+  }.taskValue
 )
