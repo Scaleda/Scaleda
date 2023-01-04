@@ -10,7 +10,7 @@ import scopt.OParser
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Simulation, ListProfiles = Value
+  val None, Simulation, ListProfiles, Serve = Value
 }
 
 case class ShellArgs
@@ -30,6 +30,8 @@ object ScaledaShellMain {
         opt[File]('C', "workdir")
           .action((x, c) => c.copy(workingDir = x))
           .text("Working directory"),
+        cmd("serve")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
         cmd("profiles")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
         cmd("sim")
@@ -67,6 +69,9 @@ object ScaledaShellMain {
             for (p <- Toolchain.profiles()) {
               KernelLogger.info(s"${p}")
             }
+          }
+          case ShellRunMode.Serve => {
+            // run as server
           }
           // case ShellRunMode.Simulation => {
           //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {

@@ -1,4 +1,5 @@
 import org.jetbrains.sbtidea.Keys._
+import scalapb.compiler.Version.scalapbVersion
 
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / intellijPluginName := "Scaleda"
@@ -48,16 +49,8 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   Compile / PB.targets := Seq(
     scalapb.gen() -> (Compile / sourceManaged).value
   ),
-  Compile / sourceGenerators += Def.task {
-    // adapt this for your build:
-    val protoPackage = "org.example.proto.foo"
-    val scalaFile = (Compile / sourceManaged).value / "_ONLY_FOR_INTELLIJ.scala"
-
-    IO.write(scalaFile,
-      s"""package $protoPackage
-         |
-         |private class _ONLY_FOR_INTELLIJ
-         |""".stripMargin)
-    Seq(scalaFile)
-  }.taskValue
+  libraryDependencies ++= Seq(
+    "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
+    "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
+  )
 )
