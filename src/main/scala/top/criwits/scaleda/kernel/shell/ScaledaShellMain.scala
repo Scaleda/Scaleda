@@ -57,8 +57,8 @@ object ScaledaShellMain {
         println(s"shell config: ${shellConfig}")
         val projectConfigFile = new File(shellConfig.workingDir, ProjectConfig.defaultConfigFile)
         if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
-          import ProjectConfig.config
-          ProjectConfig.setConfig(projectConfigFile)
+          ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
+          val config = ProjectConfig.getConfig()
           println(s"project config: ${config}")
         } else {
           println("no project config detected!")
