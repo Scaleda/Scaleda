@@ -1,14 +1,12 @@
 package top.criwits.scaleda
 package kernel.template
 
-import com.google.common.io.Resources
+import kernel.utils.{JsonHelper, KernelLogger}
+
 import com.hubspot.jinjava.Jinjava
 import org.apache.commons.io.{FileUtils, IOUtils}
-import top.criwits.scaleda.kernel.utils.{JsonHelper, KernelLogger}
 
 import java.io.{File, PrintWriter}
-import java.net.URL
-import java.nio.charset.{Charset, StandardCharsets}
 import scala.jdk.javaapi.CollectionConverters
 
 object Template {
@@ -43,12 +41,13 @@ object Template {
     render(s, context)
   }
 
-  def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String) = {
+  def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String): Unit = {
     KernelLogger.info(s"render resource ${resourcePath} to ${targetPath}, context: ${JsonHelper(context)}")
-    val result = renderResource(resourcePath, context)
     val f = new File(targetPath)
+    // if (f.exists()) return
     FileUtils.touch(f)
     val printer = new PrintWriter(f)
+    val result = renderResource(resourcePath, context)
     printer.write(result)
     printer.close()
   }
