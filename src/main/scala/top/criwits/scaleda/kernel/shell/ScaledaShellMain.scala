@@ -7,6 +7,10 @@ import kernel.toolchain.Toolchain
 import kernel.utils.{JsonHelper, KernelLogger, Paths}
 
 import scopt.OParser
+import top.criwits.scaleda.kernel.project.task.TargetType
+import top.criwits.scaleda.kernel.shell.command.{CommandResponse, CommandRunner}
+import top.criwits.scaleda.kernel.toolchain.executor.{Executor, SimulationExecutor, SynthesisExecutor}
+import top.criwits.scaleda.kernel.toolchain.impl.Vivado
 
 import java.io.File
 
@@ -92,6 +96,8 @@ object ScaledaShellMain {
       )
     }
     OParser.parse(shellParser, args, ShellArgs()).foreach(shellConfig => {
+      val workingDir = shellConfig.workingDir
+      val config = ProjectConfig.getConfig()
       KernelLogger.info(s"shell config: ${shellConfig}")
       shellConfig.runMode match {
         case ShellRunMode.ListProfiles => {
@@ -112,11 +118,38 @@ object ScaledaShellMain {
           RemoteServer.start()
         }
         case ShellRunMode.Run => {
-          if (shellConfig.target.isEmpty) {
-            KernelLogger.error("no specific target!")
-          } else {
-
-          }
+          ProjectConfig.getConfig().foreach(_.target(shellConfig.target).map(f => {
+            val (task, target) = f
+            val info = Toolchain.toolchains(task.toolchain)
+            // find profile
+            Toolchain.profiles().filter(p => p.profileName == task.toolchain).foreach(profile => {
+              // generate executor
+              val executor = target.getType match {
+                case TargetType.Simulation =>
+                  SimulationExecutor(workingDir = workingDir, topFile = new File(config.get.topFile), profile = profile)
+                case TargetType.Synthesis =>
+                  SynthesisExecutor(workingDir = workingDir, topFile = new File(config.get.topFile), profile = profile)
+                case _ => ???
+              }
+              if (target.preset) {
+                info._1 match {
+                  case Vivado.internalID => {
+                    ???
+                  }
+                  case _ => KernelLogger.error(s"not supported preset: ${task.toolchain}")
+                }
+              }
+              val toolchain = info._2(executor)
+              val commands = toolchain.commands(target.getType)
+              CommandRunner.execute(commands, (commandRespType, data) => {
+                commandRespType match {
+                  case CommandResponse.Stdout => KernelLogger.info(data.asInstanceOf[String])
+                  case CommandResponse.Stderr => KernelLogger.error(data.asInstanceOf[String])
+                  case CommandResponse.Return => KernelLogger.info(s"command done, returns ${data.asInstanceOf[Int]}")
+                }
+              })
+            })
+          }).getOrElse(KernelLogger.error("no specific target!")))
         }
         case _ => {
           KernelLogger.error("not implemented.")

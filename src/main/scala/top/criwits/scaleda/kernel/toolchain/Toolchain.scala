@@ -6,6 +6,8 @@ import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl._
 import kernel.utils.{KernelLogger, Paths, YAMLHelper}
 
+import top.criwits.scaleda.kernel.project.task.TargetType
+
 import java.io.{File, FilenameFilter}
 import scala.collection.mutable.ListBuffer
 
@@ -26,6 +28,11 @@ abstract class Toolchain(val executor: Executor) {
 
   def implement(): Seq[CommandDeps] = ???
 
+  def commands(targetType: TargetType.Value) = targetType match {
+    case TargetType.Simulation => simulate()
+    case TargetType.Synthesis => synthesise()
+    case TargetType.Implement => implement()
+  }
 }
 
 object Toolchain {

@@ -37,13 +37,32 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   }
 }
 
+object CommandResponse extends Enumeration {
+  val Stdout, Stderr, Return = Value
+}
+
+object CommandRunner {
+  val delay = 300
+
+  def execute(commands: Seq[CommandDeps], callback: (CommandResponse.Value, Any) => Unit): Unit =
+    commands.foreach(command => {
+      val runner = new CommandRunner(command).run
+      while (!runner.returnValue.isCompleted) {
+        runner.stdOut.forEach(s => callback(CommandResponse.Stdout, s))
+        runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
+        Thread.sleep(delay)
+      }
+      callback(CommandResponse.Return, runner.returnValue.value.get.get)
+    })
+}
+
 object CommandRunnerTest extends App {
   val runner = new CommandRunner(CommandDeps("ping -c 3 127.0.0.1"))
   val r = runner.run
   while (!r.returnValue.isCompleted) {
     r.stdOut.forEach(s => KernelLogger.info(s))
     r.stdErr.forEach(s => KernelLogger.error(s))
-    Thread.sleep(300)
+    Thread.sleep(CommandRunner.delay)
   }
   KernelLogger.info(s"return value: ${r.returnValue.value.get}")
 }
