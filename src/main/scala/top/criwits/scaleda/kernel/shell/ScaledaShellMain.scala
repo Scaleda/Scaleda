@@ -3,7 +3,7 @@ package kernel.shell
 
 import kernel.project.config.ProjectConfig
 import kernel.toolchain.Toolchain
-import kernel.utils.KernelLogger
+import kernel.utils.{JsonHelper, KernelLogger}
 
 import scopt.OParser
 import top.criwits.scaleda.kernel.net.RemoteServer
@@ -21,7 +21,7 @@ case class ShellArgs
 
 object ScaledaShellMain {
   def main(args: Array[String]): Unit = {
-    println(s"Scaleda shell! args: ${args.mkString(" ")}")
+    KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
     val builder = OParser.builder[ShellArgs]
     val parser = {
       import builder._
@@ -55,20 +55,20 @@ object ScaledaShellMain {
     }
     OParser.parse(parser, args, ShellArgs()) match {
       case Some(shellConfig) => {
-        println(s"shell config: ${shellConfig}")
+        KernelLogger.info(s"shell config: ${shellConfig}")
         val projectConfigFile = new File(shellConfig.workingDir, ProjectConfig.defaultConfigFile)
         if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
           ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
           val config = ProjectConfig.getConfig()
-          println(s"project config: ${config}")
+          KernelLogger.info(s"project config: ${config}")
         } else {
-          println("no project config detected!")
+          KernelLogger.info("no project config detected!")
         }
         shellConfig.runMode match {
           case ShellRunMode.ListProfiles => {
             KernelLogger.info("profile list:")
             for (p <- Toolchain.profiles()) {
-              KernelLogger.info(s"${p}")
+              KernelLogger.info(s"${JsonHelper(p)}")
             }
           }
           case ShellRunMode.Serve => {
@@ -77,7 +77,7 @@ object ScaledaShellMain {
           }
           // case ShellRunMode.Simulation => {
           //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {
-          //     println(s"not supported simulator ${shellConfig.runSimulation}")
+          //     KernelLogger.info(s"not supported simulator ${shellConfig.runSimulation}")
           //   } else {
           //     val simulator = Simulator.simulators(shellConfig.runSimulation)(
           //       shellConfig.simulationConfig.copy(
@@ -88,7 +88,7 @@ object ScaledaShellMain {
           //   }
           // }
           case _ => {
-            println("not implemented.")
+            KernelLogger.info("not implemented.")
           }
         }
       }
