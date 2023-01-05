@@ -66,7 +66,7 @@ class VivadoTemplateRenderer
   override def context: Map[String, Any] = config.map(config => {
     val context = VivadoTemplateContext(
       top = config.topModule,
-      topFile = config.topFile,
+      topFile = new File(new File(ProjectConfig.projectBase.get), config.topFile).getAbsolutePath,
       // sim = false,
       topSimFile = config.topSimFile,
       workDir = executor.workingDir.getAbsolutePath,
