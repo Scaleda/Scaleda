@@ -2,18 +2,29 @@ syntax = "proto3";
 
 package top.criwits.scaleda.kernel.net;
 
-//// The greeting service definition.
-//service Greeter {
-//  // Sends a greeting
-//  rpc SayHello (HelloRequest) returns (HelloReply) {}
-//}
-//
-//// The request message containing the user's name.
-//message HelloRequest {
-//  string name = 1;
-//}
-//
-//// The response message containing the greetings
-//message HelloReply {
-//  string message = 1;
-//}
+service Remote {
+  rpc run(RunRequest) returns (stream RunReply) {}
+}
+
+message triple {
+  string a = 1;
+  string b = 2;
+}
+
+message RunRequest {
+  string command = 1;
+  string path = 2;
+  repeated triple envs = 3;
+}
+
+enum RunReplyType {
+  RETURN = 0;
+  STDOUT = 1;
+  STDERR = 2;
+}
+
+message RunReply {
+  RunReplyType replyType = 1;
+  string strValue = 2;
+  int32 intValue = 3;
+}
