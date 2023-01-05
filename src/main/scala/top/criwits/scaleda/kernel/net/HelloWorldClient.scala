@@ -33,8 +33,9 @@ package top.criwits.scaleda
 package kernel.net
 
 import com.example.protos.helloworld.GreeterGrpc.GreeterBlockingStub
-import com.example.protos.helloworld.{GreeterGrpc, HelloRequest}
+import com.example.protos.helloworld.{GreeterGrpc, HelloReply, HelloRequest}
 import io.grpc.{ManagedChannel, ManagedChannelBuilder, StatusRuntimeException}
+import top.criwits.scaleda.kernel.utils.KernelLogger
 
 import java.util.concurrent.TimeUnit
 import java.util.logging.{Level, Logger}
@@ -53,12 +54,36 @@ object HelloWorldClient {
   }
 
   def main(args: Array[String]): Unit = {
-    val client = HelloWorldClient("localhost", 50051)
-    try {
-      val user = args.headOption.getOrElse("world")
-      client.greet(user)
-    } finally {
-      client.shutdown()
+    // val client = HelloWorldClient("localhost", 50051)
+    // try {
+    //   val user = args.headOption.getOrElse("world")
+    //   client.greet(user)
+    // } finally {
+    //   client.shutdown()
+    // }
+    val builder = ManagedChannelBuilder.forAddress("localhost", 50051)
+    builder.usePlaintext()
+    val channel = builder.build()
+    // val stub = GreeterGrpc.stub(channel)
+    //
+    // stub.streamHello(new HelloRequest("test"), new StreamObserver[HelloReply] {
+    //   override def onNext(v: HelloReply) = {
+    //     KernelLogger.info(s"client: ${v.message}")
+    //   }
+    //
+    //   override def onError(throwable: Throwable) = {
+    //     KernelLogger.error(s"client: ${throwable.toString}")
+    //   }
+    //
+    //   override def onCompleted() = {
+    //     KernelLogger.info(s"client call done")
+    //     channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+    //   }
+    // })
+    // KernelLogger.warn("execute out")
+    val stub = GreeterGrpc.blockingStub(channel)
+    for (s <- stub.streamHello(new HelloRequest("test"))) {
+      KernelLogger.info(s"client: ${s.message}")
     }
   }
 }

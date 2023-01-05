@@ -32,11 +32,13 @@ package top.criwits.scaleda
 package kernel.net
 
 import com.example.protos.helloworld.{GreeterGrpc, HelloReply, HelloRequest}
+import io.grpc.stub.StreamObserver
 import io.grpc.{Server, ServerBuilder}
+import top.criwits.scaleda.kernel.shell.command.CommandRunner
+import top.criwits.scaleda.kernel.utils.KernelLogger
 
 import java.util.logging.Logger
 import scala.language.existentials
-
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -86,6 +88,24 @@ class HelloWorldServer(executionContext: ExecutionContext) {
     override def sayHello(req: HelloRequest) = {
       val reply = HelloReply(message = "Hello " + req.name)
       Future.successful(reply)
+    }
+
+    override def streamHello(request: HelloRequest, responseObserver: StreamObserver[HelloReply]): Unit = {
+      val runner = new CommandRunner("ping -c 3 127.0.0.1")
+      val r = runner.run
+      while (!r.returnValue.isCompleted) {
+        r.stdOut.forEach(s => {
+          KernelLogger.info(s)
+          responseObserver.onNext(new HelloReply(s))
+        })
+        r.stdErr.forEach(s => {
+          KernelLogger.error(s)
+          responseObserver.onNext(new HelloReply(s))
+        })
+        Thread.sleep(300)
+      }
+      KernelLogger.info(s"return value: ${r.returnValue.value.get}")
+      responseObserver.onCompleted()
     }
   }
 
