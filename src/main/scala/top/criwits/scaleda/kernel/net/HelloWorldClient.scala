@@ -54,7 +54,6 @@ object HelloWorldClient {
 
   def main(args: Array[String]): Unit = {
     val client = HelloWorldClient("localhost", 50051)
-    new GreeterBlockingStub()
     try {
       val user = args.headOption.getOrElse("world")
       client.greet(user)
