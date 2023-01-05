@@ -9,6 +9,8 @@ import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl.Vivado.{internalID, userFriendlyName}
 import kernel.utils.{OS, Serialization}
 
+import top.criwits.scaleda.kernel.shell.command.CommandDeps
+
 /**
  * Implementation for EDA toolchain software, Vivado
  *
@@ -18,6 +20,17 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
   override def getInternalID: String = internalID
 
   override def getName: String = userFriendlyName
+
+  override def synthesise() = {
+    // ProjectConfig.getConfig().map(config =>
+    //   config.tasksByToolchain(getInternalID).flatMap(t => {
+    //     CommandDeps(s"${} -help")
+    //   }))
+    Seq(
+      CommandDeps("echo hi"),
+      CommandDeps(s"${executor.profile.path} -help"),
+    )
+  }
 }
 
 object Vivado {

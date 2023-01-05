@@ -118,11 +118,11 @@ object ScaledaShellMain {
           RemoteServer.start()
         }
         case ShellRunMode.Run => {
-          ProjectConfig.getConfig().foreach(_.target(shellConfig.target).map(f => {
+          ProjectConfig.getConfig().foreach(_.targetByName(shellConfig.target).map(f => {
             val (task, target) = f
             val info = Toolchain.toolchains(task.toolchain)
             // find profile
-            Toolchain.profiles().filter(p => p.profileName == task.toolchain).foreach(profile => {
+            Toolchain.profiles().filter(p => p.toolchainType == task.toolchain).foreach(profile => {
               // generate executor
               val executor = target.getType match {
                 case TargetType.Simulation =>

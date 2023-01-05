@@ -46,23 +46,38 @@ object CommandRunner {
 
   def execute(commands: Seq[CommandDeps], callback: (CommandResponse.Value, Any) => Unit): Unit =
     commands.foreach(command => {
+      KernelLogger.info(s"running command: ${command.command}")
       val runner = new CommandRunner(command).run
-      while (!runner.returnValue.isCompleted) {
+      do {
         runner.stdOut.forEach(s => callback(CommandResponse.Stdout, s))
         runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
         Thread.sleep(delay)
-      }
+      } while (!runner.returnValue.isCompleted)
       callback(CommandResponse.Return, runner.returnValue.value.get.get)
     })
 }
 
 object CommandRunnerTest extends App {
-  val runner = new CommandRunner(CommandDeps("ping -c 3 127.0.0.1"))
-  val r = runner.run
-  while (!r.returnValue.isCompleted) {
-    r.stdOut.forEach(s => KernelLogger.info(s))
-    r.stdErr.forEach(s => KernelLogger.error(s))
-    Thread.sleep(CommandRunner.delay)
+  val ping = CommandDeps("ping -c 3 127.0.0.1")
+
+  {
+    val runner = new CommandRunner(ping)
+    val r = runner.run
+    while (!r.returnValue.isCompleted) {
+      r.stdOut.forEach(s => KernelLogger.info(s))
+      r.stdErr.forEach(s => KernelLogger.error(s))
+      Thread.sleep(CommandRunner.delay)
+    }
+    KernelLogger.info(s"return value: ${r.returnValue.value.get}")
   }
-  KernelLogger.info(s"return value: ${r.returnValue.value.get}")
+  {
+    val commands = Seq(ping)
+    CommandRunner.execute(commands, (commandRespType, data) => {
+      commandRespType match {
+        case CommandResponse.Stdout => KernelLogger.info(data.asInstanceOf[String])
+        case CommandResponse.Stderr => KernelLogger.error(data.asInstanceOf[String])
+        case CommandResponse.Return => KernelLogger.info(s"command done, returns ${data.asInstanceOf[Int]}")
+      }
+    })
+  }
 }
