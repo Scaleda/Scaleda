@@ -7,9 +7,11 @@ import kernel.template.ResourceTemplateRender
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl.Vivado.{internalID, userFriendlyName}
-import kernel.utils.{OS, Serialization}
+import kernel.utils.{KernelFileUtils, OS, Serialization}
 
 import top.criwits.scaleda.kernel.shell.command.CommandDeps
+
+import java.io.File
 
 /**
  * Implementation for EDA toolchain software, Vivado
@@ -76,6 +78,9 @@ class VivadoTemplateRenderer
       device = taskConfig.device,
       `package` = taskConfig.`package`,
       speed = taskConfig.speed,
+      sourceList = KernelFileUtils
+        .getAllSourceFiles(new File(ProjectConfig.projectBase.get.getAbsolutePath, config.source))
+        .map(_.getAbsolutePath)
     )
     Serialization.getCCParams(context)
   }).getOrElse(Map())

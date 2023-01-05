@@ -27,6 +27,10 @@ case class ShellArgs
 
 object ScaledaShellMain {
   private def loadConfig(projectRootPath: String): Unit = {
+    val rootDir = new File(projectRootPath)
+    if (rootDir.exists() && rootDir.isDirectory) {
+      ProjectConfig.projectBase = Some(rootDir)
+    }
     val projectConfigFile = new File(projectRootPath, ProjectConfig.defaultConfigFile)
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
       ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
