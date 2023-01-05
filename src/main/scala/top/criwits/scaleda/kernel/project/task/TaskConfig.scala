@@ -3,7 +3,6 @@ package kernel.project.task
 
 case class TaskConfig
 (name: String,
- `type`: String,
  toolchain: String,
  device: String,
  `package`: String,

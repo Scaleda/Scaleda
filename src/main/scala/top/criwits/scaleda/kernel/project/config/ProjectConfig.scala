@@ -17,11 +17,11 @@ case class ProjectConfig
   topSimFile: String,
   tasks: Array[TaskConfig]
 ) {
-  def tasksSim = tasks.filter(t => t.`type` == "simulation")
+  def tasksSim = tasks.filter(t => t.targets.exists(t => t.`type` == "simulation"))
 
-  def tasksSynth = tasks.filter(t => t.`type` == "synthesis")
+  def tasksSynth = tasks.filter(t => t.targets.exists(t => t.`type` == "synthesis"))
 
-  def tasksImpl = tasks.filter(t => t.`type` == "implementation")
+  def tasksImpl = tasks.filter(t => t.targets.exists(t => t.`type` == "implementation"))
 }
 
 object ProjectConfig {
