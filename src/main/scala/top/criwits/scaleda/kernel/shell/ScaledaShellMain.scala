@@ -11,15 +11,15 @@ import scopt.OParser
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Simulation, ListProfiles, ListTasks, Serve = Value
+  val None, Run, ListProfiles, ListTasks, Serve = Value
 }
 
 case class ShellArgs
-(workingDir: File = new File("."),
+(target: String = "",
+ workingDir: File = new File("."),
  runMode: ShellRunMode.Value = ShellRunMode.None,
  serverHost: String = "",
- serverPort: Int = RemoteServer.port,
- runSimulation: String = "iverilog")
+ serverPort: Int = RemoteServer.port)
 
 object ScaledaShellMain {
   private def loadConfig(projectRootPath: String): Unit = {
@@ -74,25 +74,20 @@ object ScaledaShellMain {
         cmd("tasks")
           .text("Show loaded tasks")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
-        cmd("sim")
-          .text("Run simulation")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Simulation))
+        cmd("run")
+          .text("Run target")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Run))
           .children(
-            opt[String]('s', "simulator")
-              .action((x, c) => c.copy(runSimulation = x))
-              .text(s"Run simulation, available: ${
+            opt[String]('t', "target")
+              .action((x, c) => c.copy(target = x))
+              .text(s"Available targets: ${
                 ProjectConfig.getConfig()
-                  .map(config => config.tasksSim.map(task => task.toolchain).mkString(", "))
+                  .map(config => config.targetNames.mkString(", "))
                   .getOrElse("None")
-              }"),
-            // opt[String]("top")
-            //   .action((x, c) => c.copy(simulationConfig = c.simulationConfig.copy(topModule = x)))
-            //   .text("Specify top module")
+              }")
+              .validate(name => if (ProjectConfig.getConfig().exists(c => c.targetNames.contains(name)))
+                success else failure(s"no target ${name} found!")),
           ),
-        cmd("synth"),
-        cmd("impl"),
-        cmd("debug"),
-        cmd("program"),
         help("help").text("Prints this usage text"),
       )
     }
@@ -116,18 +111,13 @@ object ScaledaShellMain {
           // run as server
           RemoteServer.start()
         }
-        // case ShellRunMode.Simulation => {
-        //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {
-        //     KernelLogger.info(s"not supported simulator ${shellConfig.runSimulation}")
-        //   } else {
-        //     val simulator = Simulator.simulators(shellConfig.runSimulation)(
-        //       shellConfig.simulationConfig.copy(
-        //         sourceDir = config.getSourcePath(shellConfig.workingDir),
-        //         workingDir = new File(shellConfig.workingDir.getAbsolutePath, shellConfig.simulationConfig.workingDir.getPath)
-        //       ))
-        //     val returnValue = simulator.simulate()
-        //   }
-        // }
+        case ShellRunMode.Run => {
+          if (shellConfig.target.isEmpty) {
+            KernelLogger.error("no specific target!")
+          } else {
+
+          }
+        }
         case _ => {
           KernelLogger.error("not implemented.")
         }
