@@ -1,0 +1,25 @@
+source args.tcl
+file mkdir $project_dir
+
+puts "Generating project ${project_name}"
+
+{% for s in sourceList %}
+puts "Importing source: {{ s }}"
+add_files -fileset sources_1 {{ s }}
+{% endfor %}
+
+set_property top ${top} [current_fileset]
+set_property top_file {$top_file} [current_fileset]
+update_compile_order -fileset sources_1
+
+{% for ip in ipList %}
+puts "Importing IP core: {{ ip }}"
+add_files -fileset constrs_1 {{ ip }}
+{% endfor %}
+
+{% for xdc in xdcList %}
+puts "Importing xdc file: {{ xdc }}"
+add_files -fileset constrs_1 {{ xdc }}
+{% endfor %}
+
+close_project

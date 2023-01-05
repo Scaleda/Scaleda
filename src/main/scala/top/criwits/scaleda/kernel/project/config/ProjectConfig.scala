@@ -3,6 +3,8 @@ package kernel.project.config
 
 import kernel.utils.{KernelLogger, YAMLHelper}
 
+import top.criwits.scaleda.kernel.project.task.TaskConfig
+
 import java.io.File
 
 case class ProjectConfig
@@ -10,6 +12,7 @@ case class ProjectConfig
   name: String = "default-project",
   `type`: String = "rtl",
   source: String = "src/",
+  topModule: String = "",
   topFile: String,
   topSimFile: String,
   tasks: Array[TaskConfig]

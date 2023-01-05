@@ -10,6 +10,7 @@ object OS extends Enumeration {
 
   /**
    * Get host OS type
+   *
    * @return [[Windows]], [[Unix]] or [[MacOS]]
    */
   def getOSType: Value = System.getProperty("os.name").toLowerCase() match {
@@ -20,7 +21,10 @@ object OS extends Enumeration {
 
   /**
    * Get user home directory path, i.e. `~`
+   *
    * @return
    */
   def getUserHome: String = System.getProperty("user.home")
+
+  val getCpuCount = Runtime.getRuntime.availableProcessors()
 }

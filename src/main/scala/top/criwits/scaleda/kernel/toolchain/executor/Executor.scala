@@ -3,4 +3,8 @@ package kernel.toolchain.executor
 
 import kernel.toolchain.ToolchainProfile
 
-abstract class Executor(val profile: ToolchainProfile)
+import java.io.File
+
+abstract class Executor
+(val profile: ToolchainProfile,
+ val workingDir: File = new File("."))

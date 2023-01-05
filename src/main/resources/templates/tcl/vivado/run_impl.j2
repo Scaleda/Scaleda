@@ -1,0 +1,29 @@
+source run_synth.tcl
+
+set_property STEPS.PHYS_OPT_DESIGN.IS_ENABLED true [get_runs impl_1]
+
+# set tcl_tmp $project_dir/tcl
+# file mkdir $tcl_tmp
+
+# set_property STEPS.OPT_DESIGN.TCL.PRE $tcl_tmp/pre_opt_design.tcl [get_runs impl_1]
+# set_property STEPS.OPT_DESIGN.TCL.POST $tcl_tmp/post_opt_design.tcl [get_runs impl_1]
+# set_property STEPS.PLACE_DESIGN.TCL.POST $tcl_tmp/post_place_design.tcl [get_runs impl_1]
+# set_property STEPS.PHYS_OPT_DESIGN.TCL.POST $tcl_tmp/post_phys_opt_design.tcl [get_runs impl_1]
+# set_property STEPS.ROUTE_DESIGN.TCL.POST $tcl_tmp/post_route_design.tcl [get_runs impl_1]
+
+launch_runs impl_1 -to_step route_design -jobs $jobs
+wait_on_run impl_1
+
+{% if timingReport %}
+puts "Creating timing report for Implementation..."
+open_run impl_1 -name impl_1
+report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -input_pins -routable_nets -quiet -name timing_2 -file ${top}/timing_report_impl.txt
+close_design
+{% endif %}
+
+set_property SEVERITY {Warning} [get_drc_checks UCIO-1]
+
+launch_runs impl_1 -to_step write_bitstream -jobs $jobs
+wait_on_run impl_1
+
+puts "Implementation done!"

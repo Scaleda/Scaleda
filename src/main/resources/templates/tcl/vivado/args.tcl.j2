@@ -1,7 +1,11 @@
 set top {{ top }}
+set top_file {{ topFile }}
+{% if topSimFile|length > 1 %}
+set top_sim_file {{ topSimFile }}
+{% endif %}
 set project_name $top
 puts "Vivado project $project_name"
-set work_dir {{ work_dir }}
+set work_dir {{ workDir }}
 
 set device    {{ device }}
 set package   {{ package }}

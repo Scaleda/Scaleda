@@ -6,7 +6,7 @@ import top.criwits.scaleda.kernel.toolchain.ToolchainProfile
 import java.io.File
 
 case class SynthesisExecutor
-(workingDir: File = new File(".synth"),
+(override val workingDir: File = new File(".synth"),
  topFile: File,
  override val profile: ToolchainProfile
 ) extends Executor(profile)

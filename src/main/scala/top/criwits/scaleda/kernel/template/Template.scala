@@ -26,6 +26,20 @@ object Template {
   }
 }
 
+trait TemplateRenderer {
+  def render(): Unit
+}
+
+abstract class ResourceTemplateRender
+(resourceBase: String, targetBase: String, resources: Map[String, String]) extends TemplateRenderer {
+  def context: Map[String, Any]
+
+  override def render(): Unit =
+    resources.map(f => (s"${resourceBase}/${f._1}", s"${targetBase}/${f._2}"))
+      .foreach(f => Template.renderResourceTo(f._1, context, f._2))
+
+}
+
 object TemplateTest extends App {
   Template.renderResourceTo("test.j2", Map(
     "test" -> "test data"

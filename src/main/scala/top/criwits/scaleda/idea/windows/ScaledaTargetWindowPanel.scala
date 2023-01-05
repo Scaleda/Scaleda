@@ -3,13 +3,14 @@ package idea.windows
 
 import idea.ScaledaBundle
 import idea.runner.Runner
-import kernel.project.config.{ProjectConfig, TaskConfig}
+import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.treeStructure.Tree
+import top.criwits.scaleda.kernel.project.task.TaskConfig
 
 import java.awt.event.{MouseAdapter, MouseEvent}
 import javax.swing.JTree
