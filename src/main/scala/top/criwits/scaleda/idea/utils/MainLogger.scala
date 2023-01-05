@@ -22,7 +22,7 @@ object MainLogger extends AbstractLogger {
       case _ => logger.error(msg)
     }
     if (consoleView.nonEmpty) {
-      consoleView.get.print(msg, level match {
+      consoleView.get.print(s"[MainLogger] ${}\n", level match {
         case Debug => ConsoleViewContentType.LOG_DEBUG_OUTPUT
         case Info => ConsoleViewContentType.LOG_INFO_OUTPUT
         case Warn => ConsoleViewContentType.LOG_WARNING_OUTPUT
