@@ -24,13 +24,8 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
   override def getName: String = userFriendlyName
 
   override def synthesise() = {
-    // ProjectConfig.getConfig().map(config =>
-    //   config.tasksByToolchain(getInternalID).flatMap(t => {
-    //     CommandDeps(s"${} -help")
-    //   }))
     Seq(
-      CommandDeps("echo hi"),
-      CommandDeps(s"${executor.profile.path} -help"),
+      CommandDeps(s"${executor.profile.path} -mode batch -source run_synth.tcl", executor.workingDir.getAbsolutePath),
     )
   }
 }
