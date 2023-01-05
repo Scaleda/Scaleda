@@ -11,7 +11,7 @@ import top.criwits.scaleda.kernel.net.RemoteServer
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Simulation, ListProfiles, Serve = Value
+  val None, Simulation, ListProfiles, ListTasks, Serve = Value
 }
 
 case class ShellArgs
@@ -45,6 +45,9 @@ object ScaledaShellMain {
         cmd("profiles")
           .text("Show loaded profiles")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
+        cmd("tasks")
+          .text("Show loaded tasks")
+          .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
         cmd("sim")
           .text("Run simulation")
           .action((_, c) => c.copy(runMode = ShellRunMode.Simulation))
@@ -81,6 +84,13 @@ object ScaledaShellMain {
             for (p <- Toolchain.profiles()) {
               KernelLogger.info(s"${JsonHelper(p)}")
             }
+          }
+          case ShellRunMode.ListTasks => {
+            KernelLogger.info("task list:")
+            ProjectConfig.getConfig().map(config =>
+              for (p <- config.tasks) {
+                KernelLogger.info(s"${JsonHelper(p)}")
+              }).getOrElse(KernelLogger.info("no task loaded"))
           }
           case ShellRunMode.Serve => {
             // run as server

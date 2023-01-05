@@ -2,19 +2,17 @@ package top.criwits.scaleda
 package idea.windows
 
 import idea.ScaledaBundle
+import idea.runner.Runner
 import kernel.project.config.{ProjectConfig, TaskConfig}
 
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.openapi.externalSystem.service.task.ui.AbstractExternalSystemToolWindowFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.treeStructure.Tree
-import top.criwits.scaleda.idea.runner.Runner
 
-import java.awt.event.{MouseAdapter, MouseEvent, MouseListener}
+import java.awt.event.{MouseAdapter, MouseEvent}
 import javax.swing.JTree
-import javax.swing.event.{TreeSelectionEvent, TreeSelectionListener}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
 
 class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(true, true) {
@@ -59,19 +57,11 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
     sims.removeAllChildren()
     synth.removeAllChildren()
     impl.removeAllChildren()
-    val runConfigs = ProjectConfig.getConfig()
-    runConfigs match {
-      case Some(config) =>
-        config.tasks.foreach(task => {
-          task.`type` match {
-            case "simulation" => sims.add(new TargetNode(task))
-            case "synthesis" => synth.add(new TargetNode(task))
-            case "implementation" => impl.add(new TargetNode(task))
-            case _ =>
-          }
-        })
-      case None =>
-    }
+    ProjectConfig.getConfig().foreach(config => {
+      config.tasksSim.foreach(task => sims.add(new TargetNode(task)))
+      config.tasksSynth.foreach(task => synth.add(new TargetNode(task)))
+      config.tasksImpl.foreach(task => impl.add(new TargetNode(task)))
+    })
   }
 
 

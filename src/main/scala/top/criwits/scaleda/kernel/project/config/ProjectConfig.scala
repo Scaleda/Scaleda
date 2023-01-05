@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import top.criwits.scaleda.kernel.utils.{KernelLogger, YAMLHelper}
+import kernel.utils.{KernelLogger, YAMLHelper}
 
 import java.io.File
 
@@ -13,7 +13,13 @@ case class ProjectConfig
   topFile: String,
   topSimFile: String,
   tasks: Array[TaskConfig]
-)
+) {
+  def tasksSim = tasks.filter(t => t.`type` == "simulation")
+
+  def tasksSynth = tasks.filter(t => t.`type` == "synthesis")
+
+  def tasksImpl = tasks.filter(t => t.`type` == "implementation")
+}
 
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"

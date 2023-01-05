@@ -1,14 +1,30 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
+import kernel.project.config.ProjectConfig
+import kernel.shell.command.CommandDeps
+import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.Executor
-import kernel.toolchain.{Toolchain, ToolchainProfile}
-
-import top.criwits.scaleda.kernel.toolchain.impl.IVerilog.{internalID, userFriendlyName}
 
 class IVerilog(executor: Executor) extends Toolchain(executor) {
+
+  import IVerilog._
+
   override def getInternalID: String = internalID
+
   override def getName: String = userFriendlyName
+
+  private val executable = if (executor.profile.path.isEmpty) "iverilog" else executor.profile.path
+
+  override def simulate() = {
+    ProjectConfig.getConfig().map(config =>
+      config.tasks.collectFirst({ case t if t.toolchain == getInternalID => t }))
+      .map(task => {
+        Seq(
+          CommandDeps(s"${executable}")
+        )
+      }).getOrElse(Seq())
+  }
 }
 
 object IVerilog {
