@@ -3,12 +3,12 @@ package kernel.template
 
 import com.google.common.io.Resources
 import com.hubspot.jinjava.Jinjava
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import top.criwits.scaleda.kernel.utils.{JsonHelper, KernelLogger}
 
 import java.io.{File, PrintWriter}
 import java.net.URL
-import java.nio.charset.Charset
+import java.nio.charset.{Charset, StandardCharsets}
 import scala.jdk.javaapi.CollectionConverters
 
 object Template {
@@ -37,8 +37,10 @@ object Template {
     //   case _: Throwable => scala.io.Source.fromResource(s"/templates/${resourcePath}")
     // }
     // render(reader.getLines().mkString("\n"), context)
-    getClass.getClassLoader.getResourceAsStream(s"templates/${resourcePath}").toString
+    val stream = getClass.getClassLoader.getResourceAsStream(s"templates/${resourcePath}")
+    val s = IOUtils.toString(stream, "UTF-8")
     // render(Resources.toString(new URL(s"templates/${resourcePath}"), Charset.defaultCharset()), context)
+    render(s, context)
   }
 
   def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String) = {

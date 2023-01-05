@@ -2,17 +2,15 @@ package top.criwits.scaleda
 package idea.windows
 
 import idea.ScaledaBundle
-import idea.runner.Runner
+import idea.utils.MainLogger
 import kernel.project.config.ProjectConfig
+import kernel.project.task.TaskConfig
+import kernel.shell.{ScaledaRun, ScaledaRunHandler}
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.treeStructure.Tree
-import top.criwits.scaleda.idea.utils.MainLogger
-import top.criwits.scaleda.kernel.project.task.TaskConfig
-import top.criwits.scaleda.kernel.shell.{ScaledaRun, ScaledaRunHandler}
 
 import java.awt.event.{MouseAdapter, MouseEvent}
 import java.io.File
@@ -52,14 +50,19 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
         val node = selPath.getLastPathComponent match {
           case n: RootNode =>
           case n: CategoryNode =>
-          case n: TargetNode =>
-            MainLogger.warn(s"ScaledaRun: task name ${n.target.name}") // <== Double Click here
-            ProjectConfig.getConfig().map(config => {
-              config.targetByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
-                val (task, target) = f
-                ScaledaRun.runTask(ScaledaRunIdeaHandler, new File(ProjectConfig.projectBase.get), task, target)
+          case n: TargetNode => {
+            val t = new Thread(() => {
+              MainLogger.warn(s"ScaledaRun: task name ${n.target.name}") // <== Double Click here
+              ProjectConfig.getConfig().map(config => {
+                config.targetByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
+                  val (task, target) = f
+                  ScaledaRun.runTask(ScaledaRunIdeaHandler, new File(ProjectConfig.projectBase.get), task, target)
+                })
               })
             })
+            t.setDaemon(true)
+            t.start()
+          }
           // Runner.runInConsole(project, new GeneralCommandLine("C:\\Windows\\System32\\cmd.exe"), true, true)
         }
       }
