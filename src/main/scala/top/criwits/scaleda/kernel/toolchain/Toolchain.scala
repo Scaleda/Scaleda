@@ -3,7 +3,7 @@ package kernel.toolchain
 
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl._
-import kernel.utils.{KernelLogger, OS, YAMLHelper}
+import kernel.utils.{KernelLogger, OS, Paths, YAMLHelper}
 
 import java.io.{File, FilenameFilter}
 import java.lang
@@ -40,7 +40,7 @@ object Toolchain {
    * Profiles for different toolchains, loaded by [[ToolchainProfileLoader]]
    */
 
-  val defaultConfigDirectory: String = OS.getUserHome + "/.scaleda/toolchains"
+  private val defaultConfigDirectory: String = Paths.permanentToolChainsDir.getAbsolutePath
 
   private var cachedProfiles = new ListBuffer[ToolchainProfile]
 
