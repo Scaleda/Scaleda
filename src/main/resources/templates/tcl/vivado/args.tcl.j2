@@ -1,0 +1,12 @@
+set top {{ top }}
+set project_name $top
+puts "Vivado project $project_name"
+set work_dir {{ work_dir }}
+
+set device    {{ device }}
+set package   {{ package }}
+set speed     {{ speed }}
+set part      $device$package$speed
+
+set jobs {{ jobs }}
+set project_dir [file normalize ./$project_name]
