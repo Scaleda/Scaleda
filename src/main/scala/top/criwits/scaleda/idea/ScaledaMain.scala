@@ -9,6 +9,7 @@ import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
 import top.criwits.scaleda.idea.windows.{ScaledaTargetWindowFactory, ScaledaToolWindowFactory}
+import top.criwits.scaleda.kernel.template.Template
 import top.criwits.scaleda.kernel.toolchain.Toolchain
 import top.criwits.scaleda.kernel.utils.KernelLogger
 
@@ -24,6 +25,8 @@ class ScaledaMain extends /* DumbAware with */ StartupActivity {
     }
     // copy kernel logger to main logger
     KernelLogger.append(MainLogger)
+    // init jinjia
+    Template.initJinja()
     // check is having project config
     var searchedFile: Option[VirtualFile] = None
     ProjectFileIndex.getInstance(project).iterateContent(fileOrDir => {

@@ -13,6 +13,7 @@ import java.io.File
 
 object ScaledaRun {
   def runTask(handler: ScaledaRunHandler, workingDir: File, task: TaskConfig, target: TargetConfig) = {
+    KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
     val config = ProjectConfig.getConfig().get
     val info = Toolchain.toolchains(task.toolchain)
     // find profile

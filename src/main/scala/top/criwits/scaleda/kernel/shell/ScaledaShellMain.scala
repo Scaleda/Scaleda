@@ -7,6 +7,7 @@ import kernel.toolchain.Toolchain
 import kernel.utils.{JsonHelper, KernelLogger, Paths}
 
 import scopt.OParser
+import top.criwits.scaleda.kernel.template.Template
 
 import java.io.File
 
@@ -37,6 +38,8 @@ object ScaledaShellMain {
 
   def main(args: Array[String]): Unit = {
     KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
+    Template.initJinja()
+
     // seek for -C
     var pathArgFound = false
     args.foreach(arg => {
