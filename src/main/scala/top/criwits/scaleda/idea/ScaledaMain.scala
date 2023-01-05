@@ -37,6 +37,7 @@ class ScaledaMain extends /* DumbAware with */ StartupActivity {
     } else {
       val f = searchedFile.get
       ProjectConfig.configFile = Some(f.getPath)
+      ProjectConfig.projectBase = Some(f.getParent.getPath)
       MainLogger.info(s"found config: ${f}")
     }
     MainLogger.info("Scaleda launched.")

@@ -74,7 +74,7 @@ class VivadoTemplateRenderer
       `package` = taskConfig.`package`,
       speed = taskConfig.speed,
       sourceList = KernelFileUtils
-        .getAllSourceFiles(new File(ProjectConfig.projectBase.get.getAbsolutePath, config.source))
+        .getAllSourceFiles(new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, config.source))
         .map(_.getAbsolutePath)
     )
     Serialization.getCCParams(context)

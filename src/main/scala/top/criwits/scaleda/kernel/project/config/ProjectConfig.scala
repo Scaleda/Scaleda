@@ -40,7 +40,7 @@ case class ProjectConfig
 
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"
-  var projectBase: Option[File] = None
+  var projectBase: Option[String] = None
   var configFile: Option[String] = None
 
   def getConfig(path: Option[String] = configFile): Option[ProjectConfig] = {

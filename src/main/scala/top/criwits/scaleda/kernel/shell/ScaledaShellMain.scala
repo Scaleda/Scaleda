@@ -25,7 +25,7 @@ object ScaledaShellMain {
   private def loadConfig(projectRootPath: String): Unit = {
     val rootDir = new File(projectRootPath)
     if (rootDir.exists() && rootDir.isDirectory) {
-      ProjectConfig.projectBase = Some(rootDir)
+      ProjectConfig.projectBase = Some(rootDir.getAbsolutePath)
     }
     val projectConfigFile = new File(projectRootPath, ProjectConfig.defaultConfigFile)
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {

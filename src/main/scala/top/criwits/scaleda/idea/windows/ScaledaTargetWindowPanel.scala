@@ -10,11 +10,23 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.treeStructure.Tree
+import top.criwits.scaleda.idea.utils.MainLogger
 import top.criwits.scaleda.kernel.project.task.TaskConfig
+import top.criwits.scaleda.kernel.shell.{ScaledaRun, ScaledaRunHandler}
 
 import java.awt.event.{MouseAdapter, MouseEvent}
+import java.io.File
 import javax.swing.JTree
+import javax.swing.event.{TreeSelectionEvent, TreeSelectionListener}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
+
+object ScaledaRunIdeaHandler extends ScaledaRunHandler {
+  override def onStdout(data: String): Unit = MainLogger.info(data)
+
+  override def onStderr(data: String): Unit = MainLogger.error(data)
+
+  override def onReturn(returnValue: Int): Unit = MainLogger.info(s"command done, returns ${returnValue}")
+}
 
 class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(true, true) {
   // Tree
@@ -33,19 +45,46 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
   root.add(synth)
   root.add(impl)
 
-  // FIXME
-  tree.addMouseListener(new MouseAdapter {
-    override def mousePressed(e: MouseEvent): Unit = {
-      val selPath = tree.getPathForLocation(e.getX, e.getY)
-      if (e.getClickCount == 2 && selPath != null) {
+  tree.addTreeSelectionListener(new TreeSelectionListener {
+    override def valueChanged(treeSelectionEvent: TreeSelectionEvent) = {
+      val selPath = treeSelectionEvent.getPath
+      if (selPath != null) {
         val node = selPath.getLastPathComponent match {
           case n: RootNode =>
           case n: CategoryNode =>
           case n: TargetNode =>
-            println(s"${n.target.name}") // <== Double Click here
-            Runner.runInConsole(project, new GeneralCommandLine("C:\\Windows\\System32\\cmd.exe"), true, true)
+            MainLogger.warn(s"ScaledaRun: task name ${n.target.name}") // <== Double Click here
+            ProjectConfig.getConfig().map(config => {
+              config.targetByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
+                val (task, target) = f
+                ScaledaRun.runTask(ScaledaRunIdeaHandler, new File(ProjectConfig.projectBase.get), task, target)
+              })
+            })
+          // Runner.runInConsole(project, new GeneralCommandLine("C:\\Windows\\System32\\cmd.exe"), true, true)
         }
       }
+    }
+  })
+
+  // FIXME
+  tree.addMouseListener(new MouseAdapter {
+    override def mousePressed(e: MouseEvent): Unit = {
+      val selPath = tree.getPathForLocation(e.getX, e.getY)
+      // if (selPath != null) {
+      //   val node = selPath.getLastPathComponent match {
+      //     case n: RootNode =>
+      //     case n: CategoryNode =>
+      //     case n: TargetNode =>
+      //       MainLogger.warn(s"ScaledaRun: task name ${n.target.name}") // <== Double Click here
+      //       ProjectConfig.getConfig().map(config => {
+      //         config.targetByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
+      //           val (task, target) = f
+      //           ScaledaRun.runTask(ScaledaRunIdeaHandler, new File(ProjectConfig.projectBase.get), task, target)
+      //         })
+      //       })
+      //       // Runner.runInConsole(project, new GeneralCommandLine("C:\\Windows\\System32\\cmd.exe"), true, true)
+      //   }
+      // }
     }
   })
 
