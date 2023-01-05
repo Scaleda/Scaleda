@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package kernel.net
 
 import kernel.net.remote.{RemoteGrpc, RunReply, RunReplyType, RunRequest}
-import kernel.shell.command.CommandRunner
+import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.utils.KernelLogger
 
 import io.grpc.stub.StreamObserver
@@ -18,7 +18,7 @@ object RemoteServer {
     server.blockUntilShutdown()
   }
 
-  private val port = 50051
+  val port = 50051
 }
 
 class RemoteServer(executionContext: ExecutionContext) {
@@ -51,7 +51,7 @@ class RemoteServer(executionContext: ExecutionContext) {
 
   private class RemoteImpl extends RemoteGrpc.Remote {
     override def run(request: RunRequest, responseObserver: StreamObserver[RunReply]): Unit = {
-      val runner = new CommandRunner(request.command, request.path, request.envs.map(t => (t.a, t.b)))
+      val runner = new CommandRunner(CommandDeps(request.command, request.path, request.envs.map(t => (t.a, t.b))))
       val r = runner.run
       while (!r.returnValue.isCompleted) {
         r.stdOut.forEach(s => {

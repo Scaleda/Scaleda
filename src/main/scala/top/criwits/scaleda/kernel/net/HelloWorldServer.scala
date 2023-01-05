@@ -34,7 +34,7 @@ package kernel.net
 import com.example.protos.helloworld.{GreeterGrpc, HelloReply, HelloRequest}
 import io.grpc.stub.StreamObserver
 import io.grpc.{Server, ServerBuilder}
-import top.criwits.scaleda.kernel.shell.command.CommandRunner
+import top.criwits.scaleda.kernel.shell.command.{CommandDeps, CommandRunner}
 import top.criwits.scaleda.kernel.utils.KernelLogger
 
 import java.util.logging.Logger
@@ -91,7 +91,7 @@ class HelloWorldServer(executionContext: ExecutionContext) {
     }
 
     override def streamHello(request: HelloRequest, responseObserver: StreamObserver[HelloReply]): Unit = {
-      val runner = new CommandRunner("ping -c 3 127.0.0.1")
+      val runner = new CommandRunner(CommandDeps("ping -c 3 127.0.0.1"))
       val r = runner.run
       while (!r.returnValue.isCompleted) {
         r.stdOut.forEach(s => {

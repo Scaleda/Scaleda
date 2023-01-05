@@ -6,7 +6,7 @@ service Remote {
   rpc run(RunRequest) returns (stream RunReply) {}
 }
 
-message triple {
+message StringTriple {
   string a = 1;
   string b = 2;
 }
@@ -14,7 +14,7 @@ message triple {
 message RunRequest {
   string command = 1;
   string path = 2;
-  repeated triple envs = 3;
+  repeated StringTriple envs = 3;
 }
 
 enum RunReplyType {
