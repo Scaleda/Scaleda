@@ -25,7 +25,11 @@ object Template {
   def render(template: String, context: Map[String, Any]): String = {
     val c = CollectionConverters.asJava(context)
     println(s"context: ${context} => ${c}")
-    jin.get.render(template, c)
+    val curClassLoader = Thread.currentThread.getContextClassLoader
+    try {
+      Thread.currentThread.setContextClassLoader(this.getClass.getClassLoader)
+      jin.get.render(template, c)
+    } finally Thread.currentThread.setContextClassLoader(curClassLoader)
   }
 
   def renderResource(resourcePath: String, context: Map[String, Any]): String = {
