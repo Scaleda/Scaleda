@@ -80,8 +80,11 @@ object ScaledaShellMain {
           .children(
             opt[String]('s', "simulator")
               .action((x, c) => c.copy(runSimulation = x))
-            // .text(s"Run simulation, available: ${Simulator.simulators.keys.mkString(", ")}"),
-            ,
+              .text(s"Run simulation, available: ${
+                ProjectConfig.getConfig()
+                  .map(config => config.tasksSim.map(task => task.toolchain).mkString(", "))
+                  .getOrElse("None")
+              }"),
             // opt[String]("top")
             //   .action((x, c) => c.copy(simulationConfig = c.simulationConfig.copy(topModule = x)))
             //   .text("Specify top module")
