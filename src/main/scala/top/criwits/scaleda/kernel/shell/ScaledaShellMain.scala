@@ -121,7 +121,7 @@ object ScaledaShellMain {
           config.map(c => {
             ProjectConfig.getConfig().foreach(_.targetByName(shellConfig.target).map(f => {
               val (task, target) = f
-              ScaledaRun.runTask(workingDir, task, target)
+              ScaledaRun.runTask(ScaledaRunKernelHandler, workingDir, task, target)
             }).getOrElse(KernelLogger.error("no specific target!")))
           }).getOrElse(KernelLogger.error("no config loaded!"))
         }

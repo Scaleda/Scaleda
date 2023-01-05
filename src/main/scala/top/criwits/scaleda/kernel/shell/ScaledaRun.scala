@@ -1,19 +1,18 @@
 package top.criwits.scaleda
 package kernel.shell
 
+import kernel.project.config.ProjectConfig
 import kernel.project.task.{TargetConfig, TargetType, TaskConfig}
-
-import top.criwits.scaleda.kernel.project.config.ProjectConfig
-import top.criwits.scaleda.kernel.shell.command.{CommandResponse, CommandRunner}
-import top.criwits.scaleda.kernel.toolchain.Toolchain
-import top.criwits.scaleda.kernel.toolchain.executor.{SimulationExecutor, SynthesisExecutor}
-import top.criwits.scaleda.kernel.toolchain.impl.{Vivado, VivadoTemplateRenderer}
-import top.criwits.scaleda.kernel.utils.KernelLogger
+import kernel.shell.command.{CommandResponse, CommandRunner}
+import kernel.toolchain.Toolchain
+import kernel.toolchain.executor.{SimulationExecutor, SynthesisExecutor}
+import kernel.toolchain.impl.{Vivado, VivadoTemplateRenderer}
+import kernel.utils.KernelLogger
 
 import java.io.File
 
 object ScaledaRun {
-  def runTask(workingDir: File, task: TaskConfig, target: TargetConfig) = {
+  def runTask(handler: ScaledaRunHandler, workingDir: File, task: TaskConfig, target: TargetConfig) = {
     val config = ProjectConfig.getConfig().get
     val info = Toolchain.toolchains(task.toolchain)
     // find profile
@@ -39,11 +38,28 @@ object ScaledaRun {
       val commands = toolchain.commands(target.getType)
       CommandRunner.execute(commands, (commandRespType, data) => {
         commandRespType match {
-          case CommandResponse.Stdout => KernelLogger.info(data.asInstanceOf[String])
-          case CommandResponse.Stderr => KernelLogger.error(data.asInstanceOf[String])
-          case CommandResponse.Return => KernelLogger.info(s"command done, returns ${data.asInstanceOf[Int]}")
+          case CommandResponse.Stdout => handler.onStdout(data.asInstanceOf[String])
+          case CommandResponse.Stderr => handler.onStderr(data.asInstanceOf[String])
+          case CommandResponse.Return => handler.onReturn(data.asInstanceOf[Int])
         }
       })
     })
   }
+}
+
+
+trait ScaledaRunHandler {
+  def onStdout(data: String): Unit
+
+  def onStderr(data: String): Unit
+
+  def onReturn(returnValue: Int): Unit
+}
+
+object ScaledaRunKernelHandler extends ScaledaRunHandler {
+  override def onStdout(data: String): Unit = KernelLogger.info(data)
+
+  override def onStderr(data: String): Unit = KernelLogger.error(data)
+
+  override def onReturn(returnValue: Int): Unit = KernelLogger.info(s"command done, returns ${returnValue}")
 }
