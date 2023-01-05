@@ -3,7 +3,7 @@ package kernel.template
 
 import com.hubspot.jinjava.Jinjava
 import org.apache.commons.io.FileUtils
-import top.criwits.scaleda.kernel.utils.KernelLogger
+import top.criwits.scaleda.kernel.utils.{JsonHelper, KernelLogger}
 
 import java.io.{File, PrintWriter}
 import scala.jdk.javaapi.CollectionConverters
@@ -11,9 +11,11 @@ import scala.jdk.javaapi.CollectionConverters
 object Template {
   private val jin = new Jinjava()
 
+  def getJin = jin
+
   def render(template: String, context: Map[String, Any]): String = {
     val c = CollectionConverters.asJava(context)
-    // println(s"context: ${c}")
+    println(s"context: ${context} => ${c}")
     jin.render(template, c)
   }
 
@@ -21,7 +23,7 @@ object Template {
     render(scala.io.Source.fromResource(s"templates/${resourcePath}").getLines().mkString("\n"), context)
 
   def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String) = {
-    KernelLogger.info(s"render resource ${resourcePath} to ${targetPath}")
+    KernelLogger.info(s"render resource ${resourcePath} to ${targetPath}, context: ${JsonHelper(context)}")
     val result = renderResource(resourcePath, context)
     val f = new File(targetPath)
     FileUtils.touch(f)
@@ -47,6 +49,18 @@ abstract class ResourceTemplateRender
 
 object TemplateTest extends App {
   Template.renderResourceTo("test.j2", Map(
-    "test" -> "test data"
+    "test" -> "test data",
+    "list" -> Seq("a", "b")
   ), "target/test.txt")
+  val r = Template.getJin.render(
+    """
+      |test list: {% for i in list %} item:{{i}}{% endfor %}
+      |test list2: {% for i in list2 %} item:{{i}}{% endfor %}
+      |""".stripMargin, java.util.Map.of(
+      "list", java.util.List.of("a", "b"),
+      "list2", List("a", "b"),
+    ))
+  KernelLogger.warn(s"r = ${r}")
+  val li = Seq("a", "b")
+  KernelLogger.warn(s"li = ${li} => ${CollectionConverters.asJava(li)}")
 }

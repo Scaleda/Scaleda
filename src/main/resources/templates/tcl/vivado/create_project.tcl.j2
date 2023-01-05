@@ -14,7 +14,7 @@ update_compile_order -fileset sources_1
 
 {% for ip in ipList %}
 puts "Importing IP core: {{ ip }}"
-add_files -fileset constrs_1 {{ ip }}
+import_files -norecurse {{ ip }}
 {% endfor %}
 
 {% for xdc in xdcList %}
