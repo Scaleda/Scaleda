@@ -1,12 +1,12 @@
 package top.criwits.scaleda
 package kernel.shell
 
+import kernel.net.RemoteServer
 import kernel.project.config.ProjectConfig
 import kernel.toolchain.Toolchain
-import kernel.utils.{JsonHelper, KernelLogger}
+import kernel.utils.{JsonHelper, KernelLogger, Paths}
 
 import scopt.OParser
-import top.criwits.scaleda.kernel.net.RemoteServer
 
 import java.io.File
 
@@ -22,10 +22,36 @@ case class ShellArgs
  runSimulation: String = "iverilog")
 
 object ScaledaShellMain {
+  private def loadConfig(projectRootPath: String): Unit = {
+    val projectConfigFile = new File(projectRootPath, ProjectConfig.defaultConfigFile)
+    if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
+      ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
+      val config = ProjectConfig.getConfig()
+      KernelLogger.info(s"project config: ${config}")
+    }
+  }
+
   def main(args: Array[String]): Unit = {
     KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
-    val builder = OParser.builder[ShellArgs]
-    val parser = {
+    // seek for -C
+    var pathArgFound = false
+    args.foreach(arg => {
+      if (arg == "-C" || arg == "--workdir") {
+        pathArgFound = true
+      } else {
+        if (pathArgFound) {
+          loadConfig(arg)
+          pathArgFound = false
+        }
+      }
+    })
+    if (ProjectConfig.configFile.isEmpty) {
+      // try loading config in pwd
+      loadConfig(Paths.pwd.getAbsolutePath)
+    }
+    if (ProjectConfig.configFile.isEmpty) KernelLogger.info("no project config detected!")
+    val shellParser = {
+      val builder = OParser.builder[ShellArgs]
       import builder._
       OParser.sequence(
         programName("scaleda"),
@@ -67,53 +93,42 @@ object ScaledaShellMain {
         help("help").text("Prints this usage text"),
       )
     }
-    OParser.parse(parser, args, ShellArgs()) match {
-      case Some(shellConfig) => {
-        KernelLogger.info(s"shell config: ${shellConfig}")
-        val projectConfigFile = new File(shellConfig.workingDir, ProjectConfig.defaultConfigFile)
-        if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
-          ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
-          val config = ProjectConfig.getConfig()
-          KernelLogger.info(s"project config: ${config}")
-        } else {
-          KernelLogger.info("no project config detected!")
+    OParser.parse(shellParser, args, ShellArgs()).foreach(shellConfig => {
+      KernelLogger.info(s"shell config: ${shellConfig}")
+      shellConfig.runMode match {
+        case ShellRunMode.ListProfiles => {
+          KernelLogger.info("profile list:")
+          for (p <- Toolchain.profiles()) {
+            KernelLogger.info(s"${JsonHelper(p)}")
+          }
         }
-        shellConfig.runMode match {
-          case ShellRunMode.ListProfiles => {
-            KernelLogger.info("profile list:")
-            for (p <- Toolchain.profiles()) {
+        case ShellRunMode.ListTasks => {
+          KernelLogger.info("task list:")
+          ProjectConfig.getConfig().map(config =>
+            for (p <- config.tasks) {
               KernelLogger.info(s"${JsonHelper(p)}")
-            }
-          }
-          case ShellRunMode.ListTasks => {
-            KernelLogger.info("task list:")
-            ProjectConfig.getConfig().map(config =>
-              for (p <- config.tasks) {
-                KernelLogger.info(s"${JsonHelper(p)}")
-              }).getOrElse(KernelLogger.info("no task loaded"))
-          }
-          case ShellRunMode.Serve => {
-            // run as server
-            RemoteServer.start()
-          }
-          // case ShellRunMode.Simulation => {
-          //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {
-          //     KernelLogger.info(s"not supported simulator ${shellConfig.runSimulation}")
-          //   } else {
-          //     val simulator = Simulator.simulators(shellConfig.runSimulation)(
-          //       shellConfig.simulationConfig.copy(
-          //         sourceDir = config.getSourcePath(shellConfig.workingDir),
-          //         workingDir = new File(shellConfig.workingDir.getAbsolutePath, shellConfig.simulationConfig.workingDir.getPath)
-          //       ))
-          //     val returnValue = simulator.simulate()
-          //   }
-          // }
-          case _ => {
-            KernelLogger.info("not implemented.")
-          }
+            }).getOrElse(KernelLogger.info("no task loaded"))
+        }
+        case ShellRunMode.Serve => {
+          // run as server
+          RemoteServer.start()
+        }
+        // case ShellRunMode.Simulation => {
+        //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {
+        //     KernelLogger.info(s"not supported simulator ${shellConfig.runSimulation}")
+        //   } else {
+        //     val simulator = Simulator.simulators(shellConfig.runSimulation)(
+        //       shellConfig.simulationConfig.copy(
+        //         sourceDir = config.getSourcePath(shellConfig.workingDir),
+        //         workingDir = new File(shellConfig.workingDir.getAbsolutePath, shellConfig.simulationConfig.workingDir.getPath)
+        //       ))
+        //     val returnValue = simulator.simulate()
+        //   }
+        // }
+        case _ => {
+          KernelLogger.error("not implemented.")
         }
       }
-      case _ => {}
-    }
+    })
   }
 }

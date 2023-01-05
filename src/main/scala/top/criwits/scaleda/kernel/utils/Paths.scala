@@ -12,4 +12,6 @@ object Paths {
   def permanentConfigDir: File = createDirIfNonExists(new File(OS.getUserHome, ".scaleda"))
 
   def permanentToolChainsDir: File = createDirIfNonExists(new File(permanentConfigDir, "toolchains"))
+
+  def pwd = new File(System.getProperty("user.dir"))
 }
