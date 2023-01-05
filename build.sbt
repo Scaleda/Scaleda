@@ -57,4 +57,6 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   libraryDependencies += "com.hubspot.jinjava" % "jinjava" % "2.6.0",
   // https://mvnrepository.com/artifact/com.google.guava/guava
   libraryDependencies += "com.google.guava" % "guava" % "31.1-jre",
+  // https://mvnrepository.com/artifact/org.apache.commons/commons-io
+  libraryDependencies += "org.apache.commons" % "commons-io" % "1.3.2",
 )

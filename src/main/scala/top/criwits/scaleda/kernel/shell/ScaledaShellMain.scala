@@ -10,7 +10,7 @@ import scopt.OParser
 import top.criwits.scaleda.kernel.project.task.TargetType
 import top.criwits.scaleda.kernel.shell.command.{CommandResponse, CommandRunner}
 import top.criwits.scaleda.kernel.toolchain.executor.{Executor, SimulationExecutor, SynthesisExecutor}
-import top.criwits.scaleda.kernel.toolchain.impl.Vivado
+import top.criwits.scaleda.kernel.toolchain.impl.{Vivado, VivadoTemplateRenderer}
 
 import java.io.File
 
@@ -126,15 +126,16 @@ object ScaledaShellMain {
               // generate executor
               val executor = target.getType match {
                 case TargetType.Simulation =>
-                  SimulationExecutor(workingDir = workingDir, topFile = new File(config.get.topFile), profile = profile)
+                  SimulationExecutor(workingDir = new File(workingDir, ".sim"), topFile = new File(config.get.topFile), profile = profile)
                 case TargetType.Synthesis =>
-                  SynthesisExecutor(workingDir = workingDir, topFile = new File(config.get.topFile), profile = profile)
+                  SynthesisExecutor(workingDir = new File(workingDir, ".synth"), topFile = new File(config.get.topFile), profile = profile)
                 case _ => ???
               }
               if (target.preset) {
-                info._1 match {
+                task.toolchain match {
                   case Vivado.internalID => {
-                    ???
+                    val r = new VivadoTemplateRenderer(executor = executor, taskConfig = task)
+                    r.render()
                   }
                   case _ => KernelLogger.error(s"not supported preset: ${task.toolchain}")
                 }

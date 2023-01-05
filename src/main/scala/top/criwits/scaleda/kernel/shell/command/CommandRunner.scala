@@ -32,6 +32,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
 
   override def run: CommandOutputStream = {
     thread.setDaemon(true)
+    // thread.setDaemon(false)
     thread.start()
     CommandOutputStream(returnValue.future, stdOut, stdErr)
   }
@@ -71,7 +72,7 @@ object CommandRunnerTest extends App {
     KernelLogger.info(s"return value: ${r.returnValue.value.get}")
   }
   {
-    val commands = Seq(ping)
+    val commands = Seq(ping, CommandDeps("echo hi"), CommandDeps("/opt/Xilinx/Vivado/2019.2/bin/vivado -help"))
     CommandRunner.execute(commands, (commandRespType, data) => {
       commandRespType match {
         case CommandResponse.Stdout => KernelLogger.info(data.asInstanceOf[String])

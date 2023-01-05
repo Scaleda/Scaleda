@@ -2,6 +2,8 @@ package top.criwits.scaleda
 package kernel.template
 
 import com.hubspot.jinjava.Jinjava
+import org.apache.commons.io.FileUtils
+import top.criwits.scaleda.kernel.utils.KernelLogger
 
 import java.io.{File, PrintWriter}
 import scala.jdk.javaapi.CollectionConverters
@@ -19,8 +21,11 @@ object Template {
     render(scala.io.Source.fromResource(s"templates/${resourcePath}").getLines().mkString("\n"), context)
 
   def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String) = {
+    KernelLogger.info(s"render resource ${resourcePath} to ${targetPath}")
     val result = renderResource(resourcePath, context)
-    val printer = new PrintWriter(new File(targetPath))
+    val f = new File(targetPath)
+    FileUtils.touch(f)
+    val printer = new PrintWriter(f)
     printer.write(result)
     printer.close()
   }

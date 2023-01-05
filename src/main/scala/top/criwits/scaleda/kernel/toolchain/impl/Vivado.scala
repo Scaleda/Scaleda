@@ -58,7 +58,12 @@ class VivadoTemplateRenderer
   extends ResourceTemplateRender(
     "tcl/vivado",
     executor.workingDir.getAbsolutePath,
-    Map()) {
+    Map(
+      "args.tcl.j2" -> "args.tcl",
+      "create_project.tcl.j2" -> "create_project.tcl",
+      "run_synth.tcl.j2" -> "run_synth.tcl",
+      "run_impl.tcl.j2" -> "run_impl.tcl",
+    )) {
   val config = ProjectConfig.getConfig()
 
   override def context: Map[String, Any] = config.map(config => {
