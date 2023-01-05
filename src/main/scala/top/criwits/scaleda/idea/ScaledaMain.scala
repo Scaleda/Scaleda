@@ -4,10 +4,12 @@ package idea
 import idea.utils.MainLogger
 import kernel.project.config.ProjectConfig
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.{DumbAware, Project, ProjectManager}
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
+import top.criwits.scaleda.idea.runner.Runner
 import top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory
 import top.criwits.scaleda.kernel.toolchain.Toolchain
 
@@ -32,6 +34,7 @@ class ScaledaMain extends /* DumbAware with */ StartupActivity {
     }
     MainLogger.logger.info("Scaleda launched.")
   }
+
 }
 
 object ScaledaMain {
