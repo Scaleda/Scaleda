@@ -9,6 +9,7 @@ import io.grpc.stub.StreamObserver
 import io.grpc.{Server, ServerBuilder}
 
 import scala.concurrent.ExecutionContext
+import scala.language.existentials
 
 object RemoteServer {
   def start(): Unit = {

@@ -6,6 +6,7 @@ import kernel.toolchain.Toolchain
 import kernel.utils.KernelLogger
 
 import scopt.OParser
+import top.criwits.scaleda.kernel.net.RemoteServer
 
 import java.io.File
 
@@ -72,6 +73,7 @@ object ScaledaShellMain {
           }
           case ShellRunMode.Serve => {
             // run as server
+            RemoteServer.start()
           }
           // case ShellRunMode.Simulation => {
           //   if (!Simulator.simulators.keys.toSeq.contains(shellConfig.runSimulation)) {
