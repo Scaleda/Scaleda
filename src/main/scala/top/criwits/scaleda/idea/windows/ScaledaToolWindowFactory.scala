@@ -27,7 +27,7 @@ object ScaledaToolWindowFactory {
   def toolWindow(project: Project): ToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Scaleda")
   def outputPanel(project: Project): ScaledaToolWindowOutputPanel = toolWindow(project)
     .getContentManager
-    .getContent(0)
+    .getContent(0).getComponent
     .asInstanceOf[ScaledaToolWindowOutputPanel]
   def logPanel(project: Project): ScaledaToolWindowOutputPanel = toolWindow(project)
     .getContentManager
