@@ -33,8 +33,8 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     "org.antlr" % "antlr4-runtime" % "4.11.1",
     "io.circe" %% "circe-yaml" % "0.14.2",
     "com.github.scopt" %% "scopt" % "4.1.0",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.1",
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.13.1",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.1",
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.14.1",
     "ch.qos.logback" % "logback-classic" % "1.4.5",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
     "org.scalactic" %% "scalactic" % "3.2.14",
@@ -59,4 +59,6 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   libraryDependencies += "com.google.guava" % "guava" % "31.1-jre",
   // https://mvnrepository.com/artifact/org.apache.commons/commons-io
   libraryDependencies += "org.apache.commons" % "commons-io" % "1.3.2",
+  // https://mvnrepository.com/artifact/log4j/log4j
+  libraryDependencies += "log4j" % "log4j" % "1.2.17",
 )
