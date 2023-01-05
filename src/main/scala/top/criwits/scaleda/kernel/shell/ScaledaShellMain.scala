@@ -17,6 +17,8 @@ object ShellRunMode extends Enumeration {
 case class ShellArgs
 (workingDir: File = new File("."),
  runMode: ShellRunMode.Value = ShellRunMode.None,
+ serverHost: String = "",
+ serverPort: Int = RemoteServer.port,
  runSimulation: String = "iverilog")
 
 object ScaledaShellMain {
@@ -31,11 +33,20 @@ object ScaledaShellMain {
         opt[File]('C', "workdir")
           .action((x, c) => c.copy(workingDir = x))
           .text("Working directory"),
+        opt[String]("host")
+          .action((x, c) => c.copy(serverHost = x))
+          .text("Set server host for RPC"),
+        opt[Int]("port")
+          .action((x, c) => c.copy(serverPort = x))
+          .text("Set server port for RPC"),
         cmd("serve")
+          .text("Run as server")
           .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
         cmd("profiles")
+          .text("Show loaded profiles")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
         cmd("sim")
+          .text("Run simulation")
           .action((_, c) => c.copy(runMode = ShellRunMode.Simulation))
           .children(
             opt[String]('s', "simulator")

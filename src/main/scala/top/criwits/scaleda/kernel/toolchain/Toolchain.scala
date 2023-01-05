@@ -1,26 +1,30 @@
 package top.criwits.scaleda
 package kernel.toolchain
 
+import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl._
-import kernel.utils.{KernelLogger, OS, Paths, YAMLHelper}
+import kernel.utils.{KernelLogger, Paths, YAMLHelper}
 
 import java.io.{File, FilenameFilter}
-import java.lang
 import scala.collection.mutable.ListBuffer
 
 /**
  * A [[Toolchain]] is an external software used to perform simulation, synthesis and implementation.
  * Applied toolchains, like [[Vivado]] or [[Quartus]], extend this abstract base class.
+ *
  * @param executor An [[Executor]] used to hold information like configurations.
  */
 abstract class Toolchain(val executor: Executor) {
   def getInternalID: String
+
   def getName: String
 
-  def simulate(): Unit = ???
-  def synthesise(): Unit = ???
-  def implement(): Unit = ???
+  def simulate(): Seq[CommandDeps] = ???
+
+  def synthesise(): Seq[CommandDeps] = ???
+
+  def implement(): Seq[CommandDeps] = ???
 
 }
 
@@ -46,6 +50,7 @@ object Toolchain {
 
   /**
    * Load toolchain profiles from given directory
+   *
    * @param path Directory to save profiles
    */
   def profiles(path: String = defaultConfigDirectory, cache: Boolean = true): ListBuffer[ToolchainProfile] = {
