@@ -23,6 +23,6 @@ object ScaledaTargetWindowFactory {
 
   def targetPanel(project: Project): ScaledaTargetWindowPanel = toolWindow(project)
     .getContentManager
-    .getContent(0)
+    .getContent(0).getComponent
     .asInstanceOf[ScaledaTargetWindowPanel]
 }

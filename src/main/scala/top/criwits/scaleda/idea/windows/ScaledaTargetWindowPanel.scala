@@ -4,11 +4,13 @@ package idea.windows
 import idea.ScaledaBundle
 import kernel.project.config.{ProjectConfig, TaskConfig}
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.externalSystem.service.task.ui.AbstractExternalSystemToolWindowFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.treeStructure.Tree
+import top.criwits.scaleda.idea.runner.Runner
 
 import java.awt.event.{MouseAdapter, MouseEvent, MouseListener}
 import javax.swing.JTree
@@ -42,6 +44,7 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
           case n: CategoryNode =>
           case n: TargetNode =>
             println(s"${n.target.name}") // <== Double Click here
+            Runner.runInConsole(project, new GeneralCommandLine("C:\\Windows\\System32\\cmd.exe"), true, true)
         }
       }
     }
