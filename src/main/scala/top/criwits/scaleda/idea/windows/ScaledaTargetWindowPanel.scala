@@ -4,12 +4,17 @@ package idea.windows
 import idea.ScaledaBundle
 import kernel.project.config.{ProjectConfig, TaskConfig}
 
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.externalSystem.service.task.ui.AbstractExternalSystemToolWindowFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.treeStructure.Tree
+import top.criwits.scaleda.idea.runner.Runner
 
+import java.awt.event.{MouseAdapter, MouseEvent, MouseListener}
 import javax.swing.JTree
+import javax.swing.event.{TreeSelectionEvent, TreeSelectionListener}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
 
 class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(true, true) {
@@ -28,6 +33,23 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
   root.add(sims)
   root.add(synth)
   root.add(impl)
+
+  // FIXME
+  tree.addMouseListener(new MouseAdapter {
+    override def mousePressed(e: MouseEvent): Unit = {
+      val selPath = tree.getPathForLocation(e.getX, e.getY)
+      if (e.getClickCount == 2 && selPath != null) {
+        val node = selPath.getLastPathComponent match {
+          case n: RootNode =>
+          case n: CategoryNode =>
+          case n: TargetNode =>
+            println(s"${n.target.name}") // <== Double Click here
+            Runner.runInConsole(project, new GeneralCommandLine("C:\\Windows\\System32\\cmd.exe"), true, true)
+        }
+      }
+    }
+  })
+
 
   setContent(tree)
 
