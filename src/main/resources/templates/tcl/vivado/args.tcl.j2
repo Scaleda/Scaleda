@@ -10,7 +10,7 @@ set work_dir {{ workDir }}
 set device    {{ device }}
 set package   {{ package }}
 set speed     {{ speed }}
-set part      $device$package$speed
+set part      $device$package-$speed
 
 set jobs {{ jobs }}
 set project_dir [file normalize ./$project_name]
