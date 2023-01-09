@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog
+package verilog
 
 object VerilogKeywords {
   var VERILOG_KEYWORDS: Array[String] =

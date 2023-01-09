@@ -1,13 +1,12 @@
 package top.criwits.scaleda
-package idea.verilog.completion
+package verilog.completion
 
-import verilog.psi.factory.nodes.{DirectivePsiNode, PortIdentifierPsiNode, StatementPsiNode}
+import verilog.psi.factory.nodes.{DirectivePsiNode, NamedPortConnectionPsiNode, PortIdentifierPsiNode, StatementPsiNode}
 
 import com.intellij.codeInsight.completion.{CompletionContributor, CompletionType}
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.StandardPatterns.{and, not}
-import top.criwits.scaleda.idea.verilog.psi.factory.nodes.NamedPortConnectionPsiNode
-import top.criwits.scaleda.idea.verilog.{VerilogFileType, VerilogKeywords}
+import top.criwits.scaleda.verilog.{VerilogFileType, VerilogKeywords}
 
 class VerilogCompletionContributor extends CompletionContributor {
   extend(CompletionType.BASIC,

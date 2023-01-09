@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog.references
+package verilog.references
 
 import verilog.psi.factory.nodes.{ModuleIdentifierPsiNode, ReferenceHolder}
 

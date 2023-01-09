@@ -2,8 +2,8 @@ package top.criwits.scaleda.verilog.utils;
 
 import com.intellij.openapi.project.Project;
 import scala.jdk.javaapi.CollectionConverters;
-import top.criwits.scaleda.idea.verilog.VerilogPSIFileRoot;
-import top.criwits.scaleda.idea.verilog.utils.FileUtils$;
+import top.criwits.scaleda.verilog.VerilogPSIFileRoot;
+import top.criwits.scaleda.verilog.utils.FileUtils$;
 
 import java.util.List;
 

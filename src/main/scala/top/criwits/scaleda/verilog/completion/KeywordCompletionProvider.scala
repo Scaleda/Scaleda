@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog.completion
+package verilog.completion
 
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionProvider, CompletionResultSet}
 import com.intellij.codeInsight.lookup.LookupElementBuilder

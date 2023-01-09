@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog
+package verilog
 
 import com.intellij.openapi.fileTypes.{SyntaxHighlighter, SyntaxHighlighterFactory}
 import com.intellij.openapi.project.Project
