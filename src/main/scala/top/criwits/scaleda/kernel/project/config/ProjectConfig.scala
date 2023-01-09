@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import kernel.project.task.{TaskConfig, TargetConfig}
+import kernel.project.task.{TargetConfig, TaskConfig}
 import kernel.utils.{JsonHelper, KernelLogger, YAMLHelper}
 
 import java.io.File
@@ -36,6 +36,9 @@ case class ProjectConfig
     Some((h._1, h._2.get))
   }
 
+  def headTarget = targets.headOption
+
+  def headTask = targets.headOption.flatMap(t => t.tasks.headOption)
 }
 
 object ProjectConfig {
@@ -47,9 +50,13 @@ object ProjectConfig {
     path match {
       case Some(p) =>
         val config = YAMLHelper(new File(p), classOf[ProjectConfig])
-        KernelLogger.info(s"Loaded project config ${JsonHelper(config)}")
+        KernelLogger.debug(s"Loaded project config ${JsonHelper(config)}")
         Some(config)
       case None => None
     }
   }
+
+  def headTarget = getConfig().flatMap(c => c.headTarget)
+
+  def headTask = getConfig().flatMap(c => c.headTask)
 }

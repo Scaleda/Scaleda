@@ -17,3 +17,7 @@ class ScaledaRunConfigurationType extends ConfigurationType {
 
   override def getConfigurationFactories = Array(new ScaledaRunConfigurationFactory(this))
 }
+
+object ScaledaRunConfigurationType {
+  val instance = new ScaledaRunConfigurationType
+}

@@ -74,8 +74,10 @@
                     />
     </extensions>
 
+    <!-- Scaleda run tasks -->
     <extensions defaultExtensionNs="com.intellij">
         <configurationType implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationType"/>
+        <runConfigurationProducer implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationProducer"/>
     </extensions>
 
 </idea-plugin>

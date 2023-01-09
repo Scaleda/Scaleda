@@ -22,9 +22,8 @@ class ScaledaRunConfigurationEditor(private val project: Project)
 
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
-  ProjectConfig.getConfig().foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
-  ProjectConfig.getConfig().foreach(c => c.targets.headOption.foreach(t =>
-    t.tasks.foreach(t => taskName.addItem(t.name))))
+  ProjectConfig.headTarget.foreach(t => targetName.addItem(t.name))
+  ProjectConfig.headTask.foreach(t => taskName.addItem(t.name))
 
   targetName.addItemListener(e => {
     if (e.getStateChange == ItemEvent.SELECTED) {
