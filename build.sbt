@@ -38,7 +38,11 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     "ch.qos.logback" % "logback-classic" % "1.4.5",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
     "org.scalactic" %% "scalactic" % "3.2.14",
-    "org.scalatest" %% "scalatest" % "3.2.14" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.14" % "test",
+    // for logger
+    "com.lihaoyi" %% "sourcecode" % "0.2.8",
+    // for color print
+    "com.lihaoyi" %% "fansi" % "0.3.1",
   ),
   packageLibraryMappings := Seq.empty, // allow scala-library
   patchPluginXml := pluginXmlOptions { xml =>
