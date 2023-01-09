@@ -44,7 +44,7 @@ trait BasicLogger {
     else levelText(level.id - Debug.id)
 
   protected final def getSourceInfoText(implicit line: sourcecode.Line, file: sourcecode.File, name: sourcecode.Name): String =
-    (if (pathEnabled) f"${file.value}:${line.value} " else "") + name.value
+    (if (pathEnabled) f"${file.value.split("/").last.split("\\\\").last}:${line.value} " else "") + name.value
 
   protected final def logStdout[T](level: LogLevel.Value, xs: T*)(implicit line: sourcecode.Line, file: sourcecode.File, name: sourcecode.Name) =
     stdoutWithNewLine(f"${getLevelText(level)} [${getSourceInfoText}] ", xs: _*)
