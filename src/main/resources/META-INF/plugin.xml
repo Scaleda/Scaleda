@@ -12,13 +12,15 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
 
+    <!-- Actions -->
     <actions>
-
     </actions>
 
+    <!-- Listeners -->
     <applicationListeners>
     </applicationListeners>
 
+    <!-- Startup Activities -->
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="top.criwits.scaleda.idea.ScaledaMain"/>
     </extensions>
@@ -27,26 +29,22 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileType
                 name="Verilog"
-                implementationClass="top.criwits.scaleda.idea.verilog.VerilogFileType"
+                implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
                 language="Verilog"
                 extensions="v"/>
         <lang.parserDefinition language="Verilog"
-                               implementationClass="top.criwits.scaleda.idea.verilog.VerilogParserDefinition"/>
-        <lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.idea.verilog.VerilogASTFactory"/>
+                               implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
+        <lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
         <lang.syntaxHighlighterFactory language="Verilog"
-                                       implementationClass="top.criwits.scaleda.idea.verilog.VerilogSyntaxHighlighterFactory"/>
+                                       implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.idea.verilog.completion.VerilogCompletionContributor"/>
+                                implementationClass="top.criwits.scaleda.verilog.completion.VerilogCompletionContributor"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.idea.verilog.highlight.VerilogHighlightingAnnotator"/>
+                   implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.idea.verilog.annotation.VerilogReferenceAnnotator"/>
+                   implementationClass="top.criwits.scaleda.verilog.annotation.VerilogReferenceAnnotator"/>
         <lang.commenter language="Verilog"
-                        implementationClass="top.criwits.scaleda.idea.verilog.commenter.VerilogCommenter"/>
-
-
-        <!--        <toolWindow id="Scaleda" secondary="false" anchor="right" icon="/icons/logo.png"-->
-        <!--                factoryClass="top.criwits.scaleda.idea.panel.ScaledaToolWindowFactory"/>-->
+                        implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
 
     </extensions>
 

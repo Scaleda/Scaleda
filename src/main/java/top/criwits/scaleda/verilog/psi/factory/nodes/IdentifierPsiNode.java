@@ -9,7 +9,7 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiLeafNode;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.criwits.scaleda.idea.verilog.VerilogLanguage$;
+import top.criwits.scaleda.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.parser.VerilogLexer;
 
 public class IdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifierOwner {

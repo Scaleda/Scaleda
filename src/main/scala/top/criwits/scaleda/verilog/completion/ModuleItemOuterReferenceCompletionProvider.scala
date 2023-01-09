@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog.completion
+package verilog.completion
 
 import verilog.psi.factory.nodes.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
 
@@ -8,9 +8,9 @@ import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import top.criwits.scaleda.idea.verilog.VerilogFileType
-import top.criwits.scaleda.idea.verilog.references.ModuleInstantiationPsiNode
-import top.criwits.scaleda.idea.verilog.utils.FileUtils
+import top.criwits.scaleda.verilog.VerilogFileType
+import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode
+import top.criwits.scaleda.verilog.utils.FileUtils
 
 class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[CompletionParameters] {
   override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {

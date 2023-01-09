@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog
+package verilog
 
 import verilog.psi.ScopeNode
 import verilog.psi.factory.nodes.ModuleDeclarationPsiNode

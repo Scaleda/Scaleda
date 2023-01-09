@@ -1,11 +1,11 @@
 package top.criwits.scaleda
-package idea.verilog.utils
+package verilog.utils
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.{FileTypeIndex, GlobalSearchScope}
-import top.criwits.scaleda.idea.verilog.{VerilogFileType, VerilogPSIFileRoot}
+import top.criwits.scaleda.verilog.{VerilogFileType, VerilogPSIFileRoot}
 
 import scala.jdk.javaapi.CollectionConverters
 

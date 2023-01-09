@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog.commenter
+package verilog.commenter
 
 import com.intellij.lang.Commenter
 

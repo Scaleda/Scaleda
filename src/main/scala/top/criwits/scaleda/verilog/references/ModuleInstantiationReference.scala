@@ -1,10 +1,10 @@
 package top.criwits.scaleda
-package idea.verilog.references
+package verilog.references
 
 import verilog.psi.factory.nodes.ModuleDeclarationPsiNode
 
 import com.intellij.psi.{PsiElementResolveResult, PsiReferenceBase, ResolveResult}
-import top.criwits.scaleda.idea.verilog.utils.FileUtils
+import top.criwits.scaleda.verilog.utils.FileUtils
 
 class ModuleInstantiationReference(element: ModuleInstantiationPsiNode)
   extends PsiReferenceBase.Poly[ModuleInstantiationPsiNode](element, element.getHoldPsiNodeRelativeTextRange, true) {

@@ -6,11 +6,11 @@ import com.intellij.psi.tree.IElementType;
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory;
 import org.antlr.intellij.adaptor.lexer.RuleIElementType;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
-import top.criwits.scaleda.idea.verilog.VerilogLanguage$;
-import top.criwits.scaleda.idea.verilog.psi.factory.nodes.NamedPortConnectionPsiNode;
+import top.criwits.scaleda.verilog.VerilogLanguage$;
+import top.criwits.scaleda.verilog.psi.factory.nodes.NamedPortConnectionPsiNode;
 import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.factory.nodes.*;
-import top.criwits.scaleda.idea.verilog.references.ModuleInstantiationPsiNode;
+import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.verilog.highlight
+package verilog.highlight
 
 import verilog.psi.factory.nodes.DirectivePsiNode
 
