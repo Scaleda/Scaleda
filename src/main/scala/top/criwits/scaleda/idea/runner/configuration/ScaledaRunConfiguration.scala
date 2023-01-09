@@ -8,11 +8,14 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 
+import scala.collection.mutable
+
 class ScaledaRunConfiguration(project: Project, factory: ScaledaRunConfigurationFactory, name: String)
   extends LocatableConfigurationBase[RunProfileState](project, factory, name) {
 
   var targetName = ""
   var taskName = ""
+  val extraEnvs = new mutable.HashMap[String, String]
 
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] = new ScaledaRunConfigurationEditor(project)
 
