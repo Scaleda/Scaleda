@@ -74,4 +74,8 @@
                     />
     </extensions>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <configurationType implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationType"/>
+    </extensions>
+
 </idea-plugin>
