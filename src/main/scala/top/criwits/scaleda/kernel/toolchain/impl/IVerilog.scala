@@ -18,7 +18,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
   override def simulate() = {
     ProjectConfig.getConfig().map(config =>
-      config.tasks.collectFirst({ case t if t.toolchain == getInternalID => t }))
+      config.targets.collectFirst({ case t if t.toolchain == getInternalID => t }))
       .map(task => {
         Seq(
           CommandDeps(s"${executable}")

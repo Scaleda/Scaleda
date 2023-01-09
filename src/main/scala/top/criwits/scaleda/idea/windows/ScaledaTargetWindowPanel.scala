@@ -4,7 +4,7 @@ package idea.windows
 import idea.ScaledaBundle
 import idea.utils.MainLogger
 import kernel.project.config.ProjectConfig
-import kernel.project.task.TaskConfig
+import kernel.project.task.TargetConfig
 import kernel.shell.{ScaledaRun, ScaledaRunHandler}
 
 import com.intellij.openapi.project.Project
@@ -54,7 +54,7 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
             val t = new Thread(() => {
               MainLogger.warn(s"ScaledaRun: task name ${n.target.name}") // <== Double Click here
               ProjectConfig.getConfig().map(config => {
-                config.targetByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
+                config.taskByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
                   val (task, target) = f
                   ScaledaRun.runTask(ScaledaRunIdeaHandler, new File(ProjectConfig.projectBase.get), task, target)
                 })
@@ -101,9 +101,9 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
     synth.removeAllChildren()
     impl.removeAllChildren()
     ProjectConfig.getConfig().foreach(config => {
-      config.tasksSim.foreach(task => sims.add(new TargetNode(task)))
-      config.tasksSynth.foreach(task => synth.add(new TargetNode(task)))
-      config.tasksImpl.foreach(task => impl.add(new TargetNode(task)))
+      config.targetsWithSim.foreach(task => sims.add(new TargetNode(task)))
+      config.targetsWithSynth.foreach(task => synth.add(new TargetNode(task)))
+      config.targetsWithImpl.foreach(task => impl.add(new TargetNode(task)))
     })
   }
 
@@ -116,7 +116,7 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
     // TODO
   }
 
-  private class TargetNode(val target: TaskConfig) extends DefaultMutableTreeNode(target) {
+  private class TargetNode(val target: TargetConfig) extends DefaultMutableTreeNode(target) {
     setAllowsChildren(false)
   }
 

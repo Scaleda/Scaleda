@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import kernel.project.task.{TargetConfig, TaskConfig}
+import kernel.project.task.{TaskConfig, TargetConfig}
 import kernel.utils.{JsonHelper, KernelLogger, YAMLHelper}
 
 import java.io.File
@@ -14,20 +14,20 @@ case class ProjectConfig
   topModule: String = "",
   topFile: String,
   topSimFile: String,
-  tasks: Array[TaskConfig]
+  targets: Array[TargetConfig]
 ) {
-  def tasksSim = tasks.filter(t => t.targets.exists(t => t.`type` == "simulation"))
+  def targetsWithSim = targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))
 
-  def tasksSynth = tasks.filter(t => t.targets.exists(t => t.`type` == "synthesis"))
+  def targetsWithSynth = targets.filter(t => t.tasks.exists(t => t.`type` == "synthesis"))
 
-  def tasksImpl = tasks.filter(t => t.targets.exists(t => t.`type` == "implementation"))
+  def targetsWithImpl = targets.filter(t => t.tasks.exists(t => t.`type` == "implementation"))
 
-  def tasksByToolchain(toolchain: String) = tasks.filter(_.toolchain == toolchain)
+  def targetsByToolchain(toolchain: String) = targets.filter(_.toolchain == toolchain)
 
-  def targetNames = tasks.flatMap(_.targets).map(_.name)
+  def taskNames = targets.flatMap(_.tasks).map(_.name)
 
-  def targetByName(name: String): Option[(TaskConfig, TargetConfig)] = {
-    val r = tasks.map(task => (task, task.targets))
+  def taskByName(name: String): Option[(TargetConfig, TaskConfig)] = {
+    val r = targets.map(task => (task, task.tasks))
       .filter(f => f._2.exists(t => t.name == name))
       .map(f => (f._1, f._2.reduceOption((a, b) => if (a.name == name) a else b)))
     if (r.isEmpty) return None

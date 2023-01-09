@@ -89,10 +89,10 @@ object ScaledaShellMain {
               .action((x, c) => c.copy(target = x))
               .text(s"Available targets: ${
                 ProjectConfig.getConfig()
-                  .map(config => config.targetNames.mkString(", "))
+                  .map(config => config.taskNames.mkString(", "))
                   .getOrElse("None")
               }")
-              .validate(name => if (ProjectConfig.getConfig().exists(c => c.targetNames.contains(name)))
+              .validate(name => if (ProjectConfig.getConfig().exists(c => c.taskNames.contains(name)))
                 success else failure(s"no target ${name} found!")),
           ),
         help("help").text("Prints this usage text"),
@@ -112,7 +112,7 @@ object ScaledaShellMain {
         case ShellRunMode.ListTasks => {
           KernelLogger.info("task list:")
           ProjectConfig.getConfig().map(config =>
-            for (p <- config.tasks) {
+            for (p <- config.targets.flatMap(_.tasks)) {
               KernelLogger.info(s"${JsonHelper(p)}")
             }).getOrElse(KernelLogger.info("no task loaded"))
         }
@@ -122,7 +122,7 @@ object ScaledaShellMain {
         }
         case ShellRunMode.Run => {
           config.map(c => {
-            ProjectConfig.getConfig().foreach(_.targetByName(shellConfig.target).map(f => {
+            ProjectConfig.getConfig().foreach(_.taskByName(shellConfig.target).map(f => {
               val (task, target) = f
               ScaledaRun.runTask(ScaledaRunKernelHandler, workingDir, task, target)
             }).getOrElse(KernelLogger.error("no specific target!")))

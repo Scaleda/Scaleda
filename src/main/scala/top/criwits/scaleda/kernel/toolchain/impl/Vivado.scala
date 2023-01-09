@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package kernel.toolchain.impl
 
 import kernel.project.config.ProjectConfig
-import kernel.project.task.TaskConfig
+import kernel.project.task.TargetConfig
 import kernel.template.ResourceTemplateRender
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.Executor
@@ -51,7 +51,7 @@ case class VivadoTemplateContext
  timingReport: Boolean = false)
 
 class VivadoTemplateRenderer
-(executor: Executor, taskConfig: TaskConfig)
+(executor: Executor, taskConfig: TargetConfig)
   extends ResourceTemplateRender(
     "tcl/vivado",
     executor.workingDir.getAbsolutePath,

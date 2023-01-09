@@ -3,8 +3,17 @@ package kernel.project.task
 
 case class TaskConfig
 (name: String,
- toolchain: String,
- device: String,
- `package`: String,
- speed: Int,
- targets: Array[TargetConfig])
+ `type`: String,
+ tcl: String,
+ preset: Boolean = false) {
+  def getType = `type` match {
+    case "simulation" => TaskType.Simulation
+    case "synthesis" => TaskType.Synthesis
+    case "implementation" => TaskType.Implement
+    case _ => ???
+  }
+}
+
+object TaskType extends Enumeration {
+  val Simulation, Synthesis, Implement = Value
+}
