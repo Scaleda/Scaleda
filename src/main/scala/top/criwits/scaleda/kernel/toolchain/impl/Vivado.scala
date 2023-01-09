@@ -25,6 +25,9 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
 
   override def synthesise() = {
     Seq(
+      // TODO: fix CommandRunner
+      CommandDeps(s"echo kami HOYO-MiX", executor.workingDir.getAbsolutePath),
+      CommandDeps(s"${executor.profile.path} -version", executor.workingDir.getAbsolutePath),
       CommandDeps(s"${executor.profile.path} -mode batch -source run_synth.tcl", executor.workingDir.getAbsolutePath),
     )
   }
