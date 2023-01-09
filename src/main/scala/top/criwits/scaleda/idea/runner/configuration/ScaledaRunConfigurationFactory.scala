@@ -6,5 +6,7 @@ import com.intellij.openapi.project.Project
 
 class ScaledaRunConfigurationFactory(private val runConfigurationType: ScaledaRunConfigurationType)
   extends ConfigurationFactory(runConfigurationType) {
-  override def createTemplateConfiguration(project: Project) = ???
+  override def createTemplateConfiguration(project: Project) = new ScaledaRunConfiguration(project, this, "name")
+
+  override def getId = "SCALEDA_TASKS_RUN_CONFIGURATION_FACTORY"
 }
