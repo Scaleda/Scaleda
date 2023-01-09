@@ -8,5 +8,7 @@ class ScaledaRunConfigurationFactory(private val runConfigurationType: ScaledaRu
   extends ConfigurationFactory(runConfigurationType) {
   override def createTemplateConfiguration(project: Project) = new ScaledaRunConfiguration(project, this, "name")
 
-  override def getId = "SCALEDA_TASKS_RUN_CONFIGURATION_FACTORY"
+  override def getId = "Scaleda"
+
+  override def getName = "SCALEDA_TASKS_RUN_CONFIGURATION_FACTORY"
 }

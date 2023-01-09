@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project
 class ScaledaRunConfiguration(project: Project, factory: ScaledaRunConfigurationFactory, name: String)
   extends LocatableConfigurationBase[RunProfileState](project, factory, name) {
 
+  var targetName = ""
   var taskName = ""
 
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] = new ScaledaRunConfigurationEditor(project)
