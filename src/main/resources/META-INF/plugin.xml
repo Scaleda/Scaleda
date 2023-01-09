@@ -14,6 +14,9 @@
 
     <!-- Actions -->
     <actions>
+        <action id="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction"
+                class="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction" text="Run last Scaleda Task"
+                description="Run last Scaleda task"/>
     </actions>
 
     <!-- Listeners -->
