@@ -7,15 +7,15 @@ import com.intellij.execution.ui.{ConsoleView, ConsoleViewContentType}
 import com.intellij.openapi.diagnostic.Logger
 import sourcecode.{File, Line, Name}
 
-object MainLogger extends BasicLogger {
-  private val name = "scaleda-idea"
+object OutputLogger extends BasicLogger {
+  private val name = "scaleda-output"
   val logger: Logger = Logger.getInstance(name)
   var consoleView: Option[ConsoleView] = None
 
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit line: Line, file: File, name: Name) = {
     import LogLevel._
     val args = xs.mkString(" ")
-    val msg = f"[${getSourceInfoText}] $args"
+    val msg = args
     level match {
       case Debug => logger.debug(msg)
       case Info => logger.info(msg)

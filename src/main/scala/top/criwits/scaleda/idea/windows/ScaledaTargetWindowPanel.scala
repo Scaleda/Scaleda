@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows
 
 import idea.ScaledaBundle
-import idea.utils.MainLogger
+import idea.utils.{MainLogger, OutputLogger}
 import kernel.project.config.ProjectConfig
 import kernel.project.task.TargetConfig
 import kernel.shell.{ScaledaRun, ScaledaRunHandler}
@@ -19,11 +19,11 @@ import javax.swing.event.{TreeSelectionEvent, TreeSelectionListener}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
 
 object ScaledaRunIdeaHandler extends ScaledaRunHandler {
-  override def onStdout(data: String): Unit = MainLogger.info(data)
+  override def onStdout(data: String): Unit = OutputLogger.info(data)
 
-  override def onStderr(data: String): Unit = MainLogger.error(data)
+  override def onStderr(data: String): Unit = OutputLogger.error(data)
 
-  override def onReturn(returnValue: Int): Unit = MainLogger.info(s"command done, returns ${returnValue}")
+  override def onReturn(returnValue: Int): Unit = OutputLogger.info(s"command done, returns ${returnValue}")
 }
 
 class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(true, true) {

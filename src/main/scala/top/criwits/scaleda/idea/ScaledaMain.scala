@@ -1,25 +1,28 @@
 package top.criwits.scaleda
 package idea
 
-import idea.utils.MainLogger
+import idea.utils.{MainLogger, OutputLogger}
+import idea.windows.ScaledaToolWindowFactory
 import kernel.project.config.ProjectConfig
+import kernel.template.Template
+import kernel.utils.KernelLogger
 
-import com.intellij.openapi.project.{DumbAware, Project, ProjectManager}
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
-import top.criwits.scaleda.idea.windows.{ScaledaTargetWindowFactory, ScaledaToolWindowFactory}
-import top.criwits.scaleda.kernel.template.Template
-import top.criwits.scaleda.kernel.toolchain.Toolchain
-import top.criwits.scaleda.kernel.utils.KernelLogger
-
-import java.io.File
 
 class ScaledaMain extends /* DumbAware with */ StartupActivity {
   override def runActivity(project: Project): Unit = {
     // setup main logger
     try {
       MainLogger.consoleView = Some(ScaledaToolWindowFactory.logPanel(project).consoleView)
+    } catch {
+      case e: Throwable => MainLogger.error(e.getMessage)
+    }
+    // setup output logger
+    try {
+      OutputLogger.consoleView = Some(ScaledaToolWindowFactory.outputPanel(project).consoleView)
     } catch {
       case e: Throwable => MainLogger.error(e.getMessage)
     }
@@ -45,7 +48,4 @@ class ScaledaMain extends /* DumbAware with */ StartupActivity {
     }
     MainLogger.info("Scaleda launched.")
   }
-}
-
-object ScaledaMain {
 }
