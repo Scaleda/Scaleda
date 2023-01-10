@@ -8,7 +8,7 @@ import org.scalatest.matchers.should
 
 class PathsTester extends AnyFlatSpec with should.Matchers {
   behavior of "Paths"
-  it should "test get executable absolute path" in {
+  it should "get executable absolute path" in {
     OS.getOSType match {
       case OS.Windows => {
         KernelLogger.info(Paths.findExecutableOnPath("notepad.exe"))

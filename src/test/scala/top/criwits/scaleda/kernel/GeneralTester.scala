@@ -11,7 +11,7 @@ import scala.concurrent.Await
 class GeneralTester extends AnyFlatSpec with should.Matchers {
   behavior of "General"
 
-  it should "run async / await" in {
+  it should "run asynchronously" in {
     import scala.async.Async.{async, await}
     import scala.concurrent.ExecutionContext.Implicits.global
     val future = async {

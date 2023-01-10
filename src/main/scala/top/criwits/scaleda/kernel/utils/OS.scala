@@ -19,6 +19,11 @@ object OS extends Enumeration {
     case _ => Unix
   }
 
+  def isWindows: Boolean = getOSType == Windows
+
+  def getShell: String = if (isWindows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"
+  def shell(command: String): String = s"$getShell \"$command\""
+
   /**
    * Get user home directory path, i.e. `~`
    *
