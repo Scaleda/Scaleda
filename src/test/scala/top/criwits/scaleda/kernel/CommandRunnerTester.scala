@@ -1,18 +1,18 @@
 package top.criwits.scaleda
 package kernel
 
+import kernel.shell.ScaledaRunKernelHandler
+import kernel.shell.command.{CommandDeps, CommandRunner}
+import kernel.utils.{KernelLogger, OS}
+
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import top.criwits.scaleda.kernel.shell.ScaledaRunKernelHandler
-import top.criwits.scaleda.kernel.shell.command.{CommandDeps, CommandResponse, CommandRunner}
-import top.criwits.scaleda.kernel.utils.{KernelLogger, OS}
 
 class CommandRunnerTester extends AnyFlatSpec with should.Matchers {
   behavior of "CommandRunner"
 
-  it should "simply echo `helloworld`" in {
-    val shell = if (OS.getOSType == OS.Windows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"
-    val command = s"$shell \"echo helloworld\""
+  it should "echo `helloworld`" in {
+    val command = OS.shell("echo helloworld")
     KernelLogger.info(s"Test command: $command")
 
     val cmd = CommandDeps(command)
@@ -26,26 +26,8 @@ class CommandRunnerTester extends AnyFlatSpec with should.Matchers {
     assert(output == "helloworld")
   }
 
-  it should "test ping output" in {
-    val ping = CommandDeps("ping -c 3 127.0.0.1")
-
-    {
-      val runner = new CommandRunner(ping)
-      val r = runner.run
-      while (!r.returnValue.isCompleted) {
-        r.stdOut.forEach(s => KernelLogger.info(s))
-        r.stdErr.forEach(s => KernelLogger.error(s))
-        Thread.sleep(CommandRunner.delay)
-      }
-      r.stdOut.forEach(s => KernelLogger.info(s))
-      r.stdErr.forEach(s => KernelLogger.error(s))
-      KernelLogger.info(s"return value: ${r.returnValue.value.get}")
-    }
-    {
-      val commands = Seq(ping, CommandDeps("echo hi"),
-        // CommandDeps("/opt/Xilinx/Vivado/2019.2/bin/vivado -help")
-      )
-      CommandRunner.execute(commands, ScaledaRunKernelHandler)
-    }
+  it should "ping 127.0.0.1" in {
+    val ping = CommandDeps(OS.shell(s"ping ${if (OS.isWindows) "-n" else "-c"} 4 127.0.0.1"))
+    CommandRunner.execute(Seq(ping), ScaledaRunKernelHandler)
   }
 }

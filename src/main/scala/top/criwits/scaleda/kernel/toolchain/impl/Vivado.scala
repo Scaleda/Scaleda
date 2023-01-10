@@ -34,36 +34,31 @@ object Vivado {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String = "vivado"
 
-  def verify(toolchainProfile: ToolchainProfile): (Int, Option[String]) = {
-    // Vivado verifier
-    val vivadoFile = new File(toolchainProfile.path + "/bin/vivado" + (if (OS.getOSType == OS.Windows) ".bat" else ""))
-    KernelLogger.info(s"Vivado path: ${vivadoFile.getAbsolutePath}")
+  class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
+    override def verifyCommandLine: Option[CommandDeps] = {
+      // Vivado verifier
+      val vivadoFile = new File(toolchainProfile.path + "/bin/vivado" + (if (OS.getOSType == OS.Windows) ".bat" else ""))
+      KernelLogger.info(s"Vivado path: ${vivadoFile.getAbsolutePath}")
 
-    if (!vivadoFile.exists()) {
-      (-1, None)
+      if (!vivadoFile.exists()) {
+        None
+      }
+
+      val cmdLine =
+        s"${if (OS.getOSType == OS.Windows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"} \"${vivadoFile.getAbsolutePath} -version\""
+
+      KernelLogger.info(s"Vivado cmd line: ${cmdLine}")
+
+      Some(CommandDeps(cmdLine))
     }
 
-    val cmdLine = s"${if (OS.getOSType == OS.Windows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"} \"${vivadoFile.getAbsolutePath} -version\""
-    KernelLogger.info(s"Vivado cmd line: ${cmdLine}")
-
-    val command = CommandDeps(cmdLine)
-
-    var versionInfo: String = ""
-    var returnValue: Int = 0
-
-    CommandRunner.execute(Seq(command), new ScaledaRunKernelHandlerWithReturn {
-      override def onReturn(r: Int): Unit = returnValue = r
-    })
-
-    KernelLogger.info(s"Return val: $returnValue, out: ${versionInfo}")
-
-    if (returnValue == 0) {
-      val versionStr = versionInfo.split("\n").head
-      (0, Some(versionStr))
-    } else {
-      (returnValue, None)
+    override def parseVersionInfo(returnValue: Int, stdOut: String): (Boolean, Option[String]) = {
+      if (returnValue != 0) {
+        (false, None)
+      } else {
+        (true, Some(stdOut.split("\n").head))
+      }
     }
-
   }
 
   case class TemplateContext

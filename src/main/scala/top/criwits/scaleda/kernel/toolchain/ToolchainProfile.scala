@@ -3,9 +3,11 @@ package kernel.toolchain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.jetbrains.annotations.Nls
+import top.criwits.scaleda.kernel.shell.command.CommandDeps
 import top.criwits.scaleda.kernel.toolchain.impl.Vivado
 
 import java.io.File
+import scala.concurrent.Future
 
 /**
  * Class for a profile for a specific toolchain
@@ -23,10 +25,25 @@ class ToolchainProfile(var profileName: String,
   @JsonIgnore
   var removed: Boolean = false
 
-  def verify(): (Int, Option[String]) = {
+  /**
+   * Verify current toolchain status
+   * @return
+   */
+  @JsonIgnore
+  def getVerifier: Option[ToolchainProfile.Verifier] = {
     toolchainType match {
-      case Vivado.internalID => Vivado.verify(this)
-      case _ => (-2, None)
+      case Vivado.internalID => Some(new Vivado.Verifier(this))
+      case _ => None
     }
+  }
+}
+
+object ToolchainProfile {
+  /**
+   * Verifier for profile
+   */
+  abstract class Verifier(val toolchainProfile: ToolchainProfile) {
+    def verifyCommandLine: Option[CommandDeps]
+    def parseVersionInfo(returnValue: Int, stdOut: String): (Boolean, Option[String])
   }
 }

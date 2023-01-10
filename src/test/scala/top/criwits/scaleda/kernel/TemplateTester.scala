@@ -11,7 +11,8 @@ import scala.jdk.javaapi.CollectionConverters
 
 class TemplateTester extends AnyFlatSpec with should.Matchers {
   behavior of "Template"
-  it should "test template loading from resources" in {
+
+  it should "load template from resources" in {
     Template.renderResourceTo("test.j2", Map(
       "test" -> "test data",
       "list" -> Seq("a", "b")

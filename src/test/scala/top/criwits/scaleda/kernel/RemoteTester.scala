@@ -16,7 +16,7 @@ class RemoteTester extends AnyFlatSpec with should.Matchers {
     serverThread.setDaemon(true)
     serverThread.start()
     val remoteCommandDeps = RemoteCommandDeps()
-    val commands = Seq(CommandDeps("ping -c 3 127.0.0.1"), CommandDeps("echo hi"))
+    val commands = Seq(CommandDeps("ping -c 3 127.0.0.1"), CommandDeps("echo hi")) // FIXME: remote OS type get?
     RemoteCommandRunner.execute(remoteCommandDeps, commands, ScaledaRunKernelHandler)
   }
 }

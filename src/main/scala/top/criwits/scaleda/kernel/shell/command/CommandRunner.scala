@@ -1,9 +1,8 @@
 package top.criwits.scaleda
 package kernel.shell.command
 
+import kernel.shell.ScaledaRunHandler
 import kernel.utils.KernelLogger
-
-import top.criwits.scaleda.kernel.shell.ScaledaRunHandler
 
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
@@ -18,9 +17,9 @@ case class CommandDeps
 (command: String, path: String = "", envs: Seq[(String, String)] = Seq())
 
 class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
-  val path = if (deps.path.isEmpty) System.getProperty("user.dir") else deps.path
-  val command = deps.command
-  val envs = deps.envs
+  val path: String = if (deps.path.isEmpty) System.getProperty("user.dir") else deps.path
+  val command: String = deps.command
+  val envs: Seq[(String, String)] = deps.envs
   val workingDir = new File(path)
   private val proc = Process(command, workingDir, envs: _*)
   protected val returnValue = Promise[Int]()
@@ -42,7 +41,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   }
 }
 
-//noinspection duplicatedcode
+//noinspection DuplicatedCode
 object CommandRunner {
   val delay = 300
 
