@@ -65,4 +65,7 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   libraryDependencies += "org.apache.commons" % "commons-io" % "1.3.2",
   // https://mvnrepository.com/artifact/log4j/log4j
   libraryDependencies += "log4j" % "log4j" % "1.2.17",
+  libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "1.0.1",
+  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+  scalacOptions += "-Xasync",
 )
