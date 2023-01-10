@@ -6,4 +6,6 @@ import javax.swing.tree.TreeNode
 
 abstract class ScaledaRunTreeNode(val name: String) extends TreeNode {
   val icon: Icon
+
+  override def toString = name
 }

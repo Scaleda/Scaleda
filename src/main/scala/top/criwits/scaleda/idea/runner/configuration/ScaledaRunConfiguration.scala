@@ -39,7 +39,8 @@ class ScaledaRunConfiguration(
     new CommandLineState(environment) {
       override def startProcess() = {
         val cmd = new GeneralCommandLine(
-          "/opt/Xilinx/Vivado/2019.2/bin/vivado -help"
+          "/opt/Xilinx/Vivado/2019.2/bin/vivado",
+          "-help"
         )
         val processHandler = new ColoredProcessHandler(cmd)
         processHandler.setShouldKillProcessSoftly(true)

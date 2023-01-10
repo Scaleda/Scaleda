@@ -13,7 +13,7 @@ class ScaledaRunTargetNode(val target: TargetConfig)
     extends ScaledaRunTreeNode(target.name) {
   override val icon = Icons.mainSmall
 
-  var parent: Option[TreeNode] = None
+  var parent: Option[ScaledaRunRootNode] = None
 
   private val taskNodes =
     CollectionConverters.asJava(target.tasks.map(t => {

@@ -1,8 +1,9 @@
 package top.criwits.scaleda
 package idea.windows.tasks
 
-import idea.utils.Icons
 import kernel.project.task.TaskConfig
+
+import com.intellij.icons.AllIcons
 
 import java.util
 import javax.swing.Icon
@@ -10,9 +11,9 @@ import javax.swing.tree.TreeNode
 
 class ScaledaRunTaskNode(val task: TaskConfig)
     extends ScaledaRunTreeNode(task.name) {
-  override val icon: Icon = Icons.mainSmall
+  override val icon: Icon = AllIcons.RunConfigurations.TestState.Run
 
-  var parent: Option[TreeNode] = None
+  var parent: Option[ScaledaRunTargetNode] = None
 
   override def getChildAt(i: Int): TreeNode = null
 

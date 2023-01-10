@@ -4,21 +4,19 @@ package idea.runner.task
 import idea.ScaledaBundle
 import idea.runner.configuration.{
   ScaledaRunConfigurationFactory,
-  ScaledaRunConfigurationProducer,
   ScaledaRunConfigurationType
 }
-import idea.utils.Icons
 import idea.windows.tasks.ScaledaRunTaskNode
 import kernel.project.config.ProjectConfig
 
-import com.intellij.execution.{Executor, Location, PsiLocation, RunManagerEx}
+import com.intellij.execution.Executor
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.impl.{
   RunManagerImpl,
   RunnerAndConfigurationSettingsImpl
 }
 import com.intellij.execution.runners.ExecutionUtil
-import com.intellij.openapi.actionSystem.impl.SimpleDataContext
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
@@ -30,7 +28,7 @@ class ScaledaRunToolWindowTaskAction(
 ) extends AnAction(
       ScaledaBundle.message("tasks.action.run.tool.window.task.name"),
       ScaledaBundle.message("tasks.action.run.wool.window.task.description"),
-      Icons.mainSmall
+      AllIcons.RunConfigurations.TestState.Run
     ) {
   override def actionPerformed(e: AnActionEvent): Unit = {
     ProjectConfig
