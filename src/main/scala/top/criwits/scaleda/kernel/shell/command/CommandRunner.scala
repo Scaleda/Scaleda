@@ -3,6 +3,8 @@ package kernel.shell.command
 
 import kernel.utils.KernelLogger
 
+import top.criwits.scaleda.kernel.shell.ScaledaRunHandler
+
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
@@ -40,51 +42,26 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   }
 }
 
-object CommandResponse extends Enumeration {
-  val Stdout, Stderr, Return = Value
-}
-
 //noinspection duplicatedcode
 object CommandRunner {
   val delay = 300
 
-  def execute(commands: Seq[CommandDeps], callback: (CommandResponse.Value, Any) => Unit): Unit =
+  def executeLocalOrRemote(remoteCommandDeps: Option[RemoteCommandDeps], commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
     commands.foreach(command => {
       KernelLogger.info(s"running command: ${command.command}")
-      val runner = new CommandRunner(command).run
+      val runner = remoteCommandDeps.map(r => new RemoteCommandRunner(command, r).run)
+        .getOrElse(new CommandRunner(command).run)
       do {
-        runner.stdOut.forEach(s => callback(CommandResponse.Stdout, s))
-        runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
+        runner.stdOut.forEach(s => handler.onStdout(s))
+        runner.stdErr.forEach(s => handler.onStderr(s))
         Thread.sleep(delay)
       } while (!runner.returnValue.isCompleted)
       // To ensure output & error are got for the last time
-      runner.stdOut.forEach(s => callback(CommandResponse.Stdout, s))
-      runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
-      callback(CommandResponse.Return, runner.returnValue.value.get.get)
+      runner.stdOut.forEach(s => handler.onStdout(s))
+      runner.stdErr.forEach(s => handler.onStderr(s))
+      handler.onReturn(runner.returnValue.value.get.get)
     })
-}
 
-object CommandRunnerTest extends App {
-  val ping = CommandDeps("ping -c 3 127.0.0.1")
-
-  {
-    val runner = new CommandRunner(ping)
-    val r = runner.run
-    while (!r.returnValue.isCompleted) {
-      r.stdOut.forEach(s => KernelLogger.info(s))
-      r.stdErr.forEach(s => KernelLogger.error(s))
-      Thread.sleep(CommandRunner.delay)
-    }
-    KernelLogger.info(s"return value: ${r.returnValue.value.get}")
-  }
-  {
-    val commands = Seq(ping, CommandDeps("echo hi"), CommandDeps("/opt/Xilinx/Vivado/2019.2/bin/vivado -help"))
-    CommandRunner.execute(commands, (commandRespType, data) => {
-      commandRespType match {
-        case CommandResponse.Stdout => KernelLogger.info(data.asInstanceOf[String])
-        case CommandResponse.Stderr => KernelLogger.error(data.asInstanceOf[String])
-        case CommandResponse.Return => KernelLogger.info(s"command done, returns ${data.asInstanceOf[Int]}")
-      }
-    })
-  }
+  def execute(commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
+    executeLocalOrRemote(None, commands, handler)
 }

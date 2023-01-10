@@ -66,15 +66,15 @@
         <toolWindow id="Scaleda"
                     canCloseContents="false"
                     anchor="bottom"
-                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaToolWindowFactory"
+                    factoryClass="top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory"
                     />
         <!-- FIXME -->
-        <toolWindow id="Scaleda Targets"
-                    secondary="true"
-                    anchor="left"
-                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory"
-                    doNotActivateOnStart="true"
-                    />
+<!--        <toolWindow id="Scaleda Targets"-->
+<!--                    secondary="true"-->
+<!--                    anchor="left"-->
+<!--                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory"-->
+<!--                    doNotActivateOnStart="true"-->
+<!--                    />-->
     </extensions>
 
     <!-- Scaleda run tasks -->

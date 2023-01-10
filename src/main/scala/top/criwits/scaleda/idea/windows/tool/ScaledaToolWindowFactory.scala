@@ -1,13 +1,11 @@
 package top.criwits.scaleda
-package idea.windows
+package idea.windows.tool
+
+import idea.ScaledaBundle
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory, ToolWindowManager}
 import com.intellij.ui.content.ContentFactory
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.idea.utils.Icons
-
-import javax.swing.Icon
 
 class ScaledaToolWindowFactory extends ToolWindowFactory {
   override def createToolWindowContent(project: Project, toolWindow: ToolWindow): Unit = {

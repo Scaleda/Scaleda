@@ -3,6 +3,7 @@ package kernel.shell.command
 
 import kernel.net.RemoteServer
 import kernel.net.remote.{RemoteGrpc, RunReplyType, RunRequest, StringTriple}
+import kernel.shell.ScaledaRunHandler
 import kernel.utils.KernelLogger
 
 import io.grpc.ManagedChannelBuilder
@@ -37,13 +38,7 @@ class RemoteCommandRunner(deps: CommandDeps, remoteCommandDeps: RemoteCommandDep
   }
 }
 
-object RemoteCommandRunnerTest extends App {
-  val runner = new RemoteCommandRunner(CommandDeps("ping -c 3 127.0.0.1"), RemoteCommandDeps())
-  val r = runner.run
-  while (!r.returnValue.isCompleted) {
-    r.stdOut.forEach(s => KernelLogger.info(s))
-    r.stdErr.forEach(s => KernelLogger.error(s))
-    Thread.sleep(300)
-  }
-  KernelLogger.info(s"return value: ${r.returnValue.value.get}")
+object RemoteCommandRunner {
+  def execute(remoteCommandDeps: RemoteCommandDeps, commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
+    CommandRunner.executeLocalOrRemote(Some(remoteCommandDeps), commands, handler)
 }

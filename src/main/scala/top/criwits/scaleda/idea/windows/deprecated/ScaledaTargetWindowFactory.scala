@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.windows
+package idea.windows.deprecated
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory, ToolWindowManager}

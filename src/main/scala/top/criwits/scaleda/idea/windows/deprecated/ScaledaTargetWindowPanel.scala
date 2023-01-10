@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.windows
+package idea.windows.deprecated
 
 import idea.ScaledaBundle
 import idea.utils.{MainLogger, OutputLogger}

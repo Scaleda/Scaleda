@@ -4,7 +4,7 @@ package idea.runner
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.openapi.project.Project
-import top.criwits.scaleda.idea.windows.ScaledaToolWindowFactory
+import top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory
 
 object Runner {
   def runInConsole(
