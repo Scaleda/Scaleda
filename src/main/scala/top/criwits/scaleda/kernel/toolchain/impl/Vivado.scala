@@ -3,13 +3,13 @@ package kernel.toolchain.impl
 
 import kernel.project.config.ProjectConfig
 import kernel.project.task.TargetConfig
+import kernel.shell.ScaledaRunKernelHandlerWithReturn
+import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
-import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl.Vivado.{internalID, userFriendlyName}
+import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.{KernelFileUtils, KernelLogger, OS, Serialization}
-
-import top.criwits.scaleda.kernel.shell.command.{CommandDeps, CommandResponse, CommandRunner}
 
 import java.io.File
 
@@ -54,11 +54,8 @@ object Vivado {
     var versionInfo: String = ""
     var returnValue: Int = 0
 
-    CommandRunner.execute(Seq(command), (r, d) => {
-      r match {
-        case CommandResponse.Stdout | CommandResponse.Stderr => KernelLogger.info( d.asInstanceOf[String] )
-        case CommandResponse.Return => returnValue = d.asInstanceOf[Int]
-      }
+    CommandRunner.execute(Seq(command), new ScaledaRunKernelHandlerWithReturn {
+      override def onReturn(r: Int): Unit = returnValue = r
     })
 
     KernelLogger.info(s"Return val: $returnValue, out: ${versionInfo}")

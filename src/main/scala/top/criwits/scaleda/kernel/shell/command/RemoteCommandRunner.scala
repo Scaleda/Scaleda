@@ -3,6 +3,7 @@ package kernel.shell.command
 
 import kernel.net.RemoteServer
 import kernel.net.remote.{RemoteGrpc, RunReplyType, RunRequest, StringTriple}
+import kernel.shell.ScaledaRunHandler
 import kernel.utils.KernelLogger
 
 import io.grpc.ManagedChannelBuilder
@@ -35,4 +36,9 @@ class RemoteCommandRunner(deps: CommandDeps, remoteCommandDeps: RemoteCommandDep
     thread.start()
     CommandOutputStream(returnValue.future, stdOut, stdErr)
   }
+}
+
+object RemoteCommandRunner {
+  def execute(remoteCommandDeps: RemoteCommandDeps, commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
+    CommandRunner.executeLocalOrRemote(Some(remoteCommandDeps), commands, handler)
 }

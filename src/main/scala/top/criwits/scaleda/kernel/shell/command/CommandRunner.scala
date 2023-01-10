@@ -3,6 +3,8 @@ package kernel.shell.command
 
 import kernel.utils.KernelLogger
 
+import top.criwits.scaleda.kernel.shell.ScaledaRunHandler
+
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
@@ -48,18 +50,22 @@ object CommandResponse extends Enumeration {
 object CommandRunner {
   val delay = 300
 
-  def execute(commands: Seq[CommandDeps], callback: (CommandResponse.Value, Any) => Unit): Unit =
+  def executeLocalOrRemote(remoteCommandDeps: Option[RemoteCommandDeps], commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
     commands.foreach(command => {
       KernelLogger.info(s"running command: ${command.command}")
-      val runner = new CommandRunner(command).run
+      val runner = remoteCommandDeps.map(r => new RemoteCommandRunner(command, r).run)
+        .getOrElse(new CommandRunner(command).run)
       do {
-        runner.stdOut.forEach(s => callback(CommandResponse.Stdout, s))
-        runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
+        runner.stdOut.forEach(s => handler.onStdout(s))
+        runner.stdErr.forEach(s => handler.onStderr(s))
         Thread.sleep(delay)
       } while (!runner.returnValue.isCompleted)
       // To ensure output & error are got for the last time
-      runner.stdOut.forEach(s => callback(CommandResponse.Stdout, s))
-      runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
-      callback(CommandResponse.Return, runner.returnValue.value.get.get)
+      runner.stdOut.forEach(s => handler.onStdout(s))
+      runner.stdErr.forEach(s => handler.onStderr(s))
+      handler.onReturn(runner.returnValue.value.get.get)
     })
+
+  def execute(commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
+    executeLocalOrRemote(None, commands, handler)
 }

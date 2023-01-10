@@ -3,6 +3,7 @@ package kernel
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
+import top.criwits.scaleda.kernel.shell.ScaledaRunKernelHandler
 import top.criwits.scaleda.kernel.shell.command.{CommandDeps, CommandResponse, CommandRunner}
 import top.criwits.scaleda.kernel.utils.{KernelLogger, OS}
 
@@ -44,13 +45,7 @@ class CommandRunnerTester extends AnyFlatSpec with should.Matchers {
       val commands = Seq(ping, CommandDeps("echo hi"),
         // CommandDeps("/opt/Xilinx/Vivado/2019.2/bin/vivado -help")
       )
-      CommandRunner.execute(commands, (commandRespType, data) => {
-        commandRespType match {
-          case CommandResponse.Stdout => KernelLogger.info(data.asInstanceOf[String])
-          case CommandResponse.Stderr => KernelLogger.error(data.asInstanceOf[String])
-          case CommandResponse.Return => KernelLogger.info(s"command done, returns ${data.asInstanceOf[Int]}")
-        }
-      })
+      CommandRunner.execute(commands, ScaledaRunKernelHandler)
     }
   }
 }

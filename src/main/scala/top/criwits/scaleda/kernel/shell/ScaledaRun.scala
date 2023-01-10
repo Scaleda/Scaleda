@@ -37,13 +37,7 @@ object ScaledaRun {
       }
       val toolchain = info._2(executor)
       val commands = toolchain.commands(target.getType)
-      CommandRunner.execute(commands, (commandRespType, data) => {
-        commandRespType match {
-          case CommandResponse.Stdout => handler.onStdout(data.asInstanceOf[String])
-          case CommandResponse.Stderr => handler.onStderr(data.asInstanceOf[String])
-          case CommandResponse.Return => handler.onReturn(data.asInstanceOf[Int])
-        }
-      })
+      CommandRunner.execute(commands, handler)
     })
   }
 }
@@ -57,7 +51,13 @@ trait ScaledaRunHandler {
   def onReturn(returnValue: Int): Unit
 }
 
-object ScaledaRunKernelHandler extends ScaledaRunHandler {
+trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {
+  override def onStdout(data: String): Unit = KernelLogger.info(data)
+
+  override def onStderr(data: String): Unit = KernelLogger.error(data)
+}
+
+object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onStdout(data: String): Unit = KernelLogger.info(data)
 
   override def onStderr(data: String): Unit = KernelLogger.error(data)
