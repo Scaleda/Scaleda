@@ -3,7 +3,7 @@ package kernel.shell
 
 import kernel.project.config.ProjectConfig
 import kernel.project.task.{TargetConfig, TaskConfig, TaskType}
-import kernel.shell.command.CommandRunner
+import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.{SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.impl.Vivado
@@ -86,6 +86,8 @@ trait ScaledaRunHandler {
   def onReturn(returnValue: Int): Unit
 
   def isTerminating: Boolean = false
+
+  def onShellCommand(command: CommandDeps): Unit = {}
 }
 
 trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {

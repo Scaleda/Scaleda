@@ -58,6 +58,7 @@ object CommandRunner {
   ): Unit =
     commands.foreach(command => {
       KernelLogger.info(s"running command: ${command.command}")
+      handler.onShellCommand(command)
       val runner = remoteCommandDeps
         .map(r => new RemoteCommandRunner(command, r).run)
         .getOrElse(new CommandRunner(command).run)

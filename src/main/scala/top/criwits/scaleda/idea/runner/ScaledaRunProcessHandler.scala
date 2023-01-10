@@ -7,6 +7,7 @@ import kernel.shell.ScaledaRunHandler
 import kernel.utils.BasicLogger
 
 import com.intellij.execution.process.ProcessHandler
+import top.criwits.scaleda.kernel.shell.command.CommandDeps
 
 import java.io.OutputStream
 
@@ -55,6 +56,8 @@ class ScaledaRunProcessHandler(logger: BasicLogger)
     // null
     outputStream
   }
+
+  override def onShellCommand(command: CommandDeps) = logger.info(command.command)
 
   override def onStdout(data: String): Unit = logger.info(data)
 
