@@ -1,69 +1,28 @@
 package top.criwits.scaleda
 package idea.runner
 
-import idea.utils.{ConsoleLogger, MainLogger}
+import idea.ScaledaBundle
+import idea.utils.MainLogger
+import kernel.shell.ScaledaRunHandler
+import kernel.utils.BasicLogger
 
 import com.intellij.execution.process.ProcessHandler
-import com.intellij.execution.ui.ConsoleView
-import com.intellij.openapi.project.Project
 
 import java.io.OutputStream
 
-class ScaledaRunProcessHandler(
-    project: Project,
-    console: ConsoleView
-) extends ProcessHandler {
-  var launched = false
-  var stopped = false
-  var stopping = false
+class ScaledaRunProcessHandler(logger: BasicLogger)
+    extends ProcessHandler
+    with ScaledaRunHandler {
+  var terminated = false
+  var terminating = false
 
-  // val streamInput = new PipedInputStream()
-  // // val streamOutput = new PipedOutputStream(streamInput)
-  // val streamOutput = new PrintStream(streamInput)
-
-  // val consoleViewBuilder =
-  //   TextConsoleBuilderFactory.getInstance.createBuilder(project)
-  // val console = consoleViewBuilder.getConsole
-
-  // val searchScope =
-  //   ExecutionSearchScopes.executionScope(project, environment.getRunProfile)
-  // val myConsoleBuilder =
-  //   TextConsoleBuilderFactory.getInstance.createBuilder(project, searchScope)
-  // val console = myConsoleBuilder.getConsole
-
-  val logger = new ConsoleLogger(console)
-
-  val thread = new Thread(() => {
-    launched = true
-    while (!stopping) {
-      Thread.sleep(300)
-      // KernelLogger.warn("thread...")
-      // streamInput
-      // console.print("hi...\n", ConsoleViewContentType.NORMAL_OUTPUT)
-      logger.info("hi", "there")
-    }
-    // console.dispose()
-    // console.print("done.\n", ConsoleViewContentType.NORMAL_OUTPUT)
-    logger.warn("well", "I'm", "finished")
-    stopped = true
-    stopping = false
-  })
-  thread.setDaemon(true)
-  thread.start()
+  // val logger = new ConsoleLogger(console)
 
   override def destroyProcessImpl(): Unit = {
     MainLogger.warn(
-      s"destroyProcessImpl, running: ${stopped}, stopping: ${stopping}"
+      s"destroyProcessImpl, running: ${terminated}, stopping: ${terminating}"
     )
-    // val t = new Thread(() => {
-    //   stopping = true
-    //   Thread.sleep(1000)
-    //   stopping = false
-    //   stopped = true
-    // })
-    // t.setDaemon(true)
-    // t.start()
-    stopping = true
+    terminating = true
   }
 
   override def detachProcessImpl(): Unit = {
@@ -71,26 +30,41 @@ class ScaledaRunProcessHandler(
   }
 
   override def detachIsDefault(): Boolean = {
-    MainLogger.warn("detachIsDefault", false)
+    // MainLogger.warn("detachIsDefault", false)
     false
   }
 
-  override def isProcessTerminated = {
-    MainLogger.warn("isProcessTerminated", stopped)
-    stopped
+  override def isProcessTerminated: Boolean = {
+    // MainLogger.warn("isProcessTerminated", terminated)
+    terminated
   }
 
-  override def isProcessTerminating = {
-    MainLogger.warn("isProcessTerminating", stopping)
-    stopping
+  override def isProcessTerminating: Boolean = {
+    // MainLogger.warn("isProcessTerminating", terminating)
+    terminating
   }
 
+  private val outputStream = new OutputStream {
+    override def write(i: Int): Unit = MainLogger.warn("getProcessInput:", i)
+  }
   override def getProcessInput: OutputStream = {
     // new OutputStream {
     //   override def write(i: Int) = MainLogger.warn("getProcessInput:", i)
     // }
     // streamOutput
-    null
+    // null
+    outputStream
   }
 
+  override def onStdout(data: String): Unit = logger.info(data)
+
+  override def onStderr(data: String): Unit = logger.warn(data)
+
+  override def onReturn(returnValue: Int): Unit = {
+    logger.info(ScaledaBundle.message("task.run.return.text", returnValue))
+    terminating = false
+    terminated = true
+  }
+
+  override def isTerminating: Boolean = terminating
 }

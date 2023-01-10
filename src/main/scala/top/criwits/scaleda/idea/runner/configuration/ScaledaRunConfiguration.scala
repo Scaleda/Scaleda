@@ -2,8 +2,9 @@ package top.criwits.scaleda
 package idea.runner.configuration
 
 import idea.runner.ScaledaRunProcessHandler
-import idea.windows.tool.ScaledaToolWindowFactory
-import kernel.utils.KernelLogger
+import idea.utils.{ConsoleLogger, MainLogger}
+import kernel.project.config.ProjectConfig
+import kernel.shell.ScaledaRun
 
 import com.intellij.execution.configurations.{
   LocatableConfigurationBase,
@@ -20,6 +21,7 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 
+import java.io.File
 import scala.collection.mutable
 
 class ScaledaRunConfiguration(
@@ -39,36 +41,46 @@ class ScaledaRunConfiguration(
       executor: Executor,
       environment: ExecutionEnvironment
   ): RunProfileState = {
-    // new CommandLineState(environment) {
-    //   override def startProcess() = {
-    //     val cmd = new GeneralCommandLine(
-    //       "/opt/Xilinx/Vivado/2019.2/bin/vivado",
-    //       "-help"
-    //     )
-    //     val processHandler = new ColoredProcessHandler(cmd)
-    //     processHandler.setShouldKillProcessSoftly(true)
-    //     ProcessTerminatedListener.attach(processHandler)
-    //     processHandler
-    //   }
-    // }
-    KernelLogger.warn("starting")
-    val searchScope =
-      ExecutionSearchScopes.executionScope(project, environment.getRunProfile)
-    val myConsoleBuilder =
-      TextConsoleBuilderFactory.getInstance.createBuilder(project, searchScope)
-    val console = myConsoleBuilder.getConsole
+    MainLogger.warn(s"executing: taskName=$taskName, targetName=$targetName")
+    ProjectConfig
+      .getConfig()
+      .flatMap(c => {
+        c.taskByName(taskName)
+          .map(f => {
+            val (target, task) = f
+            val searchScope =
+              ExecutionSearchScopes
+                .executionScope(project, environment.getRunProfile)
+            val myConsoleBuilder =
+              TextConsoleBuilderFactory.getInstance
+                .createBuilder(project, searchScope)
+            val console = myConsoleBuilder.getConsole
 
-    (executor: Executor, runner: ProgramRunner[_]) => {
-      new ExecutionResult() {
-        override def getExecutionConsole: ExecutionConsole =
-          // ScaledaToolWindowFactory.outputPanel(project).consoleView
-          console
+            val handler =
+              new ScaledaRunProcessHandler(new ConsoleLogger(console))
+            val state = new RunProfileState {
+              override def execute(
+                  executor: Executor,
+                  runner: ProgramRunner[_]
+              ) = {
+                new ExecutionResult {
+                  override def getExecutionConsole: ExecutionConsole = console
 
-        override def getActions: Array[AnAction] = Array()
+                  override def getActions: Array[AnAction] = Array()
 
-        override def getProcessHandler: ProcessHandler =
-          new ScaledaRunProcessHandler(project, console)
-      }
-    }
+                  override def getProcessHandler: ProcessHandler = handler
+                }
+              }
+            }
+            ScaledaRun.runTaskBackground(
+              handler,
+              new File(ProjectConfig.projectBase.get),
+              target,
+              task
+            )
+            state
+          })
+      })
+      .orNull
   }
 }
