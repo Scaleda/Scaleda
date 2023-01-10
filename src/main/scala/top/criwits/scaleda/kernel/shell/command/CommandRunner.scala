@@ -54,6 +54,9 @@ object CommandRunner {
         runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
         Thread.sleep(delay)
       } while (!runner.returnValue.isCompleted)
+      //To ensure output & error are got for the last time
+      runner.stdOut.forEach(s => callback(CommandResponse.Stdout, s))
+      runner.stdErr.forEach(s => callback(CommandResponse.Stderr, s))
       callback(CommandResponse.Return, runner.returnValue.value.get.get)
     })
 }
