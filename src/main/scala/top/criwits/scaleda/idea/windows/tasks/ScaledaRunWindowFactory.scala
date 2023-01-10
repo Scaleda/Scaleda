@@ -14,11 +14,11 @@ import com.intellij.openapi.project.{DumbService, Project}
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
 import com.intellij.ui.content.impl.ContentImpl
-import com.intellij.ui.dsl.gridLayout.GridLayout
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
 
+import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
 import javax.swing.JPanel
 import javax.swing.tree.DefaultTreeModel
@@ -68,7 +68,6 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         TreeUtil.installActions(tree)
         new TreeSpeedSearch(tree)
         panel.add(ScrollPaneFactory.createScrollPane(tree))
-        val toolBarPanel = new JPanel(new GridLayout)
         // var autoScrollHandler = new AutoScrollTo
         val runManager = RunManagerImpl.getInstanceImpl(project)
         val runTaskAction =
@@ -107,7 +106,12 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
           .getInstance()
           .createActionToolbar("ScaledaRunToolbar", group, true)
         toolbar.setTargetComponent(tree)
-        toolBarPanel.add(toolbar.getComponent)
+        val toolBarPanel = new JPanel(new GridLayout())
+        // val gridLayout = new GridLayout
+        // val toolBarPanel = new JPanel()
+        val toolbarComponent = toolbar.getComponent
+        require(toolbarComponent != null)
+        toolBarPanel.add(toolbarComponent)
         panel.setToolbar(toolBarPanel)
         contentManager.addContent(new ContentImpl(panel, "", true))
       })

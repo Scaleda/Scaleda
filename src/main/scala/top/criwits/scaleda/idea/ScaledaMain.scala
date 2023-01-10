@@ -12,19 +12,28 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.wm.{RegisterToolWindowTask, ToolWindowAnchor, ToolWindowManager}
+import com.intellij.openapi.wm.{
+  RegisterToolWindowTask,
+  RegisterToolWindowTaskBuilder,
+  ToolWindowAnchor,
+  ToolWindowManager
+}
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     // setup main logger
     try {
-      MainLogger.consoleView = Some(ScaledaToolWindowFactory.logPanel(project).consoleView)
+      MainLogger.consoleView = Some(
+        ScaledaToolWindowFactory.logPanel(project).consoleView
+      )
     } catch {
       case e: Throwable => MainLogger.error(e.getMessage)
     }
     // setup output logger
     try {
-      OutputLogger.consoleView = Some(ScaledaToolWindowFactory.outputPanel(project).consoleView)
+      OutputLogger.consoleView = Some(
+        ScaledaToolWindowFactory.outputPanel(project).consoleView
+      )
     } catch {
       case e: Throwable => MainLogger.error(e.getMessage)
     }
@@ -34,12 +43,16 @@ class ScaledaMain extends StartupActivity {
     Template.initJinja()
     // check is having project config
     var searchedFile: Option[VirtualFile] = None
-    ProjectFileIndex.getInstance(project).iterateContent(fileOrDir => {
-      if (!fileOrDir.isDirectory && fileOrDir.getName == ProjectConfig.defaultConfigFile) {
-        searchedFile = Some(fileOrDir)
-      }
-      true
-    })
+    ProjectFileIndex
+      .getInstance(project)
+      .iterateContent(fileOrDir => {
+        if (
+          !fileOrDir.isDirectory && fileOrDir.getName == ProjectConfig.defaultConfigFile
+        ) {
+          searchedFile = Some(fileOrDir)
+        }
+        true
+      })
     if (searchedFile.isEmpty) {
       MainLogger.warn("there's no project config")
     } else {
@@ -52,11 +65,18 @@ class ScaledaMain extends StartupActivity {
     // setup tool window
     val toolWindowManager = ToolWindowManager.getInstance(project)
     toolWindowManager.invokeLater(() => {
-      val toolWindow = toolWindowManager.registerToolWindow(RegisterToolWindowTask.notClosable(
-        ScaledaRunWindowFactory.WINDOW_ID,
-        Icons.mainSmall,
-        ToolWindowAnchor.RIGHT
-      ))
+      // val toolWindow = toolWindowManager.registerToolWindow(RegisterToolWindowTask.notClosable(
+      //   ScaledaRunWindowFactory.WINDOW_ID,
+      //   Icons.mainSmall,
+      //   ToolWindowAnchor.RIGHT
+      // ))
+      val builder =
+        new RegisterToolWindowTaskBuilder(ScaledaRunWindowFactory.WINDOW_ID)
+      builder.icon = Icons.mainSmall
+      builder.contentFactory = new ScaledaRunWindowFactory
+      builder.anchor = ToolWindowAnchor.RIGHT
+      // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
+      val toolWindow = toolWindowManager.registerToolWindow(builder.build())
     })
 
     MainLogger.info("Scaleda launched.")
