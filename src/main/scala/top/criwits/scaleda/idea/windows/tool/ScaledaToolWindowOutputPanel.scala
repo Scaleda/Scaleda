@@ -1,7 +1,7 @@
 package top.criwits.scaleda
-package idea.windows
+package idea.windows.tool
 
-import com.intellij.execution.filters.{TextConsoleBuilder, TextConsoleBuilderFactory}
+import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.actionSystem.{ActionManager, ActionToolbar, DefaultActionGroup}
 import com.intellij.openapi.project.Project

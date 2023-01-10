@@ -1,8 +1,9 @@
 package top.criwits.scaleda
 package idea
 
-import idea.utils.{MainLogger, OutputLogger}
-import idea.windows.ScaledaToolWindowFactory
+import idea.utils.{Icons, MainLogger, OutputLogger}
+import idea.windows.tasks.ScaledaRunWindowFactory
+import idea.windows.tool.ScaledaToolWindowFactory
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
 import kernel.utils.KernelLogger
@@ -11,8 +12,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.wm.{RegisterToolWindowTask, ToolWindowAnchor, ToolWindowManager}
 
-class ScaledaMain extends /* DumbAware with */ StartupActivity {
+class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     // setup main logger
     try {
@@ -46,6 +48,17 @@ class ScaledaMain extends /* DumbAware with */ StartupActivity {
       ProjectConfig.projectBase = Some(f.getParent.getPath)
       MainLogger.info(s"found config: ${f}")
     }
+
+    // setup tool window
+    val toolWindowManager = ToolWindowManager.getInstance(project)
+    toolWindowManager.invokeLater(() => {
+      val toolWindow = toolWindowManager.registerToolWindow(RegisterToolWindowTask.notClosable(
+        ScaledaRunWindowFactory.WINDOW_ID,
+        Icons.mainSmall,
+        ToolWindowAnchor.RIGHT
+      ))
+    })
+
     MainLogger.info("Scaleda launched.")
   }
 }

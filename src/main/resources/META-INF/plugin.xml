@@ -66,7 +66,7 @@
         <toolWindow id="Scaleda"
                     canCloseContents="false"
                     anchor="bottom"
-                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaToolWindowFactory"
+                    factoryClass="top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory"
                     />
         <!-- FIXME -->
 <!--        <toolWindow id="Scaleda Targets"-->
