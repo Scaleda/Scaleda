@@ -42,10 +42,6 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   }
 }
 
-object CommandResponse extends Enumeration {
-  val Stdout, Stderr, Return = Value
-}
-
 //noinspection duplicatedcode
 object CommandRunner {
   val delay = 300
