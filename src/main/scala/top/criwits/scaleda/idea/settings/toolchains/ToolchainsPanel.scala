@@ -3,10 +3,11 @@ package idea.settings.toolchains
 
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{ActionManager, ActionPlaces, ActionPopupMenu, AnAction, AnActionEvent, DefaultActionGroup}
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.components.{JBList, JBPanelWithEmptyText}
-import com.intellij.ui.{AnActionButton, ColoredListCellRenderer, ToolbarDecorator}
+import com.intellij.ui.{AnActionButton, AnimatedIcon, ColoredListCellRenderer, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
 import org.jetbrains.annotations.Nls
 import top.criwits.scaleda.idea.ScaledaBundle
@@ -15,6 +16,7 @@ import top.criwits.scaleda.idea.utils.MainLogger
 import top.criwits.scaleda.kernel.toolchain.impl.Vivado
 
 import java.awt.BorderLayout
+import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.event.ListSelectionEvent
 import javax.swing._
 import scala.annotation.nowarn
@@ -68,9 +70,38 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
     }
   }
 
-  private def loadItem(profile: ToolchainProfile): Unit = splitter.setSecondComponent(profile.toolchainType match {
-    case _ => new SinglePathConfigPanel(profile).getComponent
-  })
+  private def loadItem(profile: ToolchainProfile): Unit = {
+    val panel = profile.toolchainType match {
+      case _ => new SinglePathConfigPanel(profile)
+    }
+    def verify(): Unit = {
+      panel.getStatusLabel.clear()
+      panel.getStatusLabel.setIcon(AnimatedIcon.Default.INSTANCE)
+      panel.getStatusLabel.append(ScaledaBundle.message("settings.verifying"))
+
+      val (status, version) = profile.verify()
+
+      if (status == 0) {
+        panel.getStatusLabel.clear()
+        panel.getStatusLabel.setIcon(AllIcons.General.InspectionsOK)
+        panel.getStatusLabel.append(version.get)
+      } else {
+        panel.getStatusLabel.clear()
+        panel.getStatusLabel.setIcon(AllIcons.General.BalloonError)
+        panel.getStatusLabel.append(status match {
+          case -1 => ScaledaBundle.message("settings.invalid_path")
+          case _ => ScaledaBundle.message("settings.unknown_error")
+        })
+      }
+    }
+    panel.getToolchainPathField.addActionListener(new ActionListener {
+      override def actionPerformed(e: ActionEvent): Unit = {
+        verify()
+      }
+    })
+
+    splitter.setSecondComponent(panel.getComponent)
+  }
 
 
   private def addProfile(e: AnActionButton): Unit = {
@@ -96,10 +127,17 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
       profile.edited = true
       profile.removed = true
       listModel.remove(index)
-      if (index != 0) {
-        toolchainList.setSelectedIndex(index - 1)
-      } else {
+
+      // some verbose logic
+      if (listModel.size() == 0) {
         splitter.setSecondComponent(emptyPanel)
+      } else {
+        // eg. index = 2, original size = 3, current size = 2
+        if (index == listModel.size()) {
+          toolchainList.setSelectedIndex(index - 1)
+        } else {
+          toolchainList.setSelectedIndex(index)
+        }
       }
     }
   }

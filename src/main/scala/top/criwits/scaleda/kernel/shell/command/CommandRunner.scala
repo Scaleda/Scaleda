@@ -8,7 +8,9 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 import scala.sys.process._
 
-case class CommandOutputStream(returnValue: Future[Int], stdOut: LinkedBlockingQueue[String], stdErr: LinkedBlockingQueue[String])
+case class CommandOutputStream(returnValue: Future[Int],
+                               stdOut: LinkedBlockingQueue[String],
+                               stdErr: LinkedBlockingQueue[String])
 
 case class CommandDeps
 (command: String, path: String = "", envs: Seq[(String, String)] = Seq())
@@ -42,6 +44,7 @@ object CommandResponse extends Enumeration {
   val Stdout, Stderr, Return = Value
 }
 
+//noinspection duplicatedcode
 object CommandRunner {
   val delay = 300
 

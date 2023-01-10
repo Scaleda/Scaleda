@@ -1,15 +1,19 @@
 package top.criwits.scaleda.idea.settings.toolchains.panel;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.ui.AnimatedIcon;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.SeparatorWithText;
+import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import top.criwits.scaleda.idea.ScaledaBundle;
 import top.criwits.scaleda.kernel.toolchain.ToolchainProfile;
 
 import javax.swing.*;
@@ -24,6 +28,7 @@ public class SinglePathConfigPanel {
     private JTextField profileNameField;
     private TextFieldWithBrowseButton toolchainPathField;
     private JPanel optionPanel;
+    private SimpleColoredComponent statusLabel;
 
     public JPanel getComponent() {
         return mainPanel;
@@ -50,6 +55,17 @@ public class SinglePathConfigPanel {
             }
         });
         mainPanel.setBorder(JBUI.Borders.empty(6));
+
+        statusLabel.setIcon(AnimatedIcon.Default.INSTANCE);
+        statusLabel.append(ScaledaBundle.message("settings.waiting_for_verification"));
+    }
+
+    public SimpleColoredComponent getStatusLabel() {
+        return statusLabel;
+    }
+
+    public TextFieldWithBrowseButton getToolchainPathField() {
+        return toolchainPathField;
     }
 
     {
@@ -70,7 +86,7 @@ public class SinglePathConfigPanel {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         optionPanel = new JPanel();
-        optionPanel.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
+        optionPanel.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(optionPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final SeparatorWithText separatorWithText1 = new SeparatorWithText();
         optionPanel.add(separatorWithText1, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -84,6 +100,8 @@ public class SinglePathConfigPanel {
         final JLabel label2 = new JLabel();
         this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.profile_name"));
         optionPanel.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        statusLabel = new SimpleColoredComponent();
+        optionPanel.add(statusLabel, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         mainPanel.add(spacer1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
@@ -138,4 +156,5 @@ public class SinglePathConfigPanel {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }
