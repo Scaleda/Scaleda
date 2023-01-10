@@ -18,18 +18,20 @@ import top.criwits.scaleda.kernel.toolchain.ToolchainProfile;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ResourceBundle;
 
-public class SinglePathConfigPanel {
+public class SinglePathConfigPanel extends AbstractConfigPanel {
     private JPanel mainPanel;
     private JTextField profileNameField;
     private TextFieldWithBrowseButton toolchainPathField;
     private JPanel optionPanel;
     private SimpleColoredComponent statusLabel;
 
+    @Override
     public JPanel getComponent() {
         return mainPanel;
     }
@@ -60,12 +62,14 @@ public class SinglePathConfigPanel {
         statusLabel.append(ScaledaBundle.message("settings.waiting_for_verification"));
     }
 
+    @Override
     public SimpleColoredComponent getStatusLabel() {
         return statusLabel;
     }
 
-    public TextFieldWithBrowseButton getToolchainPathField() {
-        return toolchainPathField;
+    @Override
+    public void addPathFieldListener(DocumentListener listener) {
+        toolchainPathField.getTextField().getDocument().addDocumentListener(listener);
     }
 
     {
