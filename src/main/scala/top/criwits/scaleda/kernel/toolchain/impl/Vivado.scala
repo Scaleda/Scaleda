@@ -41,11 +41,10 @@ object Vivado {
       KernelLogger.info(s"Vivado path: ${vivadoFile.getAbsolutePath}")
 
       if (!vivadoFile.exists()) {
-        None
+        return None
       }
 
-      val cmdLine =
-        s"${if (OS.getOSType == OS.Windows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"} \"${vivadoFile.getAbsolutePath} -version\""
+      val cmdLine = OS.shell(s"${vivadoFile.getAbsolutePath} -version")
 
       KernelLogger.info(s"Vivado cmd line: ${cmdLine}")
 
@@ -70,7 +69,7 @@ object Vivado {
    device: String,
    `package`: String,
    speed: Int,
-   jobs: Int = OS.getCpuCount,
+   jobs: Int = OS.cpuCount,
    sourceList: Seq[String] = Seq(),
    ipList: Seq[String] = Seq(),
    xdcList: Seq[String] = Seq(),

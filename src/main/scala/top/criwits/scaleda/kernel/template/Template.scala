@@ -46,7 +46,7 @@ object Template {
   }
 
   def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String): Unit = {
-    KernelLogger.info(s"render resource ${resourcePath} to ${targetPath}, context: ${JsonHelper(context)}")
+    KernelLogger.debug(s"render resource ${resourcePath} to ${targetPath}, context: ${JsonHelper(context)}")
     val f = new File(targetPath)
     // if (f.exists()) return
     FileUtils.touch(f)

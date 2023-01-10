@@ -30,7 +30,8 @@ trait BasicLogger {
     "FATAL"
   )
 
-  private var loggingLevel = Debug
+  // private var loggingLevel = Debug
+  private var loggingLevel = Info
   private var loggingEnabled = true
   private var colorEnabled = true
   private var pathEnabled = true

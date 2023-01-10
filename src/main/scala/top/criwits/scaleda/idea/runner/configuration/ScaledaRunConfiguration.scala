@@ -81,6 +81,9 @@ class ScaledaRunConfiguration(
             state
           })
       })
-      .orNull
+      .getOrElse({
+        MainLogger.warn(s"Cannot find task name: $taskName")
+        null
+      })
   }
 }
