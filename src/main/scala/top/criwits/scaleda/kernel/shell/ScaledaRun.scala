@@ -3,10 +3,10 @@ package kernel.shell
 
 import kernel.project.config.ProjectConfig
 import kernel.project.task.{TaskConfig, TaskType, TargetConfig}
-import kernel.shell.command.{CommandResponse, CommandRunner}
+import kernel.shell.command.CommandRunner
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.{SimulationExecutor, SynthesisExecutor}
-import kernel.toolchain.impl.{Vivado, VivadoTemplateRenderer}
+import kernel.toolchain.impl.Vivado
 import kernel.utils.KernelLogger
 
 import java.io.File
@@ -29,7 +29,7 @@ object ScaledaRun {
       if (target.preset) {
         task.toolchain match {
           case Vivado.internalID => {
-            val r = new VivadoTemplateRenderer(executor = executor, taskConfig = task)
+            val r = new Vivado.TemplateRenderer(executor = executor, taskConfig = task)
             r.render()
           }
           case _ => KernelLogger.error(s"not supported preset: ${task.toolchain}")
