@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
 import org.jetbrains.annotations.Nls
 import top.criwits.scaleda.kernel.shell.command.CommandDeps
-import top.criwits.scaleda.kernel.toolchain.impl.Vivado
+import top.criwits.scaleda.kernel.toolchain.impl.{IVerilog, Vivado}
 
 import java.io.File
 import scala.concurrent.Future
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 /**
  * Class for a profile for a specific toolchain
  */
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(Include.NON_EMPTY)
 class ToolchainProfile(var profileName: String,
                        var toolchainType: String,
                        var path: String, /* For Vivado / PDS / Quartus */
@@ -42,6 +42,7 @@ class ToolchainProfile(var profileName: String,
   def getVerifier: Option[ToolchainProfile.Verifier] = {
     toolchainType match {
       case Vivado.internalID => Some(new Vivado.Verifier(this))
+      case IVerilog.internalID => Some(new IVerilog.Verifier(this))
       case _ => None
     }
   }
