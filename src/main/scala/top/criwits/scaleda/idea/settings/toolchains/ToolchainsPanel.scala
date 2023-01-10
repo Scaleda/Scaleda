@@ -1,27 +1,24 @@
 package top.criwits.scaleda
 package idea.settings.toolchains
 
+import idea.ScaledaBundle
+import idea.settings.toolchains.panel.SinglePathConfigPanel
+import kernel.shell.ScaledaRunHandler
+import kernel.shell.command.CommandRunner
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.{ActionManager, ActionPlaces, ActionPopupMenu, AnAction, AnActionEvent, DefaultActionGroup}
+import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.ui.Splitter
+import com.intellij.ui._
 import com.intellij.ui.components.{JBList, JBPanelWithEmptyText}
-import com.intellij.ui.{AnActionButton, AnimatedIcon, ColoredListCellRenderer, DocumentAdapter, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
 import org.jetbrains.annotations.Nls
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.idea.settings.toolchains.panel.SinglePathConfigPanel
-import top.criwits.scaleda.idea.utils.MainLogger
-import top.criwits.scaleda.kernel.shell.command.{CommandResponse, CommandRunner}
-import top.criwits.scaleda.kernel.toolchain.impl.Vivado
 
 import java.awt.BorderLayout
-import java.awt.event.{ActionEvent, ActionListener, KeyEvent, KeyListener}
-import javax.swing.event.{DocumentEvent, ListSelectionEvent}
+import java.util.concurrent.Executors
 import javax.swing._
-import scala.annotation.nowarn
-import scala.async.Async.async
+import javax.swing.event.{DocumentEvent, ListSelectionEvent}
 import scala.collection.mutable
 
 /**
@@ -46,6 +43,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
 
   splitter.setFirstComponent(listPanel)
 
+  // Right side, default panel is empty with 'No toolchain configured'
   val emptyPanel: JBPanelWithEmptyText = new JBPanelWithEmptyText()
     .withEmptyText(ScaledaBundle.message("settings.no_tool_chain"))
     .withBorder(JBUI.Borders.emptyLeft(6))
@@ -53,6 +51,8 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
 
   var profiles: mutable.Seq[ToolchainProfile] = _
 
+  // Thread pool for profile validate
+  private val executor = Executors.newSingleThreadExecutor()
 
   private def init(): Unit = {
     profiles = Toolchain.profiles(cache = false)
@@ -78,12 +78,14 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
     }
 
     def verify(): Unit = {
-      def updateStatusLabel(icon: Icon, @Nls str: String) = {
-        SwingUtilities.invokeLater(() => {
-          panel.getStatusLabel.clear()
-          panel.getStatusLabel.setIcon(icon)
-          panel.getStatusLabel.append(str)
-        })
+      def updateStatusLabel(icon: Icon, @Nls str: String): Unit = {
+        if (!Thread.interrupted()) { // if interrupted then not modifying, not used
+          SwingUtilities.invokeLater(() => {
+            panel.getStatusLabel.clear()
+            panel.getStatusLabel.setIcon(icon)
+            panel.getStatusLabel.append(str)
+          })
+        }
       }
 
       updateStatusLabel(AnimatedIcon.Default.INSTANCE, ScaledaBundle.message("settings.verifying"))
@@ -100,11 +102,12 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
             case Some(cmdLine) =>
               // here has a command line
               var outputString = ""
-              CommandRunner.execute(Seq(cmdLine), (r, d) => r match {
-                case CommandResponse.Stdout | CommandResponse.Stderr => outputString += s"${d.asInstanceOf[String]}\n"
-                case CommandResponse.Return =>
-                  val retVal = d.asInstanceOf[Int]
-                  val result = v.parseVersionInfo(retVal, outputString)
+              CommandRunner.execute(Seq(cmdLine), new ScaledaRunHandler {
+                override def onStdout(data: String): Unit = outputString += s"$data\n"
+                override def onStderr(data: String): Unit = onStdout(data)
+
+                override def onReturn(returnValue: Int): Unit = {
+                  val result = v.parseVersionInfo(returnValue, outputString)
 
                   result match {
                     case (true, Some(version)) =>
@@ -112,35 +115,34 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
                     case (_, _) =>
                       updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.not_found"))
                   }
+                }
               })
-
           }
       }
     }
+    def executeVerify(): Unit = executor.execute(() => verify())
 
     panel.getToolchainPathField.getTextField.getDocument.addDocumentListener(new DocumentAdapter {
-      override def textChanged(e: DocumentEvent): Unit = {
-        new Thread(() => verify()).start()
-      }
+      override def textChanged(e: DocumentEvent): Unit = executeVerify()
     })
 
     splitter.setSecondComponent(panel.getComponent)
-    verify()
+    executeVerify()
   }
 
 
   private def addProfile(e: AnActionButton): Unit = {
     val group = new DefaultActionGroup()
     Toolchain.toolchains.foreach(m =>
-    group.add(new AnAction(m._2._1) {
-      override def actionPerformed(e: AnActionEvent): Unit = {
-        val newProfile = new ToolchainProfile(m._2._1, m._1, "")
-        newProfile.edited = true
-        profiles :+= newProfile
-        listModel.addElement(newProfile)
-        toolchainList.setSelectedIndex(listModel.indexOf(newProfile))
-      }
-    }))
+      group.add(new AnAction(m._2._1) { // FIXME: strange
+        override def actionPerformed(e: AnActionEvent): Unit = {
+          val newProfile = new ToolchainProfile(m._2._1, m._1, "")
+          newProfile.edited = true
+          profiles :+= newProfile
+          listModel.addElement(newProfile)
+          toolchainList.setSelectedIndex(listModel.indexOf(newProfile))
+        }
+      }))
     val popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group)
     popupMenu.getComponent.show(this, e.getContextComponent.getX, e.getContextComponent.getY)
   }

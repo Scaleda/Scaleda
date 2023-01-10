@@ -1,11 +1,12 @@
 package top.criwits.scaleda
 package kernel
 
+import kernel.shell.ScaledaRunKernelHandler
+import kernel.shell.command.{CommandDeps, CommandRunner}
+import kernel.utils.{KernelLogger, OS}
+
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import top.criwits.scaleda.kernel.shell.ScaledaRunKernelHandler
-import top.criwits.scaleda.kernel.shell.command.{CommandDeps, CommandResponse, CommandRunner}
-import top.criwits.scaleda.kernel.utils.{KernelLogger, OS}
 
 class CommandRunnerTester extends AnyFlatSpec with should.Matchers {
   behavior of "CommandRunner"
