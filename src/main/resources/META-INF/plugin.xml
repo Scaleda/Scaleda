@@ -69,12 +69,12 @@
                     factoryClass="top.criwits.scaleda.idea.windows.ScaledaToolWindowFactory"
                     />
         <!-- FIXME -->
-        <toolWindow id="Scaleda Targets"
-                    secondary="true"
-                    anchor="left"
-                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory"
-                    doNotActivateOnStart="true"
-                    />
+<!--        <toolWindow id="Scaleda Targets"-->
+<!--                    secondary="true"-->
+<!--                    anchor="left"-->
+<!--                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory"-->
+<!--                    doNotActivateOnStart="true"-->
+<!--                    />-->
     </extensions>
 
     <!-- Scaleda run tasks -->
