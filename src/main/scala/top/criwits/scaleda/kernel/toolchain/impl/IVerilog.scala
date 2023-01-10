@@ -3,7 +3,7 @@ package kernel.toolchain.impl
 
 import kernel.project.config.ProjectConfig
 import kernel.shell.command.CommandDeps
-import kernel.toolchain.Toolchain
+import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.toolchain.executor.Executor
 
 class IVerilog(executor: Executor) extends Toolchain(executor) {
@@ -30,4 +30,22 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 object IVerilog {
   val userFriendlyName: String = "Icarus Verilog"
   val internalID: String = "iverilog"
+
+  class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
+    /**
+     * Generate command line(s) used to verify toolchain profile
+     *
+     * @return One or more than one command line(s)
+     */
+    override def verifyCommandLine: Option[Seq[CommandDeps]] = ???
+
+    /**
+     * Parse toolchain version information from output of command lines of [[verifyCommandLine]]
+     *
+     * @param returnValues Return values of commands
+     * @param outputs      Output strings of commands
+     * @return
+     */
+    override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = ???
+}
 }

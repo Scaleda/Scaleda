@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.settings.toolchains
 
 import idea.ScaledaBundle
-import idea.settings.toolchains.panel.SinglePathConfigPanel
+import idea.settings.toolchains.panel.{AbstractConfigPanel, SinglePathConfigPanel}
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.CommandRunner
 import kernel.toolchain.{Toolchain, ToolchainProfile}
@@ -73,7 +73,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
   }
 
   private def loadItem(profile: ToolchainProfile): Unit = {
-    val panel = profile.toolchainType match {
+    val panel: AbstractConfigPanel = profile.toolchainType match {
       case _ => new SinglePathConfigPanel(profile)
     }
 
@@ -101,28 +101,28 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
               updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.invalid_path"))
             case Some(cmdLine) =>
               // here has a command line
-              var outputString = ""
-              CommandRunner.execute(Seq(cmdLine), new ScaledaRunHandler {
-                override def onStdout(data: String): Unit = outputString += s"$data\n"
-                override def onStderr(data: String): Unit = onStdout(data)
-
-                override def onReturn(returnValue: Int): Unit = {
-                  val result = v.parseVersionInfo(returnValue, outputString)
-
-                  result match {
-                    case (true, Some(version)) =>
-                      updateStatusLabel(AllIcons.General.InspectionsOK, version) // NonNls to Nls
-                    case (_, _) =>
-                      updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.not_found"))
-                  }
-                }
+              var outputStrings: Seq[String] = Seq.empty
+              var returnValues: Seq[Int] = Seq.empty
+              CommandRunner.execute(cmdLine, new ScaledaRunHandler {
+                override def onStdout(data: String): Unit = outputStrings ++= Seq(s"$data")
+                override def onStderr(data: String): Unit = onStdout(data) // hum?
+                override def onReturn(returnValue: Int): Unit = returnValues ++= Seq(returnValue)
               })
+
+              val result = v.parseVersionInfo(returnValues, outputStrings)
+
+              result match {
+                case (true, Some(version)) =>
+                  updateStatusLabel(AllIcons.General.InspectionsOK, version) // NonNls to Nls
+                case (_, _) =>
+                  updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.not_found"))
+              }
           }
       }
     }
     def executeVerify(): Unit = executor.execute(() => verify())
 
-    panel.getToolchainPathField.getTextField.getDocument.addDocumentListener(new DocumentAdapter {
+    panel.addPathFieldListener(new DocumentAdapter {
       override def textChanged(e: DocumentEvent): Unit = executeVerify()
     })
 
@@ -136,7 +136,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
     Toolchain.toolchains.foreach(m =>
       group.add(new AnAction(m._2._1) { // FIXME: strange
         override def actionPerformed(e: AnActionEvent): Unit = {
-          val newProfile = new ToolchainProfile(m._2._1, m._1, "")
+          val newProfile = new ToolchainProfile(m._2._1, m._1)
           newProfile.edited = true
           profiles :+= newProfile
           listModel.addElement(newProfile)

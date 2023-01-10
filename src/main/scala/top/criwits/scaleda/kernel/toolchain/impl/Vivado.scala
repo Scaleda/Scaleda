@@ -35,28 +35,27 @@ object Vivado {
   val internalID: String = "vivado"
 
   class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
-    override def verifyCommandLine: Option[CommandDeps] = {
+    override def verifyCommandLine: Option[Seq[CommandDeps]] = {
       // Vivado verifier
-      val vivadoFile = new File(toolchainProfile.path + "/bin/vivado" + (if (OS.getOSType == OS.Windows) ".bat" else ""))
+      val vivadoFile = new File(toolchainProfile.path + "/bin/vivado" + (if (OS.isWindows) ".bat" else ""))
       KernelLogger.info(s"Vivado path: ${vivadoFile.getAbsolutePath}")
 
       if (!vivadoFile.exists()) {
-        None
+        return None
       }
 
-      val cmdLine =
-        s"${if (OS.getOSType == OS.Windows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"} \"${vivadoFile.getAbsolutePath} -version\""
+      val cmdLine = OS.shell(s"${vivadoFile.getAbsolutePath} -version")
 
       KernelLogger.info(s"Vivado cmd line: ${cmdLine}")
 
-      Some(CommandDeps(cmdLine))
+      Some(Seq(CommandDeps(cmdLine)))
     }
 
-    override def parseVersionInfo(returnValue: Int, stdOut: String): (Boolean, Option[String]) = {
-      if (returnValue != 0) {
+    override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
+      if (!returnValues.map(_ == 0).reduce(_ && _)) {
         (false, None)
       } else {
-        (true, Some(stdOut.split("\n").head))
+        (true, Some(outputs.head.split("\\n").head)) // should work
       }
     }
   }
