@@ -14,4 +14,12 @@ object Paths {
   def permanentToolChainsDir: File = createDirIfNonExists(new File(permanentConfigDir, "toolchains"))
 
   def pwd = new File(System.getProperty("user.dir"))
+
+  def findExecutableOnPath(name: String): Option[String] = {
+    for (dirname <- sys.env("PATH").split(File.pathSeparator)) {
+      val file = new File(dirname, name)
+      if (file.isFile && file.canExecute) return Some(file.getAbsolutePath)
+    }
+    None
+  }
 }
