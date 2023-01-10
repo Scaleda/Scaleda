@@ -36,14 +36,3 @@ class RemoteCommandRunner(deps: CommandDeps, remoteCommandDeps: RemoteCommandDep
     CommandOutputStream(returnValue.future, stdOut, stdErr)
   }
 }
-
-object RemoteCommandRunnerTest extends App {
-  val runner = new RemoteCommandRunner(CommandDeps("ping -c 3 127.0.0.1"), RemoteCommandDeps())
-  val r = runner.run
-  while (!r.returnValue.isCompleted) {
-    r.stdOut.forEach(s => KernelLogger.info(s))
-    r.stdErr.forEach(s => KernelLogger.error(s))
-    Thread.sleep(300)
-  }
-  KernelLogger.info(s"return value: ${r.returnValue.value.get}")
-}
