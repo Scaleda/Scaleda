@@ -18,7 +18,7 @@ class RemoteCommandRunner(deps: CommandDeps, remoteCommandDeps: RemoteCommandDep
   val builder = ManagedChannelBuilder.forAddress(remoteCommandDeps.host, remoteCommandDeps.port)
   builder.usePlaintext()
   val request = new RunRequest(deps.command, deps.path, deps.envs.map(t => new StringTriple(t._1, t._2)))
-  val thread = new Thread(() => {
+  override val thread = new Thread(() => {
     val channel = builder.build()
     val stub = RemoteGrpc.blockingStub(channel)
     for (r <- stub.run(request)) {

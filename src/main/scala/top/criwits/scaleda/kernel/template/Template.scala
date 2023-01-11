@@ -24,7 +24,6 @@ object Template {
 
   def render(template: String, context: Map[String, Any]): String = {
     val c = CollectionConverters.asJava(context)
-    println(s"context: ${context} => ${c}")
     val curClassLoader = Thread.currentThread.getContextClassLoader
     try {
       Thread.currentThread.setContextClassLoader(this.getClass.getClassLoader)
