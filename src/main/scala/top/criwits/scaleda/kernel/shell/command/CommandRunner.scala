@@ -90,9 +90,12 @@ object CommandRunner {
   def executeLocalOrRemote(
       remoteCommandDeps: Option[RemoteCommandDeps],
       commands: Seq[CommandDeps],
-      handler: ScaledaRunHandler
-  ): Unit =
+      handler: ScaledaRunHandler,
+      ignoreErrors: Boolean
+  ): Unit = {
+    var meetErrors = false
     commands.foreach(command => {
+      if (!ignoreErrors && meetErrors) return
       KernelLogger.info(s"running command: ${command.command}")
       handler.onShellCommand(command)
       val runner = remoteCommandDeps
@@ -114,9 +117,12 @@ object CommandRunner {
       // To ensure output & error are got for the last time
       r.stdOut.forEach(s => handler.onStdout(s))
       r.stdErr.forEach(s => handler.onStderr(s))
-      handler.onReturn(r.returnValue.value.get.get)
+      val returnValue = r.returnValue.value.get.get
+      handler.onReturn(returnValue)
+      if (returnValue != handler.expectedReturnValue) meetErrors = true
     })
+  }
 
-  def execute(commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
-    executeLocalOrRemote(None, commands, handler)
+  def execute(commands: Seq[CommandDeps], handler: ScaledaRunHandler, ignoreErrors: Boolean = false): Unit =
+    executeLocalOrRemote(None, commands, handler, ignoreErrors)
 }

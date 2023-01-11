@@ -88,6 +88,8 @@ trait ScaledaRunHandler {
   def isTerminating: Boolean = false
 
   def onShellCommand(command: CommandDeps): Unit = {}
+
+  def expectedReturnValue: Int = 0
 }
 
 trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {

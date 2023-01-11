@@ -39,6 +39,6 @@ class RemoteCommandRunner(deps: CommandDeps, remoteCommandDeps: RemoteCommandDep
 }
 
 object RemoteCommandRunner {
-  def execute(remoteCommandDeps: RemoteCommandDeps, commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
-    CommandRunner.executeLocalOrRemote(Some(remoteCommandDeps), commands, handler)
+  def execute(remoteCommandDeps: RemoteCommandDeps, commands: Seq[CommandDeps], handler: ScaledaRunHandler, ignoreErrors: Boolean = false): Unit =
+    CommandRunner.executeLocalOrRemote(Some(remoteCommandDeps), commands, handler, ignoreErrors)
 }
