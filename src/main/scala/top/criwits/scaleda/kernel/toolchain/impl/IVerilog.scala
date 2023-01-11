@@ -6,6 +6,10 @@ import kernel.shell.command.CommandDeps
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.toolchain.executor.Executor
 
+import top.criwits.scaleda.kernel.utils.OS
+
+import java.io.File
+
 class IVerilog(executor: Executor) extends Toolchain(executor) {
 
   import IVerilog._
@@ -37,7 +41,19 @@ object IVerilog {
      *
      * @return One or more than one command line(s)
      */
-    override def verifyCommandLine: Option[Seq[CommandDeps]] = ???
+    override def verifyCommandLine: Option[Seq[CommandDeps]] = {
+      val iverilogFiles: Seq[File] = Seq(
+        new File(toolchainProfile.iverilogPath),
+        new File(toolchainProfile.iverilogVPIPath),
+        new File(toolchainProfile.vvpPath)
+      )
+
+      if (!iverilogFiles.map(_.exists()).reduce(_ && _)) {
+        return None
+      }
+
+      Some(iverilogFiles.map(f => CommandDeps(OS.shell(s"${f.getAbsolutePath} -V"))))
+    }
 
     /**
      * Parse toolchain version information from output of command lines of [[verifyCommandLine]]
@@ -46,6 +62,17 @@ object IVerilog {
      * @param outputs      Output strings of commands
      * @return
      */
-    override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = ???
+    override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
+      if (!Seq(
+        outputs.exists(_.contains("Icarus Verilog version")),
+        outputs.exists(_.contains("usage: iverilog-vpi")),
+        outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
+      ).reduce(_ && _)) {
+        (false, None)
+      } else {
+        (true, Some(outputs.filter(_.contains("Icarus Verilog version")).head))
+      }
+
+    }
 }
 }

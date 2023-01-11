@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.settings.toolchains
 
 import idea.ScaledaBundle
-import idea.settings.toolchains.panel.{AbstractConfigPanel, SinglePathConfigPanel}
+import idea.settings.toolchains.panel.{AbstractConfigPanel, IVerilogConfigPanel, SinglePathConfigPanel}
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.CommandRunner
 import kernel.toolchain.{Toolchain, ToolchainProfile}
@@ -74,6 +74,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
 
   private def loadItem(profile: ToolchainProfile): Unit = {
     val panel: AbstractConfigPanel = profile.toolchainType match {
+      case "iverilog" => new IVerilogConfigPanel(profile)
       case _ => new SinglePathConfigPanel(profile)
     }
 
