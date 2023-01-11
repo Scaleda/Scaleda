@@ -58,6 +58,9 @@
                 implementationClass="top.criwits.scaleda.tcl.TclFileType"
                 language="Tcl"
                 extensions="v"/>
+        <lang.parserDefinition language="Tcl"
+                               implementationClass="top.criwits.scaleda.tcl.TclParserDefinition"/>
+        <lang.ast.factory language="Tcl" implementationClass="top.criwits.scaleda.tcl.TclASTFactory"/>
         <lang.syntaxHighlighterFactory language="Tcl"
                                        implementationClass="top.criwits.scaleda.tcl.TclSyntaxHighlighterFactory"/>
         <lang.commenter language="Tcl"
