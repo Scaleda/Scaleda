@@ -3,6 +3,8 @@ file mkdir $project_dir
 
 puts "Generating project ${project_name}"
 
+create_project $project_name $project_dir -part $part -force
+
 {% for s in sourceList %}
 puts "Importing source: {{ s }}"
 add_files -fileset sources_1 {{ s }}
