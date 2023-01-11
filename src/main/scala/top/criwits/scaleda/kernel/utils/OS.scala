@@ -22,6 +22,7 @@ object OS extends Enumeration {
   def isWindows: Boolean = getOSType == Windows
 
   def getShell: String = if (isWindows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"
+
   def shell(command: String): String = s"$getShell \"$command\""
 
   /**
@@ -31,5 +32,5 @@ object OS extends Enumeration {
    */
   def getUserHome: String = System.getProperty("user.home")
 
-  val getCpuCount = Runtime.getRuntime.availableProcessors()
+  val cpuCount = Runtime.getRuntime.availableProcessors()
 }

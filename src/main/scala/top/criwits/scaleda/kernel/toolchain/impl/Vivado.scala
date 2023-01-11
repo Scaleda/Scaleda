@@ -25,6 +25,7 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
 
   override def synthesise() = {
     Seq(
+      // CommandDeps("ping -c 3 127.0.0.1", executor.workingDir.getAbsolutePath),
       CommandDeps(s"${executor.profile.path} -mode batch -source run_synth.tcl", executor.workingDir.getAbsolutePath),
     )
   }
@@ -69,7 +70,7 @@ object Vivado {
    device: String,
    `package`: String,
    speed: Int,
-   jobs: Int = OS.getCpuCount,
+   jobs: Int = OS.cpuCount,
    sourceList: Seq[String] = Seq(),
    ipList: Seq[String] = Seq(),
    xdcList: Seq[String] = Seq(),

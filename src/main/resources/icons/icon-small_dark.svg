@@ -7,42 +7,12 @@
    viewBox="0 0 13 13"
    version="1.1"
    id="svg16"
-   sodipodi:docname="toolWindowTodo.svg"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs20" />
-  <sodipodi:namedview
-     id="namedview18"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     showgrid="false"
-     showguides="true"
-     inkscape:zoom="22.627417"
-     inkscape:cx="2.4748737"
-     inkscape:cy="7.3141358"
-     inkscape:window-width="1920"
-     inkscape:window-height="1013"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg16">
-    <sodipodi:guide
-       position="-5.3476562,-9.3085938"
-       orientation="0,-1"
-       id="guide1640"
-       inkscape:locked="false" />
-  </sodipodi:namedview>
   <path
      id="rect231"
-     style="fill:#6e6e6e;fill-opacity:1;stroke:none;stroke-width:1.18732"
+     style="fill:#afb1b3;fill-opacity:1;stroke:none;stroke-width:1.18732"
      d="m 4.1408585,1.9958985 v 4.3697133 h 0.913419 V 2.9093173 H 10.520094 V 8.3772342 H 8.1137065 v 0.913419 H 11.433514 V 1.9958985 Z m 3.342904,1.4572714 v 0.7580328 h 1.190595 l -2.456783,2.4546827 0.537552,0.5375525 2.454683,-2.4567825 v 1.1905949 h 0.758033 V 4.2112027 3.4531699 h -0.535452 -0.222581 z m -5.257934,3.3345044 v 0.6845398 h -0.659342 v 0.4367611 h 0.659342 v 1.973825 h -0.659342 v 0.4367618 h 0.659342 v 0.684539 h 2.488279 a 2.2949011,2.1082691 0 0 0 0.0021,0 2.2949011,2.1082691 0 0 0 1.986424,-1.0541078 2.2949011,2.1082691 0 0 0 0.264577,-0.65934 h 0.821027 V 8.3772342 H 6.9399145 A 2.2949011,2.1082691 0 0 0 6.7026355,7.8417812 2.2949011,2.1082691 0 0 0 4.7162105,6.7876743 h -0.0021 z" />
 </svg>

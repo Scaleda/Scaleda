@@ -9,15 +9,21 @@ import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.{Future, Promise}
 import scala.sys.process._
 
-case class CommandOutputStream(returnValue: Future[Int],
-                               stdOut: LinkedBlockingQueue[String],
-                               stdErr: LinkedBlockingQueue[String])
+case class CommandOutputStream(
+    returnValue: Future[Int],
+    stdOut: LinkedBlockingQueue[String],
+    stdErr: LinkedBlockingQueue[String]
+)
 
-case class CommandDeps
-(command: String, path: String = "", envs: Seq[(String, String)] = Seq())
+case class CommandDeps(
+    command: String,
+    path: String = "",
+    envs: Seq[(String, String)] = Seq()
+)
 
 class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
-  val path: String = if (deps.path.isEmpty) System.getProperty("user.dir") else deps.path
+  val path: String =
+    if (deps.path.isEmpty) System.getProperty("user.dir") else deps.path
   val command: String = deps.command
   val envs: Seq[(String, String)] = deps.envs
   val workingDir = new File(path)
@@ -28,7 +34,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   private val thread = new Thread(() => {
     val exitValue = proc ! ProcessLogger(
       out => stdOut.put(out),
-      err => stdErr.put(err),
+      err => stdErr.put(err)
     )
     returnValue.success(exitValue)
   })
@@ -45,16 +51,22 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
 object CommandRunner {
   val delay = 300
 
-  def executeLocalOrRemote(remoteCommandDeps: Option[RemoteCommandDeps], commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
+  def executeLocalOrRemote(
+      remoteCommandDeps: Option[RemoteCommandDeps],
+      commands: Seq[CommandDeps],
+      handler: ScaledaRunHandler
+  ): Unit =
     commands.foreach(command => {
       KernelLogger.info(s"running command: ${command.command}")
-      val runner = remoteCommandDeps.map(r => new RemoteCommandRunner(command, r).run)
+      handler.onShellCommand(command)
+      val runner = remoteCommandDeps
+        .map(r => new RemoteCommandRunner(command, r).run)
         .getOrElse(new CommandRunner(command).run)
       do {
         runner.stdOut.forEach(s => handler.onStdout(s))
         runner.stdErr.forEach(s => handler.onStderr(s))
         Thread.sleep(delay)
-      } while (!runner.returnValue.isCompleted)
+      } while (!runner.returnValue.isCompleted && !handler.isTerminating)
       // To ensure output & error are got for the last time
       runner.stdOut.forEach(s => handler.onStdout(s))
       runner.stdErr.forEach(s => handler.onStderr(s))
