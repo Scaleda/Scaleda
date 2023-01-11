@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.runner.task.create
+package idea.runner.task.edit
 
 import idea.ScaledaBundle
 
@@ -17,10 +17,6 @@ class ScaledaRunNewTargetAction(project: Project)
       AllIcons.Actions.NewFolder
     ) {
   override def actionPerformed(e: AnActionEvent) = {
-    val r = new CreateTargetDialogWrapper(project).showAndGet()
-    MainLogger.info("dialog returns", r)
-    // val r = new CreateTargetDialog()
-    // r.pack()
-    // r.setVisible(true)
+    val _r = new EditTargetDialogWrapper(project).showAndGet()
   }
 }

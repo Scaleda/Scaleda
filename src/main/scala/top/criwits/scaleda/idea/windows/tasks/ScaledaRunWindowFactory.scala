@@ -17,7 +17,7 @@ import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
-import top.criwits.scaleda.idea.runner.task.create.{ScaledaRunNewTargetAction, ScaledaRunNewTaskAction}
+import top.criwits.scaleda.idea.runner.task.edit.{ScaledaRunNewTargetAction, ScaledaRunNewTaskAction}
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}

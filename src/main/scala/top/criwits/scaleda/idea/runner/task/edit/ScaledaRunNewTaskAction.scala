@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.runner.task.create
+package idea.runner.task.edit
 
 import idea.ScaledaBundle
 
@@ -13,6 +13,6 @@ class ScaledaRunNewTaskAction
       AllIcons.Actions.AddList
     ) {
   override def actionPerformed(e: AnActionEvent) = {
-
+    val _r = new EditTaskDialogWrapper(project).showAndGet()
   }
 }

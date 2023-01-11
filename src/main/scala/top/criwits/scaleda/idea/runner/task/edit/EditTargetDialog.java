@@ -1,8 +1,8 @@
-package top.criwits.scaleda.idea.runner.task.create;
+package top.criwits.scaleda.idea.runner.task.edit;
 
 import javax.swing.*;
 
-public class EditTargetDialog {
+public class EditTargetDialog implements EditDialogProvider {
     private JTextField name;
     private JPanel mainPanel;
     private JComboBox toolchain;
@@ -10,6 +10,7 @@ public class EditTargetDialog {
     private JTextField pack;
     private JTextField speed;
 
+    @Override
     public JPanel getMainPanel() {
         return mainPanel;
     }

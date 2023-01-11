@@ -1,19 +1,21 @@
 package top.criwits.scaleda
-package idea.runner.task.create
+package idea.runner.task.edit
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 
 import javax.swing.{JComponent, JPanel}
 
-class CreateTargetDialogWrapper(project: Project) extends DialogWrapper(project) {
+abstract class EditDialogWrapper(
+    project: Project,
+    title: String
+) extends DialogWrapper(project) with EditDialogProvider {
   init()
-  setTitle("Creating Scaleda Target")
+  setTitle(title)
 
   override def createCenterPanel(): JComponent = {
     val panel = new JPanel
-    val inner = new EditTargetDialog
-    panel.add(inner.getMainPanel)
+    panel.add(getMainPanel)
     panel
   }
 }
