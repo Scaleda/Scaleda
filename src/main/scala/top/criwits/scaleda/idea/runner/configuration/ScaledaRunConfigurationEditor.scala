@@ -9,6 +9,7 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.util.ui.{FormBuilder, UIUtil}
+import top.criwits.scaleda.idea.utils.MainLogger
 
 import java.awt.event.ItemEvent
 import scala.jdk.javaapi.CollectionConverters
@@ -22,8 +23,8 @@ class ScaledaRunConfigurationEditor(private val project: Project)
 
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
-  ProjectConfig.headTarget.foreach(t => targetName.addItem(t.name))
-  ProjectConfig.headTask.foreach(t => taskName.addItem(t.name))
+  ProjectConfig.getConfig().foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
+  ProjectConfig.getConfig().foreach(c => c.targets.foreach(target => target.tasks.foreach(t => taskName.addItem(t.name))))
 
   targetName.addItemListener(e => {
     if (e.getStateChange == ItemEvent.SELECTED) {
