@@ -27,16 +27,31 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val command: String = deps.command
   val envs: Seq[(String, String)] = deps.envs
   val workingDir = new File(path)
-  private val proc = Process(command, workingDir, envs: _*)
+  private val procBuilder = Process(command, workingDir, envs: _*)
+  private var process: Option[Process] = None
+  private var terminate: Boolean = false
+  private var terminating: Boolean = false
+  private var terminated: Boolean = false
   protected val returnValue = Promise[Int]()
   protected val stdOut = new LinkedBlockingQueue[String]
   protected val stdErr = new LinkedBlockingQueue[String]
-  private val thread = new Thread(() => {
-    val exitValue = proc ! ProcessLogger(
+  private val delay = 100
+  val thread = new Thread(() => {
+    process = Some(procBuilder.run(ProcessLogger(
       out => stdOut.put(out),
       err => stdErr.put(err)
-    )
-    returnValue.success(exitValue)
+    )))
+    while (process.get.isAlive()) {
+      if (terminate && !terminating) {
+        terminating = true
+        process.get.destroy()
+      }
+      Thread.sleep(delay)
+    }
+    if (terminate) terminate = false
+    if (terminating) terminating = false
+    terminated = true
+    returnValue.success(process.get.exitValue())
   })
 
   override def run: CommandOutputStream = {
@@ -45,11 +60,32 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
     thread.start()
     CommandOutputStream(returnValue.future, stdOut, stdErr)
   }
+
+  override def doTerminate() = terminate = true
+
+  override def canTerminate = true
+
+  override def isTerminating = terminate || terminating
+
+  override def isTerminated = terminated
 }
 
 //noinspection DuplicatedCode
 object CommandRunner {
-  val delay = 300
+  val delay = 50
+
+  private def flushStream(
+      stream: LinkedBlockingQueue[String],
+      handler: String => Unit
+  ): Unit = {
+    try {
+      while (stream.size() > 0) {
+        handler(stream.take())
+      }
+    } catch {
+      case _: InterruptedException => {}
+    }
+  }
 
   def executeLocalOrRemote(
       remoteCommandDeps: Option[RemoteCommandDeps],
@@ -60,17 +96,25 @@ object CommandRunner {
       KernelLogger.info(s"running command: ${command.command}")
       handler.onShellCommand(command)
       val runner = remoteCommandDeps
-        .map(r => new RemoteCommandRunner(command, r).run)
-        .getOrElse(new CommandRunner(command).run)
+        .map(r => new RemoteCommandRunner(command, r))
+        .getOrElse(new CommandRunner(command))
+      val r = runner.run
       do {
-        runner.stdOut.forEach(s => handler.onStdout(s))
-        runner.stdErr.forEach(s => handler.onStderr(s))
+        flushStream(r.stdOut, handler.onStdout)
+        flushStream(r.stdErr, handler.onStderr)
+        // r.stdOut.forEach(s => handler.onStdout(s))
+        // r.stdErr.forEach(s => handler.onStderr(s))
         Thread.sleep(delay)
-      } while (!runner.returnValue.isCompleted && !handler.isTerminating)
+      } while (!r.returnValue.isCompleted && !handler.isTerminating)
+      if (handler.isTerminating) {
+        runner.doTerminate()
+        while (runner.isTerminating) Thread.sleep(delay)
+        while (!r.returnValue.isCompleted) Thread.sleep(delay)
+      }
       // To ensure output & error are got for the last time
-      runner.stdOut.forEach(s => handler.onStdout(s))
-      runner.stdErr.forEach(s => handler.onStderr(s))
-      handler.onReturn(runner.returnValue.value.get.get)
+      r.stdOut.forEach(s => handler.onStdout(s))
+      r.stdErr.forEach(s => handler.onStderr(s))
+      handler.onReturn(r.returnValue.value.get.get)
     })
 
   def execute(commands: Seq[CommandDeps], handler: ScaledaRunHandler): Unit =
