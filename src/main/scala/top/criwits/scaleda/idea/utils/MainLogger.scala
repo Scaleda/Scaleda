@@ -31,5 +31,9 @@ object MainLogger extends BasicLogger {
         case _ => ConsoleViewContentType.LOG_ERROR_OUTPUT
       })
     }
+    level match {
+      case Warn | Error => Notification.logging(level, xs: _*)
+      case _ => {}
+    }
   }
 }

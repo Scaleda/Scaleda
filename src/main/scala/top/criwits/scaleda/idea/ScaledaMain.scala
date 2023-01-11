@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea
 
-import idea.utils.{Icons, MainLogger, OutputLogger}
+import idea.utils.{Icons, MainLogger, Notification, OutputLogger}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import idea.windows.tool.ScaledaToolWindowFactory
 import kernel.project.config.ProjectConfig
@@ -12,12 +12,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.wm.{
-  RegisterToolWindowTask,
-  RegisterToolWindowTaskBuilder,
-  ToolWindowAnchor,
-  ToolWindowManager
-}
+import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
@@ -37,6 +32,8 @@ class ScaledaMain extends StartupActivity {
     } catch {
       case e: Throwable => MainLogger.error(e.getMessage)
     }
+    // setup notification logger
+    Notification.setProject(project)
     // copy kernel logger to main logger
     KernelLogger.append(MainLogger)
     // init jinjia

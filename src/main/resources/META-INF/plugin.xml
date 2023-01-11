@@ -57,7 +57,7 @@
                                  bundle="bundles.ScaledaBundle"
                                  key="settings.toolchains"
                                  id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
-                                 instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable" />
+                                 instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
 
     </extensions>
 
@@ -67,20 +67,26 @@
                     canCloseContents="false"
                     anchor="bottom"
                     factoryClass="top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory"
-                    />
+        />
         <!-- FIXME -->
-<!--        <toolWindow id="Scaleda Targets"-->
-<!--                    secondary="true"-->
-<!--                    anchor="left"-->
-<!--                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory"-->
-<!--                    doNotActivateOnStart="true"-->
-<!--                    />-->
+        <!--        <toolWindow id="Scaleda Targets"-->
+        <!--                    secondary="true"-->
+        <!--                    anchor="left"-->
+        <!--                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory"-->
+        <!--                    doNotActivateOnStart="true"-->
+        <!--                    />-->
     </extensions>
 
     <!-- Scaleda run tasks -->
     <extensions defaultExtensionNs="com.intellij">
         <configurationType implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationType"/>
-        <runConfigurationProducer implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationProducer"/>
+        <runConfigurationProducer
+                implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationProducer"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup displayType="BALLOON"
+                           id="top.criwits.scaleda.idea.notification"/>
     </extensions>
 
 </idea-plugin>
