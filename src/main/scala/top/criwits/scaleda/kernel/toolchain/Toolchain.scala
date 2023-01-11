@@ -5,8 +5,7 @@ import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl._
 import kernel.utils.{KernelLogger, Paths, YAMLHelper}
-
-import top.criwits.scaleda.kernel.project.task.TaskType
+import top.criwits.scaleda.kernel.project.config.TaskType
 
 import java.io.{File, FilenameFilter}
 import scala.collection.mutable.ListBuffer

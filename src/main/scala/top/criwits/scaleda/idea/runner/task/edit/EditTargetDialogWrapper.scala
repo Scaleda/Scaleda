@@ -3,8 +3,7 @@ package idea.runner.task.edit
 
 import idea.ScaledaBundle
 import idea.utils.MainLogger
-import kernel.project.config.ProjectConfig
-import kernel.project.task.TargetConfig
+import kernel.project.config.{ProjectConfig, TargetConfig}
 import kernel.toolchain.Toolchain
 
 import com.intellij.openapi.project.Project

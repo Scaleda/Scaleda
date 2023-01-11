@@ -2,8 +2,8 @@ package top.criwits.scaleda.idea.runner.task.edit;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import top.criwits.scaleda.kernel.project.task.TargetConfig;
-import top.criwits.scaleda.kernel.project.task.TaskConfig;
+import top.criwits.scaleda.kernel.project.config.TargetConfig;
+import top.criwits.scaleda.kernel.project.config.TaskConfig;
 import top.criwits.scaleda.kernel.toolchain.Toolchain;
 
 import javax.swing.*;

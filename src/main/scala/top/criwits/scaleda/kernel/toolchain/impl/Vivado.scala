@@ -1,8 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import kernel.project.config.ProjectConfig
-import kernel.project.task.TargetConfig
+import kernel.project.config.{ProjectConfig, TargetConfig}
 import kernel.shell.ScaledaRunKernelHandlerWithReturn
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
@@ -26,7 +25,8 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
   override def synthesise() = {
     Seq(
       // CommandDeps("ping -c 3 127.0.0.1", executor.workingDir.getAbsolutePath),
-      CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source run_synth.tcl"), executor.workingDir.getAbsolutePath),
+      CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source run_synth.tcl"),
+        executor.workingDir.getAbsolutePath),
     )
   }
 }
@@ -95,7 +95,7 @@ object Vivado {
         `package` = taskConfig.`package`,
         speed = taskConfig.speed,
         sourceList = KernelFileUtils
-          .getAllSourceFiles(new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, config.source))
+          .getAllSourceFiles()
           .map(_.getAbsolutePath.replace('\\', '/'))
       )
       Serialization.getCCParams(context)

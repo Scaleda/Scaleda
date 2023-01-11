@@ -1,9 +1,8 @@
 package top.criwits.scaleda
 package idea.windows.tasks
 
-import kernel.project.task.TaskConfig
-
 import com.intellij.icons.AllIcons
+import top.criwits.scaleda.kernel.project.config.TaskConfig
 
 import java.util
 import javax.swing.Icon

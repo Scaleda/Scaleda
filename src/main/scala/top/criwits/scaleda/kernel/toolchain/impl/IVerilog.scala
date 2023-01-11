@@ -21,11 +21,12 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
   private val executable = if (executor.profile.path.isEmpty) "iverilog" else executor.profile.path
 
   override def simulate() = {
+    // TODO: ADD $DUMPVCD
     ProjectConfig.getConfig().map(config =>
       config.targets.collectFirst({ case t if t.toolchain == getInternalID => t }))
-      .map(task => {
+      .map(target => {
         Seq(
-          CommandDeps(s"${executable}")
+//          CommandDeps(OS.shell(s"${executor.profile.iverilogPath} -o ${task.get.}")) // use shell?
         )
       }).getOrElse(Seq())
   }

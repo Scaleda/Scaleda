@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.utils.Icons
-import kernel.project.task.TargetConfig
+import top.criwits.scaleda.kernel.project.config.TargetConfig
 
 import java.util
 import java.util.Collections.enumeration

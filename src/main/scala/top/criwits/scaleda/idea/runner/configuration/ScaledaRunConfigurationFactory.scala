@@ -1,10 +1,9 @@
 package top.criwits.scaleda
 package idea.runner.configuration
 
-import kernel.project.task.{TargetConfig, TaskConfig}
-
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.openapi.project.Project
+import top.criwits.scaleda.kernel.project.config.{TargetConfig, TaskConfig}
 
 class ScaledaRunConfigurationFactory(
     private val runConfigurationType: ScaledaRunConfigurationType

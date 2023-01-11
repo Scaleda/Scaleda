@@ -1,8 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import kernel.project.config.ProjectConfig
-import kernel.project.task.{TargetConfig, TaskConfig, TaskType}
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.{SimulationExecutor, SynthesisExecutor}
