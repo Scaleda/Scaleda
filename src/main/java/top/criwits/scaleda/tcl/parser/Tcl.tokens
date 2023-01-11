@@ -51,6 +51,7 @@ VALOR_DOUBLE=50
 VALOR_STRING=51
 WS=52
 COMMENT=53
+Bad_character=54
 'proc'=1
 '{'=2
 '}'=3

@@ -131,3 +131,7 @@ VALOR_DOUBLE	:	[0-9]+ '.' [0-9]+  ;
 VALOR_STRING	:	'"' ~[\r\n"]* '"'  ;
 WS	:	[ \t\r\n]+	->	skip  ;
 COMMENT	:	'#' ~[\r\n]*	->	skip  ;
+
+Bad_character
+   : .
+   ;

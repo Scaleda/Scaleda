@@ -10,7 +10,10 @@ import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.tree.{IElementType, IFileElementType}
 import com.intellij.psi.{FileViewProvider, PsiFile}
-import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory}
+import org.antlr.intellij.adaptor.lexer.{
+  ANTLRLexerAdaptor,
+  PSIElementTypeFactory
+}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
 
@@ -36,9 +39,11 @@ final class TclParserDefinition extends ParserDefinition {
 
   override def createElement(node: ASTNode) = TclPsiNodeFactory.create(node)
 
-  override def createFile(viewProvider: FileViewProvider): PsiFile = new TclPSIFileRoot(viewProvider)
+  override def createFile(viewProvider: FileViewProvider): PsiFile =
+    new TclPSIFileRoot(viewProvider)
 
-  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) = SpaceRequirements.MAY
+  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
+    SpaceRequirements.MAY
 }
 
 object TclParserDefinition {
@@ -46,16 +51,21 @@ object TclParserDefinition {
   val tokenNames = (0 until vocabulary.getMaxTokenType)
     .map(x => (x, vocabulary.getLiteralName(x)))
     .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
-    .map(x => if (x._2 == null) "<INVALID>" else x._2).toArray
-  PSIElementTypeFactory.defineLanguageIElementTypes(TclLanguage, tokenNames, TclParser.ruleNames)
+    .map(x => if (x._2 == null) "<INVALID>" else x._2)
+    .toArray
+  PSIElementTypeFactory.defineLanguageIElementTypes(
+    TclLanguage,
+    tokenNames,
+    TclParser.ruleNames
+  )
   val FILE = new IFileElementType(TclLanguage)
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     TclLanguage,
-    TclLexer.COMMENT,
+    TclLexer.COMMENT
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     TclLanguage,
-    TclLexer.WS,
+    TclLexer.WS
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
     TclLanguage,

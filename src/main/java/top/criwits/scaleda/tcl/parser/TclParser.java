@@ -24,7 +24,7 @@ public class TclParser extends Parser {
 		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
 		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
 		T__45=46, T__46=47, IDENTIFICADOR=48, VALOR_ENTERO=49, VALOR_DOUBLE=50, 
-		VALOR_STRING=51, WS=52, COMMENT=53;
+		VALOR_STRING=51, WS=52, COMMENT=53, Bad_character=54;
 	public static final int
 		RULE_inicio = 0, RULE_declaracion_funcion = 1, RULE_args_funcion = 2, 
 		RULE_cuerpo_funcion = 3, RULE_if_funcion = 4, RULE_elseif_funcion = 5, 
@@ -88,7 +88,7 @@ public class TclParser extends Parser {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			"IDENTIFICADOR", "VALOR_ENTERO", "VALOR_DOUBLE", "VALOR_STRING", "WS", 
-			"COMMENT"
+			"COMMENT", "Bad_character"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -6018,7 +6018,7 @@ public class TclParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u00015\u032f\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u00016\u032f\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
 		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
 		"\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b\u0002"+
