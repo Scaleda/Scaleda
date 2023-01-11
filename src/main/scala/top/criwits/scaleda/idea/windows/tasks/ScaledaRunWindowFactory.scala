@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
-import idea.runner.task.{ScaledaRunNewTargetAction, ScaledaRunNewTaskAction, ScaledaRunToolWindowTaskAction}
+import idea.runner.task.ScaledaRunToolWindowTaskAction
 import kernel.project.config.ProjectConfig
 import kernel.project.task.TaskConfig
 
@@ -17,6 +17,7 @@ import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
+import top.criwits.scaleda.idea.runner.task.create.{ScaledaRunNewTargetAction, ScaledaRunNewTaskAction}
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
@@ -103,7 +104,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         )
         group.addSeparator()
         val createTaskAction = new ScaledaRunNewTaskAction
-        val createTargetAction = new ScaledaRunNewTargetAction
+        val createTargetAction = new ScaledaRunNewTargetAction(project)
         group.add(createTargetAction)
         group.add(createTaskAction)
         val toolbar = ActionManager

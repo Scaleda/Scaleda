@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.runner.task
+package idea.runner.task.create
 
 import idea.ScaledaBundle
 
@@ -12,5 +12,7 @@ class ScaledaRunNewTaskAction
       ScaledaBundle.message("tasks.action.run.wool.window.create.task.description"),
       AllIcons.Actions.AddList
     ) {
-  override def actionPerformed(e: AnActionEvent) = {}
+  override def actionPerformed(e: AnActionEvent) = {
+
+  }
 }
