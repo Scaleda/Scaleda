@@ -17,6 +17,8 @@ object Template {
     try {
       Thread.currentThread.setContextClassLoader(this.getClass.getClassLoader)
       jin = Some(new Jinjava())
+    } catch {
+      case e: Throwable => KernelLogger.error(e)
     } finally Thread.currentThread.setContextClassLoader(curClassLoader)
   }
 
@@ -28,24 +30,22 @@ object Template {
     try {
       Thread.currentThread.setContextClassLoader(this.getClass.getClassLoader)
       jin.get.render(template, c)
+    } catch {
+      case e: Throwable => {
+        KernelLogger.error(e)
+        throw e
+      }
     } finally Thread.currentThread.setContextClassLoader(curClassLoader)
   }
 
   def renderResource(resourcePath: String, context: Map[String, Any]): String = {
-    // val reader = try {
-    //   scala.io.Source.fromResource(s"templates/${resourcePath}")
-    // } catch {
-    //   case _: Throwable => scala.io.Source.fromResource(s"/templates/${resourcePath}")
-    // }
-    // render(reader.getLines().mkString("\n"), context)
     val stream = getClass.getClassLoader.getResourceAsStream(s"templates/${resourcePath}")
     val s = IOUtils.toString(stream, "UTF-8")
-    // render(Resources.toString(new URL(s"templates/${resourcePath}"), Charset.defaultCharset()), context)
     render(s, context)
   }
 
   def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String): Unit = {
-    KernelLogger.debug(s"render resource ${resourcePath} to ${targetPath}, context: ${JsonHelper(context)}")
+    KernelLogger.debug(s"render resource ${resourcePath} to ${targetPath}")
     val f = new File(targetPath)
     // if (f.exists()) return
     FileUtils.touch(f)

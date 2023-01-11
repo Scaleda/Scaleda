@@ -65,7 +65,7 @@ object IVerilog {
     override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
       if (!Seq(
         outputs.exists(_.contains("Icarus Verilog version")),
-        outputs.exists(_.contains("usage: iverilog-vpi")),
+        outputs.exists(_.contains("iverilog-vpi")),
         outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
       ).reduce(_ && _)) {
         (false, None)

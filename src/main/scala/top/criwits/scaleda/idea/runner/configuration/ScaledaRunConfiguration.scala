@@ -6,11 +6,7 @@ import idea.utils.{ConsoleLogger, MainLogger}
 import kernel.project.config.ProjectConfig
 import kernel.shell.ScaledaRun
 
-import com.intellij.execution.configurations.{
-  LocatableConfigurationBase,
-  RunConfiguration,
-  RunProfileState
-}
+import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
@@ -20,6 +16,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
+import org.jdom.Element
 
 import java.io.File
 import scala.collection.mutable
@@ -33,6 +30,34 @@ class ScaledaRunConfiguration(
   var targetName = ""
   var taskName = ""
   val extraEnvs = new mutable.HashMap[String, String]
+
+  private val STORAGE_ID: String = "scaleda"
+
+  override def writeExternal(element: Element) = {
+    super.writeExternal(element)
+    val child = element.getChild(STORAGE_ID)
+    if (child != null) {
+      child.setAttribute("taskName", taskName)
+    } else {
+      val c = new Element(STORAGE_ID)
+      c.setAttribute("taskName", taskName)
+      element.addContent(c)
+    }
+  }
+
+  override def readExternal(element: Element) = {
+    super.readExternal(element)
+    val child = element.getChild(STORAGE_ID)
+    if (child != null) {
+      ProjectConfig.getConfig().foreach(c => {
+        val t = child.getAttributeValue("taskName")
+        c.taskByName(t).foreach(f => {
+          targetName = f._1.name
+          taskName = f._2.name
+        })
+      })
+    }
+  }
 
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScaledaRunConfigurationEditor(project)

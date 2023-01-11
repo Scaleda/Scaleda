@@ -13,6 +13,7 @@ class TemplateTester extends AnyFlatSpec with should.Matchers {
   behavior of "Template"
 
   it should "load template from resources" in {
+    Template.initJinja()
     Template.renderResourceTo("test.j2", Map(
       "test" -> "test data",
       "list" -> Seq("a", "b")

@@ -96,7 +96,7 @@ object Vivado {
         speed = taskConfig.speed,
         sourceList = KernelFileUtils
           .getAllSourceFiles(new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, config.source))
-          .map(_.getAbsolutePath)
+          .map(_.getAbsolutePath.replace('\\', '/'))
       )
       Serialization.getCCParams(context)
     }).getOrElse(Map())
