@@ -15,36 +15,58 @@ class TclLexerSyntaxHighlighter extends SyntaxHighlighterBase {
   override def getHighlightingLexer: Lexer =
     new ANTLRLexerAdaptor(TclLanguage, new TclLexer(null))
 
-  override def getTokenHighlights(tokenType: IElementType): Array[TextAttributesKey] = {
+  override def getTokenHighlights(
+      tokenType: IElementType
+  ): Array[TextAttributesKey] = {
     val tokenIElementType = tokenType.asInstanceOf[TokenIElementType]
     val t = tokenIElementType.getANTLRTokenType
     import TclLexerSyntaxHighlighter._
     t match {
-      case TclLexer.Block_comment => Array(createTextAttributesKey(
-        "TCL_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT))
-      case TclLexer.One_line_comment => Array(createTextAttributesKey(
-        "TCL_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT))
-      case n if n == getTypeForLiteralName(";") => Array(createTextAttributesKey(
-        "TCL_SEMICOLON", DefaultLanguageHighlighterColors.SEMICOLON))
-      case n if n == getTypeForLiteralName(",") => Array(createTextAttributesKey(
-        "TCL_COMMA", DefaultLanguageHighlighterColors.COMMA))
-      case
-        TclLexer.Binary_number |
-        TclLexer.Octal_number |
-        TclLexer.Real_number |
-        TclLexer.Decimal_number |
-        TclLexer.Hex_number
-      => Array(createTextAttributesKey(
-        "TCL_NUMBER", DefaultLanguageHighlighterColors.NUMBER))
-      case TclLexer.Dollar_identifier => Array(createTextAttributesKey(
-        "TCL_DOLLAR_IDENTIFIER", DefaultLanguageHighlighterColors.KEYWORD))
-      case n if TclKeywords.TCL_KEYWORDS.map(name => getTypeForLiteralName(name)).contains(n) =>
-        Array(createTextAttributesKey(
-          "TCL_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD))
-      case TclLexer.String => Array(createTextAttributesKey(
-        "TCL_STRING", DefaultLanguageHighlighterColors.STRING))
-      case TclLexer.Simple_identifier | TclLexer.Time_identifier | TclLexer.Escaped_identifier => Array(createTextAttributesKey(
-        "TCL_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER))
+      case TclLexer.COMMENT =>
+        Array(
+          createTextAttributesKey(
+            "TCL_COMMENT",
+            DefaultLanguageHighlighterColors.LINE_COMMENT
+          )
+        )
+      case n if n == getTypeForLiteralName(",") =>
+        Array(
+          createTextAttributesKey(
+            "TCL_COMMA",
+            DefaultLanguageHighlighterColors.COMMA
+          )
+        )
+      case TclLexer.VALOR_ENTERO | TclLexer.VALOR_DOUBLE =>
+        Array(
+          createTextAttributesKey(
+            "TCL_NUMBER",
+            DefaultLanguageHighlighterColors.NUMBER
+          )
+        )
+      case n
+          if TclKeywords.TCL_KEYWORDS
+            .map(name => getTypeForLiteralName(name))
+            .contains(n) =>
+        Array(
+          createTextAttributesKey(
+            "TCL_KEYWORD",
+            DefaultLanguageHighlighterColors.KEYWORD
+          )
+        )
+      case TclLexer.VALOR_STRING =>
+        Array(
+          createTextAttributesKey(
+            "TCL_STRING",
+            DefaultLanguageHighlighterColors.STRING
+          )
+        )
+      case TclLexer.IDENTIFICADOR =>
+        Array(
+          createTextAttributesKey(
+            "TCL_IDENTIFICADOR",
+            DefaultLanguageHighlighterColors.IDENTIFIER
+          )
+        )
       case _ => Array()
     }
   }

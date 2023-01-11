@@ -19,11 +19,9 @@ final class TclFileType extends LanguageFileType(TclLanguage) {
 }
 
 object TclFileType {
-  private final val DefaultExtension = "v"
-  final val DefaultIcon = Icons.verilog
+  private final val DefaultExtension = "tcl"
+  final val DefaultIcon = Icons.mainSmall
   val instance = new TclFileType
-
-  Log.warn(s"DefaultIcon size = ${DefaultIcon.getIconWidth}x${DefaultIcon.getIconHeight}")
 
   def isTcl(fileType: FileType): Boolean = fileType match {
     case _: TclFileType => true
