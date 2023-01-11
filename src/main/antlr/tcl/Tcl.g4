@@ -1,4 +1,4 @@
-grammar tcl;
+grammar Tcl;
 
 inicio	:	declaracion_funcion modulo_ppal ;
 

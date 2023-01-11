@@ -1,7 +1,7 @@
 package top.criwits.scaleda
-package verilog
+package tcl
 
-import verilog.parser.VerilogLexer
+import tcl.parser.TclLexer
 
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
@@ -11,49 +11,49 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, TokenIElementType}
 
-class VerilogLexerSyntaxHighlighter extends SyntaxHighlighterBase {
+class TclLexerSyntaxHighlighter extends SyntaxHighlighterBase {
   override def getHighlightingLexer: Lexer =
-    new ANTLRLexerAdaptor(VerilogLanguage, new VerilogLexer(null))
+    new ANTLRLexerAdaptor(TclLanguage, new TclLexer(null))
 
   override def getTokenHighlights(tokenType: IElementType): Array[TextAttributesKey] = {
     val tokenIElementType = tokenType.asInstanceOf[TokenIElementType]
     val t = tokenIElementType.getANTLRTokenType
-    import VerilogLexerSyntaxHighlighter._
+    import TclLexerSyntaxHighlighter._
     t match {
-      case VerilogLexer.Block_comment => Array(createTextAttributesKey(
-        "VERILOG_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT))
-      case VerilogLexer.One_line_comment => Array(createTextAttributesKey(
-        "VERILOG_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT))
+      case TclLexer.Block_comment => Array(createTextAttributesKey(
+        "TCL_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT))
+      case TclLexer.One_line_comment => Array(createTextAttributesKey(
+        "TCL_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT))
       case n if n == getTypeForLiteralName(";") => Array(createTextAttributesKey(
-        "VERILOG_SEMICOLON", DefaultLanguageHighlighterColors.SEMICOLON))
+        "TCL_SEMICOLON", DefaultLanguageHighlighterColors.SEMICOLON))
       case n if n == getTypeForLiteralName(",") => Array(createTextAttributesKey(
-        "VERILOG_COMMA", DefaultLanguageHighlighterColors.COMMA))
+        "TCL_COMMA", DefaultLanguageHighlighterColors.COMMA))
       case
-        VerilogLexer.Binary_number |
-        VerilogLexer.Octal_number |
-        VerilogLexer.Real_number |
-        VerilogLexer.Decimal_number |
-        VerilogLexer.Hex_number
+        TclLexer.Binary_number |
+        TclLexer.Octal_number |
+        TclLexer.Real_number |
+        TclLexer.Decimal_number |
+        TclLexer.Hex_number
       => Array(createTextAttributesKey(
-        "VERILOG_NUMBER", DefaultLanguageHighlighterColors.NUMBER))
-      case VerilogLexer.Dollar_identifier => Array(createTextAttributesKey(
-        "VERILOG_DOLLAR_IDENTIFIER", DefaultLanguageHighlighterColors.KEYWORD))
-      case n if VerilogKeywords.VERILOG_KEYWORDS.map(name => getTypeForLiteralName(name)).contains(n) =>
+        "TCL_NUMBER", DefaultLanguageHighlighterColors.NUMBER))
+      case TclLexer.Dollar_identifier => Array(createTextAttributesKey(
+        "TCL_DOLLAR_IDENTIFIER", DefaultLanguageHighlighterColors.KEYWORD))
+      case n if TclKeywords.TCL_KEYWORDS.map(name => getTypeForLiteralName(name)).contains(n) =>
         Array(createTextAttributesKey(
-          "VERILOG_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD))
-      case VerilogLexer.String => Array(createTextAttributesKey(
-        "VERILOG_STRING", DefaultLanguageHighlighterColors.STRING))
-      case VerilogLexer.Simple_identifier | VerilogLexer.Time_identifier | VerilogLexer.Escaped_identifier => Array(createTextAttributesKey(
-        "VERILOG_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER))
+          "TCL_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD))
+      case TclLexer.String => Array(createTextAttributesKey(
+        "TCL_STRING", DefaultLanguageHighlighterColors.STRING))
+      case TclLexer.Simple_identifier | TclLexer.Time_identifier | TclLexer.Escaped_identifier => Array(createTextAttributesKey(
+        "TCL_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER))
       case _ => Array()
     }
   }
 }
 
-object VerilogLexerSyntaxHighlighter {
+object TclLexerSyntaxHighlighter {
   def getTypeForLiteralName(name: String): Int = {
-    for (t <- 0 to VerilogLexer.VOCABULARY.getMaxTokenType) {
-      if (("'" + name + "'") == VerilogLexer.VOCABULARY.getLiteralName(t)) return t
+    for (t <- 0 to TclLexer.VOCABULARY.getMaxTokenType) {
+      if (("'" + name + "'") == TclLexer.VOCABULARY.getLiteralName(t)) return t
     }
     0
   }
