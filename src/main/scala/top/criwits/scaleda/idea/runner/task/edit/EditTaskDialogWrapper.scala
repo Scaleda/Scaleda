@@ -15,7 +15,7 @@ class EditTaskDialogWrapper(project: Project)
       project,
       ScaledaBundle.message("windows.edit.task.title")
     ) {
-  var inner = new EditTaskDialog(TaskConfig())
+  var inner: EditTaskDialog = _
 
   private def reInit: EditTaskDialog = {
     if (inner == null) inner = new EditTaskDialog(TaskConfig())
@@ -24,23 +24,23 @@ class EditTaskDialogWrapper(project: Project)
 
   def checkData(targetName: String, task: TaskConfig): Option[String] = {
     if (task.name.isBlank)
-      return Some(ScaledaBundle.message("windows.edit.task.error.name"))
+      return Some(ScaledaBundle.message("windows.edit.task.error.name", task.name))
 
     if (
       !ProjectConfig
         .getConfig()
         .exists(c => c.targets.exists(_.name == targetName))
     )
-      return Some(ScaledaBundle.message("windows.edit.task.error.target"))
+      return Some(ScaledaBundle.message("windows.edit.task.error.target", targetName))
 
     None
   }
 
   override def doOKAction() = {
-    val task = inner.getData
-    checkData(inner.getTargetName, task) match {
+    val task = reInit.getData
+    checkData(reInit.getTargetName, task) match {
       case None => {
-        ProjectConfig.insertOrReplaceTask(inner.getTargetName, task)
+        ProjectConfig.insertOrReplaceTask(reInit.getTargetName, task)
         super.doOKAction()
       }
       case Some(msg) => MainLogger.error("Cannot create/edit task:", msg)
