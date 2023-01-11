@@ -7,7 +7,7 @@ import kernel.shell.ScaledaRunKernelHandlerWithReturn
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
 import kernel.toolchain.executor.Executor
-import kernel.toolchain.impl.Vivado.{internalID, userFriendlyName}
+import kernel.toolchain.impl.Vivado.{getVivadoExec, internalID, userFriendlyName}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.{KernelFileUtils, KernelLogger, OS, Serialization}
 
@@ -26,7 +26,7 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
   override def synthesise() = {
     Seq(
       // CommandDeps("ping -c 3 127.0.0.1", executor.workingDir.getAbsolutePath),
-      CommandDeps(s"${executor.profile.path} -mode batch -source run_synth.tcl", executor.workingDir.getAbsolutePath),
+      CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source run_synth.tcl"), executor.workingDir.getAbsolutePath),
     )
   }
 }
@@ -35,20 +35,15 @@ object Vivado {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String = "vivado"
 
+  def getVivadoExec(path: String): String = new File(path + "/bin/vivado" + (if (OS.isWindows) ".bat" else "")).getAbsolutePath
+
   class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
     override def verifyCommandLine: Option[Seq[CommandDeps]] = {
-      // Vivado verifier
-      val vivadoFile = new File(toolchainProfile.path + "/bin/vivado" + (if (OS.isWindows) ".bat" else ""))
-      KernelLogger.info(s"Vivado path: ${vivadoFile.getAbsolutePath}")
-
+      val vivadoFile = new File(getVivadoExec(toolchainProfile.path))
       if (!vivadoFile.exists()) {
         return None
       }
-
       val cmdLine = OS.shell(s"${vivadoFile.getAbsolutePath} -version")
-
-      KernelLogger.info(s"Vivado cmd line: ${cmdLine}")
-
       Some(Seq(CommandDeps(cmdLine)))
     }
 

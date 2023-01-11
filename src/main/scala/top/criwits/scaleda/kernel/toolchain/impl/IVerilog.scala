@@ -66,7 +66,7 @@ object IVerilog {
       if (!Seq(
         outputs.exists(_.contains("Icarus Verilog version")),
         outputs.exists(_.contains("usage: iverilog-vpi")),
-        outputs.exists(_.contains("Icarus Verilog runtime version"))
+        outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
       ).reduce(_ && _)) {
         (false, None)
       } else {
