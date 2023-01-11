@@ -71,7 +71,7 @@ object ScaledaRun {
       task: TaskConfig,
       daemon: Boolean = true
   ): Thread = {
-    val t = new Thread(() => runTask(handler, workingDir, t, task))
+    val t = new Thread(() => runTask(handler, workingDir, target, task))
     t.setDaemon(daemon)
     t.start()
     t
