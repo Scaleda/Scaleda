@@ -65,11 +65,6 @@ class ScaledaMain extends StartupActivity {
     // setup tool window
     val toolWindowManager = ToolWindowManager.getInstance(project)
     toolWindowManager.invokeLater(() => {
-      // val toolWindow = toolWindowManager.registerToolWindow(RegisterToolWindowTask.notClosable(
-      //   ScaledaRunWindowFactory.WINDOW_ID,
-      //   Icons.mainSmall,
-      //   ToolWindowAnchor.RIGHT
-      // ))
       val builder =
         new RegisterToolWindowTaskBuilder(ScaledaRunWindowFactory.WINDOW_ID)
       builder.icon = Icons.mainSmall
