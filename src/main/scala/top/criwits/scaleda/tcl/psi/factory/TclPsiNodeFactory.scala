@@ -3,8 +3,7 @@ package tcl.psi.factory
 
 import tcl.TclLanguage
 import tcl.parser.TclParser
-import verilog.psi.factory.nodes._
-import verilog.references.ModuleInstantiationPsiNode
+import tcl.psi.factory.nodes.{IdentifierPsiNode, InicioPsiNode}
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.tree.IElementType
@@ -33,62 +32,13 @@ object TclPsiNodeFactory {
     new ANTLRPsiNode(astNode)
   }
 
-  try ruleIElementTypeClassMap.put(
+  ruleIElementTypeClassMap.put(
     // TODO: check this
-    getRuleIElementType(TclParser.RULE_indice),
+    getRuleIElementType(TclParser.RULE_declaracion),
     classOf[IdentifierPsiNode]
   )
   ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_reg_declaration),
-    classOf[RegDeclarationPsiNode]
+    getRuleIElementType(TclParser.RULE_inicio),
+    classOf[InicioPsiNode]
   )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_net_declaration),
-    classOf[NetDeclarationPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_port_identifier),
-    classOf[PortIdentifierPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_net_identifier),
-    classOf[NetIdentifierPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_module_identifier),
-    classOf[ModuleIdentifierPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_module_instantiation),
-    classOf[ModuleInstantiationPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_module_declaration),
-    classOf[ModuleDeclarationPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_variable_identifier),
-    classOf[VariableIdentifierPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_parameter_identifier),
-    classOf[ParameterIdentifierPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_statement),
-    classOf[StatementPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_named_port_connection),
-    classOf[NamedPortConnectionPsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_directive),
-    classOf[DirectivePsiNode]
-  )
-  ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_source_text),
-    classOf[SourceTextPsiNode]
-  )
-
 }

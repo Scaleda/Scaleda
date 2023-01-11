@@ -31,12 +31,11 @@ object TclPsiLeafNodeFactory {
     new ANTLRPsiLeafNode(`type`, text)
   }
 
-  def create(tokenIndex: Int, charSequence: CharSequence) =
-    createa(getTokenIElementType(tokenIndex), charSequence)
+  def create(tokenIndex: Int, charSequence: CharSequence): ANTLRPsiLeafNode =
+    create(getTokenIElementType(tokenIndex), charSequence)
 
-  try tokenIElementTypeClassMap.put(
+  tokenIElementTypeClassMap.put(
     getTokenIElementType(TclLexer.IDENTIFICADOR),
     classOf[IdentifierPsiLeafNode]
   )
-
 }
