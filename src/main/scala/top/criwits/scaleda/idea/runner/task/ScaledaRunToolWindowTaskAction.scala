@@ -10,7 +10,6 @@ import idea.windows.tasks.ScaledaRunTaskNode
 import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.Executor
-import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.impl.{
   RunManagerImpl,
   RunnerAndConfigurationSettingsImpl
@@ -48,9 +47,8 @@ class ScaledaRunToolWindowTaskAction(
               //   new PsiLocation[_](task),
               //   e.getDataContext
               // )
-              val dataContext = e.getDataContext
-              val context =
-                ConfigurationContext.getFromContext(dataContext, e.getPlace)
+              // val dataContext = e.getDataContext
+              // val context = ConfigurationContext.getFromContext(dataContext, e.getPlace)
               val producer = new ScaledaRunConfigurationFactory(
                 ScaledaRunConfigurationType.instance
               )

@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
-import idea.runner.task.ScaledaRunToolWindowTaskAction
+import idea.runner.task.{ScaledaRunNewTargetAction, ScaledaRunNewTaskAction, ScaledaRunToolWindowTaskAction}
 import kernel.project.config.ProjectConfig
 import kernel.project.task.TaskConfig
 
@@ -101,14 +101,16 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
             .getInstance()
             .createCollapseAllAction(treeExpander, tree)
         )
-        // group.addSeparator()
+        group.addSeparator()
+        val createTaskAction = new ScaledaRunNewTaskAction
+        val createTargetAction = new ScaledaRunNewTargetAction
+        group.add(createTargetAction)
+        group.add(createTaskAction)
         val toolbar = ActionManager
           .getInstance()
           .createActionToolbar("ScaledaRunToolbar", group, true)
         toolbar.setTargetComponent(tree)
         val toolBarPanel = new JPanel(new GridLayout())
-        // val gridLayout = new GridLayout
-        // val toolBarPanel = new JPanel()
         val toolbarComponent = toolbar.getComponent
         require(toolbarComponent != null)
         toolBarPanel.add(toolbarComponent)
