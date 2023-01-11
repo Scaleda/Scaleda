@@ -1,6 +1,8 @@
 package top.criwits.scaleda
 package kernel.project.task
 
+import kernel.utils.HasDefault
+
 case class TargetConfig(
     name: String = "",
     toolchain: String = "",
@@ -10,4 +12,8 @@ case class TargetConfig(
     tasks: Array[TaskConfig] = Array()
 ) {
   def getPackage = `package`
+}
+
+object TargetConfig extends HasDefault[TargetConfig] {
+  override def getDefault: TargetConfig = TargetConfig()
 }

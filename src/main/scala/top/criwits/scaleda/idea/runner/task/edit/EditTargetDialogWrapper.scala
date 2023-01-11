@@ -39,13 +39,18 @@ class EditTargetDialogWrapper(project: Project, initial: TargetConfig)
   }
 
   override def doOKAction() = {
-    val target = inner.getData
-    checkData(target) match {
-      case None => {
-        ProjectConfig.insertOrReplaceTarget(target)
-        super.doOKAction()
+    try {
+      val target = reInit.getData
+      checkData(target) match {
+        case None => {
+          ProjectConfig.insertOrReplaceTarget(target)
+          super.doOKAction()
+        }
+        case Some(msg) => MainLogger.error("Cannot create/edit target:", msg)
       }
-      case Some(msg) => MainLogger.error("Cannot create/edit target:", msg)
+    } catch {
+      case e: NumberFormatException =>
+        MainLogger.error("Input number format error: ", e)
     }
   }
 

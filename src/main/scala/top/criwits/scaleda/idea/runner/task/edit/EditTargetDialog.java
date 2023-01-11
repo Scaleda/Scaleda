@@ -1,12 +1,16 @@
 package top.criwits.scaleda.idea.runner.task.edit;
 
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import org.jetbrains.annotations.NotNull;
 import top.criwits.scaleda.kernel.project.task.TargetConfig;
+import top.criwits.scaleda.kernel.project.task.TargetConfig$;
 import top.criwits.scaleda.kernel.project.task.TaskConfig;
 import top.criwits.scaleda.kernel.toolchain.Toolchain;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.ResourceBundle;
@@ -18,6 +22,7 @@ public class EditTargetDialog implements EditDialogProvider<TargetConfig> {
     private JTextField device;
     private JTextField pack;
     private JTextField speed;
+    private TargetConfig data;
 
     @Override
     public JPanel getMainPanel() {
@@ -25,7 +30,7 @@ public class EditTargetDialog implements EditDialogProvider<TargetConfig> {
     }
 
     @Override
-    public TargetConfig getData() {
+    public TargetConfig getData() throws NumberFormatException {
         TaskConfig[] empty = new TaskConfig[0];
         return new TargetConfig(name.getText(),
                 (String) toolchain.getSelectedItem(),
@@ -41,7 +46,40 @@ public class EditTargetDialog implements EditDialogProvider<TargetConfig> {
         toolchain.setModel(new DefaultComboBoxModel<>(profiles));
         device.setText(initial.device());
         pack.setText(initial.getPackage());
-        speed.setText(initial.getPackage());
+        speed.setText(Integer.toString(initial.speed()));
+        data = TargetConfig$.MODULE$.getDefault();
+
+        name.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                data = data.copy(name.getText(), data.toolchain(), data.device(), data.getPackage(), data.speed(), data.tasks());
+            }
+        });
+        toolchain.addActionListener(actionEvent -> {
+            data = data.copy(data.name(), (String) toolchain.getSelectedItem(), data.device(), data.getPackage(), data.speed(), data.tasks());
+        });
+        device.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                data = data.copy(data.name(), data.toolchain(), device.getText(), data.getPackage(), data.speed(), data.tasks());
+            }
+        });
+        pack.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                data = data.copy(data.name(), data.toolchain(), data.device(), pack.getText(), data.speed(), data.tasks());
+            }
+        });
+        speed.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                try {
+                    int speedInt = Integer.parseInt(speed.getText());
+                    data = data.copy(data.name(), data.toolchain(), data.device(), data.getPackage(), speedInt, data.tasks());
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        });
     }
 
     {
