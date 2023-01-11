@@ -15,19 +15,19 @@ object ScaledaRun {
   def runTask(
       handler: ScaledaRunHandler,
       workingDir: File,
-      task: TargetConfig,
-      target: TaskConfig
+      target: TargetConfig,
+      task: TaskConfig
   ) = {
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
     val config = ProjectConfig.getConfig().get
-    val info = Toolchain.toolchains(task.toolchain)
+    val info = Toolchain.toolchains(target.toolchain)
     // find profile
     Toolchain
       .profiles()
-      .filter(p => p.toolchainType == task.toolchain)
+      .filter(p => p.toolchainType == target.toolchain)
       .foreach(profile => {
         // generate executor
-        val executor = target.getType match {
+        val executor = task.getType match {
           case TaskType.Simulation =>
             SimulationExecutor(
               workingDir = new File(workingDir, ".sim"),
@@ -41,25 +41,25 @@ object ScaledaRun {
               profile = profile
             )
           case _ => {
-            KernelLogger.error(s"unsupported task type: ${target.getType}")
+            KernelLogger.error(s"unsupported task type: ${task.getType}")
             ???
           }
         }
-        if (target.preset) {
-          task.toolchain match {
+        if (task.preset) {
+          target.toolchain match {
             case Vivado.internalID => {
               val r = new Vivado.TemplateRenderer(
                 executor = executor,
-                taskConfig = task
+                taskConfig = target
               )
               r.render()
             }
             case _ =>
-              KernelLogger.error(s"not supported preset: ${task.toolchain}")
+              KernelLogger.error(s"not supported preset: ${target.toolchain}")
           }
         }
         val toolchain = info._2(executor)
-        val commands = toolchain.commands(target.getType)
+        val commands = toolchain.commands(task.getType)
         CommandRunner.execute(commands, handler)
       })
   }
@@ -67,11 +67,11 @@ object ScaledaRun {
   def runTaskBackground(
       handler: ScaledaRunHandler,
       workingDir: File,
-      task: TargetConfig,
-      target: TaskConfig,
+      target: TargetConfig,
+      task: TaskConfig,
       daemon: Boolean = true
   ): Thread = {
-    val t = new Thread(() => runTask(handler, workingDir, task, target))
+    val t = new Thread(() => runTask(handler, workingDir, t, task))
     t.setDaemon(daemon)
     t.start()
     t

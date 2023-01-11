@@ -40,8 +40,7 @@ class EditTargetDialogWrapper(project: Project, initial: TargetConfig)
 
   override def doOKAction() = {
     val target = inner.getData
-    val msg = checkData(target)
-    msg match {
+    checkData(target) match {
       case None => {
         ProjectConfig.insertOrReplaceTarget(target)
         super.doOKAction()
