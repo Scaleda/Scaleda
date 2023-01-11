@@ -62,6 +62,17 @@ object ProjectConfig {
     }
   }
 
+  def getAbsolutePath(path: String): Option[String] = {
+    val file = new File(path)
+    file.isAbsolute match {
+      case true =>  projectBase match {
+        case Some(base) => Some(new File(new File(base), path).getAbsolutePath)
+        case None => None
+      }
+      case false => Some(file.getAbsolutePath)
+    }
+  }
+
   def headTarget = getConfig().flatMap(c => c.headTarget)
 
   def headTask = getConfig().flatMap(c => c.headTask)

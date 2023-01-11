@@ -35,7 +35,7 @@ object Vivado {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String = "vivado"
 
-  def getVivadoExec(path: String): String = new File(path + "/bin/vivado" + (if (OS.isWindows) ".bat" else "")).getAbsolutePath
+  def getVivadoExec(path: String): String = new File(new File(path), "/bin/vivado" + (if (OS.isWindows) ".bat" else "")).getAbsolutePath
 
   class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
     override def verifyCommandLine: Option[Seq[CommandDeps]] = {
