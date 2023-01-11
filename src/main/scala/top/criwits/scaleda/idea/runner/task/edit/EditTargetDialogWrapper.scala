@@ -2,17 +2,55 @@ package top.criwits.scaleda
 package idea.runner.task.edit
 
 import idea.ScaledaBundle
+import idea.utils.MainLogger
+import kernel.project.config.ProjectConfig
+import kernel.project.task.TargetConfig
+import kernel.toolchain.Toolchain
 
 import com.intellij.openapi.project.Project
 
 import javax.swing.JPanel
 
-class EditTargetDialogWrapper(project: Project)
-    extends EditDialogWrapper(
+class EditTargetDialogWrapper(project: Project, initial: TargetConfig)
+    extends EditDialogWrapper[TargetConfig](
       project,
       ScaledaBundle.message("windows.edit.target.title")
     ) {
-  val inner = new EditTargetDialog
+  var inner = new EditTargetDialog(initial)
 
-  override def getMainPanel: JPanel = inner.getMainPanel
+  private def reInit: EditTargetDialog = {
+    if (inner == null) inner = new EditTargetDialog(TargetConfig())
+    inner
+  }
+
+  private def checkData(target: TargetConfig): Option[String] = {
+    if (target.name.isBlank)
+      return Some(ScaledaBundle.message("windows.edit.target.error.name"))
+    if (!Toolchain.profiles().exists(_.profileName == target.toolchain))
+      return Some(ScaledaBundle.message("windows.edit.target.error.toolchain"))
+    if (target.device.isBlank)
+      return Some(ScaledaBundle.message("windows.edit.target.error.device"))
+    if (target.`package`.isBlank)
+      return Some(ScaledaBundle.message("windows.edit.target.error.package"))
+    if (target.speed == 0 || target.speed > 3)
+      return Some(ScaledaBundle.message("windows.edit.target.error.speed"))
+
+    None
+  }
+
+  override def doOKAction() = {
+    val target = inner.getData
+    val msg = checkData(target)
+    msg match {
+      case None => {
+        ProjectConfig.insertOrReplaceTarget(target)
+        super.doOKAction()
+      }
+      case Some(msg) => MainLogger.error("Cannot create/edit target:", msg)
+    }
+  }
+
+  override def getMainPanel: JPanel = reInit.getMainPanel
+
+  override def getData: TargetConfig = reInit.getData
 }

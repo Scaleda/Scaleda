@@ -103,7 +103,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
             .createCollapseAllAction(treeExpander, tree)
         )
         group.addSeparator()
-        val createTaskAction = new ScaledaRunNewTaskAction
+        val createTaskAction = new ScaledaRunNewTaskAction(project)
         val createTargetAction = new ScaledaRunNewTargetAction(project)
         group.add(createTargetAction)
         group.add(createTaskAction)

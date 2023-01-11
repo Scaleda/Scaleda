@@ -6,10 +6,10 @@ import com.intellij.openapi.ui.DialogWrapper
 
 import javax.swing.{JComponent, JPanel}
 
-abstract class EditDialogWrapper(
+abstract class EditDialogWrapper[T](
     project: Project,
     title: String
-) extends DialogWrapper(project) with EditDialogProvider {
+) extends DialogWrapper(project) with EditDialogProvider[T] {
   init()
   setTitle(title)
 

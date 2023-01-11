@@ -3,6 +3,7 @@ package idea.runner.task.edit
 
 import javax.swing.JPanel
 
-trait EditDialogProvider {
+trait EditDialogProvider[T] {
   def getMainPanel: JPanel
+  def getData: T
 }

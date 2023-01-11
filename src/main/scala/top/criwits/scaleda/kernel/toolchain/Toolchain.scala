@@ -47,6 +47,10 @@ object Toolchain {
     IVerilog.internalID -> (IVerilog.userFriendlyName, (executor: Executor) => new IVerilog(executor)),
   )
 
+  def toolchainIds = toolchains.keys.toArray
+
+  def toolchainNames = toolchains.map(_._2._1).toArray
+
   /**
    * Profiles for different toolchains, loaded by [[ToolchainProfileLoader]]
    */

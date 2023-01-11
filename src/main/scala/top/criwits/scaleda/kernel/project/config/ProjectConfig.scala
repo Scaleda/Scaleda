@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
+import idea.utils.MainLogger
 import kernel.project.task.{TargetConfig, TaskConfig}
 import kernel.utils.{JsonHelper, KernelLogger, YAMLHelper}
 
@@ -56,19 +57,23 @@ object ProjectConfig {
     path match {
       case Some(p) =>
         val config = YAMLHelper(new File(p), classOf[ProjectConfig])
-        // KernelLogger.debug(s"Loaded project config ${JsonHelper(config)}")
+        KernelLogger.debug(s"Loaded project config ${JsonHelper(config)}")
         Some(config)
       case None => None
     }
   }
 
+  def config = getConfig().get
+
   def getAbsolutePath(path: String): Option[String] = {
     val file = new File(path)
     file.isAbsolute match {
-      case true =>  projectBase match {
-        case Some(base) => Some(new File(new File(base), path).getAbsolutePath)
-        case None => None
-      }
+      case true =>
+        projectBase match {
+          case Some(base) =>
+            Some(new File(new File(base), path).getAbsolutePath)
+          case None => None
+        }
       case false => Some(file.getAbsolutePath)
     }
   }
@@ -76,4 +81,54 @@ object ProjectConfig {
   def headTarget = getConfig().flatMap(c => c.headTarget)
 
   def headTask = getConfig().flatMap(c => c.headTask)
+
+  private def saveConfig(projectConfig: ProjectConfig): Unit = {
+    YAMLHelper(projectConfig, new File(configFile.get))
+  }
+
+  def insertOrReplaceTarget(target: TargetConfig): ProjectConfig = {
+    ProjectConfig
+      .getConfig()
+      .map(c => {
+        val projectConfig = if (c.targets.exists(_.name == target.name)) {
+          val newTargets = c.targets.filter(_.name != target.name) :+ target
+          c.copy(targets = newTargets)
+        } else {
+          c.copy(targets = c.targets :+ target)
+        }
+        saveConfig(projectConfig)
+        projectConfig
+      })
+      .orNull
+  }
+
+  def insertOrReplaceTask(
+      targetName: String,
+      task: TaskConfig
+  ): ProjectConfig = {
+    ProjectConfig
+      .getConfig()
+      .map(projectConfig => {
+        if (!projectConfig.targets.exists(_.name == targetName)) {
+          MainLogger.error(
+            s"Cannot apply task ${task.name}: no target named ${targetName}"
+          )
+          null
+        } else {
+          val target = projectConfig.targets.find(_.name == targetName).get
+          val r = if (target.tasks.exists(_.name == task.name)) {
+            val newTasks = target.tasks.filter(_.name != task.name) :+ task
+            val newTarget = target.copy(tasks = newTasks)
+            projectConfig.copy(targets = projectConfig.targets :+ newTarget)
+          } else {
+            val targets =
+              projectConfig.targets :+ target.copy(tasks = target.tasks :+ task)
+            projectConfig.copy(targets = targets)
+          }
+          saveConfig(r)
+          r
+        }
+      })
+      .orNull
+  }
 }
