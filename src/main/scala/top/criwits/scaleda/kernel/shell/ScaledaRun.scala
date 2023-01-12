@@ -10,6 +10,7 @@ import kernel.toolchain.impl.Vivado
 import kernel.utils.KernelLogger
 
 import java.io.File
+import java.lang
 
 object ScaledaRun {
   def runTask(
@@ -19,49 +20,50 @@ object ScaledaRun {
       task: TaskConfig
   ) = {
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
-    val config = ProjectConfig.getConfig().get
-    val info = Toolchain.toolchains(target.toolchain)
-    // find profile
-    Toolchain
-      .profiles()
-      .filter(p => p.toolchainType == target.toolchain)
-      .foreach(profile => {
-        // generate executor
-        val executor = task.getType match {
-          case TaskType.Simulation =>
-            SimulationExecutor(
-              workingDir = new File(workingDir, ".sim"),
-              topFile = new File(config.topFile),
-              profile = profile
-            )
-          case TaskType.Synthesis =>
-            SynthesisExecutor(
-              workingDir = new File(workingDir, ".synth"),
-              topFile = new File(config.topFile),
-              profile = profile
-            )
-          case _ => {
-            KernelLogger.error(s"unsupported task type: ${task.getType}")
-            ???
-          }
-        }
-        if (task.preset) {
-          target.toolchain match {
-            case Vivado.internalID => {
-              val r = new Vivado.TemplateRenderer(
-                executor = executor,
-                taskConfig = target
+    ProjectConfig.getConfig().map(config => {
+      val info = Toolchain.toolchains(target.toolchain)
+      // find profile
+      Toolchain
+        .profiles()
+        .filter(p => p.toolchainType == target.toolchain)
+        .foreach(profile => {
+          // generate executor
+          val executor = task.getType match {
+            case TaskType.Simulation =>
+              SimulationExecutor(
+                workingDir = new File(workingDir, ".sim"),
+                topFile = new File(config.topFile),
+                profile = profile
               )
-              r.render()
+            case TaskType.Synthesis =>
+              SynthesisExecutor(
+                workingDir = new File(workingDir, ".synth"),
+                topFile = new File(config.topFile),
+                profile = profile
+              )
+            case _ => {
+              KernelLogger.error(s"unsupported task type: ${task.getType}")
+              ???
             }
-            case _ =>
-              KernelLogger.error(s"not supported preset: ${target.toolchain}")
           }
-        }
-        val toolchain = info._2(executor)
-        val commands = toolchain.commands(task.getType)
-        CommandRunner.execute(commands, handler)
-      })
+          if (task.preset) {
+            target.toolchain match {
+              case Vivado.internalID => {
+                val r = new Vivado.TemplateRenderer(
+                  executor = executor,
+                  taskConfig = target
+                )
+                r.render()
+              }
+              case _ =>
+                KernelLogger.error(s"not supported preset: ${target.toolchain}")
+            }
+          }
+          val toolchain = info._2(executor)
+          val commands = toolchain.commands(task.getType)
+          CommandRunner.execute(commands, handler)
+        })
+    }).getOrElse(throw new RuntimeException(s"Cannot load ProjectConfig when starting task ${task.name}"))
   }
 
   def runTaskBackground(
