@@ -3,6 +3,7 @@ package kernel.project.config
 
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import top.criwits.scaleda.kernel.utils.HasDefault
 
 @JsonInclude(Include.NON_EMPTY)
 case class TaskConfig(

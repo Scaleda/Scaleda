@@ -4,8 +4,8 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.jetbrains.annotations.NotNull;
-import top.criwits.scaleda.kernel.project.task.TargetConfig;
 import top.criwits.scaleda.kernel.project.config.TargetConfig;
+import top.criwits.scaleda.kernel.project.config.TargetConfig$;
 import top.criwits.scaleda.kernel.project.config.TaskConfig;
 import top.criwits.scaleda.kernel.toolchain.Toolchain;
 
@@ -53,22 +53,22 @@ public class EditTargetDialog implements EditDialogProvider<TargetConfig> {
         name.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
-                data = data.copy(name.getText(), data.toolchain(), data.device(), data.getPackage(), data.speed(), data.tasks());
+                data = data.copy(name.getText(), data.toolchain(), data.topModule(), data.device(), data.getPackage(), data.speed(), data.tasks());
             }
         });
         toolchain.addActionListener(actionEvent -> {
-            data = data.copy(data.name(), (String) toolchain.getSelectedItem(), data.device(), data.getPackage(), data.speed(), data.tasks());
+            data = data.copy(data.name(), (String) toolchain.getSelectedItem(), data.topModule(), data.device(), data.getPackage(), data.speed(), data.tasks());
         });
         device.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
-                data = data.copy(data.name(), data.toolchain(), device.getText(), data.getPackage(), data.speed(), data.tasks());
+                data = data.copy(data.name(), data.toolchain(), data.topModule(), device.getText(), data.getPackage(), data.speed(), data.tasks());
             }
         });
         pack.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
-                data = data.copy(data.name(), data.toolchain(), data.device(), pack.getText(), data.speed(), data.tasks());
+                data = data.copy(data.name(), data.toolchain(), data.topModule(), data.device(), pack.getText(), data.speed(), data.tasks());
             }
         });
         speed.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -76,7 +76,7 @@ public class EditTargetDialog implements EditDialogProvider<TargetConfig> {
             protected void textChanged(@NotNull DocumentEvent e) {
                 try {
                     int speedInt = Integer.parseInt(speed.getText());
-                    data = data.copy(data.name(), data.toolchain(), data.device(), data.getPackage(), speedInt, data.tasks());
+                    data = data.copy(data.name(), data.toolchain(), data.topModule(), data.device(), data.getPackage(), speedInt, data.tasks());
                 } catch (NumberFormatException ignored) {
                 }
             }
