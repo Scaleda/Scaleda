@@ -67,6 +67,8 @@ COMM_STR        :   [a-zA-Z0-9_.\-]+ ;
 UNKNOW_STR      :   ~[ \t\r\n;]+ ;
 
 NEWLINE : [\r?\n]+ ;
-WS	:	[ \t\r\n]+	->	skip  ;
-COMMENT	:	'#' ~[\r\n]*	->	skip  ;
-COMMENT_INLINE	:	';' ~[\r\n]*	->	skip  ;
+WS	:	[ \t\r\n]+	->	channel (HIDDEN)  ;
+COMMENT	:	'#' ~[\r\n]*	->	channel (HIDDEN)  ;
+COMMENT_INLINE	:	';' ~[\r\n]*	->	channel (HIDDEN)  ;
+
+BAD_CHAR    : . ;

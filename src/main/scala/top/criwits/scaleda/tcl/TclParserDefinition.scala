@@ -62,7 +62,7 @@ object TclParserDefinition {
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     TclLanguage,
     TclLexer.COMMENT,
-    // TclLexer.COMMENT_INLINE,
+    TclLexer.COMMENT_INLINE,
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     TclLanguage,

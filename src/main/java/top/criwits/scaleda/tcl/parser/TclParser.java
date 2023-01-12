@@ -23,7 +23,7 @@ public class TclParser extends Parser {
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
 		T__31=32, T__32=33, T__33=34, T__34=35, CONST_INTEGER=36, CONST_DOUBLE=37, 
 		CONST_STRING=38, IDENTIFICADOR=39, COMM_STR=40, UNKNOW_STR=41, NEWLINE=42, 
-		WS=43, COMMENT=44, COMMENT_INLINE=45;
+		WS=43, COMMENT=44, COMMENT_INLINE=45, BAD_CHAR=46;
 	public static final int
 		RULE_inicio = 0, RULE_identificator = 1, RULE_puts = 2, RULE_gets = 3, 
 		RULE_source = 4, RULE_declaracion = 5, RULE_func_internal = 6, RULE_func_arg = 7, 
@@ -63,7 +63,7 @@ public class TclParser extends Parser {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			"CONST_INTEGER", "CONST_DOUBLE", "CONST_STRING", "IDENTIFICADOR", "COMM_STR", 
-			"UNKNOW_STR", "NEWLINE", "WS", "COMMENT", "COMMENT_INLINE"
+			"UNKNOW_STR", "NEWLINE", "WS", "COMMENT", "COMMENT_INLINE", "BAD_CHAR"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -2854,7 +2854,7 @@ public class TclParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001-\u0149\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001.\u0149\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
 		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
 		"\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b\u0002"+
