@@ -61,8 +61,8 @@
         <lang.parserDefinition language="Tcl"
                                implementationClass="top.criwits.scaleda.tcl.TclParserDefinition"/>
 <!--        <lang.ast.factory language="Tcl" implementationClass="top.criwits.scaleda.tcl.TclASTFactory"/>-->
-<!--        <lang.syntaxHighlighterFactory language="Tcl"-->
-<!--                                       implementationClass="top.criwits.scaleda.tcl.TclSyntaxHighlighterFactory"/>-->
+        <lang.syntaxHighlighterFactory language="Tcl"
+                                       implementationClass="top.criwits.scaleda.tcl.TclSyntaxHighlighterFactory"/>
         <lang.commenter language="Tcl"
                         implementationClass="top.criwits.scaleda.tcl.commenter.TclCommenter"/>
     </extensions>

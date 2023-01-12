@@ -29,13 +29,6 @@ class TclLexerSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.LINE_COMMENT
           )
         )
-      case n if n == getTypeForLiteralName(",") =>
-        Array(
-          createTextAttributesKey(
-            "TCL_COMMA",
-            DefaultLanguageHighlighterColors.COMMA
-          )
-        )
       case TclLexer.CONST_INTEGER | TclLexer.CONST_DOUBLE =>
         Array(
           createTextAttributesKey(
