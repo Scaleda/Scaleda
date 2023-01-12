@@ -4,16 +4,15 @@ inicio : (line (';')*)* EOF ;
 
 identificator :  '$' IDENTIFICADOR indice | '${' IDENTIFICADOR '}' indice ;
 
-//puts	:	'puts' asignacion  ;
+puts	:	'puts' asignacion  ;
 gets	:	'gets' 'stdin' ;
-source	:	'source' FILENAME ;
-//declaracion	:	'set' IDENTIFICADOR asignacion  ;
-func_internal   : gets | source ;
+source	:	'source' COMM_STR ;
+declaracion	:	'set' IDENTIFICADOR asignacion  ;
+func_internal   : gets | source | puts | declaracion;
 
-func_arg  : FILENAME | identificator | const | UNKNOW_STR;
-func_args : (func_arg)*;
-func_call : FUNC_NAME func_args ;
-//func_call : UNKNOW_STR func_args ;
+func_arg  : comm_str | identificator | const | UNKNOW_STR;
+func_args : (func_arg)+;
+func_call : func_args ;
 
 agrup	:	'[' aux_agrup  ;
 aux_agrup	:	expr ']' | IDENTIFICADOR param_func ']' | gets ']' | 'array' aux_array  ;
@@ -56,18 +55,15 @@ CONST_INTEGER	:	'-'?[0-9]+  ;
 CONST_DOUBLE	:	[0-9]+ '.' [0-9]+  ;
 CONST_STRING	:	'"' ~[\r\n"]* '"'  ;
 
-UNKNOW_STR      :   ~[ \t\r\n]+ ;
-FILENAME        :   [a-zA-Z0-9_.]+ ;
+comm_str    : COMM_STR | IDENTIFICADOR;
+
 IDENTIFICADOR	:	[a-zA-Z_][a-zA-Z0-9_]*  ;
-//FUNC_NAME       :   ~[\r\n\t#;]+ ;
-FUNC_NAME       :   [a-zA-Z0-9_]+ ;
-//FILENAME        :   UNKNOW_STR ;
-//IDENTIFICADOR	:	UNKNOW_STR  ;
+//FUNC_NAME       :   IDENTIFICADOR ;
+COMM_STR        :   IDENTIFICADOR | [a-zA-Z0-9_.\-]+ ;
+
+UNKNOW_STR      :   ~[ \t\r\n]+ ;
+
 NEWLINE : [\r?\n]+ ;
 WS	:	[ \t\r\n]+	->	skip  ;
 COMMENT	:	'#' ~[\r\n]*	->	skip  ;
 COMMENT_INLINE	:	';' ~[\r\n]*	->	skip  ;
-
-BAD_CHARACTER
-   : .
-   ;
