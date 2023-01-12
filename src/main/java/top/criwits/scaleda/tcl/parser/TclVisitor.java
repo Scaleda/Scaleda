@@ -17,239 +17,11 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitInicio(TclParser.InicioContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#declaracion_funcion}.
+	 * Visit a parse tree produced by {@link TclParser#identificator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeclaracion_funcion(TclParser.Declaracion_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#args_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArgs_funcion(TclParser.Args_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#cuerpo_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCuerpo_funcion(TclParser.Cuerpo_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#if_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIf_funcion(TclParser.If_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#elseif_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElseif_funcion(TclParser.Elseif_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#else_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElse_funcion(TclParser.Else_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#switch_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSwitch_funcion(TclParser.Switch_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#case_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCase_funcion(TclParser.Case_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#case2_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCase2_funcion(TclParser.Case2_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#default_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDefault_funcion(TclParser.Default_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#for_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFor_funcion(TclParser.For_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#while_funcion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitWhile_funcion(TclParser.While_funcionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#cuerpo_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCuerpo_loop_func(TclParser.Cuerpo_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#if_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIf_loop_func(TclParser.If_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#elseif_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElseif_loop_func(TclParser.Elseif_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#else_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElse_loop_func(TclParser.Else_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#switch_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSwitch_loop_func(TclParser.Switch_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#case_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCase_loop_func(TclParser.Case_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#case2_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCase2_loop_func(TclParser.Case2_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#default_loop_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDefault_loop_func(TclParser.Default_loop_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#modulo_ppal}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitModulo_ppal(TclParser.Modulo_ppalContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_if}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_if(TclParser.R_ifContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#elseif}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElseif(TclParser.ElseifContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_else}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_else(TclParser.R_elseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_switch}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_switch(TclParser.R_switchContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_case}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_case(TclParser.R_caseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#case2}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCase2(TclParser.Case2Context ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_default}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_default(TclParser.R_defaultContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#cuerpo_inst}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCuerpo_inst(TclParser.Cuerpo_instContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_for}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_for(TclParser.R_forContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_while}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_while(TclParser.R_whileContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#cuerpo_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCuerpo_loop(TclParser.Cuerpo_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#if_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIf_loop(TclParser.If_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#elseif_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElseif_loop(TclParser.Elseif_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#else_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitElse_loop(TclParser.Else_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#switch_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSwitch_loop(TclParser.Switch_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#case_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCase_loop(TclParser.Case_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#case2_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCase2_loop(TclParser.Case2_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#default_loop}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDefault_loop(TclParser.Default_loopContext ctx);
+	T visitIdentificator(TclParser.IdentificatorContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TclParser#puts}.
 	 * @param ctx the parse tree
@@ -317,107 +89,23 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVal_indice(TclParser.Val_indiceContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#valor}.
+	 * Visit a parse tree produced by {@link TclParser#const}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitValor(TclParser.ValorContext ctx);
+	T visitConst(TclParser.ConstContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#incremento}.
+	 * Visit a parse tree produced by {@link TclParser#line}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIncremento(TclParser.IncrementoContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_break}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_break(TclParser.R_breakContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_continue}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_continue(TclParser.R_continueContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#r_return}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR_return(TclParser.R_returnContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#value_return}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitValue_return(TclParser.Value_returnContext ctx);
+	T visitLine(TclParser.LineContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TclParser#expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExpr(TclParser.ExprContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#asig_for}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAsig_for(TclParser.Asig_forContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_if}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_if(TclParser.Inicio_ifContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_elseif}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_elseif(TclParser.Inicio_elseifContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_else}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_else(TclParser.Inicio_elseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_switch}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_switch(TclParser.Inicio_switchContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_case}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_case(TclParser.Inicio_caseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_default}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_default(TclParser.Inicio_defaultContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_for}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_for(TclParser.Inicio_forContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#dec_for}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDec_for(TclParser.Dec_forContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio_while}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_while(TclParser.Inicio_whileContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TclParser#expresion}.
 	 * @param ctx the parse tree
