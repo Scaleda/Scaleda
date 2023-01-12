@@ -1,7 +1,8 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
+import kernel.project.config.ProjectConfig
+import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.{SimulationExecutor, SynthesisExecutor}
@@ -9,6 +10,7 @@ import kernel.toolchain.impl.Vivado
 import kernel.utils.KernelLogger
 
 import java.io.File
+import java.lang
 
 object ScaledaRun {
   def runTask(
@@ -18,50 +20,49 @@ object ScaledaRun {
       task: TaskConfig
   ) = {
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
-    val config = ProjectConfig.getConfig().get
-    val info = Toolchain.toolchains(target.toolchain)
-    // find profile
-    Toolchain
-      .profiles()
-      .filter(p => p.toolchainType == target.toolchain) // TODO: if none? if multiple?
-      .foreach(profile => {
-        // generate executor
-        val executor = task.getTaskType match {
-          case TaskType.Simulation =>
-            SimulationExecutor(
-              workingDir = new File(workingDir, ".sim"),
-              topModule = task.findTopModule.get, // TODO / FIXME: Exception if not valid
-              profile = profile
-            )
-          case TaskType.Synthesis =>
-            SynthesisExecutor(
-              workingDir = new File(workingDir, ".synth"),
-              topModule = task.findTopModule.get,
-              profile = profile
-            )
-          case _ => {
-            KernelLogger.error(s"unsupported task type: ${task.getTaskType}")
-            ???
-          }
-        }
-        if (task.preset) {
-          target.toolchain match {
-            case Vivado.internalID => {
-              val r = new Vivado.TemplateRenderer(
-                executor = executor,
-                targetConfig = target,
-                taskConfig = task
+    ProjectConfig.getConfig().map(config => {
+      val info = Toolchain.toolchains(target.toolchain)
+      // find profile
+      Toolchain
+        .profiles()
+        .filter(p => p.toolchainType == target.toolchain)
+        .foreach(profile => {
+          // generate executor
+          val executor = task.getTaskType match {
+            case TaskType.Simulation =>
+              SimulationExecutor(
+                workingDir = new File(workingDir, ".sim"),
+                topModule = config.topModule,
+                profile = profile
               )
-              r.render()
-            }
+            case TaskType.Synthesis =>
+              SynthesisExecutor(
+                workingDir = new File(workingDir, ".synth"),
+                topModule = config.topModule,
+                profile = profile
+              )
             case _ =>
-              KernelLogger.error(s"not supported preset: ${target.toolchain}")
+              KernelLogger.error(s"unsupported task type: ${task.getTaskType}")
+              ???
           }
-        }
-        val toolchain = info._2(executor)
-        val commands = toolchain.commands(task.getTaskType)
-        CommandRunner.execute(commands, handler)
-      })
+          if (task.preset) {
+            target.toolchain match {
+              case Vivado.internalID =>
+                val r = new Vivado.TemplateRenderer(
+                  executor = executor,
+                  targetConfig = target,
+                  taskConfig = task,
+                )
+                r.render()
+              case _ =>
+                KernelLogger.error(s"not supported preset: ${target.toolchain}")
+            }
+          }
+          val toolchain = info._2(executor)
+          val commands = toolchain.commands(task.getTaskType)
+          CommandRunner.execute(commands, handler)
+        })
+    }).getOrElse(throw new RuntimeException(s"Cannot load ProjectConfig when starting task ${task.name}"))
   }
 
   def runTaskBackground(
@@ -104,5 +105,5 @@ object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onStderr(data: String): Unit = KernelLogger.error(data)
 
   override def onReturn(returnValue: Int): Unit =
-    KernelLogger.info(s"command done, returns ${returnValue}")
+    KernelLogger.info(s"command done, returns $returnValue")
 }
