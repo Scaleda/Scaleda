@@ -61,7 +61,7 @@ IDENTIFICADOR	:	[a-zA-Z_][a-zA-Z0-9_]*  ;
 //FUNC_NAME       :   IDENTIFICADOR ;
 COMM_STR        :   IDENTIFICADOR | [a-zA-Z0-9_.\-]+ ;
 
-UNKNOW_STR      :   ~[ \t\r\n]+ ;
+UNKNOW_STR      :   ~[ \t\r\n;]+ ;
 
 NEWLINE : [\r?\n]+ ;
 WS	:	[ \t\r\n]+	->	skip  ;
