@@ -137,6 +137,18 @@ public class TclBaseListener implements TclListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFunc_proc(TclParser.Func_procContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunc_proc(TclParser.Func_procContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAgrup(TclParser.AgrupContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -468,6 +480,30 @@ public class TclBaseListener implements TclListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitComm_str(TclParser.Comm_strContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnknown_str(TclParser.Unknown_strContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnknown_str(TclParser.Unknown_strContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunc_name(TclParser.Func_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunc_name(TclParser.Func_nameContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

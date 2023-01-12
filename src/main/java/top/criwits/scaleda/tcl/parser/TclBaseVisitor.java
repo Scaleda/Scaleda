@@ -88,6 +88,13 @@ public class TclBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Tc
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitFunc_proc(TclParser.Func_procContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitAgrup(TclParser.AgrupContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -278,4 +285,18 @@ public class TclBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Tc
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitComm_str(TclParser.Comm_strContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitUnknown_str(TclParser.Unknown_strContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitFunc_name(TclParser.Func_nameContext ctx) { return visitChildren(ctx); }
 }

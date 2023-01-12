@@ -14,6 +14,8 @@ func_arg  : comm_str | identificator | const | UNKNOW_STR;
 func_args : (func_arg)*;
 func_call : func_name func_args ;
 
+func_proc   : func_call | func_internal ;
+
 agrup	:	'[' aux_agrup  ;
 aux_agrup	:	expr ']' | IDENTIFICADOR param_func ']' | gets ']' | 'array' aux_array  ;
 aux_array	:	'size' IDENTIFICADOR ']' | 'exists' IDENTIFICADOR ']'  ;
@@ -30,7 +32,7 @@ const	:	CONST_STRING | CONST_INTEGER | CONST_DOUBLE  ;
 
 //line : puts | gets | declaracion | source | func_call | '\n' | '\r\n';
 line_empty  : NEWLINE{} ;
-line : line_empty | func_call | func_internal ;
+line : line_empty | func_proc ;
 
 expr	:	'expr' '{' expresion '}'  ;
 

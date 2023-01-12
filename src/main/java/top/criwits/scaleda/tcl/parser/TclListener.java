@@ -108,6 +108,16 @@ public interface TclListener extends ParseTreeListener {
 	 */
 	void exitFunc_call(TclParser.Func_callContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link TclParser#func_proc}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc_proc(TclParser.Func_procContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#func_proc}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc_proc(TclParser.Func_procContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TclParser#agrup}.
 	 * @param ctx the parse tree
 	 */
@@ -387,4 +397,24 @@ public interface TclListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitComm_str(TclParser.Comm_strContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#unknown_str}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnknown_str(TclParser.Unknown_strContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#unknown_str}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnknown_str(TclParser.Unknown_strContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#func_name}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc_name(TclParser.Func_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#func_name}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc_name(TclParser.Func_nameContext ctx);
 }

@@ -71,6 +71,12 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunc_call(TclParser.Func_callContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TclParser#func_proc}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_proc(TclParser.Func_procContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TclParser#agrup}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -238,4 +244,16 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitComm_str(TclParser.Comm_strContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#unknown_str}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnknown_str(TclParser.Unknown_strContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#func_name}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_name(TclParser.Func_nameContext ctx);
 }
