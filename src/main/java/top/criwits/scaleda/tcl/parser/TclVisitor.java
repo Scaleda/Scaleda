@@ -35,11 +35,41 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitGets(TclParser.GetsContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TclParser#source}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSource(TclParser.SourceContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TclParser#declaracion}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitDeclaracion(TclParser.DeclaracionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#func_internal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_internal(TclParser.Func_internalContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#func_arg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_arg(TclParser.Func_argContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#func_args}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_args(TclParser.Func_argsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#func_call}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_call(TclParser.Func_callContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TclParser#agrup}.
 	 * @param ctx the parse tree
@@ -94,6 +124,12 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitConst(TclParser.ConstContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#line_empty}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLine_empty(TclParser.Line_emptyContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TclParser#line}.
 	 * @param ctx the parse tree
@@ -196,4 +232,10 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitOp_una(TclParser.Op_unaContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#comm_str}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitComm_str(TclParser.Comm_strContext ctx);
 }

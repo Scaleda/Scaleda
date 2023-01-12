@@ -32,11 +32,11 @@ object TclPsiNodeFactory {
     new ANTLRPsiNode(astNode)
   }
 
-  ruleIElementTypeClassMap.put(
-    // TODO: check this
-    getRuleIElementType(TclParser.RULE_declaracion),
-    classOf[IdentifierPsiNode]
-  )
+  // ruleIElementTypeClassMap.put(
+  //   // TODO: check this
+  //   getRuleIElementType(TclParser.RULE_declaracion),
+  //   classOf[IdentifierPsiNode]
+  // )
   ruleIElementTypeClassMap.put(
     getRuleIElementType(TclParser.RULE_inicio),
     classOf[InicioPsiNode]

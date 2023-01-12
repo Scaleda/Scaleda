@@ -10,10 +10,7 @@ import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.tree.{IElementType, IFileElementType}
 import com.intellij.psi.{FileViewProvider, PsiFile}
-import org.antlr.intellij.adaptor.lexer.{
-  ANTLRLexerAdaptor,
-  PSIElementTypeFactory
-}
+import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
 
@@ -55,13 +52,17 @@ object TclParserDefinition {
     .toArray
   PSIElementTypeFactory.defineLanguageIElementTypes(
     TclLanguage,
+    // tokenNames :+ "<INVALID>",
     tokenNames,
     TclParser.ruleNames
   )
   val FILE = new IFileElementType(TclLanguage)
+  val tokens = PSIElementTypeFactory.getTokenIElementTypes(TclLanguage)
+  TclLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     TclLanguage,
-    TclLexer.COMMENT
+    TclLexer.COMMENT,
+    // TclLexer.COMMENT_INLINE,
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     TclLanguage,
@@ -69,6 +70,6 @@ object TclParserDefinition {
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
     TclLanguage,
-    TclLexer.VALOR_STRING
+    TclLexer.CONST_STRING
   )
 }

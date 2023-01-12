@@ -65,6 +65,18 @@ public class TclBaseListener implements TclListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSource(TclParser.SourceContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSource(TclParser.SourceContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterDeclaracion(TclParser.DeclaracionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -72,6 +84,54 @@ public class TclBaseListener implements TclListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDeclaracion(TclParser.DeclaracionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunc_internal(TclParser.Func_internalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunc_internal(TclParser.Func_internalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunc_arg(TclParser.Func_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunc_arg(TclParser.Func_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunc_args(TclParser.Func_argsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunc_args(TclParser.Func_argsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunc_call(TclParser.Func_callContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunc_call(TclParser.Func_callContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -180,6 +240,18 @@ public class TclBaseListener implements TclListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitConst(TclParser.ConstContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLine_empty(TclParser.Line_emptyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLine_empty(TclParser.Line_emptyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -384,6 +456,18 @@ public class TclBaseListener implements TclListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitOp_una(TclParser.Op_unaContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterComm_str(TclParser.Comm_strContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComm_str(TclParser.Comm_strContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

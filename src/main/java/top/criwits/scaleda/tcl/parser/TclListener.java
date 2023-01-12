@@ -48,6 +48,16 @@ public interface TclListener extends ParseTreeListener {
 	 */
 	void exitGets(TclParser.GetsContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link TclParser#source}.
+	 * @param ctx the parse tree
+	 */
+	void enterSource(TclParser.SourceContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#source}.
+	 * @param ctx the parse tree
+	 */
+	void exitSource(TclParser.SourceContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TclParser#declaracion}.
 	 * @param ctx the parse tree
 	 */
@@ -57,6 +67,46 @@ public interface TclListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDeclaracion(TclParser.DeclaracionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#func_internal}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc_internal(TclParser.Func_internalContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#func_internal}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc_internal(TclParser.Func_internalContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#func_arg}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc_arg(TclParser.Func_argContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#func_arg}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc_arg(TclParser.Func_argContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#func_args}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc_args(TclParser.Func_argsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#func_args}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc_args(TclParser.Func_argsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#func_call}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc_call(TclParser.Func_callContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#func_call}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc_call(TclParser.Func_callContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TclParser#agrup}.
 	 * @param ctx the parse tree
@@ -147,6 +197,16 @@ public interface TclListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitConst(TclParser.ConstContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#line_empty}.
+	 * @param ctx the parse tree
+	 */
+	void enterLine_empty(TclParser.Line_emptyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#line_empty}.
+	 * @param ctx the parse tree
+	 */
+	void exitLine_empty(TclParser.Line_emptyContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TclParser#line}.
 	 * @param ctx the parse tree
@@ -317,4 +377,14 @@ public interface TclListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitOp_una(TclParser.Op_unaContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#comm_str}.
+	 * @param ctx the parse tree
+	 */
+	void enterComm_str(TclParser.Comm_strContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#comm_str}.
+	 * @param ctx the parse tree
+	 */
+	void exitComm_str(TclParser.Comm_strContext ctx);
 }
