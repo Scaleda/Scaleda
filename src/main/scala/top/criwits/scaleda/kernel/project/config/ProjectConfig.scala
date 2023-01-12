@@ -9,13 +9,14 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 
 import java.io.File
 
+@JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
     `type`: String = "rtl",
     source: String = "src/",
+    topModule: String = "",
     targets: Array[TargetConfig]
-) extends ConfigNode {
-
+) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))
 

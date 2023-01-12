@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import kernel.project.config.{ProjectConfig, TargetConfig}
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
 import kernel.shell.ScaledaRunKernelHandlerWithReturn
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
@@ -57,22 +57,21 @@ object Vivado {
   }
 
   case class TemplateContext
-  (top: String,
-   topFile: String,
-   topSimFile: String,
-   // sim: Boolean,
+  (top: String, // Top module, if sim == true, then it is testbench; otherwise, it is topmodule
    workDir: String,
    device: String,
    `package`: String,
    speed: Int,
    jobs: Int = OS.cpuCount,
-   sourceList: Seq[String] = Seq(),
+   sourceList: Seq[String] = Seq(), // NOTE: simulation top file is EXCLUDED here!
+   sim: Boolean,
+   testbenchSource: String, // empty if no testbench is given
    ipList: Seq[String] = Seq(),
    xdcList: Seq[String] = Seq(),
    timingReport: Boolean = false)
 
   class TemplateRenderer
-  (executor: Executor, taskConfig: TargetConfig)
+  (executor: Executor, targetConfig: TargetConfig, taskConfig: TaskConfig)
     extends ResourceTemplateRender(
       "tcl/vivado",
       executor.workingDir.getAbsolutePath,
@@ -85,18 +84,21 @@ object Vivado {
     val config = ProjectConfig.getConfig()
 
     override def context: Map[String, Any] = config.map(config => {
+      val top = taskConfig.findTopModule.get // TODO / FIXME: Exception
+      val topFile = KernelFileUtils.getModuleFile(top).get // TODO / FIXME
+      val sim = taskConfig.`type` == "simulation"
       val context = Vivado.TemplateContext(
-        top = config.topModule,
-        topFile = new File(new File(ProjectConfig.projectBase.get), config.topFile).getAbsolutePath,
-        // sim = false,
-        topSimFile = config.topSimFile,
+        top = top,
         workDir = executor.workingDir.getAbsolutePath,
-        device = taskConfig.device,
-        `package` = taskConfig.`package`,
-        speed = taskConfig.speed,
+        device = targetConfig.device,
+        `package` = targetConfig.`package`,
+        speed = targetConfig.speed,
         sourceList = KernelFileUtils
           .getAllSourceFiles()
-          .map(_.getAbsolutePath.replace('\\', '/'))
+          .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
+          .map(_.getAbsolutePath.replace('\\', '/')),
+        sim = sim,
+        testbenchSource = topFile.getAbsolutePath // if sim == false, then this will not be used
       )
       Serialization.getCCParams(context)
     }).getOrElse(Map())

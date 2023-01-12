@@ -29,6 +29,7 @@ public class EditTaskDialog implements EditDialogProvider<TaskConfig> {
     public TaskConfig getData() {
         return new TaskConfig(name.getText(),
                 (String) typ.getSelectedItem(),
+                "", // FIXME: topModule
                 tcl.getText(),
                 preset.isSelected());
     }

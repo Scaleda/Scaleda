@@ -29,6 +29,7 @@ public class EditTargetDialog implements EditDialogProvider<TargetConfig> {
         TaskConfig[] empty = new TaskConfig[0];
         return new TargetConfig(name.getText(),
                 (String) toolchain.getSelectedItem(),
+                "", // FIXME: topModule
                 device.getText(),
                 pack.getText(),
                 Integer.parseInt(speed.getText()),

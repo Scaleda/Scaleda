@@ -23,24 +23,24 @@ object ScaledaRun {
     // find profile
     Toolchain
       .profiles()
-      .filter(p => p.toolchainType == target.toolchain)
+      .filter(p => p.toolchainType == target.toolchain) // TODO: if none? if multiple?
       .foreach(profile => {
         // generate executor
-        val executor = task.getType match {
+        val executor = task.getTaskType match {
           case TaskType.Simulation =>
             SimulationExecutor(
               workingDir = new File(workingDir, ".sim"),
-              topFile = new File(config.topFile),
+              topModule = task.findTopModule.get, // TODO / FIXME: Exception if not valid
               profile = profile
             )
           case TaskType.Synthesis =>
             SynthesisExecutor(
               workingDir = new File(workingDir, ".synth"),
-              topFile = new File(config.topFile),
+              topModule = task.findTopModule.get,
               profile = profile
             )
           case _ => {
-            KernelLogger.error(s"unsupported task type: ${task.getType}")
+            KernelLogger.error(s"unsupported task type: ${task.getTaskType}")
             ???
           }
         }
@@ -49,7 +49,8 @@ object ScaledaRun {
             case Vivado.internalID => {
               val r = new Vivado.TemplateRenderer(
                 executor = executor,
-                taskConfig = target
+                targetConfig = target,
+                taskConfig = task
               )
               r.render()
             }
@@ -58,7 +59,7 @@ object ScaledaRun {
           }
         }
         val toolchain = info._2(executor)
-        val commands = toolchain.commands(task.getType)
+        val commands = toolchain.commands(task.getTaskType)
         CommandRunner.execute(commands, handler)
       })
   }

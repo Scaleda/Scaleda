@@ -31,12 +31,11 @@ object KernelFileUtils {
   }
 
   def getModuleTitle(verilogFile: File): Option[String] = {
-    val content = Source.fromFile(verilogFile).mkString("\n")
-    //                               1              2       3    4 - module name
+    val content = Source.fromFile(verilogFile).mkString
     val p = Pattern.compile("((.|\\n|\\r)*?)(module)(\\s)(\\w+)(\\s*)(((#)(\\s*)(\\((.|\\n|\\r)*?\\))(\\s*))?)(\\((.|\\n|\\r)*?\\))(\\s*)(;)((.|\\n|\\r)*?)(endmodule)((.|\\n|\\r)*?)")
     val m = p.matcher(content)
     if (m.find()) {
-      Some(m.group(4))
+      Some(m.group(5))
     } else {
       None
     }

@@ -8,10 +8,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 case class TargetConfig(
     name: String = "",
     toolchain: String = "",
+    topModule: String = "",
     device: String = "",
     `package`: String = "",
     speed: Int = 1,
     tasks: Array[TaskConfig] = Array()
-) extends ConfigNode {
+) extends ConfigNode() {
   def getPackage = `package`
 }
