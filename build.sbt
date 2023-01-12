@@ -9,6 +9,7 @@ ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11"))
 Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
+val jacksonVersion = "2.13.4"
 
 lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   version := "0.0.1-SNAPSHOT",
@@ -33,8 +34,6 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     "org.antlr" % "antlr4-runtime" % "4.11.1",
     "io.circe" %% "circe-yaml" % "0.14.2",
     "com.github.scopt" %% "scopt" % "4.1.0",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.14.1",
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.14.1",
     "ch.qos.logback" % "logback-classic" % "1.4.5",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
     "org.scalactic" %% "scalactic" % "3.2.14",
@@ -67,5 +66,9 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   libraryDependencies += "log4j" % "log4j" % "1.2.17",
   libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "1.0.1",
   libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,
+  // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-scala
+  libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+  // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
+  libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
   scalacOptions += "-Xasync",
 )

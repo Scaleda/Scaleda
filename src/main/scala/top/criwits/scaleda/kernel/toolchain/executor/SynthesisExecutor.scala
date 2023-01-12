@@ -7,6 +7,6 @@ import java.io.File
 
 case class SynthesisExecutor
 (override val workingDir: File = new File(".synth"),
- topFile: File,
+ topModule: String,
  override val profile: ToolchainProfile
 ) extends Executor(profile)

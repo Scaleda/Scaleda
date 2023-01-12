@@ -2,20 +2,21 @@ package top.criwits.scaleda
 package kernel.project.config
 
 import idea.utils.MainLogger
-import kernel.project.task.{TargetConfig, TaskConfig}
 import kernel.utils.{JsonHelper, KernelLogger, YAMLHelper}
+
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 
 import java.io.File
 
+@JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
     `type`: String = "rtl",
     source: String = "src/",
     topModule: String = "",
-    topFile: String,
-    topSimFile: String,
     targets: Array[TargetConfig]
-) {
+) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))
 
@@ -58,25 +59,17 @@ object ProjectConfig {
       case Some(p) =>
         val config = YAMLHelper(new File(p), classOf[ProjectConfig])
         KernelLogger.debug(s"Loaded project config ${JsonHelper(config)}")
+        // generate node relationship
+        config.targets.foreach(target => {
+          target.parentNode = Some(config)
+          target.tasks.foreach(task => task.parentNode = Some(target))
+        })
         Some(config)
       case None => None
     }
   }
 
   def config = getConfig().get
-
-  def getAbsolutePath(path: String): Option[String] = {
-    val file = new File(path)
-    file.isAbsolute match {
-      case true =>
-        projectBase match {
-          case Some(base) =>
-            Some(new File(new File(base), path).getAbsolutePath)
-          case None => None
-        }
-      case false => Some(file.getAbsolutePath)
-    }
-  }
 
   def headTarget = getConfig().flatMap(c => c.headTarget)
 

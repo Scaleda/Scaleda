@@ -3,8 +3,7 @@ package idea.windows.tasks
 
 import idea.ScaledaBundle
 import idea.runner.task.ScaledaRunToolWindowTaskAction
-import kernel.project.config.ProjectConfig
-import kernel.project.task.TaskConfig
+import kernel.project.config.{ProjectConfig, TaskConfig}
 
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.ide.{CommonActionsManager, DefaultTreeExpander}

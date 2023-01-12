@@ -7,6 +7,6 @@ import java.io.File
 
 case class SimulationExecutor
 (override val workingDir: File = new File(".sim"),
- topFile: File,
+ topModule: String,
  override val profile: ToolchainProfile
 ) extends Executor(profile)

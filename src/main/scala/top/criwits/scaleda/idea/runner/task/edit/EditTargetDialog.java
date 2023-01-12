@@ -5,8 +5,8 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.jetbrains.annotations.NotNull;
 import top.criwits.scaleda.kernel.project.task.TargetConfig;
-import top.criwits.scaleda.kernel.project.task.TargetConfig$;
-import top.criwits.scaleda.kernel.project.task.TaskConfig;
+import top.criwits.scaleda.kernel.project.config.TargetConfig;
+import top.criwits.scaleda.kernel.project.config.TaskConfig;
 import top.criwits.scaleda.kernel.toolchain.Toolchain;
 
 import javax.swing.*;
@@ -34,6 +34,7 @@ public class EditTargetDialog implements EditDialogProvider<TargetConfig> {
         TaskConfig[] empty = new TaskConfig[0];
         return new TargetConfig(name.getText(),
                 (String) toolchain.getSelectedItem(),
+                "", // FIXME: topModule
                 device.getText(),
                 pack.getText(),
                 Integer.parseInt(speed.getText()),

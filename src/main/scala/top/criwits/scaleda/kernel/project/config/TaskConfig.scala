@@ -1,25 +1,26 @@
 package top.criwits.scaleda
-package kernel.project.task
+package kernel.project.config
 
-import kernel.utils.HasDefault
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 
 @JsonInclude(Include.NON_EMPTY)
 case class TaskConfig(
     name: String = "",
     `type`: String = "",
+    topModule: String = "",
     tcl: String = "",
-    preset: Boolean = false
-) {
+    preset: Boolean = false,
+) extends ConfigNode() {
   @JsonIgnore
-  def getType = `type` match {
+  def getTaskType = `type` match {
     case "simulation"     => TaskType.Simulation
     case "synthesis"      => TaskType.Synthesis
     case "implementation" => TaskType.Implement
     case _                => ???
   }
+
+
   @JsonIgnore
   def getTypeString = `type`
 }

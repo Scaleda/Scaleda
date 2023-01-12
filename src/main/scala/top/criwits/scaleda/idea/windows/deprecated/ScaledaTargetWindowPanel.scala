@@ -3,8 +3,7 @@ package idea.windows.deprecated
 
 import idea.ScaledaBundle
 import idea.utils.{MainLogger, OutputLogger}
-import kernel.project.config.ProjectConfig
-import kernel.project.task.TargetConfig
+import kernel.project.config.{ProjectConfig, TargetConfig}
 import kernel.shell.{ScaledaRun, ScaledaRunHandler}
 
 import com.intellij.openapi.project.Project
