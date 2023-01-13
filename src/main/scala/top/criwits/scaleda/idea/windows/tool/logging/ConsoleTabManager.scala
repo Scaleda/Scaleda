@@ -21,7 +21,7 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
   val logService = project.getService(classOf[ScaledaLoggingService])
   val contentFactory = ContentFactory.SERVICE.getInstance()
   val emptyContent = contentFactory.createContent(
-    new NoActionTabsView(project).getContent,
+    new EmptyTabContentView(project).getContent,
     "",
     false
   )
