@@ -17,6 +17,6 @@ class ScaledaRunNewTargetAction(project: Project)
       AllIcons.Actions.NewFolder
     ) {
   override def actionPerformed(e: AnActionEvent) = {
-    val _r = new EditTargetDialogWrapper(project, TargetConfig()).showAndGet()
+    val _r = new EditTargetDialogWrapper(project, None).showAndGet()
   }
 }

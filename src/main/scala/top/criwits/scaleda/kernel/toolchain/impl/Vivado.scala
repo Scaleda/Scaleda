@@ -61,7 +61,7 @@ object Vivado {
    workDir: String,
    device: String,
    `package`: String,
-   speed: Int,
+   speed: String,
    jobs: Int = OS.cpuCount,
    sourceList: Seq[String] = Seq(), // NOTE: simulation top file is EXCLUDED here!
    sim: Boolean,
