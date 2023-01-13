@@ -14,6 +14,7 @@ import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
 import java.util.concurrent.TimeUnit
+import scala.collection.mutable
 import scala.io.Source
 import scala.sys.process._
 
@@ -26,14 +27,16 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   override def getattr(path: String, stat: FileStat): Int = {
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
-    val mode = FuseUtils.fileAttrsUnixToInt(file)
+    var mode = FuseUtils.fileAttrsUnixToInt(file)
+    if (Files.isSymbolicLink(file.toPath)) {
+      mode = (mode & 0xfff) | (0xa << 12)
+    }
     logger.info(
       s"getattr($path), file: ${file.getAbsolutePath}, mode: ${Integer.toOctalString(mode)}"
     )
     val p = file.toPath
     val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
-    // do not support symbol link now
-    stat.st_nlink.set(1)
+    // stat.st_nlink.set(1)
     stat.st_size.set(attrs.size())
     stat.st_mode.set(mode)
     stat.st_atim.tv_sec.set(attrs.lastAccessTime().to(TimeUnit.SECONDS))
@@ -41,9 +44,21 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     0
   }
 
-  override def readlink(path: String, buf: Pointer, size: Long) = {
-    logger.info("readlink")
-    super.readlink(path, buf, size)
+  override def readlink(path: String, buf: Pointer, size: Long): Int = {
+    logger.info(s"readlink(path=$path)")
+    val file = getFile(path)
+    if (!Files.isSymbolicLink(file.toPath)) return -ErrorCodes.ENOENT
+    val run = s"readlink ${file.getAbsolutePath}"
+    val array = mutable.ArrayBuffer[String]()
+    val r = run ! ProcessLogger(
+      stdout => array.addOne(stdout),
+      _ => {}
+    )
+    val res = array.mkString("")
+    val len = math.min(res.length, size.toInt)
+    buf.put(0, res.getBytes(), 0, len)
+    buf.putByte(len, 0)
+    0
   }
 
   override def mknod(path: String, mode: Long, rdev: Long): Int = {
@@ -67,7 +82,6 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (file.exists() && file.isDirectory) return -ErrorCodes.EISDIR
     file.delete()
     0
-    // super.unlink(path)
   }
 
   override def rmdir(path: String): Int = {
@@ -75,13 +89,16 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (!file.exists() || (file.exists() && file.isFile))
       return -ErrorCodes.ENOENT
     file.delete()
-    // s"rm -rf ${file.getAbsolutePath}".!
     0
   }
 
-  override def symlink(oldpath: String, newpath: String) = {
-    logger.info("symlink")
-    super.symlink(oldpath, newpath)
+  override def symlink(oldpath: String, newpath: String): Int = {
+    logger.info(s"symlink(old=$oldpath, new=$newpath)")
+    // oldpath is stored as string
+    val fileOld = new File(oldpath)
+    val fileNew = getFile(newpath)
+    Files.createSymbolicLink(fileNew.toPath, fileOld.toPath)
+    0
   }
 
   override def rename(oldpath: String, newpath: String): Int = {
