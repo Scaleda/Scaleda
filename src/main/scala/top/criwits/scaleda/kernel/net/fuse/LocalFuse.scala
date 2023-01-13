@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
 
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.{File, FileInputStream, FileOutputStream, RandomAccessFile}
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
@@ -172,20 +172,12 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (!file.exists()) return -ErrorCodes.ENOENT
     if (file.isDirectory) return -ErrorCodes.EISDIR
     try {
-      val inputStream = new FileInputStream(file)
-      val source = inputStream.readAllBytes()
-      inputStream.close()
-      val data =
-        Array.copyOf(source, math.max(source.length, size.toInt + offset.toInt))
-      buf.get(0, data, offset.toInt, size.toInt)
-      val stream = new FileOutputStream(file)
-      logger.info(s"write: offset=$offset, size=$size")
-      stream.write(data, offset.toInt, size.toInt)
-      stream.flush()
-      stream.close()
-      val p = file.toPath
-      val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
-      logger.info(s"write after: size=${attrs.size()}")
+      val rf = new RandomAccessFile(file, "rw")
+      rf.seek(offset)
+      val data = new Array[Byte](size.toInt)
+      buf.get(0, data, 0, size.toInt)
+      rf.write(data)
+      rf.close()
       size.toInt
     } catch {
       case e: Throwable =>
