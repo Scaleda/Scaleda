@@ -4,7 +4,6 @@ package kernel.net.fuse
 import kernel.utils.OS
 
 import jnr.ffi.Pointer
-import jnr.ffi.provider.jffi.ByteBufferMemoryIO
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Timespec}
 import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
@@ -24,9 +23,9 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
 
   override def getattr(path: String, stat: FileStat): Int = {
     val file = getFile(path)
-    logger.info(s"getattr($path), file: ${file.getAbsolutePath}")
     if (!file.exists()) return -ErrorCodes.ENOENT
     val mode = FuseUtils.fileAttrsUnixToInt(file)
+    logger.info(s"getattr($path), file: ${file.getAbsolutePath}, mode: ${Integer.toOctalString(mode)}")
     val p = file.toPath
     val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
     // do not support symbol link now
@@ -104,11 +103,14 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   ): Int = {
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
+    if (file.isDirectory) return -ErrorCodes.EISDIR
+    logger.info(s"read(path=$path, size=$size, offset=$offset)")
     val stream = new FileInputStream(file)
     stream.skip(offset)
     val data = stream.readNBytes(size.toInt)
-    buf.put(0, data, 0, 0)
-    0
+    logger.info(s"read: got data ${data.length} bytes")
+    buf.put(0, data, 0, data.length)
+    data.length
   }
 
   override def write(
@@ -166,28 +168,30 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    logger.info(s"readdir(path=$path, offset=$offset)")
     val file = getFile(path)
-    if (!file.exists() || !file.isFile) return -ErrorCodes.ENOENT
+    if (!file.exists() || !file.isDirectory) return -ErrorCodes.ENOENT
+    logger.info(s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}")
     val list = file.listFiles()
+    logger.info(s"listed files: ${list.mkString(", ")}")
     if (list.length <= offset) return -ErrorCodes.ENOENT
     val byteBuffer =
       ByteBuffer.allocate(list.map(_.getName).max.length * list.length)
-    val buffer = new ByteBufferMemoryIO(buf.getRuntime, byteBuffer)
-    for (i <- 0 until list.length) {
-      if (i >= offset) {
-        val f = list(i)
-        val nameBuffer = ByteBuffer.allocate(f.getName.length + 1)
-        nameBuffer.put(0, f.getName.getBytes, 0, f.getName.length)
-        filter.apply(
-          buffer,
-          nameBuffer,
-          Pointer.newIntPointer(buf.getRuntime, 0),
-          offset
-        )
-      }
-    }
-    0
+    // val buffer = new ByteBufferMemoryIO(buf.getRuntime, byteBuffer)
+    // var offsetNow = offset
+    list.slice(offset.toInt, list.length).headOption.map(f=> {
+      logger.info(s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}")
+      val nameBuffer = ByteBuffer.allocate(f.getName.length + 1)
+      nameBuffer.put(0, f.getName.getBytes, 0, f.getName.length)
+      // offsetNow = offsetNow + 1
+      filter.apply(
+        buf,
+        nameBuffer,
+        Pointer.newIntPointer(buf.getRuntime, 0),
+        offset + 1
+        // offsetNow
+      )
+      0
+    }).getOrElse(-ErrorCodes.ENOENT)
   }
 
   // override def releasedir(path: String, fi: FuseFileInfo) =

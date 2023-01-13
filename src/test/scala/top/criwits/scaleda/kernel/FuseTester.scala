@@ -8,7 +8,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import ru.serce.jnrfuse.FuseStubFS
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import java.nio.file.Files
 import java.nio.file.attribute.{BasicFileAttributes, PosixFileAttributes, PosixFilePermissions}
 import scala.jdk.CollectionConverters._
@@ -74,13 +74,18 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
       val source = "/tmp/mnt-source"
       val dest = "/tmp/mnt"
       s"mkdir -p $source".!
-      s"echo \"file content\" > $source/file.txt".!
+      // s"echo \"file content\" > $source/file.txt".!
+      val printer = new PrintWriter(new File(source, "file.txt"))
+      val content = "file content"
+      printer.print(content)
+      printer.close()
       s"rm -rf $dest".!
       s"mkdir -p $dest".!
       val fs = new LocalFuse(source)
       FuseUtils.mountFs(fs, dest, blocking = false)
       s"ls -lahi $dest".!
       s"cat $dest/file.txt".!
+      // Thread.sleep(100000)
       fs.umount()
       println("test finished")
     }
