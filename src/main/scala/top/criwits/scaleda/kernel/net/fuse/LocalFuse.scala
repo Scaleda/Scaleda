@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
 
-import java.io.{File, FileInputStream, FileOutputStream, RandomAccessFile}
+import java.io.{File, RandomAccessFile}
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
@@ -276,7 +276,8 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     logger.info(s"listed files: ${list.mkString(", ")}")
     if (offsetNow == 0) applyFilter(".")
     if (offsetNow == 1) applyFilter("..")
-    if (list.length + 2 <= offsetNow) return -ErrorCodes.ENOENT
+    if (list.length + 2 == offsetNow) return 0
+    if (list.length + 2 < offsetNow) return -ErrorCodes.ENOENT
     list
       .slice(offsetNow.toInt - 2, list.length)
       .headOption
