@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package top.criwits.scaleda.kernel.net.fuse;
+
+service RemoteFuse {
+  rpc getattr(PathRequest) returns (IntTupleReply) {}
+  rpc readlink(PathRequest) returns (StringTupleReply) {}
+  //  rpc mknod(EmptyRequest) returns (IntReply) {}
+  rpc mkdir(PathModeRequest) returns (IntReply) {}
+  rpc unlink(PathRequest) returns (IntReply) {}
+  rpc rmdir(PathRequest) returns (IntReply) {}
+  rpc symlink(TuplePathRequest) returns (IntReply) {}
+  rpc rename(TuplePathRequest) returns (IntReply) {}
+  //  rpc link(TuplePathRequest) returns (IntReply) {}
+  rpc chmod(PathModeRequest) returns (IntReply) {}
+  //  rpc chown() returns (IntReply) {}
+  rpc truncate(PathSizeRequest) returns (IntReply) {}
+  //  rpc open() returns (IntReply) {}
+  rpc read(ReadRequest) returns (ReadReply) {}
+  rpc write(WriteRequest) returns (IntReply) {}
+  rpc readdir(ReaddirRequest) returns (ReaddirReply) {}
+  rpc create(PathModeRequest) returns (IntReply) {}
+}
+
+message EmptyRequest {}
+message PathRequest {
+  string path = 1;
+}
+message TuplePathRequest {
+  string oldpath = 1;
+  string newpath = 2;
+}
+message PathModeRequest {
+  string path = 1;
+  uint32 mode = 2;
+}
+message PathSizeRequest {
+  string path = 1;
+  uint32 size = 2;
+}
+message ReaddirRequest {
+  string path = 1;
+  uint32 offset = 2;
+}
+message ReadRequest {
+  string path = 1;
+  uint32 size = 2;
+  uint32 offset = 3;
+}
+message WriteRequest {
+  string path = 1;
+  bytes data = 2;
+  uint32 size = 3;
+  uint32 offset = 4;
+}
+
+message IntReply {
+  uint32 r = 1;
+}
+message IntTupleReply {
+  uint32 r1 = 1;
+  uint32 r2 = 2;
+}
+message StringTupleReply {
+  uint32 r1 = 1;
+  string r2 = 2;
+}
+message ReadReply {
+  uint32 size = 1;
+  bytes data = 2;
+}
+message ReaddirReply {
+  repeated string name = 1;
+}
