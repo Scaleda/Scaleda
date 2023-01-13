@@ -22,6 +22,8 @@ object Template {
     } finally Thread.currentThread.setContextClassLoader(curClassLoader)
   }
 
+  def destroyJinja(): Unit = jin = None
+
   def getJin = jin
 
   def render(template: String, context: Map[String, Any]): String = {

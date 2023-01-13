@@ -4,10 +4,11 @@ package idea.utils
 import kernel.utils.{BasicLogger, LogLevel}
 
 import com.intellij.execution.ui.{ConsoleView, ConsoleViewContentType}
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.Logger
 import sourcecode.{File, Line, Name}
 
-object OutputLogger extends BasicLogger {
+object OutputLogger extends BasicLogger with Disposable {
   private val name = "scaleda-output"
   val logger: Logger = Logger.getInstance(name)
   var consoleView: Option[ConsoleView] = None
@@ -32,4 +33,6 @@ object OutputLogger extends BasicLogger {
       })
     }
   }
+
+  override def dispose() = consoleView = None
 }

@@ -5,10 +5,11 @@ import idea.ScaledaBundle
 import kernel.utils.{BasicLogger, LogLevel}
 
 import com.intellij.notification.{NotificationGroupManager, NotificationType}
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import sourcecode.{File, Line, Name}
 
-object Notification extends BasicLogger {
+object Notification extends BasicLogger with Disposable {
   private var project: Option[Project] = None
 
   def setProject(p: Project) = project = Some(p)
@@ -36,4 +37,6 @@ object Notification extends BasicLogger {
         .notify(project)
     })
   }
+
+  override def dispose() = project = None
 }

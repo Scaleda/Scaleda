@@ -28,6 +28,11 @@
         <postStartupActivity implementation="top.criwits.scaleda.idea.ScaledaMain"/>
     </extensions>
 
+    <!-- Services -->
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
+    </extensions>
+
     <!-- Verilog Support -->
     <extensions defaultExtensionNs="com.intellij">
         <fileType

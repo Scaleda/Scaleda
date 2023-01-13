@@ -8,6 +8,7 @@ import kernel.project.config.ProjectConfig
 import kernel.template.Template
 import kernel.utils.KernelLogger
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
@@ -38,6 +39,10 @@ class ScaledaMain extends StartupActivity {
     KernelLogger.append(MainLogger)
     // init jinjia
     Template.initJinja()
+
+    val c = ApplicationManager.getApplication.getService(classOf[ScaledaMainService])
+    require(c != null)
+
     // check is having project config
     var searchedFile: Option[VirtualFile] = None
     ProjectFileIndex
@@ -56,7 +61,7 @@ class ScaledaMain extends StartupActivity {
       val f = searchedFile.get
       ProjectConfig.configFile = Some(f.getPath)
       ProjectConfig.projectBase = Some(f.getParent.getPath)
-      MainLogger.info(s"found config: ${f}")
+      MainLogger.info(s"found config: $f")
     }
 
     // setup tool window
