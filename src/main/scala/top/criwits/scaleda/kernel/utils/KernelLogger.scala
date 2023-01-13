@@ -16,6 +16,8 @@ object KernelLogger extends BasicLogger {
 
   def append(l: BasicLogger) = others.addOne(l)
 
+  def clearOthers(): Unit = others.clear()
+
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit line: Line, file: File, name: Name) = {
     import LogLevel._
     val args = xs.mkString(" ")

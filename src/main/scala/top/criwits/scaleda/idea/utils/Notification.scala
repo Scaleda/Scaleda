@@ -38,5 +38,10 @@ object Notification extends BasicLogger with Disposable {
     })
   }
 
-  override def dispose() = project = None
+  override def dispose() = {
+    // project.foreach(p => {
+    //   p.dispose()
+    // })
+    project = None
+  }
 }

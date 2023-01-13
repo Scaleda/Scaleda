@@ -40,7 +40,8 @@ class ScaledaMain extends StartupActivity {
     // init jinjia
     Template.initJinja()
 
-    val c = ApplicationManager.getApplication.getService(classOf[ScaledaMainService])
+    // val c = ApplicationManager.getApplication.getService(classOf[ScaledaMainService])
+    val c = project.getService(classOf[ScaledaMainService])
     require(c != null)
 
     // check is having project config

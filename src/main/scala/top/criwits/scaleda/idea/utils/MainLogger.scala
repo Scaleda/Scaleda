@@ -38,5 +38,10 @@ object MainLogger extends BasicLogger with Disposable {
     }
   }
 
-  override def dispose() = consoleView = None
+  override def dispose() = {
+    consoleView.foreach(c => {
+      c.dispose()
+    })
+    consoleView = None
+  }
 }
