@@ -6,7 +6,8 @@ import kernel.utils.KernelLogger
 import ru.serce.jnrfuse.{FuseException, FuseStubFS}
 
 import java.io.File
-import java.nio.file.Paths
+import java.nio.file.attribute.{PosixFileAttributes, PosixFilePermissions}
+import java.nio.file.{Files, Paths}
 import scala.sys.process._
 
 object FuseUtils {
@@ -36,5 +37,23 @@ object FuseUtils {
       fs.umount()
       KernelLogger.info(s"umount done")
     }
+  }
+
+  def fileAttrsUnixString(file: File): String = {
+    val path = file.toPath
+    val attrs = Files.readAttributes(path, classOf[PosixFileAttributes])
+    val perms = attrs.permissions()
+    PosixFilePermissions.toString(perms)
+  }
+
+  def fileAttrsUnixToInt(file: File): Int = {
+    val str = fileAttrsUnixString(file)
+    def bitToInt(c: Char): Int = if (c == '-') 0 else 1
+    def groupToInt(group: String): Int =
+      (0 until 3).map(i => bitToInt(group.charAt(i)) << (2 - i)).sum
+    (0 until 3)
+      .map(_ * 3)
+      .map(i => groupToInt(str.slice(i, i + 3)) << (6 - i))
+      .sum
   }
 }
