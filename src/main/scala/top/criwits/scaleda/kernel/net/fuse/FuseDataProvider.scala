@@ -3,16 +3,19 @@ package kernel.net.fuse
 
 import kernel.net.fuse.fs._
 
+import com.google.protobuf.ByteString
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
 
-import java.io.File
+import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
 import java.util.concurrent.TimeUnit
-import scala.async.Async.async
+import scala.async.Async.{async, await}
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.sys.process._
 
 class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   val logger = LoggerFactory.getLogger(getClass)
@@ -48,38 +51,158 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     }
   }
 
-  override def readlink(request: PathRequest): Future[StringTupleReply] = async {
-    // Files.readSymbolicLink()
-    StringTupleReply()
+  override def readlink(request: PathRequest): Future[StringTupleReply] =
+    async {
+      val path = request.path
+      val file = getFile(path)
+      if (!Files.isSymbolicLink(file.toPath))
+        StringTupleReply(-ErrorCodes.ENOENT)
+      else {
+        val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
+        StringTupleReply(r2 = res)
+      }
+    }
+
+  override def mkdir(request: PathModeRequest): Future[IntReply] = async {
+    val path = request.path
+    val file = getFile(path)
+    if (file.exists() || (file.exists() && file.isFile))
+      IntReply(-ErrorCodes.ENOENT)
+    else {
+      s"mkdir ${file.getAbsolutePath}".!
+      await(chmod(request))
+    }
   }
 
-  /** rpc mknod(EmptyRequest) returns (IntReply) {}
-    */
-  override def mkdir(request: PathModeRequest): Future[IntReply] = ???
+  override def unlink(request: PathRequest): Future[IntReply] = async {
+    val file = getFile(request.path)
+    if (!file.exists()) IntReply(-ErrorCodes.ENOENT)
+    else if (file.exists() && file.isDirectory) IntReply(-ErrorCodes.EISDIR)
+    else {
+      file.delete()
+      IntReply()
+    }
+  }
 
-  override def unlink(request: PathRequest): Future[IntReply] = ???
+  override def rmdir(request: PathRequest): Future[IntReply] = async {
+    val file = getFile(request.path)
+    IntReply({
+      if (!file.exists() || (file.exists() && file.isFile)) {
+        -ErrorCodes.ENOENT
+      } else {
+        file.delete()
+        0
+      }
+    })
+  }
 
-  override def rmdir(request: PathRequest): Future[IntReply] = ???
+  override def symlink(request: TuplePathRequest): Future[IntReply] = async {
+    import request._
+    val fileOld = new File(oldpath)
+    val fileNew = getFile(newpath)
+    Files.createSymbolicLink(fileNew.toPath, fileOld.toPath)
+    IntReply()
+  }
 
-  override def symlink(request: TuplePathRequest): Future[IntReply] = ???
+  override def rename(request: TuplePathRequest): Future[IntReply] = async {
+    import request._
+    IntReply({
+      val fileOld = getFile(oldpath)
+      val fileNew = getFile(newpath)
+      if (fileOld.renameTo(fileNew)) 0
+      else -ErrorCodes.EIO
+    })
+  }
 
-  override def rename(request: TuplePathRequest): Future[IntReply] = ???
+  override def chmod(request: PathModeRequest): Future[IntReply] = async {
+    import request._
+    IntReply({
+      val file = getFile(path)
+      val run =
+        s"chmod ${Integer.toOctalString(mode.toInt & 0xfff)} ${file.getAbsolutePath}"
+      logger.info(
+        s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
+      )
+      val r = run.!
+      if (r == 0) 0 else -ErrorCodes.ENOENT
+    })
+  }
 
-  /** rpc link(TuplePathRequest) returns (IntReply) {}
-    */
-  override def chmod(request: PathModeRequest): Future[IntReply] = ???
+  override def read(request: ReadRequest): Future[ReadReply] = async {
+    import request._
+    val file = getFile(path)
+    if (!file.exists()) ReadReply(-ErrorCodes.ENOENT)
+    else if (file.isDirectory) ReadReply(-ErrorCodes.EISDIR)
+    else {
+      logger.info(s"read(path=$path, size=$size, offset=$offset)")
+      val rf = new RandomAccessFile(file, "r")
+      rf.seek(offset)
+      val data = new Array[Byte](size)
+      // warning: this func blocks thread
+      rf.read(data, 0, size)
+      ReadReply(size = size, data = ByteString.copyFrom(data))
+    }
+  }
 
-  /** rpc chown() returns (IntReply) {}
-    */
-  override def truncate(request: PathSizeRequest): Future[IntReply] = ???
+  override def write(request: WriteRequest): Future[IntReply] = async {
+    import request._
+    logger.info(s"write(path=$path, size=$size, offset=$offset)")
+    val file = getFile(path)
+    IntReply({
+      if (!file.exists()) -ErrorCodes.ENOENT
+      else if (file.isDirectory) -ErrorCodes.EISDIR
+      else {
+        val rf = new RandomAccessFile(file, "rw")
+        rf.seek(offset)
+        rf.write(data.toByteArray)
+        rf.close()
+        size
+      }
+    })
+  }
 
-  /** rpc open() returns (IntReply) {}
-    */
-  override def read(request: ReadRequest): Future[ReadReply] = ???
+  override def readdir(request: ReaddirRequest): Future[ReaddirReply] = async {
+    import request._
+    val file = getFile(path)
+    if (!file.exists() || !file.isDirectory) ReaddirReply(-ErrorCodes.ENOENT)
+    else {
+      var offsetNow = offset
 
-  override def write(request: WriteRequest): Future[IntReply] = ???
+      val results = ArrayBuffer[String]()
 
-  override def readdir(request: ReaddirRequest): Future[ReaddirReply] = ???
+      def applyFilter(filename: String): Unit = {
+        results.addOne(filename)
+      }
 
-  override def create(request: PathModeRequest): Future[IntReply] = ???
+      logger.info(
+        s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}"
+      )
+      val list = file.listFiles()
+      logger.info(s"listed files: ${list.mkString(", ")}")
+      if (offsetNow == 0) applyFilter(".")
+      if (offsetNow == 1) applyFilter("..")
+      if (list.length + 2 == offsetNow) ReaddirReply()
+      else if (list.length + 2 < offsetNow) ReaddirReply(-ErrorCodes.ENOENT)
+      else
+        list
+          .slice(offsetNow.toInt - 2, list.length)
+          .headOption
+          .map(f => {
+            logger.info(
+              s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}"
+            )
+            applyFilter(f.getName)
+            ReaddirReply(name = results.toSeq)
+          })
+          .getOrElse(ReaddirReply(-ErrorCodes.ENOENT))
+    }
+  }
+
+  override def create(request: PathModeRequest): Future[IntReply] = async {
+    val file = getFile(request.path)
+    // s"touch ${file.getAbsolutePath}".!
+    if (file.exists() && file.isDirectory) IntReply(-ErrorCodes.EISDIR)
+    else if (!file.createNewFile()) IntReply(-ErrorCodes.EIO)
+    else await(chmod(request))
+  }
 }

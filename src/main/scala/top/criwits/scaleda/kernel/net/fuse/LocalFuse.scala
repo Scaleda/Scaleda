@@ -50,7 +50,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     logger.info(s"readlink(path=$path)")
     val file = getFile(path)
     if (!Files.isSymbolicLink(file.toPath)) return -ErrorCodes.ENOENT
-    val res = Files.readSymbolicLink(file.toPath).toAbsolutePath.toFile.getAbsolutePath
+    val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
     val len = math.min(res.length, size.toInt)
     buf.put(0, res.getBytes(), 0, len)
     buf.putByte(len, 0)

@@ -16,7 +16,7 @@ service RemoteFuse {
   //  rpc link(TuplePathRequest) returns (IntReply) {}
   rpc chmod(PathModeRequest) returns (IntReply) {}
   //  rpc chown() returns (IntReply) {}
-  rpc truncate(PathSizeRequest) returns (IntReply) {}
+  //  rpc truncate(PathSizeRequest) returns (IntReply) {}
   //  rpc open() returns (IntReply) {}
   rpc read(ReadRequest) returns (ReadReply) {}
   rpc write(WriteRequest) returns (IntReply) {}
@@ -79,5 +79,6 @@ message ReadReply {
   bytes data = 2;
 }
 message ReaddirReply {
-  repeated string name = 1;
+  uint32 r = 1;
+  repeated string name = 2;
 }
