@@ -22,12 +22,24 @@ object FuseUtils {
       val file = new File(mountPoint)
       if (!file.exists())
         KernelLogger.warn("creating dirs with returns:", file.mkdirs())
+      def doMount(): Unit = fs.mount(
+        path,
+        blocking,
+        true,
+        Array(
+          "-o",
+          "allow_other",
+          "-o",
+          "fsname=scaleda-fs"
+        )
+      )
       try {
-        fs.mount(path, blocking)
+        // fs.mount(path, blocking)
+        doMount()
       } catch {
         case _: FuseException => {
           s"umount $mountPoint".!
-          fs.mount(path, blocking)
+          doMount()
         }
       }
     } catch {

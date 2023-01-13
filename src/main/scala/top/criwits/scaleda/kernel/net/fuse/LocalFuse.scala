@@ -31,16 +31,18 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (Files.isSymbolicLink(file.toPath)) {
       mode = (mode & 0xfff) | (0xa << 12)
     }
-    logger.info(
-      s"getattr($path), file: ${file.getAbsolutePath}, mode: ${Integer.toOctalString(mode)}"
-    )
     val p = file.toPath
     val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
     // stat.st_nlink.set(1)
-    stat.st_size.set(attrs.size())
+    val size = attrs.size()
+    stat.st_size.set(size)
     stat.st_mode.set(mode)
     stat.st_atim.tv_sec.set(attrs.lastAccessTime().to(TimeUnit.SECONDS))
     stat.st_mtim.tv_sec.set(attrs.lastModifiedTime().to(TimeUnit.SECONDS))
+    logger.info(
+      s"getattr($path), file: ${file.getAbsolutePath}, mode: ${Integer
+        .toOctalString(mode)}, size: ${size}"
+    )
     0
   }
 
@@ -130,7 +132,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def truncate(path: String, size: Long) = {
-    logger.info("truncate")
+    logger.info(s"truncate(path=$path, size=$size)")
     super.truncate(path, size)
   }
 
@@ -165,14 +167,31 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
+    logger.info(s"write(path=$path, size=$size, offset=$offset)")
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
     if (file.isDirectory) return -ErrorCodes.EISDIR
-    val data = new Array[Byte](size.toInt + 1)
-    buf.get(0, data, 0, size.toInt)
-    val stream = new FileOutputStream(file)
-    stream.write(data, offset.toInt, size.toInt)
-    size.toInt
+    try {
+      val inputStream = new FileInputStream(file)
+      val source = inputStream.readAllBytes()
+      inputStream.close()
+      val data =
+        Array.copyOf(source, math.max(source.length, size.toInt + offset.toInt))
+      buf.get(0, data, offset.toInt, size.toInt)
+      val stream = new FileOutputStream(file)
+      logger.info(s"write: offset=$offset, size=$size")
+      stream.write(data, offset.toInt, size.toInt)
+      stream.flush()
+      stream.close()
+      val p = file.toPath
+      val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
+      logger.info(s"write after: size=${attrs.size()}")
+      size.toInt
+    } catch {
+      case e: Throwable =>
+        logger.error(s"ERROR when write: $e")
+        throw e
+    }
   }
 
   override def statfs(path: String, stbuf: Statvfs) = {
