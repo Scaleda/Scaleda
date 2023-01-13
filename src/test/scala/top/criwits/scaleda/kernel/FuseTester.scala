@@ -71,7 +71,17 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
   }
   it should "test local fs" in {
     if (!OS.isWindows) {
-      LocalFuse.main(Array())
+      val source = "/tmp/mnt-source"
+      val dest = "/tmp/mnt"
+      val fs = new LocalFuse(source)
+      FuseUtils.mountFs(fs, dest, blocking = false)
+      // Thread.sleep(1000 * 60)
+      // touch source/exit to exit
+      val exitFile = new File(source, "exit")
+      while (!exitFile.exists()) Thread.sleep(100)
+      exitFile.delete()
+      fs.umount()
+      KernelLogger.info("done")
     }
   }
 }
