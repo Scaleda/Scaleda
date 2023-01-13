@@ -20,7 +20,7 @@ class ServerSideFuse(
 ) extends LocalFuse(sourcePath) {
   val logger = LoggerFactory.getLogger(getClass)
   val builder = ManagedChannelBuilder.forAddress(host, port)
-  // builder.usePlaintext()
+  builder.usePlaintext()
   val channel = builder.build()
   val stub = RemoteFuseGrpc.blockingStub(channel)
 

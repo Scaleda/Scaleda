@@ -166,26 +166,23 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     val file = getFile(path)
     if (!file.exists() || !file.isDirectory) ReaddirReply(-ErrorCodes.ENOENT)
     else {
-      var offsetNow = offset
-
       val results = ArrayBuffer[String]()
 
-      def applyFilter(filename: String): Unit = {
+      def applyFilter(filename: String): Unit =
         results.addOne(filename)
-      }
 
       logger.info(
         s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}"
       )
       val list = file.listFiles()
       logger.info(s"listed files: ${list.mkString(", ")}")
-      if (offsetNow == 0) applyFilter(".")
-      if (offsetNow == 1) applyFilter("..")
-      if (list.length + 2 == offsetNow) ReaddirReply()
-      else if (list.length + 2 < offsetNow) ReaddirReply(-ErrorCodes.ENOENT)
+      if (offset == 0) applyFilter(".")
+      if (offset == 1 || offset == 0) applyFilter("..")
+      if (list.length + 2 == offset) ReaddirReply()
+      else if (list.length + 2 < offset) ReaddirReply(-ErrorCodes.ENOENT)
       else
         list
-          .slice(offsetNow.toInt - 2, list.length)
+          .slice(offset - 2, list.length)
           .headOption
           .map(f => {
             logger.info(
