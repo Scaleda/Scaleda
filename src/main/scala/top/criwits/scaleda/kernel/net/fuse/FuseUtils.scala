@@ -54,6 +54,6 @@ object FuseUtils {
     (0 until 3)
       .map(_ * 3)
       .map(i => groupToInt(str.slice(i, i + 3)) << (6 - i))
-      .sum
+      .sum // | ((if (file.isDirectory) 1 else 0) << 9)
   }
 }
