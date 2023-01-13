@@ -9,14 +9,14 @@ import com.intellij.ui.content.ContentFactory
 
 class ScaledaToolWindowFactory extends ToolWindowFactory {
   override def createToolWindowContent(project: Project, toolWindow: ToolWindow): Unit = {
-    val contentFactory = ContentFactory.SERVICE.getInstance()
-    val logPanel = new ScaledaToolWindowOutputPanel(project)
-    val logTab = contentFactory.createContent(logPanel, "Log", false)
-    toolWindow.getContentManager.addContent(logTab)
-
-    val outputPanel = new ScaledaToolWindowOutputPanel(project)
-    val outputTab = contentFactory.createContent(outputPanel, ScaledaBundle.message("windows.tool.output.title"), false)
-    toolWindow.getContentManager.addContent(outputTab)
+    // val contentFactory = ContentFactory.SERVICE.getInstance()
+    // val logPanel = new ScaledaToolWindowOutputPanel(project)
+    // val logTab = contentFactory.createContent(logPanel, "Log", false)
+    // toolWindow.getContentManager.addContent(logTab)
+    //
+    // val outputPanel = new ScaledaToolWindowOutputPanel(project)
+    // val outputTab = contentFactory.createContent(outputPanel, ScaledaBundle.message("windows.tool.output.title"), false)
+    // toolWindow.getContentManager.addContent(outputTab)
   }
 
 }

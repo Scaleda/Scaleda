@@ -6,28 +6,19 @@ import kernel.template.Template
 import kernel.utils.KernelLogger
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.project.ProjectManager
+import top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory
 
-// @Service(Array(Service.Level.PROJECT))
-// @Service(Array(Service.Level.APP))
 final class ScaledaMainService extends Disposable {
-  // register disposables
-  // private val disposer = Disposer.newDisposable(this, "ScaledaRootDisposable")
-  // Disposer.register(disposer, MainLogger)
-  // Disposer.register(disposer, OutputLogger)
-  // Disposer.register(disposer, Notification)
-  // Disposer.register(disposer, () => Template.destroyJinja())
-
-  // Disposer.register(this, MainLogger)
-  // Disposer.register(this, OutputLogger)
-  // Disposer.register(this, Notification)
-  // Disposer.register(this, () => Template.destroyJinja())
-
   // override def dispose() = disposer.dispose()
   override def dispose() = {
     // disposer.dispose()
-    MainLogger.dispose()
-    OutputLogger.dispose()
-    Notification.dispose()
+    // MainLogger.dispose()
+    MainLogger.consoleView.foreach(c => c.dispose())
+    // ProjectManager.getInstance().getOpenProjects.foreach(p => {
+    //   ScaledaToolWindowFactory.outputPanel(p).consoleView.dispose()
+    //   ScaledaToolWindowFactory.logPanel(p).consoleView.dispose()
+    // })
     Template.destroyJinja()
     KernelLogger.clearOthers()
   }

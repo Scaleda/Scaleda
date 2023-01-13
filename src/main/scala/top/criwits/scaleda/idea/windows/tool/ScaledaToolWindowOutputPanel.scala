@@ -18,15 +18,15 @@ class ScaledaToolWindowOutputPanel(project: Project) extends SimpleToolWindowPan
   }
 
   // the console view
-  val consoleView: ConsoleView = {
-    val builder = TextConsoleBuilderFactory.getInstance().createBuilder(project)
-    builder.setViewer(true)
-    builder.getConsole
-  }
+  // val consoleView: ConsoleView = {
+  //   val builder = TextConsoleBuilderFactory.getInstance().createBuilder(project)
+  //   builder.setViewer(true)
+  //   builder.getConsole
+  // }
 
   setToolbar(toolbar.getComponent)
   toolbar.setTargetComponent(this)
-  setContent(consoleView.getComponent)
+  // setContent(consoleView.getComponent)
 
   def showPanel(): Unit = {
     val contentManager = ScaledaToolWindowFactory.toolWindow(project).getContentManager

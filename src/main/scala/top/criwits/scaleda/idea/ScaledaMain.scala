@@ -8,6 +8,7 @@ import kernel.project.config.ProjectConfig
 import kernel.template.Template
 import kernel.utils.KernelLogger
 
+import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
@@ -18,24 +19,13 @@ import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor,
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     // setup main logger
-    try {
-      MainLogger.consoleView = Some(
-        ScaledaToolWindowFactory.logPanel(project).consoleView
-      )
-    } catch {
-      case e: Throwable => MainLogger.error(e.getMessage)
-    }
-    // setup output logger
-    try {
-      OutputLogger.consoleView = Some(
-        ScaledaToolWindowFactory.outputPanel(project).consoleView
-      )
-    } catch {
-      case e: Throwable => MainLogger.error(e.getMessage)
-    }
-    // setup notification logger
-    Notification.setProject(project)
+    // try {
+    //   MainLogger.project = Some(() => project)
+    // } catch {
+    //   case e: Throwable => MainLogger.error(e.getMessage)
+    // }
     // copy kernel logger to main logger
+    // MainLogger.consoleView = Some(TextConsoleBuilderFactory.getInstance.createBuilder(project).getConsole)
     KernelLogger.append(MainLogger)
     // init jinjia
     Template.initJinja()
