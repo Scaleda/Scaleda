@@ -39,7 +39,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     stat.st_mode.set(mode)
     stat.st_atim.tv_sec.set(attrs.lastAccessTime().to(TimeUnit.SECONDS))
     stat.st_mtim.tv_sec.set(attrs.lastModifiedTime().to(TimeUnit.SECONDS))
-    logger.info(
+    logger.debug(
       s"getattr($path), file: ${file.getAbsolutePath}, mode: ${Integer
         .toOctalString(mode)}, size: ${size}"
     )
@@ -47,7 +47,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def readlink(path: String, buf: Pointer, size: Long): Int = {
-    logger.info(s"readlink(path=$path)")
+    logger.debug(s"readlink(path=$path)")
     val file = getFile(path)
     if (!Files.isSymbolicLink(file.toPath)) return -ErrorCodes.ENOENT
     // val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
@@ -65,12 +65,12 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def mknod(path: String, mode: Long, rdev: Long): Int = {
-    logger.info("mknod")
+    logger.debug("mknod")
     super.mknod(path, mode, rdev)
   }
 
   override def mkdir(path: String, mode: Long): Int = {
-    logger.info(s"mkdir(path=$path, mode=${Integer.toOctalString(mode.toInt)})")
+    logger.debug(s"mkdir(path=$path, mode=${Integer.toOctalString(mode.toInt)})")
     val file = getFile(path)
     if (file.exists() || (file.exists() && file.isFile))
       return -ErrorCodes.ENOENT
@@ -79,7 +79,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def unlink(path: String): Int = {
-    logger.info(s"unlink(path=$path)")
+    logger.debug(s"unlink(path=$path)")
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
     if (file.exists() && file.isDirectory) return -ErrorCodes.EISDIR
@@ -96,7 +96,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def symlink(oldpath: String, newpath: String): Int = {
-    logger.info(s"symlink(old=$oldpath, new=$newpath)")
+    logger.debug(s"symlink(old=$oldpath, new=$newpath)")
     // oldpath is stored as string
     val fileOld = new File(oldpath)
     val fileNew = getFile(newpath)
@@ -112,7 +112,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def link(oldpath: String, newpath: String) = {
-    logger.info("link")
+    logger.debug("link")
     super.link(oldpath, newpath)
   }
 
@@ -120,7 +120,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     val file = getFile(path)
     val run =
       s"chmod ${Integer.toOctalString(mode.toInt & 0xfff)} ${file.getAbsolutePath}"
-    logger.info(
+    logger.debug(
       s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
     )
     val r = run.!
@@ -128,17 +128,17 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def chown(path: String, uid: Long, gid: Long) = {
-    logger.info("chown")
+    logger.debug("chown")
     super.chown(path, uid, gid)
   }
 
   override def truncate(path: String, size: Long) = {
-    logger.info(s"truncate(path=$path, size=$size)")
+    logger.debug(s"truncate(path=$path, size=$size)")
     super.truncate(path, size)
   }
 
   override def open(path: String, fi: FuseFileInfo): Int = {
-    logger.info(s"open(path=$path)")
+    logger.debug(s"open(path=$path)")
     super.open(path, fi)
   }
 
@@ -152,7 +152,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
     if (file.isDirectory) return -ErrorCodes.EISDIR
-    logger.info(s"read(path=$path, size=$size, offset=$offset)")
+    logger.debug(s"read(path=$path, size=$size, offset=$offset)")
     val rf = new RandomAccessFile(file, "r")
     rf.seek(offset)
     val data = new Array[Byte](size.toInt)
@@ -161,7 +161,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     // val stream = new FileInputStream(file)
     // stream.skip(offset)
     // val data = stream.readNBytes(size.toInt)
-    // logger.info(s"read: got data ${data.length} bytes")
+    // logger.debug(s"read: got data ${data.length} bytes")
     buf.put(0, data, 0, data.length)
     data.length
   }
@@ -173,7 +173,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    logger.info(s"write(path=$path, size=$size, offset=$offset)")
+    logger.debug(s"write(path=$path, size=$size, offset=$offset)")
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
     if (file.isDirectory) return -ErrorCodes.EISDIR
@@ -193,22 +193,22 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def statfs(path: String, stbuf: Statvfs) = {
-    logger.info("statfs")
+    logger.debug("statfs")
     super.statfs(path, stbuf)
   }
 
   override def flush(path: String, fi: FuseFileInfo) = {
-    logger.info("flush")
+    logger.debug("flush")
     super.flush(path, fi)
   }
 
   override def release(path: String, fi: FuseFileInfo) = {
-    logger.info("release")
+    logger.debug("release")
     super.release(path, fi)
   }
 
   override def fsync(path: String, isdatasync: Int, fi: FuseFileInfo) = {
-    logger.info("fsync")
+    logger.debug("fsync")
     super.fsync(path, isdatasync, fi)
   }
 
@@ -219,7 +219,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       size: Long,
       flags: Int
   ): Int = {
-    logger.info(s"setxattr(path=$path, name=$name, size=$size)")
+    logger.debug(s"setxattr(path=$path, name=$name, size=$size)")
     // 0
     super.setxattr(path, name, value, size, flags)
   }
@@ -231,7 +231,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       size: Long
   ): Int = {
     val file = getFile(path)
-    logger.info(
+    logger.debug(
       s"getxattr(path=$path, name=$name, size=$size) file: ${file.getAbsoluteFile}"
     )
     if (!file.exists()) return -ErrorCodes.ENOENT
@@ -239,17 +239,17 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def listxattr(path: String, list: Pointer, size: Long) = {
-    logger.info("listxattr")
+    logger.debug("listxattr")
     super.listxattr(path, list, size)
   }
 
   override def removexattr(path: String, name: String) = {
-    logger.info("removexattr")
+    logger.debug("removexattr")
     super.removexattr(path, name)
   }
 
   override def opendir(path: String, fi: FuseFileInfo) = {
-    logger.info("opendir")
+    logger.debug("opendir")
     super.opendir(path, fi)
   }
 
@@ -270,11 +270,11 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       filter.apply(buf, nameBuffer, null, offsetNow)
       0
     }
-    logger.info(
+    logger.debug(
       s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}"
     )
     val list = file.listFiles()
-    logger.info(s"listed files: ${list.mkString(", ")}")
+    logger.debug(s"listed files: ${list.mkString(", ")}")
     if (offsetNow == 0) applyFilter(".")
     if (offsetNow == 1) applyFilter("..")
     if (list.length + 2 == offsetNow) return 0
@@ -283,7 +283,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       .slice(offsetNow.toInt - 2, list.length)
       .headOption
       .map(f => {
-        logger.info(
+        logger.debug(
           s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}"
         )
         applyFilter(f.getName)
@@ -292,31 +292,31 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def releasedir(path: String, fi: FuseFileInfo) = {
-    logger.info("releasedir")
+    logger.debug("releasedir")
     super.releasedir(path, fi)
   }
 
   override def fsyncdir(path: String, fi: FuseFileInfo) = {
-    logger.info("fsyncdir")
+    logger.debug("fsyncdir")
     super.fsyncdir(path, fi)
   }
 
   override def init(conn: Pointer): Pointer = {
-    logger.info("init")
+    logger.debug("init")
     null
   }
 
   override def destroy(initResult: Pointer): Unit = {
-    logger.info("destroy")
+    logger.debug("destroy")
   }
 
   override def access(path: String, mask: Int) = {
-    logger.info("access")
+    logger.debug("access")
     super.access(path, mask)
   }
 
   override def create(path: String, mode: Long, fi: FuseFileInfo): Int = {
-    logger.info(
+    logger.debug(
       s"create(path=$path, mode=${Integer.toOctalString(mode.toInt)})"
     )
     val file = getFile(path)
@@ -327,17 +327,17 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def ftruncate(path: String, size: Long, fi: FuseFileInfo) = {
-    logger.info("ftruncate")
+    logger.debug("ftruncate")
     super.ftruncate(path, size, fi)
   }
 
   override def fgetattr(path: String, stbuf: FileStat, fi: FuseFileInfo) = {
-    logger.info("fgetattr")
+    logger.debug("fgetattr")
     super.fgetattr(path, stbuf, fi)
   }
 
   override def utimens(path: String, timespec: Array[Timespec]): Int = {
-    logger.info(s"utimens(path=$path, timespec: ${timespec.mkString(", ")})")
+    logger.debug(s"utimens(path=$path, timespec: ${timespec.mkString(", ")})")
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
     s"touch ${file.getAbsolutePath}".!
@@ -390,6 +390,6 @@ object LocalFuse {
     } finally {
       fs.umount()
     }
-    KernelLogger.info("test finished")
+    KernelLogger.debug("test finished")
   }
 }
