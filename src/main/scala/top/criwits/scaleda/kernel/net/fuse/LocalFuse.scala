@@ -245,30 +245,30 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   ): Int = {
     val file = getFile(path)
     if (!file.exists() || !file.isDirectory) return -ErrorCodes.ENOENT
+    var offsetNow = offset
+    def applyFilter(filename: String): Int = {
+      val nameBuffer = ByteBuffer.allocate(filename.length + 1)
+      nameBuffer.put(0, filename.getBytes, 0, filename.length)
+      offsetNow += 1
+      filter.apply(buf, nameBuffer, null, offsetNow)
+      0
+    }
     logger.info(
       s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}"
     )
     val list = file.listFiles()
     logger.info(s"listed files: ${list.mkString(", ")}")
-    if (list.length <= offset) return -ErrorCodes.ENOENT
-    val byteBuffer =
-      ByteBuffer.allocate(list.map(_.getName).max.length * list.length)
+    if (offsetNow == 0) applyFilter(".")
+    if (offsetNow == 1) applyFilter("..")
+    if (list.length + 2 <= offsetNow) return -ErrorCodes.ENOENT
     list
-      .slice(offset.toInt, list.length)
+      .slice(offsetNow.toInt - 2, list.length)
       .headOption
       .map(f => {
         logger.info(
           s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}"
         )
-        val nameBuffer = ByteBuffer.allocate(f.getName.length + 1)
-        nameBuffer.put(0, f.getName.getBytes, 0, f.getName.length)
-        filter.apply(
-          buf,
-          nameBuffer,
-          Pointer.newIntPointer(buf.getRuntime, 0),
-          offset + 1
-        )
-        0
+        applyFilter(f.getName)
       })
       .getOrElse(-ErrorCodes.ENOENT)
   }
