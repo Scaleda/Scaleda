@@ -1,24 +1,19 @@
 package top.criwits.scaleda
 package idea.windows.tool.logging
 
-import kernel.utils.{BasicLogger, LogLevel}
-
+import com.intellij.execution.ui.{ConsoleView, ConsoleViewContentType}
 import com.intellij.openapi.Disposable
 
 import scala.collection.mutable
 
 class ScaledaLoggingService extends Disposable {
-  private val listeners = new mutable.HashMap[String, BasicLogger]
+  private val listeners = new mutable.HashMap[String, ConsoleView]
 
-  def addListener(sourceId: String, logger: BasicLogger) =
-    listeners.put(sourceId, logger)
+  def addListener(sourceId: String, receiver: ConsoleView) =
+    listeners.put(sourceId, receiver)
 
-  def logging[T](sourceId: String, level: LogLevel.Value, xs: T*)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      name: sourcecode.Name
-  ): Unit =
-    listeners.get(sourceId).foreach(_.logging(level, xs: _*))
+  def print(id: String, msg: String, t: ConsoleViewContentType) =
+    listeners.get(id).foreach(_.print(msg, t))
 
   def stop(logSourceId: String): Unit = {}
 

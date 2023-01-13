@@ -1,15 +1,12 @@
 package top.criwits.scaleda
 package idea
 
-import idea.utils.{Icons, MainLogger, Notification, OutputLogger}
+import idea.utils.{Icons, MainLogger}
 import idea.windows.tasks.ScaledaRunWindowFactory
-import idea.windows.tool.ScaledaToolWindowFactory
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
 import kernel.utils.KernelLogger
 
-import com.intellij.execution.filters.TextConsoleBuilderFactory
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
@@ -18,21 +15,12 @@ import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor,
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
-    // setup main logger
-    // try {
-    //   MainLogger.project = Some(() => project)
-    // } catch {
-    //   case e: Throwable => MainLogger.error(e.getMessage)
-    // }
-    // copy kernel logger to main logger
-    // MainLogger.consoleView = Some(TextConsoleBuilderFactory.getInstance.createBuilder(project).getConsole)
     KernelLogger.append(MainLogger)
     // init jinjia
     Template.initJinja()
 
-    // val c = ApplicationManager.getApplication.getService(classOf[ScaledaMainService])
-    val c = project.getService(classOf[ScaledaMainService])
-    require(c != null)
+    // val c = project.getService(classOf[ScaledaMainService])
+    // require(c != null)
 
     // check is having project config
     var searchedFile: Option[VirtualFile] = None

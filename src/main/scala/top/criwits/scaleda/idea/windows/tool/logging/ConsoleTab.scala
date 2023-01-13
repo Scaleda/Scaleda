@@ -6,20 +6,12 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 
-import java.awt.BorderLayout
-import javax.swing.JPanel
-
 class ConsoleTab(project: Project, logSourceId: String) extends Disposable{
-  // private val consoleView = new LogConsoleViewImpl(project, logSourceId)
   val builder = TextConsoleBuilderFactory.getInstance().createBuilder(project)
   builder.setViewer(true)
   private val consoleView = builder.getConsole
-  // private val console = new JPanel()
-  // val content = new JPanel()
-
-  // console.add(consoleView.getComponent, BorderLayout.CENTER)
-  // content.add(consoleView.getComponent, BorderLayout.CENTER)
-  // content.add(console, BorderLayout.CENTER)
+  val service = project.getService(classOf[ScaledaLoggingService])
+  service.addListener(logSourceId, consoleView)
   Disposer.register(this, consoleView)
 
   def getContent = consoleView.getComponent
@@ -27,6 +19,5 @@ class ConsoleTab(project: Project, logSourceId: String) extends Disposable{
   override def dispose() = {
     val service = project.getService(classOf[ScaledaLoggingService])
     service.stop(logSourceId)
-    // content.removeAll()
   }
 }

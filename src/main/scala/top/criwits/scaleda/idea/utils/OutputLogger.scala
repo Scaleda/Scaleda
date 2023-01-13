@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.utils
 
-import idea.windows.tool.ScaledaToolWindowFactory
+import idea.windows.tool.logging.ScaledaLoggingService
 import kernel.utils.{BasicLogger, LogLevel}
 
 import com.intellij.openapi.diagnostic.Logger
@@ -9,8 +9,7 @@ import com.intellij.openapi.project.Project
 import sourcecode.{File, Line, Name}
 
 class OutputLogger(project: Project) extends BasicLogger {
-  private val name = "scaleda-output"
-  val logger: Logger = Logger.getInstance(name)
+  val logger: Logger = Logger.getInstance(OutputLogger.LOGGER_ID)
 
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit
       line: Line,
@@ -27,10 +26,8 @@ class OutputLogger(project: Project) extends BasicLogger {
       case _     => logger.error(msg)
     }
 
-    // ScaledaToolWindowFactory
-    //   .outputPanel(project)
-    //   .consoleView
-    //   .print(s"$msg\n", MainLogger.consoleLevel(level))
+    val service = project.getService(classOf[ScaledaLoggingService])
+    service.print(OutputLogger.LOGGER_ID, s"$msg\n", MainLogger.consoleLevel(level))
     level match {
       case Warn | Error => Notification(project).logging(level, xs: _*)
       case _            => {}
@@ -39,5 +36,7 @@ class OutputLogger(project: Project) extends BasicLogger {
 }
 
 object OutputLogger {
+  final val LOGGER_ID = "scaleda-output"
   def apply(project: Project): OutputLogger = new OutputLogger(project)
+  def apply(): OutputLogger = new OutputLogger(ProjectNow.apply().get)
 }

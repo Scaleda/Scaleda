@@ -1,17 +1,16 @@
 package top.criwits.scaleda
 package idea.utils
 
+import idea.windows.tool.logging.ScaledaLoggingService
 import kernel.utils.{BasicLogger, LogLevel}
 
-import com.intellij.execution.ui.{ConsoleView, ConsoleViewContentType}
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.diagnostic.Logger
 import sourcecode.{File, Line, Name}
 
 object MainLogger extends BasicLogger {
-  private val name = "scaleda-idea"
-  val logger: Logger = Logger.getInstance(name)
-  // var project: Option[() => Project] = None
-  var consoleView: Option[ConsoleView] = None
+  final val LOGGER_ID = "scaleda-idea"
+  val logger: Logger = Logger.getInstance(LOGGER_ID)
 
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit
       line: Line,
@@ -27,19 +26,14 @@ object MainLogger extends BasicLogger {
       case Warn  => logger.warn(msg)
       case _     => logger.error(msg)
     }
-    consoleView.foreach(c => {
-      c.print(s"$msg\n", MainLogger.consoleLevel(level))
+    ProjectNow().foreach(project => {
+      val service = project.getService(classOf[ScaledaLoggingService])
+      service.print(LOGGER_ID, s"$msg\n", MainLogger.consoleLevel(level))
+      level match {
+        case Warn | Error => Notification(project).logging(level, xs: _*)
+        case _            => {}
+      }
     })
-    // ProjectManager.getInstance().getOpenProjects.headOption.foreach(p => {
-    //   ScaledaToolWindowFactory
-    //     .logPanel(p)
-    //     .consoleView
-    //     .print(s"$msg\n", MainLogger.consoleLevel(level))
-    //   level match {
-    //     case Warn | Error => Notification(p).logging(level, xs: _*)
-    //     case _ => {}
-    //   }
-    // })
   }
 
   import LogLevel._

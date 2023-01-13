@@ -34,4 +34,5 @@ class Notification(project: Project) extends BasicLogger {
 
 object Notification {
   def apply(project: Project): Notification = new Notification(project)
+  def apply(): Notification = new Notification(ProjectNow.apply().get)
 }

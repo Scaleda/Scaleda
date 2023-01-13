@@ -14,9 +14,7 @@ import com.intellij.ui.content.{
 
 class ConsoleTabManager(project: Project, contentManager: ContentManager)
     extends ContentManagerListener
-    with Disposable
-    // with LogSourceListener
-    {
+    with Disposable {
   private val LOG_SOURCE_KEY =
     Key.create[String](ScaledaDataKeys.LOG_SOURCE_ID.getName)
 
@@ -38,17 +36,12 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
       contentManager.removeContent(emptyContent, false)
     val consoleTab = new ConsoleTab(project, logSourceId)
     Disposer.register(this, consoleTab)
-    val content = contentFactory.createContent(consoleTab.getContent, name, false)
+    val content =
+      contentFactory.createContent(consoleTab.getContent, name, false)
     content.putUserData(LOG_SOURCE_KEY, logSourceId)
     contentManager.addContent(content)
     contentManager.setSelectedContent(content)
   }
 
   override def dispose(): Unit = {}
-
-  // override def newContentAdded(sourceId: String): Unit = ???
-  //
-  // override def sourceStarted(sourceId: String): Boolean = ???
-  //
-  // override def sourceStopped(sourceId: String): Boolean = ???
 }
