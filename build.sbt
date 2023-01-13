@@ -71,4 +71,6 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
   libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
   scalacOptions += "-Xasync",
+  // https://mvnrepository.com/artifact/com.github.serceman/jnr-fuse
+  libraryDependencies += "com.github.serceman" % "jnr-fuse" % "0.5.7",
 )
