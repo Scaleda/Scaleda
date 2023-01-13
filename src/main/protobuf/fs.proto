@@ -3,7 +3,9 @@ syntax = "proto3";
 package top.criwits.scaleda.kernel.net.fuse;
 
 service RemoteFuse {
-  rpc getattr(PathRequest) returns (IntTupleReply) {}
+  rpc init(EmptyReq) returns (EmptyReq) {}
+  rpc destroy(EmptyReq) returns (EmptyReq) {}
+  rpc getattr(PathRequest) returns (GetAttrReply) {}
   rpc readlink(PathRequest) returns (StringTupleReply) {}
   //  rpc mknod(EmptyRequest) returns (IntReply) {}
   rpc mkdir(PathModeRequest) returns (IntReply) {}
@@ -22,7 +24,7 @@ service RemoteFuse {
   rpc create(PathModeRequest) returns (IntReply) {}
 }
 
-message EmptyRequest {}
+message EmptyReq {}
 message PathRequest {
   string path = 1;
 }
@@ -64,6 +66,13 @@ message IntTupleReply {
 message StringTupleReply {
   uint32 r1 = 1;
   string r2 = 2;
+}
+message GetAttrReply {
+  uint32 r = 1;
+  uint64 size = 2;
+  uint32 mode = 3;
+  uint64 a_time = 4;
+  uint64 m_time = 5;
 }
 message ReadReply {
   uint32 size = 1;

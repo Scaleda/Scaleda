@@ -50,13 +50,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     logger.info(s"readlink(path=$path)")
     val file = getFile(path)
     if (!Files.isSymbolicLink(file.toPath)) return -ErrorCodes.ENOENT
-    val run = s"readlink ${file.getAbsolutePath}"
-    val array = mutable.ArrayBuffer[String]()
-    val r = run ! ProcessLogger(
-      stdout => array.addOne(stdout),
-      _ => {}
-    )
-    val res = array.mkString("")
+    val res = Files.readSymbolicLink(file.toPath).toAbsolutePath.toFile.getAbsolutePath
     val len = math.min(res.length, size.toInt)
     buf.put(0, res.getBytes(), 0, len)
     buf.putByte(len, 0)
@@ -355,7 +349,7 @@ object LocalFuse {
     printTextToFile(content, new File(source, "file.txt"))
     s"rm -rf $dest".!
     s"mkdir -p $dest".!
-    val fs = new ServerFuse(source)
+    val fs = new ServerSideFuse(source)
     try {
       FuseUtils.mountFs(fs, dest, blocking = false)
       s"ls -lahi $dest".!

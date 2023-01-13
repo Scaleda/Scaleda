@@ -1,12 +1,10 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
-import kernel.utils.OS
-
 import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
-import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
-import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
+import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo}
+import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir}
 
 import java.io.{File, RandomAccessFile}
 import java.nio.ByteBuffer
@@ -16,7 +14,7 @@ import java.util.concurrent.TimeUnit
 import scala.collection.mutable
 import scala.sys.process._
 
-class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
+class ServerSideFuse(sourcePath: String) extends LocalFuse(sourcePath) {
   val logger = LoggerFactory.getLogger(getClass)
 
   override def getattr(path: String, stat: FileStat): Int = {
@@ -56,11 +54,6 @@ class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
     buf.put(0, res.getBytes(), 0, len)
     buf.putByte(len, 0)
     0
-  }
-
-  override def mknod(path: String, mode: Long, rdev: Long): Int = {
-    logger.info("mknod")
-    super.mknod(path, mode, rdev)
   }
 
   override def mkdir(path: String, mode: Long): Int = {
@@ -105,11 +98,6 @@ class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
     0
   }
 
-  override def link(oldpath: String, newpath: String) = {
-    logger.info("link")
-    super.link(oldpath, newpath)
-  }
-
   override def chmod(path: String, mode: Long) = {
     val file = getFile(path)
     val run =
@@ -119,21 +107,6 @@ class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
     )
     val r = run.!
     if (r == 0) 0 else -ErrorCodes.ENOENT
-  }
-
-  override def chown(path: String, uid: Long, gid: Long) = {
-    logger.info("chown")
-    super.chown(path, uid, gid)
-  }
-
-  override def truncate(path: String, size: Long) = {
-    logger.info(s"truncate(path=$path, size=$size)")
-    super.truncate(path, size)
-  }
-
-  override def open(path: String, fi: FuseFileInfo): Int = {
-    logger.info(s"open(path=$path)")
-    super.open(path, fi)
   }
 
   override def read(
@@ -186,67 +159,6 @@ class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
     }
   }
 
-  override def statfs(path: String, stbuf: Statvfs) = {
-    logger.info("statfs")
-    super.statfs(path, stbuf)
-  }
-
-  override def flush(path: String, fi: FuseFileInfo) = {
-    logger.info("flush")
-    super.flush(path, fi)
-  }
-
-  override def release(path: String, fi: FuseFileInfo) = {
-    logger.info("release")
-    super.release(path, fi)
-  }
-
-  override def fsync(path: String, isdatasync: Int, fi: FuseFileInfo) = {
-    logger.info("fsync")
-    super.fsync(path, isdatasync, fi)
-  }
-
-  override def setxattr(
-      path: String,
-      name: String,
-      value: Pointer,
-      size: Long,
-      flags: Int
-  ): Int = {
-    logger.info(s"setxattr(path=$path, name=$name, size=$size)")
-    // 0
-    super.setxattr(path, name, value, size, flags)
-  }
-
-  override def getxattr(
-      path: String,
-      name: String,
-      value: Pointer,
-      size: Long
-  ): Int = {
-    val file = getFile(path)
-    logger.info(
-      s"getxattr(path=$path, name=$name, size=$size) file: ${file.getAbsoluteFile}"
-    )
-    if (!file.exists()) return -ErrorCodes.ENOENT
-    super.getxattr(path, name, value, size)
-  }
-
-  override def listxattr(path: String, list: Pointer, size: Long) = {
-    logger.info("listxattr")
-    super.listxattr(path, list, size)
-  }
-
-  override def removexattr(path: String, name: String) = {
-    logger.info("removexattr")
-    super.removexattr(path, name)
-  }
-
-  override def opendir(path: String, fi: FuseFileInfo) = {
-    logger.info("opendir")
-    super.opendir(path, fi)
-  }
-
   override def readdir(
       path: String,
       buf: Pointer,
@@ -285,16 +197,6 @@ class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
       .getOrElse(-ErrorCodes.ENOENT)
   }
 
-  override def releasedir(path: String, fi: FuseFileInfo) = {
-    logger.info("releasedir")
-    super.releasedir(path, fi)
-  }
-
-  override def fsyncdir(path: String, fi: FuseFileInfo) = {
-    logger.info("fsyncdir")
-    super.fsyncdir(path, fi)
-  }
-
   override def init(conn: Pointer): Pointer = {
     logger.info("init")
     null
@@ -302,11 +204,6 @@ class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
 
   override def destroy(initResult: Pointer): Unit = {
     logger.info("destroy")
-  }
-
-  override def access(path: String, mask: Int) = {
-    logger.info("access")
-    super.access(path, mask)
   }
 
   override def create(path: String, mode: Long, fi: FuseFileInfo): Int = {
@@ -318,23 +215,5 @@ class ServerFuse(sourcePath: String) extends LocalFuse(sourcePath) {
     if (file.exists() && file.isDirectory) return -ErrorCodes.EISDIR
     if (!file.createNewFile()) return -ErrorCodes.EIO
     chmod(path, mode)
-  }
-
-  override def ftruncate(path: String, size: Long, fi: FuseFileInfo) = {
-    logger.info("ftruncate")
-    super.ftruncate(path, size, fi)
-  }
-
-  override def fgetattr(path: String, stbuf: FileStat, fi: FuseFileInfo) = {
-    logger.info("fgetattr")
-    super.fgetattr(path, stbuf, fi)
-  }
-
-  override def utimens(path: String, timespec: Array[Timespec]): Int = {
-    logger.info(s"utimens(path=$path, timespec: ${timespec.mkString(", ")})")
-    val file = getFile(path)
-    if (!file.exists()) return -ErrorCodes.ENOENT
-    s"touch ${file.getAbsolutePath}".!
-    0
   }
 }
