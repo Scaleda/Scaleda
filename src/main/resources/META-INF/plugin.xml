@@ -32,7 +32,7 @@
     <extensions defaultExtensionNs="com.intellij">
 <!--        <applicationService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>-->
         <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
-        <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
+        <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaConsoleService"/>
 <!--        <applicationService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService2"/>-->
     </extensions>
 

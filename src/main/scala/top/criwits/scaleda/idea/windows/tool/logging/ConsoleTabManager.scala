@@ -18,7 +18,7 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
   private val LOG_SOURCE_KEY =
     Key.create[String](ScaledaDataKeys.LOG_SOURCE_ID.getName)
 
-  val logService = project.getService(classOf[ScaledaLoggingService])
+  val logService = project.getService(classOf[ScaledaConsoleService])
   val contentFactory = ContentFactory.SERVICE.getInstance()
   val emptyContent = contentFactory.createContent(
     new EmptyTabContentView(project).getContent,

@@ -6,7 +6,7 @@ import com.intellij.openapi.Disposable
 
 import scala.collection.mutable
 
-class ScaledaLoggingService extends Disposable {
+class ScaledaConsoleService extends Disposable {
   private val listeners = new mutable.HashMap[String, ConsoleView]
 
   def addListener(sourceId: String, receiver: ConsoleView) =

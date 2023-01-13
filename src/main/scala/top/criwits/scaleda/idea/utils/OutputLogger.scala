@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.utils
 
-import idea.windows.tool.logging.ScaledaLoggingService
+import idea.windows.tool.logging.ScaledaConsoleService
 import kernel.utils.{BasicLogger, LogLevel}
 
 import com.intellij.openapi.diagnostic.Logger
@@ -26,7 +26,7 @@ class OutputLogger(project: Project) extends BasicLogger {
       case _     => logger.error(msg)
     }
 
-    val service = project.getService(classOf[ScaledaLoggingService])
+    val service = project.getService(classOf[ScaledaConsoleService])
     service.print(OutputLogger.LOGGER_ID, s"$msg\n", MainLogger.consoleLevel(level))
     level match {
       case Warn | Error => Notification(project).logging(level, xs: _*)
