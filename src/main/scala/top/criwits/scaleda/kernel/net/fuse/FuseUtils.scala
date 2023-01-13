@@ -34,8 +34,8 @@ object FuseUtils {
       case e: InterruptedException =>
         KernelLogger.warn("mount interrupted cause:", e)
     } finally {
-      fs.umount()
-      KernelLogger.info(s"umount done")
+      // fs.umount()
+      // KernelLogger.info(s"umount done")
     }
   }
 
@@ -54,6 +54,6 @@ object FuseUtils {
     (0 until 3)
       .map(_ * 3)
       .map(i => groupToInt(str.slice(i, i + 3)) << (6 - i))
-      .sum // | ((if (file.isDirectory) 1 else 0) << 9)
+      .sum | ((if (file.isDirectory) 4 else 8) << 12)
   }
 }

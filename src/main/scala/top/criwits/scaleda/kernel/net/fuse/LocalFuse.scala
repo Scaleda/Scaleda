@@ -5,6 +5,7 @@ import kernel.utils.OS
 
 import jnr.ffi.Pointer
 import jnr.ffi.provider.jffi.ByteBufferMemoryIO
+import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Timespec}
 import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
 
@@ -16,12 +17,14 @@ import java.util.concurrent.TimeUnit
 import scala.sys.process._
 
 class LocalFuse(sourcePath: String) extends FuseStubFS {
+  val logger = LoggerFactory.getLogger(getClass)
   require(!OS.isWindows)
 
   private def getFile(path: String): File = new File(sourcePath, path)
 
   override def getattr(path: String, stat: FileStat): Int = {
     val file = getFile(path)
+    logger.info(s"getattr($path), file: ${file.getAbsolutePath}")
     if (!file.exists()) return -ErrorCodes.ENOENT
     val mode = FuseUtils.fileAttrsUnixToInt(file)
     val p = file.toPath
@@ -38,13 +41,15 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   // override def readlink(path: String, buf: Pointer, size: Long) =
   //   super.readlink(path, buf, size)
 
-  override def mknod(path: String, mode: Long, rdev: Long): Unit = {
+  override def mknod(path: String, mode: Long, rdev: Long): Int = {
+    logger.info(s"mknod(path=$path, mode=${Integer.toOctalString(mode.toInt)})")
     val file = getFile(path)
     s"touch ${file.getAbsolutePath}".!
     chmod(path, mode)
   }
 
   override def mkdir(path: String, mode: Long): Int = {
+    logger.info(s"mkdir(path=$path, mode=${Integer.toOctalString(mode.toInt)})")
     val file = getFile(path)
     if (file.exists() || (file.exists() && file.isFile))
       return -ErrorCodes.ENOENT
@@ -161,6 +166,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
+    logger.info(s"readdir(path=$path, offset=$offset)")
     val file = getFile(path)
     if (!file.exists() || !file.isFile) return -ErrorCodes.ENOENT
     val list = file.listFiles()
@@ -190,9 +196,14 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   // override def fsyncdir(path: String, fi: FuseFileInfo) =
   //   super.fsyncdir(path, fi)
 
-  override def init(conn: Pointer) = super.init(conn)
+  override def init(conn: Pointer): Pointer = {
+    logger.info("init")
+    null
+  }
 
-  override def destroy(initResult: Pointer) = super.destroy(initResult)
+  override def destroy(initResult: Pointer): Unit = {
+    logger.info("destroy")
+  }
 
   // override def access(path: String, mask: Int) = super.access(path, mask)
 
@@ -206,9 +217,10 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   //   super.fgetattr(path, stbuf, fi)
 
   override def utimens(path: String, timespec: Array[Timespec]): Int = {
+    logger.info(s"utimens(path=$path, timespec: ${timespec.mkString(", ")})")
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
-    ""
+    s"touch ${file.getAbsolutePath}".!
     0
   }
 }
