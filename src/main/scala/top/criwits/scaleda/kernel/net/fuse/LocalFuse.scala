@@ -14,7 +14,6 @@ import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
 import java.util.concurrent.TimeUnit
-import scala.collection.mutable
 import scala.io.Source
 import scala.sys.process._
 
@@ -349,7 +348,7 @@ object LocalFuse {
     printTextToFile(content, new File(source, "file.txt"))
     s"rm -rf $dest".!
     s"mkdir -p $dest".!
-    val fs = new ServerSideFuse(source)
+    val fs = new LocalFuse(source)
     try {
       FuseUtils.mountFs(fs, dest, blocking = false)
       s"ls -lahi $dest".!

@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel
 
-import kernel.net.fuse.{FuseUtils, ServerSideFuse}
+import kernel.net.fuse.{FuseUtils, LocalFuse}
 import kernel.utils.{KernelLogger, OS}
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -73,7 +73,7 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
     if (!OS.isWindows) {
       val source = "/tmp/mnt-source"
       val dest = "/tmp/mnt"
-      val fs = new ServerSideFuse(source)
+      val fs = new LocalFuse(source)
       FuseUtils.mountFs(fs, dest, blocking = false)
       // Thread.sleep(1000 * 60)
       // touch source/exit to exit
