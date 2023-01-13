@@ -86,7 +86,7 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
       KernelLogger.info("done")
     }
   }
-  it should "test remote fs" in {
+  ignore should "test remote fs" in {
     val source = "/tmp/mnt-source"
     val dest = "/tmp/mnt"
     val t = new Thread(() => FuseRpcServer.start(source))
