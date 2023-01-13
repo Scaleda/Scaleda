@@ -12,6 +12,12 @@ import scala.language.existentials
 
 object FuseRpcServer {
   val port = RemoteServer.port + 1
+
+  def start(sourcePath: String): Unit = {
+    val server = new FuseRpcServer(ExecutionContext.global)
+    server.start(sourcePath)
+    server.blockUntilShutdown()
+  }
 }
 
 class FuseRpcServer(executionContext: ExecutionContext) { self =>

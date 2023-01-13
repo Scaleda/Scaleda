@@ -11,6 +11,7 @@ import ru.serce.jnrfuse.FuseFillDir
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo}
 
 import java.nio.ByteBuffer
+import scala.language.existentials
 
 class ServerSideFuse(
     sourcePath: String,

@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel
 
-import kernel.net.fuse.{FuseUtils, LocalFuse}
+import kernel.net.fuse.{FuseRpcServer, FuseUtils, LocalFuse, ServerSideFuse}
 import kernel.utils.{KernelLogger, OS}
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -69,7 +69,9 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
       s"chmod 755 $path".!
     }
   }
-  it should "test local fs" in {
+  // will not run this by default,
+  // cause it detects file to stop testing
+  ignore should "test local fs" in {
     if (!OS.isWindows) {
       val source = "/tmp/mnt-source"
       val dest = "/tmp/mnt"
@@ -82,6 +84,22 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
       exitFile.delete()
       fs.umount()
       KernelLogger.info("done")
+    }
+  }
+  it should "test remote fs" in {
+    val source = "/tmp/mnt-source"
+    val dest = "/tmp/mnt"
+    val t = new Thread(() => FuseRpcServer.start(source))
+    t.setDaemon(true)
+    t.start()
+    val fs = new ServerSideFuse(dest)
+    FuseUtils.mountFs(fs, dest, blocking = false)
+    try {
+      val exitFile = new File(source, "exit")
+      while (!exitFile.exists()) Thread.sleep(100)
+      exitFile.delete()
+    } finally {
+      fs.umount()
     }
   }
 }
