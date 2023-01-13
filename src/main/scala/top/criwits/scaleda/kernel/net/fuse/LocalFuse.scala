@@ -5,7 +5,7 @@ import kernel.utils.OS
 
 import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
-import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Timespec}
+import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
 
 import java.io.{File, FileInputStream, FileOutputStream}
@@ -25,7 +25,9 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
     val mode = FuseUtils.fileAttrsUnixToInt(file)
-    logger.info(s"getattr($path), file: ${file.getAbsolutePath}, mode: ${Integer.toOctalString(mode)}")
+    logger.info(
+      s"getattr($path), file: ${file.getAbsolutePath}, mode: ${Integer.toOctalString(mode)}"
+    )
     val p = file.toPath
     val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
     // do not support symbol link now
@@ -37,14 +39,14 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     0
   }
 
-  // override def readlink(path: String, buf: Pointer, size: Long) =
-  //   super.readlink(path, buf, size)
+  override def readlink(path: String, buf: Pointer, size: Long) = {
+    logger.info("readlink")
+    super.readlink(path, buf, size)
+  }
 
   override def mknod(path: String, mode: Long, rdev: Long): Int = {
-    logger.info(s"mknod(path=$path, mode=${Integer.toOctalString(mode.toInt)})")
-    val file = getFile(path)
-    s"touch ${file.getAbsolutePath}".!
-    chmod(path, mode)
+    logger.info("mknod")
+    super.mknod(path, mode, rdev)
   }
 
   override def mkdir(path: String, mode: Long): Int = {
@@ -66,8 +68,10 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     0
   }
 
-  // override def symlink(oldpath: String, newpath: String) =
-  //   super.symlink(oldpath, newpath)
+  override def symlink(oldpath: String, newpath: String) = {
+    logger.info("symlink")
+    super.symlink(oldpath, newpath)
+  }
 
   override def rename(oldpath: String, newpath: String): Int = {
     val fileOld = getFile(oldpath)
@@ -76,8 +80,10 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     0
   }
 
-  // override def link(oldpath: String, newpath: String) =
-  //   super.link(oldpath, newpath)
+  override def link(oldpath: String, newpath: String) = {
+    logger.info("link")
+    super.link(oldpath, newpath)
+  }
 
   override def chmod(path: String, mode: Long) = {
     val file = getFile(path)
@@ -85,14 +91,21 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (r == 0) 0 else -ErrorCodes.ENOENT
   }
 
-  // override def chown(path: String, uid: Long, gid: Long) =
-  //   super.chown(path, uid, gid)
+  override def chown(path: String, uid: Long, gid: Long) = {
+    logger.info("chown")
+    super.chown(path, uid, gid)
+  }
 
-  // override def truncate(path: String, size: Long) = super.truncate(path, size)
+  override def truncate(path: String, size: Long) = {
+    logger.info("truncate")
+    super.truncate(path, size)
+  }
 
-  // override def open(path: String, fi: FuseFileInfo): Unit = {
-  //   val file = getFile(path)
-  // }
+  override def open(path: String, fi: FuseFileInfo): Int = {
+    // val file = getFile(path)
+    logger.info("open")
+    super.open(path, fi)
+  }
 
   override def read(
       path: String,
@@ -122,44 +135,81 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   ): Int = {
     val file = getFile(path)
     if (!file.exists()) return -ErrorCodes.ENOENT
-    val data = new Array[Byte](size.toInt)
-    buf.get(0, data, 0, 0)
+    if (file.isDirectory) return -ErrorCodes.EISDIR
+    val data = new Array[Byte](size.toInt + 1)
+    buf.get(0, data, 0, size.toInt)
     val stream = new FileOutputStream(file)
     stream.write(data, offset.toInt, size.toInt)
+    size.toInt
+  }
+
+  override def statfs(path: String, stbuf: Statvfs) = {
+    logger.info("statfs")
+    super.statfs(path, stbuf)
+  }
+
+  override def flush(path: String, fi: FuseFileInfo) = {
+    logger.info("flush")
+    super.flush(path, fi)
+  }
+
+  override def release(path: String, fi: FuseFileInfo) = {
+    logger.info("release")
+    super.release(path, fi)
+  }
+
+  override def fsync(path: String, isdatasync: Int, fi: FuseFileInfo) = {
+    logger.info("fsync")
+    super.fsync(path, isdatasync, fi)
+  }
+
+  override def setxattr(
+      path: String,
+      name: String,
+      value: Pointer,
+      size: Long,
+      flags: Int
+  ): Int = {
+    logger.info(s"setxattr(path=$path, name=$name, size=$size)")
+    // super.setxattr(path, name, value, size, flags)
     0
   }
 
-  // override def statfs(path: String, stbuf: Statvfs) = super.statfs(path, stbuf)
+  override def getxattr(
+      path: String,
+      name: String,
+      value: Pointer,
+      size: Long
+  ): Int = {
+    val file = getFile(path)
+    logger.info(
+      s"getxattr(path=$path, name=$name, size=$size) file: ${file.getAbsoluteFile}"
+    )
+    if (!file.exists()) return -ErrorCodes.ENOENT
+    // val p = file.toPath
+    // try {
+    //   val attr = Files.getAttribute(p, name)
+    //   logger.info(s"getxattr: got attr $attr")
+    // } catch {
+    //   case e: Throwable => logger.info(s"getxattr: get attr error: ${e.toString}")
+    // }
+    0
+  }
 
-  // override def flush(path: String, fi: FuseFileInfo) = super.flush(path, fi)
-  //
-  // override def release(path: String, fi: FuseFileInfo) = super.release(path, fi)
+  override def listxattr(path: String, list: Pointer, size: Long) = {
+    logger.info("listxattr")
+    super.listxattr(path, list, size)
+  }
 
-  // override def fsync(path: String, isdatasync: Int, fi: FuseFileInfo) =
-  //   super.fsync(path, isdatasync, fi)
+  override def removexattr(path: String, name: String) = {
+    logger.info("removexattr")
+    super.removexattr(path, name)
+  }
 
-  // override def setxattr(
-  //     path: String,
-  //     name: String,
-  //     value: Pointer,
-  //     size: Long,
-  //     flags: Int
-  // ) = super.setxattr(path, name, value, size, flags)
-  //
-  // override def getxattr(
-  //     path: String,
-  //     name: String,
-  //     value: Pointer,
-  //     size: Long
-  // ) = super.getxattr(path, name, value, size)
-
-  // override def listxattr(path: String, list: Pointer, size: Long) =
-  //   super.listxattr(path, list, size)
-  //
-  // override def removexattr(path: String, name: String) =
-  //   super.removexattr(path, name)
-
-  // override def opendir(path: String, fi: FuseFileInfo) = super.opendir(path, fi)
+  override def opendir(path: String, fi: FuseFileInfo) = {
+    logger.info("opendir")
+    super.opendir(path, fi)
+  }
 
   override def readdir(
       path: String,
@@ -170,7 +220,9 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   ): Int = {
     val file = getFile(path)
     if (!file.exists() || !file.isDirectory) return -ErrorCodes.ENOENT
-    logger.info(s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}")
+    logger.info(
+      s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}"
+    )
     val list = file.listFiles()
     logger.info(s"listed files: ${list.mkString(", ")}")
     if (list.length <= offset) return -ErrorCodes.ENOENT
@@ -178,27 +230,37 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       ByteBuffer.allocate(list.map(_.getName).max.length * list.length)
     // val buffer = new ByteBufferMemoryIO(buf.getRuntime, byteBuffer)
     // var offsetNow = offset
-    list.slice(offset.toInt, list.length).headOption.map(f=> {
-      logger.info(s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}")
-      val nameBuffer = ByteBuffer.allocate(f.getName.length + 1)
-      nameBuffer.put(0, f.getName.getBytes, 0, f.getName.length)
-      // offsetNow = offsetNow + 1
-      filter.apply(
-        buf,
-        nameBuffer,
-        Pointer.newIntPointer(buf.getRuntime, 0),
-        offset + 1
-        // offsetNow
-      )
-      0
-    }).getOrElse(-ErrorCodes.ENOENT)
+    list
+      .slice(offset.toInt, list.length)
+      .headOption
+      .map(f => {
+        logger.info(
+          s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}"
+        )
+        val nameBuffer = ByteBuffer.allocate(f.getName.length + 1)
+        nameBuffer.put(0, f.getName.getBytes, 0, f.getName.length)
+        // offsetNow = offsetNow + 1
+        filter.apply(
+          buf,
+          nameBuffer,
+          Pointer.newIntPointer(buf.getRuntime, 0),
+          offset + 1
+          // offsetNow
+        )
+        0
+      })
+      .getOrElse(-ErrorCodes.ENOENT)
   }
 
-  // override def releasedir(path: String, fi: FuseFileInfo) =
-  //   super.releasedir(path, fi)
-  //
-  // override def fsyncdir(path: String, fi: FuseFileInfo) =
-  //   super.fsyncdir(path, fi)
+  override def releasedir(path: String, fi: FuseFileInfo) = {
+    logger.info("releasedir")
+    super.releasedir(path, fi)
+  }
+
+  override def fsyncdir(path: String, fi: FuseFileInfo) = {
+    logger.info("fsyncdir")
+    super.fsyncdir(path, fi)
+  }
 
   override def init(conn: Pointer): Pointer = {
     logger.info("init")
@@ -209,16 +271,27 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     logger.info("destroy")
   }
 
-  // override def access(path: String, mask: Int) = super.access(path, mask)
+  override def access(path: String, mask: Int) = {
+    logger.info("access")
+    super.access(path, mask)
+  }
 
-  // override def create(path: String, mode: Long, fi: FuseFileInfo) =
-  //   super.create(path, mode, fi)
-  //
-  // override def ftruncate(path: String, size: Long, fi: FuseFileInfo) =
-  //   super.ftruncate(path, size, fi)
-  //
-  // override def fgetattr(path: String, stbuf: FileStat, fi: FuseFileInfo) =
-  //   super.fgetattr(path, stbuf, fi)
+  override def create(path: String, mode: Long, fi: FuseFileInfo) = {
+    logger.info(s"create(path=$path, mode=${Integer.toOctalString(mode.toInt)})")
+    val file = getFile(path)
+    s"touch ${file.getAbsolutePath}".!
+    chmod(path, mode)
+  }
+
+  override def ftruncate(path: String, size: Long, fi: FuseFileInfo) = {
+    logger.info("ftruncate")
+    super.ftruncate(path, size, fi)
+  }
+
+  override def fgetattr(path: String, stbuf: FileStat, fi: FuseFileInfo) = {
+    logger.info("fgetattr")
+    super.fgetattr(path, stbuf, fi)
+  }
 
   override def utimens(path: String, timespec: Array[Timespec]): Int = {
     logger.info(s"utimens(path=$path, timespec: ${timespec.mkString(", ")})")
