@@ -11,6 +11,7 @@ import java.nio.file.{Files, Paths}
 import scala.sys.process._
 
 object FuseUtils {
+  val debug = false
   def mountFs(
       fs: FuseStubFS,
       mountPoint: String,
@@ -25,7 +26,7 @@ object FuseUtils {
       def doMount(): Unit = fs.mount(
         path,
         blocking,
-        true,
+        debug,
         Array(
           "-o",
           "allow_other",

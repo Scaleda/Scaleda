@@ -14,6 +14,7 @@ import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
 import java.util.concurrent.TimeUnit
+import scala.collection.mutable
 import scala.io.Source
 import scala.sys.process._
 
@@ -49,7 +50,14 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     logger.info(s"readlink(path=$path)")
     val file = getFile(path)
     if (!Files.isSymbolicLink(file.toPath)) return -ErrorCodes.ENOENT
-    val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
+    // val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
+    val run = s"readlink ${file.getAbsolutePath}"
+    val array = mutable.ArrayBuffer[String]()
+    val r = run ! ProcessLogger(
+      stdout => array.addOne(stdout),
+      _ => {}
+    )
+    val res = array.mkString("")
     val len = math.min(res.length, size.toInt)
     buf.put(0, res.getBytes(), 0, len)
     buf.putByte(len, 0)

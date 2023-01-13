@@ -12,6 +12,7 @@ import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
 import java.util.concurrent.TimeUnit
 import scala.async.Async.{async, await}
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -58,7 +59,15 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       if (!Files.isSymbolicLink(file.toPath))
         StringTupleReply(-ErrorCodes.ENOENT)
       else {
-        val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
+        // val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
+        val run = s"readlink ${file.getAbsolutePath}"
+        val array = mutable.ArrayBuffer[String]()
+        val r = run ! ProcessLogger(
+          stdout => array.addOne(stdout),
+          _ => {}
+        )
+        val res = array.mkString("")
+        logger.warn(s"readlink: sourcePath=$sourcePath, path=$path, res=$res")
         StringTupleReply(r2 = res)
       }
     }
