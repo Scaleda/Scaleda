@@ -98,8 +98,11 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
 
   override def chmod(path: String, mode: Long) = {
     val file = getFile(path)
-    val run = s"chmod ${Integer.toOctalString(mode.toInt & 0xfff)} ${file.getAbsolutePath}"
-    logger.info(s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run")
+    val run =
+      s"chmod ${Integer.toOctalString(mode.toInt & 0xfff)} ${file.getAbsolutePath}"
+    logger.info(
+      s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
+    )
     val r = run.!
     if (r == 0) 0 else -ErrorCodes.ENOENT
   }
@@ -115,8 +118,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def open(path: String, fi: FuseFileInfo): Int = {
-    // val file = getFile(path)
-    logger.info("open")
+    logger.info(s"open(path=$path)")
     super.open(path, fi)
   }
 
@@ -199,14 +201,6 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       s"getxattr(path=$path, name=$name, size=$size) file: ${file.getAbsoluteFile}"
     )
     if (!file.exists()) return -ErrorCodes.ENOENT
-    // val p = file.toPath
-    // try {
-    //   val attr = Files.getAttribute(p, name)
-    //   logger.info(s"getxattr: got attr $attr")
-    // } catch {
-    //   case e: Throwable => logger.info(s"getxattr: get attr error: ${e.toString}")
-    // }
-    // 0
     super.getxattr(path, name, value, size)
   }
 
@@ -242,8 +236,6 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (list.length <= offset) return -ErrorCodes.ENOENT
     val byteBuffer =
       ByteBuffer.allocate(list.map(_.getName).max.length * list.length)
-    // val buffer = new ByteBufferMemoryIO(buf.getRuntime, byteBuffer)
-    // var offsetNow = offset
     list
       .slice(offset.toInt, list.length)
       .headOption
@@ -253,13 +245,11 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
         )
         val nameBuffer = ByteBuffer.allocate(f.getName.length + 1)
         nameBuffer.put(0, f.getName.getBytes, 0, f.getName.length)
-        // offsetNow = offsetNow + 1
         filter.apply(
           buf,
           nameBuffer,
           Pointer.newIntPointer(buf.getRuntime, 0),
           offset + 1
-          // offsetNow
         )
         0
       })
@@ -290,12 +280,14 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     super.access(path, mask)
   }
 
-  override def create(path: String, mode: Long, fi: FuseFileInfo) = {
+  override def create(path: String, mode: Long, fi: FuseFileInfo): Int = {
     logger.info(
       s"create(path=$path, mode=${Integer.toOctalString(mode.toInt)})"
     )
     val file = getFile(path)
-    s"touch ${file.getAbsolutePath}".!
+    // s"touch ${file.getAbsolutePath}".!
+    if (file.exists() && file.isDirectory) return -ErrorCodes.EISDIR
+    if (!file.createNewFile()) return -ErrorCodes.EIO
     chmod(path, mode)
   }
 
