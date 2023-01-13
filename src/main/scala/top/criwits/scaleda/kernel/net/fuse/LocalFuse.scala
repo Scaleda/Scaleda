@@ -60,13 +60,22 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     chmod(path, mode)
   }
 
-  // override def unlink(path: String) = super.unlink(path)
+  override def unlink(path: String): Int = {
+    logger.info(s"unlink(path=$path)")
+    val file = getFile(path)
+    if (!file.exists()) return -ErrorCodes.ENOENT
+    if (file.exists() && file.isDirectory) return -ErrorCodes.EISDIR
+    file.delete()
+    0
+    // super.unlink(path)
+  }
 
   override def rmdir(path: String): Int = {
     val file = getFile(path)
     if (!file.exists() || (file.exists() && file.isFile))
       return -ErrorCodes.ENOENT
-    s"rm -rf ${file.getAbsolutePath}".!
+    file.delete()
+    // s"rm -rf ${file.getAbsolutePath}".!
     0
   }
 
@@ -89,7 +98,9 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
 
   override def chmod(path: String, mode: Long) = {
     val file = getFile(path)
-    val r = s"chmod ${Integer.toOctalString(mode.toInt & 0x1ff)} ${file.getAbsolutePath}".!
+    val run = s"chmod ${Integer.toOctalString(mode.toInt & 0xfff)} ${file.getAbsolutePath}"
+    logger.info(s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run")
+    val r = run.!
     if (r == 0) 0 else -ErrorCodes.ENOENT
   }
 
@@ -173,8 +184,8 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
       flags: Int
   ): Int = {
     logger.info(s"setxattr(path=$path, name=$name, size=$size)")
-    // super.setxattr(path, name, value, size, flags)
-    0
+    // 0
+    super.setxattr(path, name, value, size, flags)
   }
 
   override def getxattr(
@@ -195,7 +206,8 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     // } catch {
     //   case e: Throwable => logger.info(s"getxattr: get attr error: ${e.toString}")
     // }
-    0
+    // 0
+    super.getxattr(path, name, value, size)
   }
 
   override def listxattr(path: String, list: Pointer, size: Long) = {
