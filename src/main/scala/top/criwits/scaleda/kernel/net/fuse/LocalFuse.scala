@@ -152,10 +152,15 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (!file.exists()) return -ErrorCodes.ENOENT
     if (file.isDirectory) return -ErrorCodes.EISDIR
     logger.info(s"read(path=$path, size=$size, offset=$offset)")
-    val stream = new FileInputStream(file)
-    stream.skip(offset)
-    val data = stream.readNBytes(size.toInt)
-    logger.info(s"read: got data ${data.length} bytes")
+    val rf = new RandomAccessFile(file, "r")
+    rf.seek(offset)
+    val data = new Array[Byte](size.toInt)
+    // warning: this func bloking thread
+    rf.read(data, 0, size.toInt)
+    // val stream = new FileInputStream(file)
+    // stream.skip(offset)
+    // val data = stream.readNBytes(size.toInt)
+    // logger.info(s"read: got data ${data.length} bytes")
     buf.put(0, data, 0, data.length)
     data.length
   }
