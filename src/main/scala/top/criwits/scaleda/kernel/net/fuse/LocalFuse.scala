@@ -1,7 +1,8 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
-import kernel.utils.OS
+import kernel.net.fuse.FuseUtils.printTextToFile
+import kernel.utils.{KernelLogger, OS}
 
 import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
@@ -13,6 +14,7 @@ import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFileAttributes
 import java.util.concurrent.TimeUnit
+import scala.io.Source
 import scala.sys.process._
 
 class LocalFuse(sourcePath: String) extends FuseStubFS {
@@ -87,7 +89,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
 
   override def chmod(path: String, mode: Long) = {
     val file = getFile(path)
-    val r = s"chmod ${Integer.toOctalString(mode.toInt & 0x1ff)}".!
+    val r = s"chmod ${Integer.toOctalString(mode.toInt & 0x1ff)} ${file.getAbsolutePath}".!
     if (r == 0) 0 else -ErrorCodes.ENOENT
   }
 
@@ -277,7 +279,9 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
   }
 
   override def create(path: String, mode: Long, fi: FuseFileInfo) = {
-    logger.info(s"create(path=$path, mode=${Integer.toOctalString(mode.toInt)})")
+    logger.info(
+      s"create(path=$path, mode=${Integer.toOctalString(mode.toInt)})"
+    )
     val file = getFile(path)
     s"touch ${file.getAbsolutePath}".!
     chmod(path, mode)
@@ -299,5 +303,54 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (!file.exists()) return -ErrorCodes.ENOENT
     s"touch ${file.getAbsolutePath}".!
     0
+  }
+}
+
+object LocalFuse {
+  // !! NEVER RUN THIS !!
+  // !! YOUR JVM WILL CRASH AND CANNOT RESTART !!
+  def main(args: Array[String]): Unit = {
+    val source = "/tmp/mnt-source"
+    val dest = "/tmp/mnt"
+    s"mkdir -p $source".!
+    val content = "file content"
+    printTextToFile(content, new File(source, "file.txt"))
+    s"rm -rf $dest".!
+    s"mkdir -p $dest".!
+    val fs = new LocalFuse(source)
+    try {
+      FuseUtils.mountFs(fs, dest, blocking = false)
+      s"ls -lahi $dest".!
+      // s"cat $dest/file.txt".!
+      assert(
+        Source
+          .fromFile(new File(dest, "file.txt"))
+          .getLines()
+          .mkString("\n") == content
+      )
+      printTextToFile(content, new File(dest, "file2.txt"))
+      assert(
+        Source
+          .fromFile(new File(dest, "file2.txt"))
+          .getLines()
+          .mkString("\n") == content
+      )
+      // Thread.sleep(10000000)
+      val code =
+        """#include <stdio.h>
+          |int main() {
+          |  puts("hello!");
+          |  return 0;
+          |}
+          |""".stripMargin
+      val codeFile = new File(dest, "code.c")
+      printTextToFile(code, codeFile)
+      s"gcc ${codeFile.getAbsolutePath} -o c".!
+      val executableFile = new File(codeFile.getParentFile, "c")
+      s"${executableFile.getAbsolutePath}".!
+    } finally {
+      fs.umount()
+    }
+    KernelLogger.info("test finished")
   }
 }

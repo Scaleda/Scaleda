@@ -4,15 +4,13 @@ package kernel
 import kernel.net.fuse.{FuseUtils, LocalFuse}
 import kernel.utils.{KernelLogger, OS}
 
-import org.apache.commons.io.FileUtils
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import ru.serce.jnrfuse.FuseStubFS
 
-import java.io.{File, PrintWriter}
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.attribute.{BasicFileAttributes, PosixFileAttributes, PosixFilePermissions}
-import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.sys.process._
 
@@ -71,35 +69,9 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
       s"chmod 755 $path".!
     }
   }
-  def printTextToFile(content: String, file: File): Unit = {
-    if (!file.exists()) {
-      file.getParentFile.mkdirs()
-      // FileUtils.touch(file)
-      s"touch ${file.getAbsoluteFile}".!
-    }
-    val printer = new PrintWriter(file)
-    printer.print(content)
-    printer.close()
-  }
   it should "test local fs" in {
     if (!OS.isWindows) {
-      val source = "/tmp/mnt-source"
-      val dest = "/tmp/mnt"
-      s"mkdir -p $source".!
-      val content = "file content"
-      printTextToFile(content, new File(source, "file.txt"))
-      s"rm -rf $dest".!
-      s"mkdir -p $dest".!
-      val fs = new LocalFuse(source)
-      FuseUtils.mountFs(fs, dest, blocking = false)
-      s"ls -lahi $dest".!
-      // s"cat $dest/file.txt".!
-      assert(Source.fromFile(new File(dest, "file.txt")).getLines().mkString("\n") == content)
-      printTextToFile(content, new File(dest, "file2.txt"))
-      assert(Source.fromFile(new File(dest, "file2.txt")).getLines().mkString("\n") == content)
-      Thread.sleep(100000)
-      fs.umount()
-      println("test finished")
+      LocalFuse.main(Array())
     }
   }
 }

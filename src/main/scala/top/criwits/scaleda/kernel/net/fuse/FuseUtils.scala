@@ -5,7 +5,7 @@ import kernel.utils.KernelLogger
 
 import ru.serce.jnrfuse.{FuseException, FuseStubFS}
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import java.nio.file.attribute.{PosixFileAttributes, PosixFilePermissions}
 import java.nio.file.{Files, Paths}
 import scala.sys.process._
@@ -55,5 +55,16 @@ object FuseUtils {
       .map(_ * 3)
       .map(i => groupToInt(str.slice(i, i + 3)) << (6 - i))
       .sum | ((if (file.isDirectory) 4 else 8) << 12)
+  }
+
+  def printTextToFile(content: String, file: File): Unit = {
+    if (!file.exists()) {
+      file.getParentFile.mkdirs()
+      // FileUtils.touch(file)
+      s"touch ${file.getAbsoluteFile}".!
+    }
+    val printer = new PrintWriter(file)
+    printer.print(content)
+    printer.close()
   }
 }
