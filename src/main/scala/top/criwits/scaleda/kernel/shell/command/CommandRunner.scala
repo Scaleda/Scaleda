@@ -37,21 +37,31 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   protected val stdErr = new LinkedBlockingQueue[String]
   private val delay = 100
   val thread = new Thread(() => {
-    process = Some(procBuilder.run(ProcessLogger(
-      out => stdOut.put(out),
-      err => stdErr.put(err)
-    )))
-    while (process.get.isAlive()) {
-      if (terminate && !terminating) {
-        terminating = true
-        process.get.destroy()
+    try {
+      process = Some(procBuilder.run(ProcessLogger(
+        out => stdOut.put(out),
+        err => stdErr.put(err)
+      )))
+      while (process.get.isAlive()) {
+        if (terminate && !terminating) {
+          terminating = true
+          process.get.destroy()
+        }
+        Thread.sleep(delay)
       }
-      Thread.sleep(delay)
+      if (terminate) terminate = false
+      if (terminating) terminating = false
+      terminated = true
+      returnValue.success(process.get.exitValue())
+    } catch {
+      case e: Throwable => stdErr.put(e.toString)
+        throw e
+    } finally {
+      if (terminate) terminate = false
+      if (terminating) terminating = false
+      terminated = true
+      returnValue.success(-1)
     }
-    if (terminate) terminate = false
-    if (terminating) terminating = false
-    terminated = true
-    returnValue.success(process.get.exitValue())
   })
 
   override def run: CommandOutputStream = {

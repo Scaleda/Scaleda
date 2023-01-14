@@ -1,12 +1,10 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import kernel.project.config.ProjectConfig
 import kernel.shell.command.CommandDeps
-import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.toolchain.executor.Executor
-
-import top.criwits.scaleda.kernel.utils.OS
+import kernel.toolchain.{Toolchain, ToolchainProfile}
+import kernel.utils.{KernelFileUtils, OS}
 
 import java.io.File
 
@@ -18,17 +16,16 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
   override def getName: String = userFriendlyName
 
-  private val executable = if (executor.profile.path.isEmpty) "iverilog" else executor.profile.path
-
   override def simulate() = {
     // TODO: ADD $DUMPVCD
-    ProjectConfig.getConfig().map(config =>
-      config.targets.collectFirst({ case t if t.toolchain == getInternalID => t }))
-      .map(target => {
-        Seq(
-//          CommandDeps(OS.shell(s"${executor.profile.iverilogPath} -o ${task.get.}")) // use shell?
-        )
-      }).getOrElse(Seq())
+    // TODO: iverilog output file
+    val outputFile = "simulation"
+    val sources = KernelFileUtils.getAllSourceFiles()
+    Seq(
+      CommandDeps(OS.shell(s"${executor.profile.iverilogPath} ${sources.map(_.getAbsolutePath).mkString(" ")} -o $outputFile"),
+        executor.workingDir.getAbsolutePath),
+      CommandDeps(OS.shell(s"${executor.profile.vvpPath} $outputFile"), executor.workingDir.getAbsolutePath),
+    )
   }
 }
 
