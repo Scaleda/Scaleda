@@ -22,13 +22,16 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
 
   override def getName: String = userFriendlyName
 
-  override def synthesise() = {
+  override def synthesise() =
     Seq(
-      // CommandDeps("ping -c 3 127.0.0.1", executor.workingDir.getAbsolutePath),
       CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source run_synth.tcl"),
         executor.workingDir.getAbsolutePath),
     )
-  }
+
+  override def implement() = Seq(
+    CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source run_impl.tcl"),
+      executor.workingDir.getAbsolutePath),
+  )
 }
 
 object Vivado {
