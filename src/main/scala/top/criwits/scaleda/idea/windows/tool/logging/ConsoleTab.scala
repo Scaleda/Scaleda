@@ -12,7 +12,7 @@ class ConsoleTab(project: Project, logSourceId: String) extends Disposable {
   def getContent = panel
 
   override def dispose() = {
-    val service = project.getService(classOf[ScaledaConsoleService])
+    val service = project.getService(classOf[ScaledaLoggingService])
     service.stop(logSourceId)
   }
 }

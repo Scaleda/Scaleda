@@ -6,11 +6,7 @@ import idea.windows.tool.ScaledaDataKeys
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.{Disposer, Key}
-import com.intellij.ui.content.{
-  ContentFactory,
-  ContentManager,
-  ContentManagerListener
-}
+import com.intellij.ui.content.{Content, ContentFactory, ContentManager, ContentManagerListener}
 
 class ConsoleTabManager(project: Project, contentManager: ContentManager)
     extends ContentManagerListener
@@ -18,9 +14,9 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
   private val LOG_SOURCE_KEY =
     Key.create[String](ScaledaDataKeys.LOG_SOURCE_ID.getName)
 
-  val logService = project.getService(classOf[ScaledaConsoleService])
+  val logService = project.getService(classOf[ScaledaLoggingService])
   val contentFactory = ContentFactory.SERVICE.getInstance()
-  val emptyContent = contentFactory.createContent(
+  private val emptyContent = contentFactory.createContent(
     new EmptyTabContentView(project).getContent,
     "",
     false
@@ -39,6 +35,10 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
     val content =
       contentFactory.createContent(consoleTab.getContent, name, false)
     content.putUserData(LOG_SOURCE_KEY, logSourceId)
+    addContentTab(content)
+  }
+
+  def addContentTab(content: Content) = {
     contentManager.addContent(content)
     contentManager.setSelectedContent(content)
   }

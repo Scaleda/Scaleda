@@ -5,7 +5,7 @@ import kernel.project.config.ProjectConfig
 import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
-import kernel.toolchain.executor.{SimulationExecutor, SynthesisExecutor}
+import kernel.toolchain.executor.{ImplementExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.impl.Vivado
 import kernel.utils.KernelLogger
 
@@ -41,9 +41,12 @@ object ScaledaRun {
                 topModule = config.topModule,
                 profile = profile
               )
-            case _ =>
-              KernelLogger.error(s"unsupported task type: ${task.getTaskType}")
-              ???
+            case TaskType.Implement =>
+              ImplementExecutor(
+                workingDir = new File(new File(workingDir, ".impl"), task.name),
+                topModule = config.topModule,
+                profile = profile
+              )
           }
           if (task.preset) {
             target.toolchain match {

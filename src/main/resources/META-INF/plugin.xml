@@ -30,10 +30,8 @@
 
     <!-- Services -->
     <extensions defaultExtensionNs="com.intellij">
-<!--        <applicationService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>-->
         <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
-        <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaConsoleService"/>
-<!--        <applicationService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService2"/>-->
+        <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
     </extensions>
 
     <!-- Verilog Support -->
@@ -92,13 +90,6 @@
                     anchor="bottom"
                     factoryClass="top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory"
         />
-        <!-- FIXME -->
-        <!--        <toolWindow id="Scaleda Targets"-->
-        <!--                    secondary="true"-->
-        <!--                    anchor="left"-->
-        <!--                    factoryClass="top.criwits.scaleda.idea.windows.ScaledaTargetWindowFactory"-->
-        <!--                    doNotActivateOnStart="true"-->
-        <!--                    />-->
     </extensions>
 
     <!-- Scaleda run tasks -->

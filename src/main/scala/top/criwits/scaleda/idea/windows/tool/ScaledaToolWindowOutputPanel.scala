@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.windows.tool
 
-import idea.windows.tool.logging.ScaledaConsoleService
+import idea.windows.tool.logging.ScaledaLoggingService
 
 import com.intellij.execution.actions.ClearConsoleAction
 import com.intellij.execution.filters.TextConsoleBuilderFactory
@@ -22,7 +22,7 @@ class ScaledaToolWindowOutputPanel(
   val builder = TextConsoleBuilderFactory.getInstance().createBuilder(project)
   builder.setViewer(true)
   private val consoleView = builder.getConsole
-  val service = project.getService(classOf[ScaledaConsoleService])
+  val service = project.getService(classOf[ScaledaLoggingService])
   service.addListener(logSourceId, consoleView)
   Disposer.register(parent, consoleView)
 

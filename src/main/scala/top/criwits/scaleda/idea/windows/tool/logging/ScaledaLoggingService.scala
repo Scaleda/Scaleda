@@ -1,13 +1,13 @@
 package top.criwits.scaleda
 package idea.windows.tool.logging
 
-import com.intellij.execution.ui.{ConsoleView, ConsoleViewContentType}
+import kernel.utils.LogLevel
+
 import com.intellij.openapi.Disposable
-import top.criwits.scaleda.kernel.utils.LogLevel
 
 import scala.collection.mutable
 
-class ScaledaConsoleService extends Disposable {
+class ScaledaLoggingService extends Disposable {
   private val listeners = new mutable.HashMap[String, ScaledaLogReceiver]
 
   def addListener(sourceId: String, receiver: ScaledaLogReceiver) =
