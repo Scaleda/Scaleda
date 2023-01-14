@@ -31,13 +31,13 @@ object ScaledaRun {
           val executor = task.getTaskType match {
             case TaskType.Simulation =>
               SimulationExecutor(
-                workingDir = new File(workingDir, ".sim"),
+                workingDir = new File(new File(workingDir, ".sim"), task.name),
                 topModule = config.topModule,
                 profile = profile
               )
             case TaskType.Synthesis =>
               SynthesisExecutor(
-                workingDir = new File(workingDir, ".synth"),
+                workingDir = new File(new File(workingDir, ".synth"), task.name),
                 topModule = config.topModule,
                 profile = profile
               )
