@@ -57,7 +57,7 @@ class ScaledaRunProcessHandler(logger: BasicLogger)
     outputStream
   }
 
-  override def onShellCommand(command: CommandDeps) = logger.info("in", command.path, "executing", command.command)
+  override def onShellCommand(command: CommandDeps) = logger.debug("in", command.path, "executing", command.command)
 
   override def onStdout(data: String): Unit = logger.info(data)
 

@@ -10,6 +10,9 @@ import sourcecode.{File, Line, Name}
 
 class ConsoleLogger(consoleView: ConsoleView) extends BasicLogger {
   val logger: Logger = Logger.getInstance(getClass)
+
+  setLevel(Debug)
+
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit line: Line, file: File, name: Name) = {
     val msg = xs.mkString(" ")
     level match {
