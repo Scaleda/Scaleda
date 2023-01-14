@@ -17,6 +17,7 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
+import top.criwits.scaleda.idea.windows.tool.message.{ScaledaMessage, ScaledaMessageTab}
 
 import java.io.File
 import scala.collection.mutable
@@ -82,7 +83,7 @@ class ScaledaRunConfiguration(
             val console = myConsoleBuilder.getConsole
 
             val handler =
-              new ScaledaRunProcessHandler(new ConsoleLogger(console))
+              new ScaledaRunProcessHandler(new ConsoleLogger(console, logSourceId = Some(ScaledaMessageTab.MESSAGE_ID)))
             val state = new RunProfileState {
               override def execute(
                   executor: Executor,

@@ -17,6 +17,7 @@ import javax.swing.JTree
 import javax.swing.event.{TreeSelectionEvent, TreeSelectionListener}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
 
+@Deprecated
 class ScaledaRunIdeaHandler(project: Project) extends ScaledaRunHandler {
   override def onStdout(data: String): Unit = OutputLogger(project).info(data)
 
@@ -25,6 +26,7 @@ class ScaledaRunIdeaHandler(project: Project) extends ScaledaRunHandler {
   override def onReturn(returnValue: Int): Unit = OutputLogger(project).info(s"command done, returns ${returnValue}")
 }
 
+@Deprecated
 class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(true, true) {
   // Tree
   private val tree = new Tree(new MyTreeModel)

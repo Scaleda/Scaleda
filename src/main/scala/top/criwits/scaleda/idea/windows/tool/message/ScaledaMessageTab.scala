@@ -6,7 +6,7 @@ import idea.windows.tool.logging.{ScaledaLogReceiver, ScaledaLoggingService}
 import kernel.utils.LogLevel
 
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.{ActionManager, DefaultActionGroup}
+import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent, DefaultActionGroup}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBList
@@ -18,20 +18,21 @@ class ScaledaMessageTab(project: Project)
     with Disposable {
   private val msgSourceId = ScaledaMessageTab.MESSAGE_ID
   private val dataModel = new DefaultListModel[ScaledaMessage]()
-  private val logReceiver = new ScaledaLogReceiver {
-    override def print(text: String, level: LogLevel.Value) =
-      dataModel.addElement(ScaledaMessage(text = text, level = level))
-  }
+  private val messageParser = new ScaledaMessageParser(dataModel)
   private val service = project.getService(classOf[ScaledaLoggingService])
-  service.addListener(msgSourceId, logReceiver)
+  service.addListener(msgSourceId, messageParser)
   private val listComponent = new JBList[ScaledaMessage](dataModel)
   private val renderer = new ScaledaMessageRenderer
   listComponent.setCellRenderer(renderer)
 
+  private val clearMessageAction = new AnAction() {
+    override def actionPerformed(e: AnActionEvent) = dataModel.clear()
+  }
+
   val group = new DefaultActionGroup()
   group.add(new ScaledaRunLastTaskAction)
   group.addSeparator()
-  group.add(new ScaledaRunLastTaskAction)
+  group.add(clearMessageAction)
 
   val toolbar = ActionManager
     .getInstance()
@@ -47,5 +48,5 @@ class ScaledaMessageTab(project: Project)
 }
 
 object ScaledaMessageTab {
-  private val MESSAGE_ID = "scaleda-message"
+  val MESSAGE_ID = "scaleda-message"
 }

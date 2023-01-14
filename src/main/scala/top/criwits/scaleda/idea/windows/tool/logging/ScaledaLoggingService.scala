@@ -14,7 +14,7 @@ class ScaledaLoggingService extends Disposable {
     listeners.put(sourceId, receiver)
 
   def print(id: String, msg: String, l: LogLevel.Value) =
-    listeners.get(id).foreach(_.print(msg, l))
+    listeners.get(id).foreach(_.print(id, msg, l))
 
   def stop(logSourceId: String): Unit = {}
 

@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory, ToolWindowManager}
 import com.intellij.ui.content.ContentFactory
 
+@Deprecated
 class ScaledaTargetWindowFactory extends ToolWindowFactory {
   override def createToolWindowContent(project: Project, toolWindow: ToolWindow): Unit = {
     val treePanel = new ScaledaTargetWindowPanel(project)
