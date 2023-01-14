@@ -5,7 +5,8 @@ import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl._
 import kernel.utils.{KernelLogger, Paths, YAMLHelper}
-import top.criwits.scaleda.kernel.project.config.TaskType
+
+import top.criwits.scaleda.kernel.project.config.{TaskConfig, TaskType}
 
 import java.io.{File, FilenameFilter}
 import scala.collection.mutable.ListBuffer
@@ -21,16 +22,16 @@ abstract class Toolchain(val executor: Executor) {
 
   def getName: String
 
-  def simulate(): Seq[CommandDeps] = ???
+  def simulate(task: TaskConfig): Seq[CommandDeps] = ???
 
-  def synthesise(): Seq[CommandDeps] = ???
+  def synthesise(task: TaskConfig): Seq[CommandDeps] = ???
 
-  def implement(): Seq[CommandDeps] = ???
+  def implement(task: TaskConfig): Seq[CommandDeps] = ???
 
-  def commands(targetType: TaskType.Value) = targetType match {
-    case TaskType.Simulation => simulate()
-    case TaskType.Synthesis => synthesise()
-    case TaskType.Implement => implement()
+  def commands(task: TaskConfig) = task.getTaskType match {
+    case TaskType.Simulation => simulate(task)
+    case TaskType.Synthesis => synthesise(task)
+    case TaskType.Implement => implement(task)
   }
 }
 

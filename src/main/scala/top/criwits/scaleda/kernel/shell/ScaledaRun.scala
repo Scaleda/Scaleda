@@ -1,8 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import kernel.project.config.ProjectConfig
-import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.{ImplementExecutor, SimulationExecutor, SynthesisExecutor}
@@ -10,7 +9,6 @@ import kernel.toolchain.impl.Vivado
 import kernel.utils.KernelLogger
 
 import java.io.File
-import java.lang
 
 object ScaledaRun {
   def runTask(
@@ -48,21 +46,27 @@ object ScaledaRun {
                 profile = profile
               )
           }
-          if (task.preset) {
-            target.toolchain match {
-              case Vivado.internalID =>
-                val r = new Vivado.TemplateRenderer(
-                  executor = executor,
-                  targetConfig = target,
-                  taskConfig = task,
-                )
-                r.render()
-              case _ =>
-                KernelLogger.error(s"not supported preset: ${target.toolchain}")
-            }
-          }
+          val taskUse =
+            if (task.preset) {
+              target.toolchain match {
+                case Vivado.internalID =>
+                  val r = new Vivado.TemplateRenderer(
+                    executor = executor,
+                    targetConfig = target,
+                    taskConfig = task,
+                  )
+                  r.render()
+                  task.copy(tcl = task.getTaskType match {
+                    case TaskType.Implement => "run_impl.tcl"
+                    case _ => "run_synth.tcl"
+                  })
+                case _ =>
+                  KernelLogger.error(s"not supported preset: ${target.toolchain}")
+                  task
+              }
+            } else task
           val toolchain = info._2(executor)
-          val commands = toolchain.commands(task.getTaskType)
+          val commands = toolchain.commands(taskUse)
           CommandRunner.execute(commands, handler)
         })
     }).getOrElse(throw new RuntimeException(s"Cannot load ProjectConfig when starting task ${task.name}"))

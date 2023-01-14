@@ -6,6 +6,8 @@ import kernel.toolchain.executor.Executor
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.{KernelFileUtils, OS}
 
+import top.criwits.scaleda.kernel.project.config.TaskConfig
+
 import java.io.File
 
 class IVerilog(executor: Executor) extends Toolchain(executor) {
@@ -16,10 +18,11 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
   override def getName: String = userFriendlyName
 
-  override def simulate() = {
+  override def simulate(task: TaskConfig) = {
     // TODO: ADD $DUMPVCD
     // TODO: iverilog output file
-    val outputFile = "simulation"
+    // val outputFile = "simulation"
+    val outputFile = s"\"${task.topModule}\""
     val sources = KernelFileUtils.getAllSourceFiles()
     Seq(
       CommandDeps(OS.shell(s"${executor.profile.iverilogPath} ${sources.map(_.getAbsolutePath).mkString(" ")} -o $outputFile"),
