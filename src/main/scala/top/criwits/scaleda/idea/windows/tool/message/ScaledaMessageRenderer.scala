@@ -1,7 +1,10 @@
 package top.criwits.scaleda
 package idea.windows.tool.message
 
-import java.awt.Component
+import com.intellij.icons.AllIcons
+import top.criwits.scaleda.idea.utils.Icons
+
+import java.awt.{Color, Component}
 import javax.swing.{JLabel, JList, ListCellRenderer}
 
 class ScaledaMessageRenderer extends ListCellRenderer[ScaledaMessage] {
@@ -12,6 +15,15 @@ class ScaledaMessageRenderer extends ListCellRenderer[ScaledaMessage] {
       b: Boolean,
       b1: Boolean
   ): Component = {
-    new JLabel(e.text)
+    val label = new JLabel(e.text)
+    import top.criwits.scaleda.kernel.utils.LogLevel._
+    val icon = e.level match {
+      case Debug => Icons.logVerbose
+      case Info => AllIcons.General.Information
+      case Warn => AllIcons.General.Warning
+      case _ => AllIcons.General.Error
+    }
+    label.setIcon(icon)
+    label
   }
 }

@@ -17,4 +17,6 @@ object Icons {
   final val verilog = IconLoader.getIcon("/icons/verilog", Icons.getClass)
   final val toolWindow =
     IconLoader.getIcon("/icons/scaledaToolWindow", Icons.getClass)
+  final val logVerbose =
+    IconLoader.getIcon("/icons/log-verbose", Icons.getClass)
 }
