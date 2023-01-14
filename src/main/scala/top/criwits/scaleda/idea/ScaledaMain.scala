@@ -5,13 +5,14 @@ import idea.utils.{Icons, MainLogger}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
-import kernel.utils.KernelLogger
+import kernel.utils.{KernelLogger, LogLevel}
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
+import top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
@@ -56,5 +57,14 @@ class ScaledaMain extends StartupActivity {
     })
 
     MainLogger.info("Scaleda launched.")
+    val t = new Thread(() => {
+      val service = project.getService(classOf[ScaledaLoggingService])
+      while (true) {
+        service.print("scaleda-message-vivado", "WARNING: [Test tag] test message", LogLevel.Warn)
+        Thread.sleep(500)
+      }
+    })
+    t.setDaemon(true)
+    t.start()
   }
 }
