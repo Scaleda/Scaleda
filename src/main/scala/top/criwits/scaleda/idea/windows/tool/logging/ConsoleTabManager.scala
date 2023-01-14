@@ -6,7 +6,13 @@ import idea.windows.tool.ScaledaDataKeys
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.{Disposer, Key}
-import com.intellij.ui.content.{Content, ContentFactory, ContentManager, ContentManagerListener}
+import com.intellij.ui.content.{
+  ContentFactory,
+  ContentManager,
+  ContentManagerListener
+}
+
+import javax.swing.JPanel
 
 class ConsoleTabManager(project: Project, contentManager: ContentManager)
     extends ContentManagerListener
@@ -26,21 +32,22 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
 
   contentManager.addContent(emptyContent)
 
-  def addTab(logSourceId: String, name: String) = {
+  def addTab(logSourceId: String, name: String, switchTo: Boolean = true) = {
     // remove empty content
     if (contentManager.getContentCount == 1)
       contentManager.removeContent(emptyContent, false)
     val consoleTab = new ConsoleTab(project, logSourceId)
     Disposer.register(this, consoleTab)
-    val content =
-      contentFactory.createContent(consoleTab.getContent, name, false)
-    content.putUserData(LOG_SOURCE_KEY, logSourceId)
-    addContentTab(content)
+
+    // what's this?
+    // content.putUserData(LOG_SOURCE_KEY, logSourceId)
+    addPanel(consoleTab.getPanel, name, switchTo = switchTo)
   }
 
-  def addContentTab(content: Content) = {
+  def addPanel(panel: JPanel, name: String, switchTo: Boolean = true) = {
+    val content = contentFactory.createContent(panel, name, false)
     contentManager.addContent(content)
-    contentManager.setSelectedContent(content)
+    if (switchTo) contentManager.setSelectedContent(content)
   }
 
   override def dispose(): Unit = {}

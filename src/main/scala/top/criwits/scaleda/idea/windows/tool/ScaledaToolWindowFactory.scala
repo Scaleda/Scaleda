@@ -6,11 +6,8 @@ import idea.windows.tool.logging.{ConsoleTabManager, ScaledaLoggingService}
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.wm.{
-  ToolWindow,
-  ToolWindowFactory,
-  ToolWindowManager
-}
+import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory, ToolWindowManager}
+import top.criwits.scaleda.idea.windows.tool.message.ScaledaMessageTab
 
 class ScaledaToolWindowFactory extends ToolWindowFactory {
   override def createToolWindowContent(
@@ -22,8 +19,11 @@ class ScaledaToolWindowFactory extends ToolWindowFactory {
       new ConsoleTabManager(project, toolWindow.getContentManager)
     Disposer.register(service, tabManager)
 
-    tabManager.addTab(OutputLogger.LOGGER_ID, "Output Logger")
-    tabManager.addTab(MainLogger.LOGGER_ID, "Main Logger")
+    val messageTab = new ScaledaMessageTab(project)
+    tabManager.addPanel(messageTab.getPanel, "Messages")
+
+    tabManager.addTab(OutputLogger.LOGGER_ID, "Output Logger", switchTo = false)
+    tabManager.addTab(MainLogger.LOGGER_ID, "Main Logger", switchTo = false)
   }
 }
 

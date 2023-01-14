@@ -7,9 +7,9 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 
 class ConsoleTab(project: Project, logSourceId: String) extends Disposable {
-  val panel = new ScaledaToolWindowOutputPanel(this, project, logSourceId)
+  private val panel = new ScaledaToolWindowOutputPanel(this, project, logSourceId)
 
-  def getContent = panel
+  def getPanel = panel
 
   override def dispose() = {
     val service = project.getService(classOf[ScaledaLoggingService])
