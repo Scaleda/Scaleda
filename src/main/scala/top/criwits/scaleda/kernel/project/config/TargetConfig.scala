@@ -12,7 +12,7 @@ case class TargetConfig(
     topModule: String = "",
     device: String = "",
     `package`: String = "",
-    speed: Int = 1,
+    speed: String = "",
     tasks: Array[TaskConfig] = Array()
 ) extends ConfigNode() {
   def getPackage = `package`
