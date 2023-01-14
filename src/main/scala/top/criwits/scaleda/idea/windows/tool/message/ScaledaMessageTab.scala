@@ -10,6 +10,7 @@ import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBList
+import top.criwits.scaleda.kernel.toolchain.Toolchain
 
 import javax.swing.DefaultListModel
 
@@ -20,7 +21,9 @@ class ScaledaMessageTab(project: Project)
   private val dataModel = new DefaultListModel[ScaledaMessage]()
   private val messageParser = new ScaledaMessageParser(dataModel)
   private val service = project.getService(classOf[ScaledaLoggingService])
-  service.addListener(msgSourceId, messageParser)
+  // add all known toolchain types
+  Toolchain.toolchains.keys.foreach(toolchain =>
+    service.addListener(s"$msgSourceId-$toolchain", messageParser))
   private val listComponent = new JBList[ScaledaMessage](dataModel)
   private val renderer = new ScaledaMessageRenderer
   listComponent.setCellRenderer(renderer)

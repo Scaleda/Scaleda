@@ -83,7 +83,9 @@ class ScaledaRunConfiguration(
             val console = myConsoleBuilder.getConsole
 
             val handler =
-              new ScaledaRunProcessHandler(new ConsoleLogger(console, logSourceId = Some(ScaledaMessageTab.MESSAGE_ID)))
+              new ScaledaRunProcessHandler(
+                new ConsoleLogger(console,
+                  logSourceId = Some(s"${ScaledaMessageTab.MESSAGE_ID}-${target.toolchain}")))
             val state = new RunProfileState {
               override def execute(
                   executor: Executor,
