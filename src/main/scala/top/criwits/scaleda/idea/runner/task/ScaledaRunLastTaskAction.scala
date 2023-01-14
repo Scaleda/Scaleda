@@ -3,10 +3,10 @@ package idea.runner.task
 
 import idea.ScaledaBundle
 import idea.utils.{Icons, MainLogger}
-import kernel.utils.JsonHelper
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import top.criwits.scaleda.kernel.project.config.{TargetConfig, TaskConfig}
+import top.criwits.scaleda.kernel.utils.serialise.JSONHelper
 
 class ScaledaRunLastTaskAction
   extends AnAction(ScaledaBundle.message("tasks.action.run.task.name",
@@ -18,7 +18,7 @@ class ScaledaRunLastTaskAction
   override def actionPerformed(e: AnActionEvent): Unit = {
     import ScaledaRunLastTaskAction._
     if (lastRunTarget.nonEmpty && lastRunTask.nonEmpty) {
-      MainLogger.warn("starting target", JsonHelper(lastRunTarget.get), "task", JsonHelper(lastRunTask.get))
+      MainLogger.warn("starting target", JSONHelper(lastRunTarget.get), "task", JSONHelper(lastRunTask.get))
     }
   }
 }

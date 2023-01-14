@@ -6,4 +6,5 @@ import javax.swing.JPanel
 trait EditDialogProvider[T] {
   def getMainPanel: JPanel
   def getData: T
+  def validateConfig: Boolean
 }

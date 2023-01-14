@@ -27,21 +27,27 @@ public class EditTaskDialog implements EditDialogProvider<TaskConfig> {
 
     @Override
     public TaskConfig getData() {
-        return new TaskConfig(name.getText(),
-                (String) typ.getSelectedItem(),
-                "", // FIXME: topModule
-                tcl.getText(),
-                preset.isSelected());
+//        return new TaskConfig(name.getText(),
+//                (String) typ.getSelectedItem(),
+//                None, // FIXME: topModule
+//                tcl.getText(),
+//                preset.isSelected());
+        return null;
+    }
+
+    @Override
+    public boolean validateConfig() {
+        return false;
     }
 
     public EditTaskDialog(TaskConfig initial) {
-        name.setText(initial.name());
-        tcl.setText(initial.tcl());
-        preset.setSelected(initial.preset());
-        String[] types = {"simulation", "synthesis", "implementation"};
-        typ.setModel(new DefaultComboBoxModel<>(types));
-        String[] targets = Arrays.stream(ProjectConfig$.MODULE$.config().targets()).map(TargetConfig::name).toArray(String[]::new);
-        target.setModel(new DefaultComboBoxModel<>(targets));
+//        name.setText(initial.name());
+//        tcl.setText(initial.tcl());
+//        preset.setSelected(initial.preset());
+//        String[] types = {"simulation", "synthesis", "implementation"};
+//        typ.setModel(new DefaultComboBoxModel<>(types));
+//        String[] targets = Arrays.stream(ProjectConfig$.MODULE$.config().targets()).map(TargetConfig::name).toArray(String[]::new);
+//        target.setModel(new DefaultComboBoxModel<>(targets));
     }
 
     public String getTargetName() {

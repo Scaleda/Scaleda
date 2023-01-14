@@ -84,15 +84,15 @@ object Vivado {
     val config = ProjectConfig.getConfig()
 
     override def context: Map[String, Any] = config.map(config => {
-      val top = taskConfig.findTopModule.get // TODO / FIXME: Exception
+      val top = taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
       val topFile = KernelFileUtils.getModuleFile(top).get // TODO / FIXME
       val sim = taskConfig.`type` == "simulation"
       val context = Vivado.TemplateContext(
         top = top,
         workDir = executor.workingDir.getAbsolutePath,
-        device = targetConfig.device,
-        `package` = targetConfig.`package`,
-        speed = targetConfig.speed,
+        device = targetConfig.options.get("device"), // FIXME
+        `package` = targetConfig.options.get("package"), // FIXME
+        speed = targetConfig.options.get("speed"), // FIXME
         sourceList = KernelFileUtils
           .getAllSourceFiles()
           .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)

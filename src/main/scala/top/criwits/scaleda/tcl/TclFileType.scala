@@ -20,7 +20,7 @@ final class TclFileType extends LanguageFileType(TclLanguage) {
 
 object TclFileType {
   private final val DefaultExtension = "tcl"
-  final val DefaultIcon = Icons.mainSmall
+  final val DefaultIcon = Icons.tcl
   val instance = new TclFileType
 
   def isTcl(fileType: FileType): Boolean = fileType match {

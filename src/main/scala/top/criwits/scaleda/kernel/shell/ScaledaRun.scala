@@ -13,6 +13,13 @@ import java.io.File
 import java.lang
 
 object ScaledaRun {
+  /**
+   * Run a task
+   * @param handler A [[ScaledaRunHandler]] used to redirect output and error
+   * @param workingDir Working directory
+   * @param target A [[TargetConfig]]
+   * @param task A [[TaskConfig]]
+   */
   def runTask(
       handler: ScaledaRunHandler,
       workingDir: File,
@@ -20,7 +27,7 @@ object ScaledaRun {
       task: TaskConfig
   ) = {
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
-    ProjectConfig.getConfig().map(config => {
+
       val info = Toolchain.toolchains(target.toolchain)
       // find profile
       Toolchain
@@ -28,21 +35,21 @@ object ScaledaRun {
         .filter(p => p.toolchainType == target.toolchain)
         .foreach(profile => {
           // generate executor
-          val executor = task.getTaskType match {
+          val executor = task.taskType match {
             case TaskType.Simulation =>
               SimulationExecutor(
                 workingDir = new File(workingDir, ".sim"),
-                topModule = config.topModule,
+                topModule = task.findTopModule.get, // FIXME
                 profile = profile
               )
             case TaskType.Synthesis =>
               SynthesisExecutor(
                 workingDir = new File(workingDir, ".synth"),
-                topModule = config.topModule,
+                topModule = task.findTopModule.get,
                 profile = profile
               )
             case _ =>
-              KernelLogger.error(s"unsupported task type: ${task.getTaskType}")
+              KernelLogger.error(s"unsupported task type: ${task.taskType}")
               ???
           }
           if (task.preset) {
@@ -59,10 +66,9 @@ object ScaledaRun {
             }
           }
           val toolchain = info._2(executor)
-          val commands = toolchain.commands(task.getTaskType)
+          val commands = toolchain.commands(task.taskType)
           CommandRunner.execute(commands, handler)
         })
-    }).getOrElse(throw new RuntimeException(s"Cannot load ProjectConfig when starting task ${task.name}"))
   }
 
   def runTaskBackground(

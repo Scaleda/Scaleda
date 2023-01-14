@@ -4,10 +4,11 @@ package kernel.shell
 import kernel.net.RemoteServer
 import kernel.project.config.ProjectConfig
 import kernel.toolchain.Toolchain
-import kernel.utils.{JsonHelper, KernelLogger, Paths}
+import kernel.utils.{KernelLogger, Paths}
 
 import scopt.OParser
 import top.criwits.scaleda.kernel.template.Template
+import top.criwits.scaleda.kernel.utils.serialise.JSONHelper
 
 import java.io.File
 
@@ -117,7 +118,7 @@ object ScaledaShellMain {
           case ShellRunMode.ListProfiles => {
             KernelLogger.info("profile list:")
             for (p <- Toolchain.profiles()) {
-              KernelLogger.info(s"${JsonHelper(p)}")
+              KernelLogger.info(s"${JSONHelper(p)}")
             }
           }
           case ShellRunMode.ListTasks => {
@@ -126,7 +127,7 @@ object ScaledaShellMain {
               .getConfig()
               .map(config =>
                 for (p <- config.targets.flatMap(_.tasks)) {
-                  KernelLogger.info(s"${JsonHelper(p)}")
+                  KernelLogger.info(s"${JSONHelper(p)}")
                 }
               )
               .getOrElse(KernelLogger.info("no task loaded"))

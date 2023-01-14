@@ -46,7 +46,9 @@ class EditTaskDialogWrapper(project: Project)
     }
   }
 
-  override def getMainPanel: JPanel = reInit.getMainPanel
+  override def createMainPanel: JPanel = reInit.getMainPanel
 
-  override def getData = TaskConfig()
+//  override def getData = TaskConfig()
+
+//  override def initPanel(): Unit = ???
 }

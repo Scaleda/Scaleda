@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
-import idea.runner.task.ScaledaRunToolWindowTaskAction
+import idea.runner.task.{ScaledaReloadTasksAction, ScaledaRunToolWindowTaskAction}
 import kernel.project.config.{ProjectConfig, TaskConfig}
 
 import com.intellij.execution.impl.RunManagerImpl
@@ -106,6 +106,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         val createTargetAction = new ScaledaRunNewTargetAction(project)
         group.add(createTargetAction)
         group.add(createTaskAction)
+        group.addSeparator()
+        val refreshTasksAction = new ScaledaReloadTasksAction
+        group.add(refreshTasksAction)
         val toolbar = ActionManager
           .getInstance()
           .createActionToolbar("ScaledaRunToolbar", group, true)
