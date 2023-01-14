@@ -65,7 +65,7 @@
                 name="Tcl"
                 implementationClass="top.criwits.scaleda.tcl.TclFileType"
                 language="Tcl"
-                extensions="v"/>
+                extensions="tcl"/>
         <lang.parserDefinition language="Tcl"
                                implementationClass="top.criwits.scaleda.tcl.TclParserDefinition"/>
 <!--        <lang.ast.factory language="Tcl" implementationClass="top.criwits.scaleda.tcl.TclASTFactory"/>-->
