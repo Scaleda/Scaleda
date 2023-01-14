@@ -17,12 +17,12 @@ import javax.swing.JTree
 import javax.swing.event.{TreeSelectionEvent, TreeSelectionListener}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
 
-object ScaledaRunIdeaHandler extends ScaledaRunHandler {
-  override def onStdout(data: String): Unit = OutputLogger.info(data)
+class ScaledaRunIdeaHandler(project: Project) extends ScaledaRunHandler {
+  override def onStdout(data: String): Unit = OutputLogger(project).info(data)
 
-  override def onStderr(data: String): Unit = OutputLogger.error(data)
+  override def onStderr(data: String): Unit = OutputLogger(project).error(data)
 
-  override def onReturn(returnValue: Int): Unit = OutputLogger.info(s"command done, returns ${returnValue}")
+  override def onReturn(returnValue: Int): Unit = OutputLogger(project).info(s"command done, returns ${returnValue}")
 }
 
 class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(true, true) {
@@ -55,7 +55,7 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
               ProjectConfig.getConfig().map(config => {
                 config.taskByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
                   val (target, task) = f
-                  ScaledaRun.runTask(ScaledaRunIdeaHandler, new File(ProjectConfig.projectBase.get), target, task)
+                  ScaledaRun.runTask(new ScaledaRunIdeaHandler(project), new File(ProjectConfig.projectBase.get), target, task)
                 })
               })
             })

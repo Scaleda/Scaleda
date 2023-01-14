@@ -1,9 +1,8 @@
 package top.criwits.scaleda
 package idea
 
-import idea.utils.{Icons, MainLogger, Notification, OutputLogger}
+import idea.utils.{Icons, MainLogger}
 import idea.windows.tasks.ScaledaRunWindowFactory
-import idea.windows.tool.ScaledaToolWindowFactory
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
 import kernel.utils.KernelLogger
@@ -16,28 +15,13 @@ import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor,
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
-    // setup main logger
-    try {
-      MainLogger.consoleView = Some(
-        ScaledaToolWindowFactory.logPanel(project).consoleView
-      )
-    } catch {
-      case e: Throwable => MainLogger.error(e.getMessage)
-    }
-    // setup output logger
-    try {
-      OutputLogger.consoleView = Some(
-        ScaledaToolWindowFactory.outputPanel(project).consoleView
-      )
-    } catch {
-      case e: Throwable => MainLogger.error(e.getMessage)
-    }
-    // setup notification logger
-    Notification.setProject(project)
-    // copy kernel logger to main logger
     KernelLogger.append(MainLogger)
     // init jinjia
     Template.initJinja()
+
+    // val c = project.getService(classOf[ScaledaMainService])
+    // require(c != null)
+
     // check is having project config
     var searchedFile: Option[VirtualFile] = None
     ProjectFileIndex
@@ -56,7 +40,7 @@ class ScaledaMain extends StartupActivity {
       val f = searchedFile.get
       ProjectConfig.configFile = Some(f.getPath)
       ProjectConfig.projectBase = Some(f.getParent.getPath)
-      MainLogger.info(s"found config: ${f}")
+      MainLogger.info(s"found config: $f")
     }
 
     // setup tool window

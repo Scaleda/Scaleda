@@ -8,11 +8,7 @@ import com.intellij.notification.{NotificationGroupManager, NotificationType}
 import com.intellij.openapi.project.Project
 import sourcecode.{File, Line, Name}
 
-object Notification extends BasicLogger {
-  private var project: Option[Project] = None
-
-  def setProject(p: Project) = project = Some(p)
-
+class Notification(project: Project) extends BasicLogger {
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit
       line: Line,
       file: File,
@@ -20,20 +16,23 @@ object Notification extends BasicLogger {
   ): Unit = {
     val msg = xs.mkString(" ")
     import LogLevel._
-    project.foreach(project => {
-      NotificationGroupManager
-        .getInstance()
-        .getNotificationGroup(ScaledaBundle.message("notification.id"))
-        .createNotification(
-          msg,
-          level match {
-            case Info  => NotificationType.INFORMATION
-            case Warn  => NotificationType.WARNING
-            case Error => NotificationType.ERROR
-            case _     => ???
-          }
-        )
-        .notify(project)
-    })
+    NotificationGroupManager
+      .getInstance()
+      .getNotificationGroup(ScaledaBundle.message("notification.id"))
+      .createNotification(
+        msg,
+        level match {
+          case Info  => NotificationType.INFORMATION
+          case Warn  => NotificationType.WARNING
+          case Error => NotificationType.ERROR
+          case _     => ???
+        }
+      )
+      .notify(project)
   }
+}
+
+object Notification {
+  def apply(project: Project): Notification = new Notification(project)
+  def apply(): Notification = new Notification(ProjectNow.apply().get)
 }
