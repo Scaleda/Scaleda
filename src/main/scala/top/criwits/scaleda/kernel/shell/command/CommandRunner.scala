@@ -27,6 +27,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val command: String = deps.command
   val envs: Seq[(String, String)] = deps.envs
   val workingDir = new File(path)
+  if (!workingDir.exists()) workingDir.mkdirs()
   private val procBuilder = Process(command, workingDir, envs: _*)
   private var process: Option[Process] = None
   private var terminate: Boolean = false
@@ -60,7 +61,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
       if (terminate) terminate = false
       if (terminating) terminating = false
       terminated = true
-      returnValue.success(-1)
+      if (!returnValue.isCompleted) returnValue.success(-1)
     }
   })
 
@@ -82,7 +83,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
 
 //noinspection DuplicatedCode
 object CommandRunner {
-  val delay = 50
+  private val delay = 50
 
   private def flushStream(
       stream: LinkedBlockingQueue[String],
@@ -115,8 +116,6 @@ object CommandRunner {
       do {
         flushStream(r.stdOut, handler.onStdout)
         flushStream(r.stdErr, handler.onStderr)
-        // r.stdOut.forEach(s => handler.onStdout(s))
-        // r.stdErr.forEach(s => handler.onStderr(s))
         Thread.sleep(delay)
       } while (!r.returnValue.isCompleted && !handler.isTerminating)
       if (handler.isTerminating) {
