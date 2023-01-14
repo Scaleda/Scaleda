@@ -8,11 +8,11 @@ import top.criwits.scaleda.idea.utils.MainLogger
 
 import scala.language.implicitConversions
 
-trait TextLoggingReceiver {
+trait ScaledaLogReceiver {
   def print(text: String, level: LogLevel.Value): Unit
 }
 
-object TextLoggingReceiver {
-  implicit def apply(consoleView: ConsoleView): TextLoggingReceiver =
+object ScaledaLogReceiver {
+  implicit def apply(consoleView: ConsoleView): ScaledaLogReceiver =
     (text: String, level: LogLevel.Value) => consoleView.print(text, MainLogger.consoleLevel(level))
 }

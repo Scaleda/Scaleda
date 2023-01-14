@@ -8,9 +8,9 @@ import top.criwits.scaleda.kernel.utils.LogLevel
 import scala.collection.mutable
 
 class ScaledaConsoleService extends Disposable {
-  private val listeners = new mutable.HashMap[String, TextLoggingReceiver]
+  private val listeners = new mutable.HashMap[String, ScaledaLogReceiver]
 
-  def addListener(sourceId: String, receiver: TextLoggingReceiver) =
+  def addListener(sourceId: String, receiver: ScaledaLogReceiver) =
     listeners.put(sourceId, receiver)
 
   def print(id: String, msg: String, l: LogLevel.Value) =
