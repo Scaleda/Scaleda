@@ -14,6 +14,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
 import top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService
 
+import scala.util.Random
+
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     KernelLogger.append(MainLogger)
@@ -60,6 +62,11 @@ class ScaledaMain extends StartupActivity {
     val t = new Thread(() => {
       val service = project.getService(classOf[ScaledaLoggingService])
       while (true) {
+        val r = LogLevel(Random.nextInt(LogLevel.Fatal.id) - LogLevel.Debug.id)
+        val time = System.currentTimeMillis()
+        val text = r match {
+          case Lo
+        }
         service.print("scaleda-message-vivado", "WARNING: [Test tag] test message", LogLevel.Warn)
         Thread.sleep(500)
       }

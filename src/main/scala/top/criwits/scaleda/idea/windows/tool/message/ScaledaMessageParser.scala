@@ -6,10 +6,10 @@ import kernel.toolchain.impl.Vivado
 import kernel.utils.LogLevel
 
 import java.util.regex.Pattern
-import javax.swing.DefaultListModel
 
-class ScaledaMessageParser(dataModel: DefaultListModel[ScaledaMessage])
-    extends ScaledaLogReceiver {
+class ScaledaMessageParser(
+    handler: ScaledaMessage => Unit
+) extends ScaledaLogReceiver {
   override def print(
       source: String,
       text: String,
@@ -27,8 +27,12 @@ class ScaledaMessageParser(dataModel: DefaultListModel[ScaledaMessage])
           case "WARNING" => Warn
           case _         => Error
         }
-        dataModel.addElement(
-          ScaledaMessage(text = s"[$tag] $message", level = textedLevel)
+        handler(
+          ScaledaMessage(
+            text = s"[$tag] $message",
+            level = textedLevel,
+            time = System.currentTimeMillis()
+          )
         )
       }
     }

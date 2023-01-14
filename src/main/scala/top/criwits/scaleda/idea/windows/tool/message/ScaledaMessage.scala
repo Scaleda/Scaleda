@@ -5,6 +5,7 @@ import kernel.utils.LogLevel
 
 case class ScaledaMessage(
     code: Int = 0,
+    time: Long = 0,
     level: LogLevel.Value = LogLevel.Debug,
     text: String = ""
 )
