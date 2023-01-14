@@ -28,7 +28,7 @@ object MainLogger extends BasicLogger {
     }
     ProjectNow().foreach(project => {
       val service = project.getService(classOf[ScaledaConsoleService])
-      service.print(LOGGER_ID, s"$msg\n", MainLogger.consoleLevel(level))
+      service.print(LOGGER_ID, s"$msg\n", level)
       level match {
         case Warn | Error => Notification(project).logging(level, xs: _*)
         case _            => {}
