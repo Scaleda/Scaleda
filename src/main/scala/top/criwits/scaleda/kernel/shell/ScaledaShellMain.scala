@@ -1,7 +1,8 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import kernel.net.RemoteServer
+import kernel.net.remote.Empty
+import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
 import kernel.toolchain.Toolchain
@@ -39,22 +40,30 @@ object ScaledaShellMain {
     }
   }
 
+  private def preParseArgs(
+      args: Array[String],
+      option: Seq[String]
+  ): Option[String] = {
+    var found = false
+    args.foreach(arg => {
+      if (option.contains(arg))
+        found = true
+      else if (found)
+        return Some(arg)
+    })
+    None
+  }
+
   def main(args: Array[String]): Unit = {
+    // setup logger
+
     KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
     Template.initJinja()
 
-    // seek for -C
-    var pathArgFound = false
-    args.foreach(arg => {
-      if (arg == "-C" || arg == "--workdir") {
-        pathArgFound = true
-      } else {
-        if (pathArgFound) {
-          loadConfig(arg)
-          pathArgFound = false
-        }
-      }
-    })
+    // preparse workdir
+    preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(_))
+    // preparse server host
+    val host = preParseArgs(args, Seq("--host"))
     if (ProjectConfig.configFile.isEmpty) {
       // try loading config in pwd
       loadConfig(Paths.pwd.getAbsolutePath)
@@ -117,9 +126,19 @@ object ScaledaShellMain {
         KernelLogger.info(s"shell config: ${shellConfig}")
         shellConfig.runMode match {
           case ShellRunMode.ListProfiles => {
-            KernelLogger.info("profile list:")
+            KernelLogger.info("local profile list:")
             for (p <- Toolchain.profiles()) {
               KernelLogger.info(s"${JSONHelper(p)}")
+            }
+            if (shellConfig.serverHost.nonEmpty) {
+              val stub =
+                RemoteClient(shellConfig.serverHost, shellConfig.serverPort)
+              val profiles = stub.getProfiles(Empty())
+              if (profiles.profiles.nonEmpty) {
+                KernelLogger.info("remote profile list:")
+                for (p <- profiles.profiles)
+                  KernelLogger.info(s"${JSONHelper(p)}")
+              }
             }
           }
           case ShellRunMode.ListTasks => {
@@ -127,7 +146,7 @@ object ScaledaShellMain {
             ProjectConfig
               .getConfig()
               .map(config =>
-                for (p <- config.tasks.flatMap(_.tasks)) {
+                for (p <- config.targets.flatMap(_.tasks)) {
                   KernelLogger.info(s"${JSONHelper(p)}")
                 }
               )
@@ -157,6 +176,9 @@ object ScaledaShellMain {
                   )
               })
               .getOrElse(KernelLogger.error("no config loaded!"))
+          }
+          case ShellRunMode.None => {
+            KernelLogger.warn("no action specified, do nothing")
           }
           case _ => {
             KernelLogger.error("not implemented.")

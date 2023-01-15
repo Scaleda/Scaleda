@@ -4,17 +4,13 @@ package idea.runner.configuration
 import idea.runner.ScaledaRunProcessHandler
 import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.ScaledaMessageTab
-import kernel.net.RemoteServer
+import kernel.net.{RemoteClient, RemoteServer}
 import kernel.net.remote.{Empty, RemoteGrpc, RemoteProfile}
 import kernel.project.config.ProjectConfig
 import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
 
-import com.intellij.execution.configurations.{
-  LocatableConfigurationBase,
-  RunConfiguration,
-  RunProfileState
-}
+import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
@@ -93,11 +89,7 @@ class ScaledaRunConfiguration(
                   .profiles()
                   .exists(_.toolchainType == target.toolchain)
               } else {
-                val builder = ManagedChannelBuilder
-                  .forAddress(task.host.get, RemoteServer.port)
-                builder.usePlaintext()
-                val channel = builder.build()
-                val stub = RemoteGrpc.blockingStub(channel)
+                val stub = RemoteClient(task.host.get, RemoteServer.port)
                 remoteProfiles = Some(stub.getProfiles(Empty()).profiles)
                 remoteProfiles.get.exists(_.toolchainType == target.toolchain)
               }

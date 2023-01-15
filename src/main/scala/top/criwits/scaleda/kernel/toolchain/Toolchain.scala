@@ -80,7 +80,7 @@ object Toolchain {
       newItem.file = Some(f)
       profiles += newItem
     })
-    KernelLogger.info(s"${profiles.size} profiles loaded")
+    KernelLogger.debug(s"${profiles.size} profiles loaded")
     cachedProfiles = profiles
     cachedProfiles
   }
