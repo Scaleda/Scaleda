@@ -6,6 +6,9 @@ import kernel.utils.KernelLogger
 
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
+import scala.async.Async.async
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, Promise}
 import scala.sys.process._
 
@@ -134,4 +137,33 @@ object CommandRunner {
 
   def execute(commands: Seq[CommandDeps], handler: ScaledaRunHandler, ignoreErrors: Boolean = false): Unit =
     executeLocalOrRemote(None, commands, handler, ignoreErrors)
+
+  def executeAsyncLocalOrRemote
+  (remoteCommandDeps: Option[RemoteCommandDeps],
+   commands: Seq[CommandDeps],
+   handler: ScaledaRunHandler,
+   ignoreErrors: Boolean = false): Future[Seq[Int]] = async {
+    val returnValues = ArrayBuffer[Int]()
+    val returnValueHandler = new ScaledaRunHandler {
+      override def onStdout(data: String): Unit = handler.onStdout(data)
+
+      override def onStderr(data: String): Unit = handler.onStderr(data)
+
+      override def onReturn(returnValue: Int): Unit = {
+        handler.onReturn(returnValue)
+        returnValues.addOne(returnValue)
+      }
+
+      override def isTerminating: Boolean = handler.isTerminating
+
+      override def onShellCommand(command: CommandDeps): Unit = handler.onShellCommand(command)
+
+      override def expectedReturnValue: Int = handler.expectedReturnValue
+    }
+    executeLocalOrRemote(remoteCommandDeps, commands, returnValueHandler, ignoreErrors)
+    returnValues.toSeq
+  }
+
+  def executeAsync(commands: Seq[CommandDeps], handler: ScaledaRunHandler, ignoreErrors: Boolean = false): Future[Seq[Int]] =
+    executeAsyncLocalOrRemote(None, commands, handler, ignoreErrors)
 }

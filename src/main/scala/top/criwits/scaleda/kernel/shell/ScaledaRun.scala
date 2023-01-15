@@ -9,6 +9,7 @@ import kernel.toolchain.impl.Vivado
 import kernel.utils.KernelLogger
 
 import java.io.File
+import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
   /**
@@ -119,4 +120,14 @@ object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
 
   override def onReturn(returnValue: Int): Unit =
     KernelLogger.info(s"command done, returns $returnValue")
+}
+
+class ScaledaRunHandlerToArray
+(returnValues: Option[ArrayBuffer[Int]], outputs: ArrayBuffer[String], errors: Option[ArrayBuffer[String]] = None)
+  extends ScaledaRunHandler {
+  override def onStdout(data: String): Unit = outputs.addOne(data)
+
+  override def onStderr(data: String): Unit = errors.map(_.addOne(data)).getOrElse(onStdout(data))
+
+  override def onReturn(returnValue: Int): Unit = returnValues.foreach(_.addOne(returnValue))
 }

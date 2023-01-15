@@ -9,7 +9,10 @@ import kernel.utils.serialise.YAMLHelper
 import kernel.utils.{KernelLogger, Paths}
 
 import java.io.{File, FilenameFilter}
+import scala.async.Async.async
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
  * A [[Toolchain]] is an external software used to perform simulation, synthesis and implementation.
@@ -33,8 +36,6 @@ abstract class Toolchain(val executor: Executor) {
     case TaskType.Synthesis => synthesise(task)
     case TaskType.Implement => implement(task)
   }
-
-  def detectProfiles: Seq[ToolchainProfile] = Seq()
 }
 
 object Toolchain {
@@ -92,7 +93,7 @@ object Toolchain {
       case Some(f) => if (profile.removed) removeProfile(profile) else YAMLHelper(profile, f)
       case None =>
         val shortname = profile.profileName.toLowerCase().replaceAll("[^a-z0-9]+", "-")
-        YAMLHelper(profile, new File(defaultConfigDirectory + "/" + shortname + ".yml"))
+        YAMLHelper(profile, new File(defaultConfigDirectory, shortname + ".yml"))
     }
 
   def removeProfile(profile: ToolchainProfile): Boolean =
@@ -100,8 +101,4 @@ object Toolchain {
       case Some(f) => f.delete()
       case None => false
     }
-
-  def detectProfiles: Seq[Toolchain] = {
-
-  }
 }

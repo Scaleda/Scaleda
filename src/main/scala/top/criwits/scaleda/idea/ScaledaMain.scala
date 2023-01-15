@@ -1,20 +1,20 @@
 package top.criwits.scaleda
 package idea
 
+import idea.settings.toolchains.ProfileDetectAction
 import idea.utils.{Icons, MainLogger}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
-import kernel.utils.{KernelLogger, LogLevel}
+import kernel.toolchain.Toolchain
+import kernel.utils.KernelLogger
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
-import top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService
-
-import scala.util.Random
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
@@ -59,23 +59,11 @@ class ScaledaMain extends StartupActivity {
     })
 
     MainLogger.info("Scaleda launched.")
-    // val t = new Thread(() => {
-    //   val service = project.getService(classOf[ScaledaLoggingService])
-    //   while (true) {
-    //     val r = LogLevel(Random.nextInt(LogLevel.Fatal.id - LogLevel.Debug.id) + LogLevel.Debug.id)
-    //     val time = System.currentTimeMillis()
-    //     import LogLevel._
-    //     val levelText = r match {
-    //       case Debug => "DEBUG"
-    //       case Info => "INFO"
-    //       case Warn => "WARNING"
-    //       case _ => "ERROR"
-    //     }
-    //     service.print("scaleda-message-vivado", s"$levelText: [Test tag] test message $time", r)
-    //     Thread.sleep(500)
-    //   }
-    // })
-    // t.setDaemon(true)
-    // t.start()
+
+    // if no profiles loaded, detect all profiles and popup message
+    if (Toolchain.profiles().isEmpty) {
+      ActionManager.getInstance()
+        .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
+    }
   }
 }
