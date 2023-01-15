@@ -9,10 +9,7 @@ import kernel.utils.serialise.YAMLHelper
 import kernel.utils.{KernelLogger, Paths}
 
 import java.io.{File, FilenameFilter}
-import scala.async.Async.async
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 /**
  * A [[Toolchain]] is an external software used to perform simulation, synthesis and implementation.

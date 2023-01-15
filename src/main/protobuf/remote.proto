@@ -3,7 +3,7 @@ syntax = "proto3";
 package top.criwits.scaleda.kernel.net;
 
 service Remote {
-  rpc run(RunRequest) returns (stream RunReply) {}
+  rpc Run(RunRequest) returns (stream RunReply) {}
 }
 
 message StringTriple {
@@ -18,13 +18,13 @@ message RunRequest {
 }
 
 enum RunReplyType {
-  RETURN = 0;
-  STDOUT = 1;
-  STDERR = 2;
+  RUN_REPLY_TYPE_RETURN = 0;
+  RUN_REPLY_TYPE_STDOUT = 1;
+  RUN_REPLY_TYPE_STDERR = 2;
 }
 
 message RunReply {
-  RunReplyType replyType = 1;
-  string strValue = 2;
-  int32 intValue = 3;
+  RunReplyType reply_type = 1;
+  string str_value = 2;
+  int32 int_value = 3;
 }
