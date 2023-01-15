@@ -1,11 +1,9 @@
 package top.criwits.scaleda.idea;
 
 import com.intellij.DynamicBundle;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.PropertyKey;
+import org.jetbrains.annotations.*;
 
+import java.util.Locale;
 import java.util.function.Supplier;
 
 public final class ScaledaBundle extends DynamicBundle {

@@ -55,8 +55,6 @@ object ScaledaShellMain {
   }
 
   def main(args: Array[String]): Unit = {
-    // setup logger
-
     KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
     Template.initJinja()
 

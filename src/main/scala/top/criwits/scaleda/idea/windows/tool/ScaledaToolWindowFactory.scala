@@ -7,6 +7,7 @@ import idea.windows.tool.logging.{ConsoleTabManager, ScaledaLoggingService}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory, ToolWindowManager}
+import top.criwits.scaleda.idea.ScaledaBundle
 import top.criwits.scaleda.idea.windows.tool.message.ScaledaMessageTab
 
 class ScaledaToolWindowFactory extends ToolWindowFactory {
@@ -22,8 +23,8 @@ class ScaledaToolWindowFactory extends ToolWindowFactory {
     val messageTab = new ScaledaMessageTab(project)
     tabManager.addPanel(messageTab, "Messages")
 
-    tabManager.addTab(OutputLogger.LOGGER_ID, "Output Logger", switchTo = false)
-    tabManager.addTab(MainLogger.LOGGER_ID, "Main Logger", switchTo = false)
+    tabManager.addTab(OutputLogger.LOGGER_ID, ScaledaBundle.message("windows.tool.log.output.title"), switchTo = false)
+    tabManager.addTab(MainLogger.LOGGER_ID, ScaledaBundle.message("windows.tool.log.main.title"), switchTo = false)
   }
 }
 
