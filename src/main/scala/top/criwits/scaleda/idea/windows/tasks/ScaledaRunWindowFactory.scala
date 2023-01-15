@@ -16,10 +16,7 @@ import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
-import top.criwits.scaleda.idea.runner.task.edit.{
-  // ScaledaRunNewTargetAction,
-  ScaledaRunNewTaskAction
-}
+import top.criwits.scaleda.idea.runner.task.edit.{ScaledaCreateNewTargetAction, ScaledaCreateNewTaskAction}
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
@@ -72,6 +69,8 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         new TreeSpeedSearch(tree)
         panel.add(ScrollPaneFactory.createScrollPane(tree))
         // var autoScrollHandler = new AutoScrollTo
+
+        // Run
         val runManager = RunManagerImpl.getInstanceImpl(project)
         val runTaskAction =
           new ScaledaRunToolWindowTaskAction(tree, project, runManager)
@@ -92,7 +91,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         })
         val group = new DefaultActionGroup()
         group.add(runTaskAction)
+
         group.addSeparator()
+
         val treeExpander = new DefaultTreeExpander(tree)
         group.add(
           CommonActionsManager
@@ -104,14 +105,19 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
             .getInstance()
             .createCollapseAllAction(treeExpander, tree)
         )
+
         group.addSeparator()
-        val createTaskAction = new ScaledaRunNewTaskAction(project)
-        // val createTargetAction = new ScaledaRunNewTargetAction(project)
-        // group.add(createTargetAction)
+
+        val createTargetAction = new ScaledaCreateNewTargetAction(project)
+        group.add(createTargetAction)
+        val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
         group.add(createTaskAction)
+
         group.addSeparator()
+
         val refreshTasksAction = new ScaledaReloadTasksAction
         group.add(refreshTasksAction)
+
         val toolbar = ActionManager
           .getInstance()
           .createActionToolbar("ScaledaRunToolbar", group, true)

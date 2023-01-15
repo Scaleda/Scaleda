@@ -1,25 +1,24 @@
 package top.criwits.scaleda
-package idea.runner.task.edit
+package idea.runner.task.edit.task
 
 import idea.ScaledaBundle
+import idea.runner.task.edit.EditDialogWrapper
 import idea.utils.MainLogger
-import kernel.project.config.{ProjectConfig, TaskConfig}
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
 
 import com.intellij.openapi.project.Project
 
 import javax.swing.JPanel
 
-class EditTaskDialogWrapper(project: Project)
+class EditTaskDialogWrapper(target: TargetConfig, project: Project, config: Option[TaskConfig])
     extends EditDialogWrapper[TaskConfig](
       project,
       ScaledaBundle.message("windows.edit.task.title")
     ) {
-  var inner: EditTaskDialog = _
 
-  private def reInit: EditTaskDialog = {
-    if (inner == null) inner = new EditTaskDialog(TaskConfig())
-    inner
-  }
+  private val targetName = target.name
+
+  var inner: EditTaskDialog = _
 
   def checkData(targetName: String, task: TaskConfig): Option[String] = {
     if (task.name.isBlank)
@@ -36,18 +35,26 @@ class EditTaskDialogWrapper(project: Project)
   }
 
   override def doOKAction() = {
-    val task = reInit.getData
-    checkData(reInit.getTargetName, task) match {
+    val task = inner.getData
+    checkData(targetName, task) match {
       case None => {
-        ProjectConfig.insertOrReplaceTask(reInit.getTargetName, task)
+        ProjectConfig.insertOrReplaceTask(targetName, task) // FIXME!!!!!!
         super.doOKAction()
       }
       case Some(msg) => MainLogger.error("Cannot create/edit task:", msg)
     }
   }
 
-  override def createMainPanel: JPanel = reInit.getMainPanel
+  override def createMainPanel: JPanel = {
+    inner = new EditTaskDialog(target, config, this)
+    updateOKStatus()
+    inner.getMainPanel
+  }
 
+
+  def updateOKStatus(): Unit = {
+    setOKActionEnabled(inner != null && inner.validateConfig)
+  }
 //  override def getData = TaskConfig()
 
 //  override def initPanel(): Unit = ???

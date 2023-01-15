@@ -20,6 +20,13 @@ import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 
+/**
+ * Action: run task in right panel
+ *
+ * @param tree Tree in the right panel, used to detect whether task is picked
+ * @param project the project
+ * @param runManager IJ [[RunManager]]
+ */
 class ScaledaRunToolWindowTaskAction(
     tree: Tree,
     project: Project,
@@ -29,6 +36,12 @@ class ScaledaRunToolWindowTaskAction(
       ScaledaBundle.message("tasks.action.run.wool.window.task.description"),
       AllIcons.RunConfigurations.TestState.Run
     ) {
+  override def update(e: AnActionEvent): Unit = {
+    val presentation = e.getPresentation
+    val selectedNodes = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
+    presentation.setEnabled(selectedNodes.nonEmpty)
+  }
+
   override def actionPerformed(e: AnActionEvent): Unit = {
     ProjectConfig
       .getConfig()

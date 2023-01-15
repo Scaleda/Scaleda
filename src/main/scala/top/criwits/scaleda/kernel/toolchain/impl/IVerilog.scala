@@ -6,7 +6,7 @@ import kernel.toolchain.executor.Executor
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.{KernelFileUtils, OS}
 
-import top.criwits.scaleda.kernel.project.config.TaskConfig
+import top.criwits.scaleda.kernel.project.config.{TaskConfig, TaskType}
 
 import java.io.File
 
@@ -35,6 +35,10 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 object IVerilog {
   val userFriendlyName: String = "Icarus Verilog"
   val internalID: String = "iverilog"
+
+  val supportedTask: Set[TaskType.Value] = Set(
+    TaskType.Simulation
+  )
 
   class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
     /**

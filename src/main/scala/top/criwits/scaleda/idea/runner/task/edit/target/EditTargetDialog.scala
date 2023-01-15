@@ -99,9 +99,9 @@ class EditTargetDialog(config: Option[TargetConfig], parent: EditTargetDialogWra
 
   // check top module status
   private val projectConfig = ProjectConfig.getConfig().get // FIXME
-  private val projectTopModuleValid = projectConfig.topModule != null && projectConfig.topModule.nonEmpty
+  private val projectTopModuleValid = projectConfig.topModule.isDefined
   if (projectTopModuleValid) {
-    // add a prompt! TODO: NOT WORKING
+    // add a prompt!
     PromptSupport.setPrompt(ScaledaBundle.message("windows.edit.target.inherited_top_module",
       projectConfig.topModule.get),
       upperPanel.topModuleField)

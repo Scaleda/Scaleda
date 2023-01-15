@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunKernelHandlerWithReturn
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
@@ -42,6 +42,12 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
 object Vivado {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String = "vivado"
+
+  val supportedTask: Set[TaskType.Value] = Set(
+    TaskType.Simulation,
+    TaskType.Synthesis,
+    TaskType.Implement
+  )
 
   def getVivadoExec(path: String): String = new File(new File(path), "/bin/vivado" + (if (OS.isWindows) ".bat" else "")).getAbsolutePath
 
