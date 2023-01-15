@@ -14,25 +14,37 @@ class Notification(project: Project) extends BasicLogger {
       file: File,
       name: Name
   ): Unit = {
-    val msg = xs.mkString(" ")
-    import LogLevel._
-    NotificationGroupManager
-      .getInstance()
-      .getNotificationGroup(ScaledaBundle.message("notification.id"))
-      .createNotification(
-        msg,
-        level match {
-          case Info  => NotificationType.INFORMATION
-          case Warn  => NotificationType.WARNING
-          case Error => NotificationType.ERROR
-          case _     => ???
-        }
-      )
-      .notify(project)
+    if (xs.length != 2) {
+      val msg = xs.mkString(" ")
+      NotificationGroupManager
+        .getInstance()
+        .getNotificationGroup(ScaledaBundle.message("notification.id"))
+        .createNotification(msg, Notification.levelMatch(level))
+        .notify(project)
+    } else {
+      // select title and content
+      val title = xs.head.toString
+      val content = xs.slice(1, xs.length).mkString(" ")
+      val notification = NotificationGroupManager
+        .getInstance()
+        .getNotificationGroup(ScaledaBundle.message("notification.id"))
+        .createNotification(content, Notification.levelMatch(level))
+      notification.setTitle(title)
+      notification.notify(project)
+    }
   }
 }
 
 object Notification {
   def apply(project: Project): Notification = new Notification(project)
   def apply(): Notification = new Notification(ProjectNow.apply().get)
+
+  private def levelMatch(level: LogLevel.Value): NotificationType = {
+    import LogLevel._
+    level match {
+      case Info => NotificationType.INFORMATION
+      case Warn => NotificationType.WARNING
+      case _    => NotificationType.ERROR
+    }
+  }
 }

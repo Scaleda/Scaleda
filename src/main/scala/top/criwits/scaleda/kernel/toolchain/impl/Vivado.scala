@@ -182,7 +182,9 @@ object Vivado extends ToolchainProfileDetector {
               result._2.getOrElse(userFriendlyName),
               internalID
             )
-          profile.path = vivadoPath
+          profile.path = vivadoFile.getAbsolutePath
+            .replace("/bin/vivado", "")
+            .replace("\\bin\\vivado.bat", "")
           Seq(profile)
         } else Seq()
       case None => Seq()

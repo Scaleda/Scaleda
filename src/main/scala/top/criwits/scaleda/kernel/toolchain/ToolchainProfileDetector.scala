@@ -22,15 +22,7 @@ object ToolchainProfileDetector {
       if (cached && detected.nonEmpty) detected.get
       else {
         val detectors = allDetectors.toSeq
-        if (detectors.nonEmpty) {
-          val profileTest = await(detectors.head.detectProfiles)
-          println(profileTest)
-        }
         val futures = detectors.map(d => d.detectProfiles)
-        // var result: Seq[Seq[ToolchainProfile]] = Seq()
-        // val result = (for { s <- futures } yield await(s)).flatten
-        // for (s <- futures) { await(s) }
-        // for {s <- futures} yield await(s)
         val profiles = await(for {
           checked <- Future.sequence(futures)
         } yield checked.flatten)

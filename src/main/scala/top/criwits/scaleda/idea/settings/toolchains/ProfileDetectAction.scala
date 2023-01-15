@@ -9,6 +9,7 @@ import top.criwits.scaleda.idea.ScaledaBundle
 import top.criwits.scaleda.kernel.toolchain.{Toolchain, ToolchainProfileDetector}
 
 import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 /**
  * Detect profiles and popup notification
@@ -31,6 +32,7 @@ class ProfileDetectAction(project: Project) extends AnAction {
       notification.addAction(new AnAction(ScaledaBundle.message("detector.notification.add")) {
         override def actionPerformed(e: AnActionEvent) = {
           detected.foreach(Toolchain.syncProfile)
+          notification.expire()
         }
       })
       notification.notify(project)
