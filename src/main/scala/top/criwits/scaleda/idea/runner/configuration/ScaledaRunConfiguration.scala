@@ -88,13 +88,13 @@ class ScaledaRunConfiguration(
             val (target, task) = f
             var remoteProfiles: Option[Seq[RemoteProfile]] = None
             val hasProfile =
-              if (target.host.nonEmpty) {
+              if (task.host.isEmpty) {
                 Toolchain
                   .profiles()
                   .exists(_.toolchainType == target.toolchain)
               } else {
                 val builder = ManagedChannelBuilder
-                  .forAddress(target.host.get, RemoteServer.port)
+                  .forAddress(task.host.get, RemoteServer.port)
                 builder.usePlaintext()
                 val channel = builder.build()
                 val stub = RemoteGrpc.blockingStub(channel)

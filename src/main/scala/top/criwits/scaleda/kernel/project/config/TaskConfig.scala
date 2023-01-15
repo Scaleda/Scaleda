@@ -21,6 +21,7 @@ case class TaskConfig(
     topModule: Option[String] = None,
     preset: Boolean = true,
     tcl: Option[String] = None,
+    host: Option[String] = None,
 ) extends ConfigNode() {
 
   def taskType = taskTypeList(`type`)._2
