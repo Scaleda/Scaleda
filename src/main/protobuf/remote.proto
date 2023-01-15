@@ -32,10 +32,10 @@ message RunReply {
   int32 int_value = 3;
 }
 
-message ToolchainProfile {
+message RemoteProfile {
   string name = 1;
   string toolchain_type = 2;
 }
 message ProfilesReply {
-  repeated ToolchainProfile profiles = 1;
+  repeated RemoteProfile profiles = 1;
 }

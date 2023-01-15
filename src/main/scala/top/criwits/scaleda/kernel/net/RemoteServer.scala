@@ -101,7 +101,7 @@ class RemoteServer(executionContext: ExecutionContext) {
           .profiles()
           .toSeq
           .map(p =>
-            ToolchainProfile(
+            RemoteProfile(
               name = p.profileName,
               toolchainType = p.toolchainType
             )

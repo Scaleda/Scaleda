@@ -4,6 +4,8 @@ package idea.runner.configuration
 import idea.runner.ScaledaRunProcessHandler
 import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.ScaledaMessageTab
+import kernel.net.RemoteServer
+import kernel.net.remote.{Empty, RemoteGrpc, RemoteProfile}
 import kernel.project.config.ProjectConfig
 import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
@@ -22,10 +24,12 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
+import io.grpc.ManagedChannelBuilder
 import org.jdom.Element
 
 import java.io.File
 import scala.collection.mutable
+import scala.language.existentials
 
 class ScaledaRunConfiguration(
     project: Project,
@@ -82,11 +86,22 @@ class ScaledaRunConfiguration(
         c.taskByName(taskName)
           .map(f => {
             val (target, task) = f
-            if (
-              !Toolchain
-                .profiles()
-                .exists(_.toolchainType == target.toolchain)
-            ) {
+            var remoteProfiles: Option[Seq[RemoteProfile]] = None
+            val hasProfile =
+              if (target.host.nonEmpty) {
+                Toolchain
+                  .profiles()
+                  .exists(_.toolchainType == target.toolchain)
+              } else {
+                val builder = ManagedChannelBuilder
+                  .forAddress(target.host.get, RemoteServer.port)
+                builder.usePlaintext()
+                val channel = builder.build()
+                val stub = RemoteGrpc.blockingStub(channel)
+                remoteProfiles = Some(stub.getProfiles(Empty()).profiles)
+                remoteProfiles.get.exists(_.toolchainType == target.toolchain)
+              }
+            if (!hasProfile) {
               Notification(project).error(
                 "Toolchain not found",
                 s"Cannot find toolchain ${target.toolchain}, check your profile list"
