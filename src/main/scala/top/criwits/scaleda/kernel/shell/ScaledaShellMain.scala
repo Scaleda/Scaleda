@@ -75,7 +75,8 @@ object ScaledaShellMain {
           .text("Set server host for RPC"),
         opt[Int]("port")
           .action((x, c) => c.copy(serverPort = x))
-          .text("Set server port for RPC"),
+          .text("Set server port for RPC")
+          .hidden(),
         cmd("serve")
           .text("Run as server")
           .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
@@ -144,11 +145,11 @@ object ScaledaShellMain {
                   .foreach(
                     _.taskByName(shellConfig.task)
                       .map(f => {
-                        val (task, task) = f
+                        val (target, task) = f
                         ScaledaRun.runTask(
                           ScaledaRunKernelHandler,
                           workingDir,
-                          task,
+                          target,
                           task
                         )
                       })
