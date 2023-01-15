@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
 import org.jetbrains.annotations.Nls
 import top.criwits.scaleda.idea.ScaledaBundle
+import top.criwits.scaleda.idea.utils.Notification
 import top.criwits.scaleda.kernel.toolchain.{Toolchain, ToolchainProfileDetector}
 
 import scala.concurrent.Await
@@ -28,6 +29,7 @@ class ProfileDetectAction(project: Project) extends AnAction {
         .getInstance()
         .getNotificationGroup(ScaledaBundle.message("notification.id"))
         .createNotification(content, NotificationType.INFORMATION)
+      notification.setTitle(ScaledaBundle.message("detector.notification.found.title"))
       // save detected profiles to disk
       notification.addAction(new AnAction(ScaledaBundle.message("detector.notification.add")) {
         override def actionPerformed(e: AnActionEvent) = {
@@ -36,6 +38,11 @@ class ProfileDetectAction(project: Project) extends AnAction {
         }
       })
       notification.notify(project)
+    } else {
+      Notification(project).warn(
+        ScaledaBundle.message("detector.notification.found.title"),
+        ScaledaBundle.message("detector.notification.found.none")
+      )
     }
   }
 }
