@@ -5,6 +5,7 @@ package top.criwits.scaleda.kernel.net;
 service Remote {
   rpc Run(RunRequest) returns (stream RunReply) {}
   rpc GetProfiles(Empty) returns (ProfilesReply) {}
+  rpc GetRemoteInfo(Empty) returns (RemoteInfo) {}
 }
 
 message Empty {}
@@ -38,4 +39,13 @@ message RemoteProfile {
 }
 message ProfilesReply {
   repeated RemoteProfile profiles = 1;
+}
+
+enum RemoteOsType {
+  REMOTE_OS_TYPE_LINUX = 0;
+  REMOTE_OS_TYPE_WINDOWS = 1;
+  REMOTE_OS_TYPE_MACOS = 2;
+}
+message RemoteInfo {
+  RemoteOsType os = 1;
 }

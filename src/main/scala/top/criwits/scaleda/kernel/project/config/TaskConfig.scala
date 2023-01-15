@@ -3,6 +3,7 @@ package kernel.project.config
 
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import top.criwits.scaleda.kernel.project.config.TaskConfig.taskTypeList
 import top.criwits.scaleda.kernel.utils.HasDefault
 
 /**
@@ -22,12 +23,7 @@ case class TaskConfig(
     tcl: Option[String] = None,
 ) extends ConfigNode() {
 
-  def taskType = `type` match {
-    case "simulation"     => TaskType.Simulation
-    case "synthesis"      => TaskType.Synthesis
-    case "implementation" => TaskType.Implement
-    case _                => ??? // FIXME: A better way?
-  }
+  def taskType = taskTypeList(`type`)._2
 
   def taskString = `type`
 }
@@ -38,4 +34,10 @@ object TaskType extends Enumeration {
 
 object TaskConfig extends HasDefault[TaskConfig] {
   override def getDefault: TaskConfig = TaskConfig()
+
+  val taskTypeList: Map[String, (String, TaskType.Value)] = Map(
+    "simulation" -> ("Simulation", TaskType.Simulation),
+    "synthesis" -> ("Synthesis", TaskType.Synthesis),
+    "implementation" -> ("Implementation", TaskType.Implement)
+  )
 }

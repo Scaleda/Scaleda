@@ -39,12 +39,12 @@ object Toolchain {
   /**
    * All valid toolchains are listed here, with their corresponding implementation class
    */
-  val toolchains: Map[String, (String, Executor => Toolchain)] = Map(
-    Vivado.internalID -> (Vivado.userFriendlyName, (executor: Executor) => new Vivado(executor)),
-    Quartus.internalID -> (Quartus.userFriendlyName, (executor: Executor) => new Quartus(executor)),
-    PDS.internalID -> (PDS.userFriendlyName, (executor: Executor) => new PDS(executor)),
-    Verilator.internalID -> (Verilator.userFriendlyName, (executor: Executor) => new Verilator(executor)),
-    IVerilog.internalID -> (IVerilog.userFriendlyName, (executor: Executor) => new IVerilog(executor)),
+  val toolchains: Map[String, (String, Executor => Toolchain, Set[TaskType.Value])] = Map(
+    Vivado.internalID -> (Vivado.userFriendlyName, (executor: Executor) => new Vivado(executor), Vivado.supportedTask),
+    Quartus.internalID -> (Quartus.userFriendlyName, (executor: Executor) => new Quartus(executor), Quartus.supportedTask),
+    PDS.internalID -> (PDS.userFriendlyName, (executor: Executor) => new PDS(executor), PDS.supportedTask),
+    Verilator.internalID -> (Verilator.userFriendlyName, (executor: Executor) => new Verilator(executor), Verilator.supportedTask),
+    IVerilog.internalID -> (IVerilog.userFriendlyName, (executor: Executor) => new IVerilog(executor), IVerilog.supportedTask),
   )
 
   def toolchainIds = toolchains.keys.toArray

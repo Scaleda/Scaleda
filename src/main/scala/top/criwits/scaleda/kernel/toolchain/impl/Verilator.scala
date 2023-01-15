@@ -3,6 +3,7 @@ package kernel.toolchain.impl
 
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 
+import top.criwits.scaleda.kernel.project.config.TaskType
 import top.criwits.scaleda.kernel.toolchain.{Toolchain, ToolchainProfile}
 import top.criwits.scaleda.kernel.toolchain.impl.Verilator.{internalID, userFriendlyName}
 
@@ -16,6 +17,11 @@ class Verilator(executor: Executor) extends Toolchain(executor) {
 object Verilator {
   val userFriendlyName: String = "Verilator"
   val internalID: String = "verilator"
+
+  val supportedTask: Set[TaskType.Value] = Set(
+    TaskType.Simulation
+  )
+
 }
 
 

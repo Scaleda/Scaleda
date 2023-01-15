@@ -20,5 +20,7 @@ class ScaledaReloadTasksAction extends AnAction(
 
     SaveAndSyncHandler.getInstance().refreshOpenFiles();
     VirtualFileManager.getInstance().refreshAndFindFileByNioPath(new File(ProjectConfig.configFile.get).toPath)
+
+    // TODO: Refresh tree panel!
   }
 }

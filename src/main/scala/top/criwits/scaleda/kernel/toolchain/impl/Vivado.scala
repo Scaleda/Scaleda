@@ -1,16 +1,12 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
 import kernel.toolchain.executor.Executor
-import kernel.toolchain.impl.Vivado.{
-  getVivadoExec,
-  internalID,
-  userFriendlyName
-}
+import kernel.toolchain.impl.Vivado.{getVivadoExec, internalID, userFriendlyName}
 import kernel.toolchain.{Toolchain, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
@@ -66,6 +62,12 @@ class Vivado(executor: Executor)
 object Vivado extends ToolchainProfileDetector {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String = "vivado"
+
+  val supportedTask: Set[TaskType.Value] = Set(
+    TaskType.Simulation,
+    TaskType.Synthesis,
+    TaskType.Implement
+  )
 
   def getVivadoExec(path: String): String = new File(
     new File(path),
