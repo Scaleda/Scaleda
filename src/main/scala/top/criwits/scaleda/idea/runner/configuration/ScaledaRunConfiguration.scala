@@ -2,11 +2,17 @@ package top.criwits.scaleda
 package idea.runner.configuration
 
 import idea.runner.ScaledaRunProcessHandler
-import idea.utils.{ConsoleLogger, MainLogger}
+import idea.utils.{ConsoleLogger, MainLogger, Notification}
+import idea.windows.tool.message.ScaledaMessageTab
 import kernel.project.config.ProjectConfig
 import kernel.shell.ScaledaRun
+import kernel.toolchain.Toolchain
 
-import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
+import com.intellij.execution.configurations.{
+  LocatableConfigurationBase,
+  RunConfiguration,
+  RunProfileState
+}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
@@ -17,7 +23,6 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
-import top.criwits.scaleda.idea.windows.tool.message.{ScaledaMessage, ScaledaMessageTab}
 
 import java.io.File
 import scala.collection.mutable
@@ -50,13 +55,16 @@ class ScaledaRunConfiguration(
     super.readExternal(element)
     val child = element.getChild(STORAGE_ID)
     if (child != null) {
-      ProjectConfig.getConfig().foreach(c => {
-        val t = child.getAttributeValue("taskName")
-        c.taskByName(t).foreach(f => {
-          targetName = f._1.name
-          taskName = f._2.name
+      ProjectConfig
+        .getConfig()
+        .foreach(c => {
+          val t = child.getAttributeValue("taskName")
+          c.taskByName(t)
+            .foreach(f => {
+              targetName = f._1.name
+              taskName = f._2.name
+            })
         })
-      })
     }
   }
 
@@ -74,39 +82,56 @@ class ScaledaRunConfiguration(
         c.taskByName(taskName)
           .map(f => {
             val (target, task) = f
-            val searchScope =
-              ExecutionSearchScopes
-                .executionScope(project, environment.getRunProfile)
-            val myConsoleBuilder =
-              TextConsoleBuilderFactory.getInstance
-                .createBuilder(project, searchScope)
-            val console = myConsoleBuilder.getConsole
+            if (
+              !Toolchain
+                .profiles()
+                .exists(_.toolchainType == target.toolchain)
+            ) {
+              Notification(project).error(
+                "Toolchain not found",
+                s"Cannot find toolchain ${target.toolchain}, check your profile list"
+              )
+              null
+            } else {
+              val searchScope =
+                ExecutionSearchScopes
+                  .executionScope(project, environment.getRunProfile)
+              val myConsoleBuilder =
+                TextConsoleBuilderFactory.getInstance
+                  .createBuilder(project, searchScope)
+              val console = myConsoleBuilder.getConsole
 
-            val handler =
-              new ScaledaRunProcessHandler(
-                new ConsoleLogger(console,
-                  logSourceId = Some(s"${ScaledaMessageTab.MESSAGE_ID}-${target.toolchain}")))
-            val state = new RunProfileState {
-              override def execute(
-                  executor: Executor,
-                  runner: ProgramRunner[_]
-              ) = {
-                new ExecutionResult {
-                  override def getExecutionConsole: ExecutionConsole = console
+              val handler =
+                new ScaledaRunProcessHandler(
+                  new ConsoleLogger(
+                    console,
+                    logSourceId = Some(
+                      s"${ScaledaMessageTab.MESSAGE_ID}-${target.toolchain}"
+                    )
+                  )
+                )
+              val state = new RunProfileState {
+                override def execute(
+                    executor: Executor,
+                    runner: ProgramRunner[_]
+                ) = {
+                  new ExecutionResult {
+                    override def getExecutionConsole: ExecutionConsole = console
 
-                  override def getActions: Array[AnAction] = Array()
+                    override def getActions: Array[AnAction] = Array()
 
-                  override def getProcessHandler: ProcessHandler = handler
+                    override def getProcessHandler: ProcessHandler = handler
+                  }
                 }
               }
+              ScaledaRun.runTaskBackground(
+                handler,
+                new File(ProjectConfig.projectBase.get),
+                target,
+                task
+              )
+              state
             }
-            ScaledaRun.runTaskBackground(
-              handler,
-              new File(ProjectConfig.projectBase.get),
-              target,
-              task
-            )
-            state
           })
       })
       .getOrElse({

@@ -18,12 +18,10 @@ import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor,
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
+    // copy kernel logs to main logger
     KernelLogger.append(MainLogger)
     // init jinjia
     Template.initJinja()
-
-    // val c = project.getService(classOf[ScaledaMainService])
-    // require(c != null)
 
     // check is having project config
     var searchedFile: Option[VirtualFile] = None
