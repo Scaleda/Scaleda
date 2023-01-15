@@ -62,12 +62,16 @@ class ScaledaMain extends StartupActivity {
     val t = new Thread(() => {
       val service = project.getService(classOf[ScaledaLoggingService])
       while (true) {
-        val r = LogLevel(Random.nextInt(LogLevel.Fatal.id) - LogLevel.Debug.id)
+        val r = LogLevel(Random.nextInt(LogLevel.Fatal.id - LogLevel.Debug.id) + LogLevel.Debug.id)
         val time = System.currentTimeMillis()
-        val text = r match {
-          case Lo
+        import LogLevel._
+        val levelText = r match {
+          case Debug => "DEBUG"
+          case Info => "INFO"
+          case Warn => "WARNING"
+          case _ => "ERROR"
         }
-        service.print("scaleda-message-vivado", "WARNING: [Test tag] test message", LogLevel.Warn)
+        service.print("scaleda-message-vivado", s"$levelText: [Test tag] test message $time", r)
         Thread.sleep(500)
       }
     })

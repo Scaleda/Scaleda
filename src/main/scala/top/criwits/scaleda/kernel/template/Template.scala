@@ -1,10 +1,11 @@
 package top.criwits.scaleda
 package kernel.template
 
-import kernel.utils.{JsonHelper, KernelLogger}
+import kernel.utils.KernelLogger
 
 import com.hubspot.jinjava.Jinjava
 import org.apache.commons.io.{FileUtils, IOUtils}
+import top.criwits.scaleda.kernel.utils.serialise.JSONHelper
 
 import java.io.{File, PrintWriter}
 import scala.jdk.javaapi.CollectionConverters

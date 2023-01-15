@@ -2,20 +2,29 @@ package top.criwits.scaleda
 package kernel.project.config
 
 import idea.utils.MainLogger
-import kernel.utils.{JsonHelper, KernelLogger, YAMLHelper}
+import kernel.utils.KernelLogger
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import top.criwits.scaleda.kernel.utils.serialise.{JSONHelper, YAMLHelper}
 
 import java.io.File
 
+/**
+ * Case class for project-level config, i.e. `scaleda.yml`
+ * @param name Project name
+ * @param `type` Project type, should be 'rtl'
+ * @param source Project source folder
+ * @param topModule Top module name, can be overriden by [[TargetConfig]] or [[TaskConfig]]
+ * @param targets List of [[TargetConfig]]
+ */
 @JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
     `type`: String = "rtl",
     source: String = "src/",
-    topModule: String = "",
-    targets: Array[TargetConfig]
+    topModule: Option[String] = None,
+    targets: Array[TargetConfig] = Array()
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))
@@ -58,7 +67,7 @@ object ProjectConfig {
     path match {
       case Some(p) =>
         val config = YAMLHelper(new File(p), classOf[ProjectConfig])
-        KernelLogger.debug(s"Loaded project config ${JsonHelper(config)}")
+        KernelLogger.debug(s"Loaded project config ${JSONHelper(config)}")
         // generate node relationship
         config.targets.foreach(target => {
           target.parentNode = Some(config)

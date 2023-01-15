@@ -6,16 +6,16 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
 
 abstract class ConfigNode() {
   @JsonIgnore
-  val topModule: String
+  val topModule: Option[String]
   @JsonIgnore
   var parentNode: Option[ConfigNode] = None
 
   @JsonIgnore
   def findTopModule: Option[String] = topModule match {
-    case "" | null => parentNode match {
+    case None => parentNode match {
       case Some(parent) => parent.findTopModule
       case None => None
     }
-    case str => Some(str)
+    case Some(str) => Some(str)
   }
 }

@@ -9,13 +9,11 @@ import javax.swing.{JComponent, JPanel}
 abstract class EditDialogWrapper[T](
     project: Project,
     title: String
-) extends DialogWrapper(project) with EditDialogProvider[T] {
+) extends DialogWrapper(project) {
   init()
   setTitle(title)
 
-  override def createCenterPanel(): JComponent = {
-    val panel = new JPanel
-    panel.add(getMainPanel)
-    panel
-  }
+  def createMainPanel: JPanel
+
+  override def createCenterPanel(): JComponent = createMainPanel
 }

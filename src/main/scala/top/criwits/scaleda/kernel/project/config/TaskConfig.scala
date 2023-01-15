@@ -5,25 +5,31 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import top.criwits.scaleda.kernel.utils.HasDefault
 
+/**
+ * Case class for config of task
+ * @param name Task name, shown in right panel & config menu
+ * @param `type` 'simulation', 'synthesis' or 'implementation'
+ * @param topModule Top module, if [[None]] then inherited
+ * @param preset Use built-in execution policy
+ * @param tcl Path to Tcl script
+ */
 @JsonInclude(Include.NON_EMPTY)
 case class TaskConfig(
     name: String = "",
     `type`: String = "",
-    topModule: String = "",
-    tcl: String = "",
-    preset: Boolean = false,
+    topModule: Option[String] = None,
+    preset: Boolean = true,
+    tcl: Option[String] = None,
 ) extends ConfigNode() {
-  @JsonIgnore
-  def getTaskType = `type` match {
+
+  def taskType = `type` match {
     case "simulation"     => TaskType.Simulation
     case "synthesis"      => TaskType.Synthesis
     case "implementation" => TaskType.Implement
-    case _                => ???
+    case _                => ??? // FIXME: A better way?
   }
 
-
-  @JsonIgnore
-  def getTypeString = `type`
+  def taskString = `type`
 }
 
 object TaskType extends Enumeration {

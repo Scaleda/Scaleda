@@ -11,6 +11,13 @@ import kernel.utils.KernelLogger
 import java.io.File
 
 object ScaledaRun {
+  /**
+   * Run a task
+   * @param handler A [[ScaledaRunHandler]] used to redirect output and error
+   * @param workingDir Working directory
+   * @param target A [[TargetConfig]]
+   * @param task A [[TaskConfig]]
+   */
   def runTask(
       handler: ScaledaRunHandler,
       workingDir: File,
@@ -18,7 +25,7 @@ object ScaledaRun {
       task: TaskConfig
   ) = {
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
-    ProjectConfig.getConfig().map(config => {
+
       val info = Toolchain.toolchains(target.toolchain)
       // find profile
       Toolchain
@@ -26,23 +33,23 @@ object ScaledaRun {
         .filter(p => p.toolchainType == target.toolchain)
         .foreach(profile => {
           // generate executor
-          val executor = task.getTaskType match {
+          val executor = task.taskType match {
             case TaskType.Simulation =>
               SimulationExecutor(
                 workingDir = new File(new File(workingDir, ".sim"), task.name),
-                topModule = config.topModule,
+                topModule = task.findTopModule.get, // FIXME
                 profile = profile
               )
             case TaskType.Synthesis =>
               SynthesisExecutor(
                 workingDir = new File(new File(workingDir, ".synth"), task.name),
-                topModule = config.topModule,
+                topModule = task.findTopModule.get,
                 profile = profile
               )
             case TaskType.Implement =>
               ImplementExecutor(
                 workingDir = new File(new File(workingDir, ".impl"), task.name),
-                topModule = config.topModule,
+                topModule = task.findTopModule.get,
                 profile = profile
               )
           }
@@ -56,10 +63,10 @@ object ScaledaRun {
                     taskConfig = task,
                   )
                   r.render()
-                  task.copy(tcl = task.getTaskType match {
+                  task.copy(tcl = Some(task.taskType match {
                     case TaskType.Implement => "run_impl.tcl"
                     case _ => "run_synth.tcl"
-                  })
+                  }))
                 case _ =>
                   KernelLogger.error(s"not supported preset: ${target.toolchain}")
                   task
@@ -69,7 +76,6 @@ object ScaledaRun {
           val commands = toolchain.commands(taskUse)
           CommandRunner.execute(commands, handler)
         })
-    }).getOrElse(throw new RuntimeException(s"Cannot load ProjectConfig when starting task ${task.name}"))
   }
 
   def runTaskBackground(

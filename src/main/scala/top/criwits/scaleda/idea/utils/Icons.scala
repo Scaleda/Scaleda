@@ -15,6 +15,7 @@ object Icons {
   final val mainWithNamePlain =
     IconLoader.getIcon("/icons/icon-with-name-plain", Icons.getClass)
   final val verilog = IconLoader.getIcon("/icons/verilog", Icons.getClass)
+  final val tcl = IconLoader.getIcon("/icons/tcl", Icons.getClass)
   final val toolWindow =
     IconLoader.getIcon("/icons/scaledaToolWindow", Icons.getClass)
   final val logVerbose =

@@ -22,16 +22,21 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
 
   override def getName: String = userFriendlyName
 
-  override def synthesise(task: TaskConfig) =
+  override def synthesise(task: TaskConfig) = {
+    if (task.tcl.isEmpty) KernelLogger.warn("did not specify tcl for vivado target, fallback to default")
     Seq(
-      CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source ${task.tcl}"),
+      CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source ${task.tcl.getOrElse("run_synth.tcl")}"),
         executor.workingDir.getAbsolutePath),
     )
+  }
 
-  override def implement(task: TaskConfig) = Seq(
-    CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source ${task.tcl}"),
-      executor.workingDir.getAbsolutePath),
-  )
+  override def implement(task: TaskConfig) = {
+    if (task.tcl.isEmpty) KernelLogger.warn("did not specify tcl for vivado target, fallback to default")
+    Seq(
+      CommandDeps(OS.shell(s"${getVivadoExec(executor.profile.path)} -mode batch -source ${task.tcl.getOrElse("run_impl.tcl")}"),
+        executor.workingDir.getAbsolutePath),
+    )
+  }
 }
 
 object Vivado {
@@ -87,15 +92,15 @@ object Vivado {
     val config = ProjectConfig.getConfig()
 
     override def context: Map[String, Any] = config.map(config => {
-      val top = taskConfig.findTopModule.get // TODO / FIXME: Exception
+      val top = taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
       val topFile = KernelFileUtils.getModuleFile(top).get // TODO / FIXME
       val sim = taskConfig.`type` == "simulation"
       val context = Vivado.TemplateContext(
         top = top,
         workDir = executor.workingDir.getAbsolutePath,
-        device = targetConfig.device,
-        `package` = targetConfig.`package`,
-        speed = targetConfig.speed,
+        device = targetConfig.options.get("device"), // FIXME
+        `package` = targetConfig.options.get("package"), // FIXME
+        speed = targetConfig.options.get("speed"), // FIXME
         sourceList = KernelFileUtils
           .getAllSourceFiles()
           .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)

@@ -1,34 +1,20 @@
 package top.criwits.scaleda
-package kernel.utils
+package kernel.utils.serialise
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 import java.io.{BufferedWriter, File, FileWriter}
 
-trait AbstractSerializeHelper {
-  def apply[T](file: File, clazz: Class[T]): T
-
-  def apply(value: Any): String
-
-  def apply(value: Any, file: File): Unit
-}
-
-object YAMLHelper extends AbstractSerializeHelper {
-  private val mapper = YAMLMapper.builder()
+object JSONHelper extends SerialiseHelper {
+  private val mapper = JsonMapper.builder()
     .addModule(DefaultScalaModule)
     .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     .build()
 
-  /**
-   * Convert YAML file into an object with given class type
-   *
-   * @param file  The YAML file
-   * @param clazz The target class type
-   * @tparam T The inherited class type (by providing `clazz` it is implicit)
-   * @return
-   */
+  def apply[T](string: String, clazz: Class[T]): T = mapper.readValue[T](string, clazz)
+
   def apply[T](file: File, clazz: Class[T]): T = mapper.readValue[T](file, clazz)
 
   def apply(value: Any): String = mapper.writeValueAsString(value)
