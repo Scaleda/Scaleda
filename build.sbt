@@ -73,4 +73,16 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   scalacOptions += "-Xasync",
   // https://mvnrepository.com/artifact/com.github.serceman/jnr-fuse
   libraryDependencies += "com.github.serceman" % "jnr-fuse" % "0.5.7",
+  assembly / assemblyMergeStrategy := {
+    case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
+    case PathList(ps@_*) if ps.last endsWith ".properties" => MergeStrategy.first
+    case PathList(ps@_*) if ps.last endsWith ".xml" => MergeStrategy.first
+    case PathList(ps@_*) if ps.last endsWith ".types" => MergeStrategy.first
+    case PathList(ps@_*) if ps.last endsWith ".class" => MergeStrategy.first
+    case "application.conf" => MergeStrategy.concat
+    case "unwanted.txt" => MergeStrategy.discard
+    case x =>
+      val oldStrategy = (assembly / assemblyMergeStrategy).value
+      oldStrategy(x)
+  }
 )
