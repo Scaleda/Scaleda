@@ -3,12 +3,12 @@ package kernel.shell
 
 import kernel.net.RemoteServer
 import kernel.project.config.ProjectConfig
+import kernel.template.Template
 import kernel.toolchain.Toolchain
+import kernel.utils.serialise.JSONHelper
 import kernel.utils.{KernelLogger, Paths}
 
 import scopt.OParser
-import top.criwits.scaleda.kernel.template.Template
-import top.criwits.scaleda.kernel.utils.serialise.JSONHelper
 
 import java.io.File
 
@@ -17,7 +17,7 @@ object ShellRunMode extends Enumeration {
 }
 
 case class ShellArgs(
-    target: String = "",
+    task: String = "",
     workingDir: File = new File("."),
     runMode: ShellRunMode.Value = ShellRunMode.None,
     serverHost: String = "",
@@ -86,12 +86,12 @@ object ScaledaShellMain {
           .text("Show loaded tasks")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
         cmd("run")
-          .text("Run target")
+          .text("Run task")
           .action((_, c) => c.copy(runMode = ShellRunMode.Run))
           .children(
-            opt[String]('t', "target")
-              .action((x, c) => c.copy(target = x))
-              .text(s"Available targets: ${ProjectConfig
+            opt[String]('t', "task")
+              .action((x, c) => c.copy(task = x))
+              .text(s"Available tasks: ${ProjectConfig
                 .getConfig()
                 .map(config => config.taskNames.mkString(", "))
                 .getOrElse("None")}")
@@ -102,7 +102,7 @@ object ScaledaShellMain {
                     .exists(c => c.taskNames.contains(name))
                 )
                   success
-                else failure(s"no target ${name} found!")
+                else failure(s"no task ${name} found!")
               )
           ),
         help("help").text("Prints this usage text")
@@ -126,7 +126,7 @@ object ScaledaShellMain {
             ProjectConfig
               .getConfig()
               .map(config =>
-                for (p <- config.targets.flatMap(_.tasks)) {
+                for (p <- config.tasks.flatMap(_.tasks)) {
                   KernelLogger.info(s"${JSONHelper(p)}")
                 }
               )
@@ -142,17 +142,17 @@ object ScaledaShellMain {
                 ProjectConfig
                   .getConfig()
                   .foreach(
-                    _.taskByName(shellConfig.target)
+                    _.taskByName(shellConfig.task)
                       .map(f => {
-                        val (target, task) = f
+                        val (task, task) = f
                         ScaledaRun.runTask(
                           ScaledaRunKernelHandler,
                           workingDir,
-                          target,
+                          task,
                           task
                         )
                       })
-                      .getOrElse(KernelLogger.error("no specific target!"))
+                      .getOrElse(KernelLogger.error("no specific task!"))
                   )
               })
               .getOrElse(KernelLogger.error("no config loaded!"))
