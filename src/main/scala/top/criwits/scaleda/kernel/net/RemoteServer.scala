@@ -11,6 +11,9 @@ import io.grpc.{Server, ServerBuilder}
 import scala.concurrent.ExecutionContext
 import scala.language.existentials
 
+/**
+ * Main gRPC server, will receiver commands from client and execute them
+ */
 object RemoteServer {
   def start(): Unit = {
     val server = new RemoteServer(ExecutionContext.global)

@@ -7,17 +7,22 @@ import com.google.protobuf.ByteString
 import io.grpc.ManagedChannelBuilder
 import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
-import ru.serce.jnrfuse.FuseFillDir
-import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo}
+import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
+import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Timespec}
 
 import java.nio.ByteBuffer
 import scala.language.existentials
 
+/**
+ * Fuse running on remote server,
+ * all operations will call scaleda client through gRPC
+ * @param host gRPC host to scaleda
+ * @param port gRPC port
+ */
 class ServerSideFuse(
-    sourcePath: String,
     host: String = "localhost",
     port: Int = FuseRpcServer.port
-) extends LocalFuse(sourcePath) {
+) extends FuseStubFS {
   val logger = LoggerFactory.getLogger(getClass)
   val builder = ManagedChannelBuilder.forAddress(host, port)
   builder.usePlaintext()
@@ -134,4 +139,6 @@ class ServerSideFuse(
 
   override def create(path: String, mode: Long, fi: FuseFileInfo): Int =
     stub.create(PathModeRequest(path = path, mode = mode.toInt)).r
+
+  override def utimens(path: String, timespec: Array[Timespec]): Int = 0
 }

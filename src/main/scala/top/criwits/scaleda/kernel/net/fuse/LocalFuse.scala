@@ -18,6 +18,10 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.sys.process._
 
+/**
+ * Map path to another path through Fuse
+ * @param sourcePath source data path
+ */
 class LocalFuse(sourcePath: String) extends FuseStubFS {
   private val logger = LoggerFactory.getLogger(getClass)
   require(!OS.isWindows)
