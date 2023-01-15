@@ -1,15 +1,11 @@
 package top.criwits.scaleda
 package kernel.net
 
-import kernel.net.remote.RunReplyType.{
-  RUN_REPLY_TYPE_RETURN,
-  RUN_REPLY_TYPE_STDERR,
-  RUN_REPLY_TYPE_STDOUT
-}
+import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
 import kernel.net.remote._
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
-import kernel.utils.KernelLogger
+import kernel.utils.{KernelLogger, OS}
 
 import io.grpc.stub.StreamObserver
 import io.grpc.{Server, ServerBuilder}
@@ -107,6 +103,14 @@ class RemoteServer(executionContext: ExecutionContext) {
             )
           )
       )
+    }
+
+    override def getRemoteInfo(request: Empty): Future[RemoteInfo] = async {
+      RemoteInfo(os = OS.getOSType match {
+        case OS.Windows => RemoteOsType.REMOTE_OS_TYPE_WINDOWS
+        case OS.MacOS => RemoteOsType.REMOTE_OS_TYPE_MACOS
+        case OS.Unix => RemoteOsType.REMOTE_OS_TYPE_LINUX
+      })
     }
   }
 }
