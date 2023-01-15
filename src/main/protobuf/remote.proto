@@ -4,7 +4,10 @@ package top.criwits.scaleda.kernel.net;
 
 service Remote {
   rpc Run(RunRequest) returns (stream RunReply) {}
+  rpc GetProfiles(Empty) returns (ProfilesReply) {}
 }
+
+message Empty {}
 
 message StringTriple {
   string a = 1;
@@ -27,4 +30,12 @@ message RunReply {
   RunReplyType reply_type = 1;
   string str_value = 2;
   int32 int_value = 3;
+}
+
+message ToolchainProfile {
+  string name = 1;
+  string toolchain_type = 2;
+}
+message ProfilesReply {
+  repeated ToolchainProfile profiles = 1;
 }

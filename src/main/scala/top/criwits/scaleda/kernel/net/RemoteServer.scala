@@ -6,14 +6,17 @@ import kernel.net.remote.RunReplyType.{
   RUN_REPLY_TYPE_STDERR,
   RUN_REPLY_TYPE_STDOUT
 }
-import kernel.net.remote.{RemoteGrpc, RunReply, RunRequest}
+import kernel.net.remote._
 import kernel.shell.command.{CommandDeps, CommandRunner}
+import kernel.toolchain.Toolchain
 import kernel.utils.KernelLogger
 
 import io.grpc.stub.StreamObserver
 import io.grpc.{Server, ServerBuilder}
 
-import scala.concurrent.ExecutionContext
+import scala.async.Async.async
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.existentials
 
 /** Main gRPC server, will receiver commands from client and execute them
@@ -90,6 +93,20 @@ class RemoteServer(executionContext: ExecutionContext) {
         )
       )
       responseObserver.onCompleted()
+    }
+
+    override def getProfiles(request: Empty): Future[ProfilesReply] = async {
+      ProfilesReply(
+        Toolchain
+          .profiles()
+          .toSeq
+          .map(p =>
+            ToolchainProfile(
+              name = p.profileName,
+              toolchainType = p.toolchainType
+            )
+          )
+      )
     }
   }
 }
