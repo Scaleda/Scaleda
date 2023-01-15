@@ -33,6 +33,8 @@ abstract class Toolchain(val executor: Executor) {
     case TaskType.Synthesis => synthesise(task)
     case TaskType.Implement => implement(task)
   }
+
+  def detectProfiles: Seq[ToolchainProfile] = Seq()
 }
 
 object Toolchain {
@@ -93,10 +95,13 @@ object Toolchain {
         YAMLHelper(profile, new File(defaultConfigDirectory + "/" + shortname + ".yml"))
     }
 
-
   def removeProfile(profile: ToolchainProfile): Boolean =
     profile.file match {
       case Some(f) => f.delete()
       case None => false
     }
+
+  def detectProfiles: Seq[Toolchain] = {
+
+  }
 }

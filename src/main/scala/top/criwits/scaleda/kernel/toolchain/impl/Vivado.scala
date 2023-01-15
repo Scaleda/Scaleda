@@ -8,7 +8,7 @@ import kernel.template.ResourceTemplateRender
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.impl.Vivado.{getVivadoExec, internalID, userFriendlyName}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
-import kernel.utils.{KernelFileUtils, KernelLogger, OS, Serialization}
+import kernel.utils.{KernelFileUtils, KernelLogger, OS, Paths, Serialization}
 
 import java.io.File
 
@@ -37,6 +37,12 @@ class Vivado(executor: Executor) extends Toolchain(executor) {
         executor.workingDir.getAbsolutePath),
     )
   }
+
+  override def detectProfiles = {
+    val vivadoPath = Paths.findExecutableOnPath("vivado")
+    Vivado.Ve
+    Seq(new ToolchainProfile())
+  }
 }
 
 object Vivado {
@@ -55,7 +61,12 @@ object Vivado {
       Some(Seq(CommandDeps(cmdLine)))
     }
 
-    override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
+    override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) =
+      Verifier.parseVersionInfo(returnValues, outputs)
+  }
+
+  object Verifier {
+    def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
       if (!returnValues.map(_ == 0).reduce(_ && _)) {
         (false, None)
       } else {

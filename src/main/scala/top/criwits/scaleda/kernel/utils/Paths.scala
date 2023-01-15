@@ -16,7 +16,7 @@ object Paths {
   def pwd = new File(System.getProperty("user.dir"))
 
   def findExecutableOnPath(name: String): Option[String] = {
-    for (dirname <- sys.env("PATH").split(File.pathSeparator)) {
+    for (dirname <- sys.env.getOrElse("PATH", "").split(File.pathSeparator)) {
       val file = new File(dirname, name)
       if (file.isFile && file.canExecute) return Some(file.getAbsolutePath)
     }

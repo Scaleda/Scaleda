@@ -108,7 +108,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
                 override def onStdout(data: String): Unit = outputStrings ++= Seq(s"$data")
                 override def onStderr(data: String): Unit = onStdout(data) // hum?
                 override def onReturn(returnValue: Int): Unit = returnValues ++= Seq(returnValue)
-              }, true) // ignore errors, for iverilog usage will return `1`
+              }, ignoreErrors = true) // ignore errors, for iverilog usage will return `1`
 
               val result = v.parseVersionInfo(returnValues, outputStrings)
 
