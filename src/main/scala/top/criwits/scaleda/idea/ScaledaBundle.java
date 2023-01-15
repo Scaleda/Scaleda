@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.function.Supplier;
 
 public final class ScaledaBundle extends DynamicBundle {
-    @NonNls private static final String BUNDLE = "bundles.ScaledaBundle";
+    @NonNls private static final String BUNDLE = "bundles.ScaledaBundle_zh";
     private static final ScaledaBundle INSTANCE = new ScaledaBundle();
 
     private ScaledaBundle() { super(BUNDLE); }
