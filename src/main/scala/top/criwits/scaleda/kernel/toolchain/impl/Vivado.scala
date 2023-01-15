@@ -161,7 +161,7 @@ object Vivado extends ToolchainProfileDetector {
   }
 
   override def detectProfiles = async {
-    Paths.findExecutableOnPath("/opt/Xilinx/Vivado/2019.2/bin/vivado") match {
+    Paths.findExecutableOnPath("vivado") match {
       case Some(vivadoPath) =>
         val vivadoFile = new File(vivadoPath)
         val commands = Seq(
