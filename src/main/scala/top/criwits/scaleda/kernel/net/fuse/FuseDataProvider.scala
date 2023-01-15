@@ -18,6 +18,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.sys.process._
 
+/**
+ * gRPC data provider for filesystem sync
+ * @param sourcePath source data path
+ */
 class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   val logger = LoggerFactory.getLogger(getClass)
 

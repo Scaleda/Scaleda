@@ -12,6 +12,13 @@ import scala.sys.process._
 
 object FuseUtils {
   val debug = false
+
+  /**
+   * Mount a filesystem, will retry if failed
+   * @param fs filesystem
+   * @param mountPoint mount point
+   * @param blocking will block current thread until umount
+   */
   def mountFs(
       fs: FuseStubFS,
       mountPoint: String,
