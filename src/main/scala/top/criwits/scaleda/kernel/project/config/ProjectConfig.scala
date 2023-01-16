@@ -1,7 +1,6 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import idea.utils.MainLogger
 import kernel.utils.KernelLogger
 
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -112,7 +111,7 @@ object ProjectConfig {
       .getConfig()
       .map(projectConfig => {
         if (!projectConfig.targets.exists(_.name == targetName)) {
-          MainLogger.error(
+          KernelLogger.error(
             s"Cannot apply task ${task.name}: no target named ${targetName}"
           )
           null
