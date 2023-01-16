@@ -100,6 +100,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
           .getInstance()
           .createExpandAllAction(treeExpander, tree)
         group.add(expandAll)
+        ScaledaRunWindowFactory.expandAll = Some(expandAll)
         // auto expand all after creation
         ActionManager.getInstance().tryToExecute(expandAll, null, null, null, false)
         group.add(
@@ -137,6 +138,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 object ScaledaRunWindowFactory {
   val WINDOW_ID = "scaleda"
   var model: Option[DefaultTreeModel] = None
+  var expandAll: Option[AnAction] = None
 
   def getRootNode: ScaledaRunRootNode = {
     ProjectConfig
