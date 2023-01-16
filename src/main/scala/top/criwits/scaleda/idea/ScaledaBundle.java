@@ -1,16 +1,13 @@
 package top.criwits.scaleda.idea;
 
-import com.intellij.DynamicBundle;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.PropertyKey;
+import top.criwits.scaleda.idea.i18n.DynamicScaledaBundle;
 
-import java.util.Locale;
-import java.util.function.Supplier;
-
-public final class ScaledaBundle extends DynamicBundle {
+public final class ScaledaBundle extends DynamicScaledaBundle {
     @NonNls private static final String BUNDLE = "bundles.ScaledaBundle";
-    // TODO: support i18n
-    // note that if we replace INSTANCE with BUNDLE_ZH on launch, shown language may change
-    @NonNls private static final String BUNDLE_ZH = "bundles.ScaledaBundle_zh";
     private static final ScaledaBundle INSTANCE = new ScaledaBundle();
 
     private ScaledaBundle() { super(BUNDLE); }
