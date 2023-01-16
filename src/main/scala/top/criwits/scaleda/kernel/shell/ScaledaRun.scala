@@ -1,84 +1,92 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
-import kernel.shell.command.{CommandDeps, CommandRunner}
-import kernel.toolchain.Toolchain
+import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
+import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor.{ImplementExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.impl.{IVerilog, Vivado}
+import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
 import java.io.File
 import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
-  /**
-   * Run a task
-   * @param handler A [[ScaledaRunHandler]] used to redirect output and error
-   * @param workingDir Working directory
-   * @param target A [[TargetConfig]]
-   * @param task A [[TaskConfig]]
-   */
+
+  /** Run a task
+    * @param handler A [[ScaledaRunHandler]] used to redirect output and error
+    * @param workingDir Working directory
+    * @param target A [[TargetConfig]]
+    * @param task A [[TaskConfig]]
+    * @param profile An optional [[ToolchainProfile]]
+    */
   def runTask(
       handler: ScaledaRunHandler,
       workingDir: File,
       target: TargetConfig,
-      task: TaskConfig
+      task: TaskConfig,
+      profile: Option[ToolchainProfile] = None,
+      remoteDeps: Option[RemoteCommandDeps] = None
   ) = {
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
 
-      val info = Toolchain.toolchains(target.toolchain)
-      // find profile
-      Toolchain
+    val info = Toolchain.toolchains(target.toolchain)
+    // find profile
+    var profileUse = profile
+    if (profileUse.isEmpty) {
+      profileUse = Toolchain
         .profiles()
-        .filter(p => p.toolchainType == target.toolchain)
-        .foreach(profile => {
-          // generate executor
-          val executor = task.taskType match {
-            case TaskType.Simulation =>
-              SimulationExecutor(
-                workingDir = new File(new File(workingDir, ".sim"), task.name),
-                topModule = task.findTopModule.get, // FIXME
-                profile = profile
-              )
-            case TaskType.Synthesis =>
-              SynthesisExecutor(
-                workingDir = new File(new File(workingDir, ".synth"), task.name),
-                topModule = task.findTopModule.get,
-                profile = profile
-              )
-            case TaskType.Implement =>
-              ImplementExecutor(
-                workingDir = new File(new File(workingDir, ".impl"), task.name),
-                topModule = task.findTopModule.get,
-                profile = profile
-              )
-          }
-          val taskUse =
-            if (task.preset) {
-              target.toolchain match {
-                case Vivado.internalID =>
-                  val r = new Vivado.TemplateRenderer(
-                    executor = executor,
-                    targetConfig = target,
-                    taskConfig = task,
-                  )
-                  r.render()
-                  task.copy(tcl = Some(task.taskType match {
-                    case TaskType.Implement => "run_impl.tcl"
-                    case _ => "run_synth.tcl"
-                  }))
-                case IVerilog.internalID =>
-                  task
-                case _ =>
-                  KernelLogger.error(s"not supported preset: ${target.toolchain}")
-                  task
-              }
-            } else task
-          val toolchain = info._2(executor)
-          val commands = toolchain.commands(taskUse)
-          CommandRunner.execute(commands, handler)
-        })
+        .find(p => p.toolchainType == target.toolchain)
+    }
+    profileUse
+      .map(profile => {
+        // generate executor
+        val executor = task.taskType match {
+          case TaskType.Simulation =>
+            SimulationExecutor(
+              workingDir = new File(new File(workingDir, ".sim"), task.name),
+              topModule = task.findTopModule.get, // FIXME
+              profile = profile
+            )
+          case TaskType.Synthesis =>
+            SynthesisExecutor(
+              workingDir = new File(new File(workingDir, ".synth"), task.name),
+              topModule = task.findTopModule.get,
+              profile = profile
+            )
+          case TaskType.Implement =>
+            ImplementExecutor(
+              workingDir = new File(new File(workingDir, ".impl"), task.name),
+              topModule = task.findTopModule.get,
+              profile = profile
+            )
+        }
+        val taskUse =
+          if (task.preset) {
+            target.toolchain match {
+              case Vivado.internalID =>
+                val r = new Vivado.TemplateRenderer(
+                  executor = executor,
+                  targetConfig = target,
+                  taskConfig = task
+                )
+                r.render()
+                task.copy(tcl = Some(task.taskType match {
+                  case TaskType.Implement => "run_impl.tcl"
+                  case _                  => "run_synth.tcl"
+                }))
+              case IVerilog.internalID =>
+                task
+              case _ =>
+                KernelLogger.error(s"not supported preset: ${target.toolchain}")
+                task
+            }
+          } else task
+        val toolchain = info._2(executor)
+        val commands = toolchain.commands(taskUse)
+        CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+      })
+      .getOrElse(KernelLogger.error("No profile found!"))
   }
 
   def runTaskBackground(
@@ -124,12 +132,16 @@ object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
     KernelLogger.info(s"command done, returns $returnValue")
 }
 
-class ScaledaRunHandlerToArray
-(returnValues: Option[ArrayBuffer[Int]], outputs: ArrayBuffer[String], errors: Option[ArrayBuffer[String]] = None)
-  extends ScaledaRunHandler {
+class ScaledaRunHandlerToArray(
+    returnValues: Option[ArrayBuffer[Int]],
+    outputs: ArrayBuffer[String],
+    errors: Option[ArrayBuffer[String]] = None
+) extends ScaledaRunHandler {
   override def onStdout(data: String): Unit = outputs.addOne(data)
 
-  override def onStderr(data: String): Unit = errors.map(_.addOne(data)).getOrElse(onStdout(data))
+  override def onStderr(data: String): Unit =
+    errors.map(_.addOne(data)).getOrElse(onStdout(data))
 
-  override def onReturn(returnValue: Int): Unit = returnValues.foreach(_.addOne(returnValue))
+  override def onReturn(returnValue: Int): Unit =
+    returnValues.foreach(_.addOne(returnValue))
 }

@@ -4,8 +4,9 @@ package kernel.shell
 import kernel.net.remote.Empty
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
+import kernel.shell.command.RemoteCommandDeps
 import kernel.template.Template
-import kernel.toolchain.Toolchain
+import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.serialise.JSONHelper
 import kernel.utils.{KernelLogger, Paths}
 
@@ -22,7 +23,8 @@ case class ShellArgs(
     workingDir: File = new File("."),
     runMode: ShellRunMode.Value = ShellRunMode.None,
     serverHost: String = "",
-    serverPort: Int = RemoteServer.port
+    serverPort: Int = RemoteServer.port,
+    profileName: Option[String] = None
 )
 
 object ScaledaShellMain {
@@ -111,7 +113,10 @@ object ScaledaShellMain {
                 )
                   success
                 else failure(s"no task ${name} found!")
-              )
+              ),
+            opt[String]('p', "profile")
+              .action((x, c) => c.copy(profileName = Some(x)))
+              .text("Specify profile name")
           ),
         help("help").text("Prints this usage text")
       )
@@ -119,6 +124,10 @@ object ScaledaShellMain {
     OParser
       .parse(shellParser, args, ShellArgs())
       .foreach(shellConfig => {
+        val stub =
+          if (shellConfig.serverHost.nonEmpty)
+            Some(RemoteClient(shellConfig.serverHost, shellConfig.serverPort))
+          else None
         val workingDir = shellConfig.workingDir
         val config = ProjectConfig.getConfig()
         KernelLogger.info(s"shell config: ${shellConfig}")
@@ -128,16 +137,14 @@ object ScaledaShellMain {
             for (p <- Toolchain.profiles()) {
               KernelLogger.info(s"${JSONHelper(p)}")
             }
-            if (shellConfig.serverHost.nonEmpty) {
-              val stub =
-                RemoteClient(shellConfig.serverHost, shellConfig.serverPort)
+            stub.foreach(stub => {
               val profiles = stub.getProfiles(Empty())
               if (profiles.profiles.nonEmpty) {
                 KernelLogger.info("remote profile list:")
                 for (p <- profiles.profiles)
                   KernelLogger.info(s"${JSONHelper(p)}")
               }
-            }
+            })
           }
           case ShellRunMode.ListTasks => {
             KernelLogger.info("task list:")
@@ -163,11 +170,40 @@ object ScaledaShellMain {
                     _.taskByName(shellConfig.task)
                       .map(f => {
                         val (target, task) = f
+                        val profile = shellConfig.profileName
+                          .flatMap(name => {
+                            // if remote host specified, use remote name
+                            stub
+                              .map(stub =>
+                                stub.getProfiles(Empty()).profiles.map(_.name)
+                              )
+                              .getOrElse(
+                                Toolchain.profiles().map(_.profileName).toSeq
+                              )
+                              .find(_ == name)
+                          })
+                          .map(name =>
+                            new ToolchainProfile(
+                              name,
+                              "vivado",
+                              "/opt/Xilinx/Vivado/2019.2"
+                            )
+                          )
                         ScaledaRun.runTask(
                           ScaledaRunKernelHandler,
                           workingDir,
                           target,
-                          task
+                          task,
+                          profile = profile,
+                          remoteDeps =
+                            if (stub.isEmpty)
+                              Some(
+                                RemoteCommandDeps(
+                                  host = shellConfig.serverHost,
+                                  port = shellConfig.serverPort
+                                )
+                              )
+                            else None
                         )
                       })
                       .getOrElse(KernelLogger.error("no specific task!"))

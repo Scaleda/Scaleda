@@ -34,6 +34,10 @@ class ToolchainProfile(var profileName: String,
     this(profileName, toolchainType, "", "", "", "")
   }
 
+  def this(profileName: String, toolchainType: String, path: String) = {
+    this(profileName, toolchainType, path, "", "", "")
+  }
+
   /**
    * Verify current toolchain status
    * @return

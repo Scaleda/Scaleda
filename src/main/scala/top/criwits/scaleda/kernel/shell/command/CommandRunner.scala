@@ -105,7 +105,7 @@ object CommandRunner {
       remoteCommandDeps: Option[RemoteCommandDeps],
       commands: Seq[CommandDeps],
       handler: ScaledaRunHandler,
-      ignoreErrors: Boolean
+      ignoreErrors: Boolean = false
   ): Unit = {
     var meetErrors = false
     commands.foreach(command => {
