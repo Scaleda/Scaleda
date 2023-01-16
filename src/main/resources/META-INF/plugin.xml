@@ -12,6 +12,8 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
 
+    <resource-bundle>bundles.ScaledaBundle</resource-bundle>
+
     <!-- Actions -->
     <actions>
         <action id="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction"
