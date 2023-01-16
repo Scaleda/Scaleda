@@ -4,7 +4,7 @@ package kernel.shell
 import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor.{ImplementExecutor, SimulationExecutor, SynthesisExecutor}
-import kernel.toolchain.impl.Vivado
+import kernel.toolchain.impl.{IVerilog, Vivado}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
@@ -75,6 +75,8 @@ object ScaledaRun {
                   case TaskType.Implement => "run_impl.tcl"
                   case _                  => "run_synth.tcl"
                 }))
+              case IVerilog.internalID =>
+                task
               case _ =>
                 KernelLogger.error(s"not supported preset: ${target.toolchain}")
                 task

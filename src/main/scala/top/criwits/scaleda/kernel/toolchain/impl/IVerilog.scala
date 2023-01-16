@@ -22,10 +22,10 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     // TODO: ADD $DUMPVCD
     // TODO: iverilog output file
     // val outputFile = "simulation"
-    val outputFile = s"\"${task.topModule}\""
+    val outputFile = s"\"${task.topModule.get}\""
     val sources = KernelFileUtils.getAllSourceFiles()
     Seq(
-      CommandDeps(OS.shell(s"${executor.profile.iverilogPath} ${sources.map(_.getAbsolutePath).mkString(" ")} -o $outputFile"),
+      CommandDeps(OS.shell(s"${executor.profile.iverilogPath} -o $outputFile ${sources.map(_.getAbsolutePath).mkString(" ")}"),
         executor.workingDir.getAbsolutePath),
       CommandDeps(OS.shell(s"${executor.profile.vvpPath} $outputFile"), executor.workingDir.getAbsolutePath),
     )
