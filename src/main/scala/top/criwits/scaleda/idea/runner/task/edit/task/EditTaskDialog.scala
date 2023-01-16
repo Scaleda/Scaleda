@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.runner.task.edit.task
 
-import idea.runner.task.edit.EditDialogProvider
+import idea.runner.task.edit.EditDialog
 import kernel.project.config.{TargetConfig, TaskConfig}
 
 import com.intellij.ui.DocumentAdapter
@@ -16,7 +16,7 @@ import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent}
 
 class EditTaskDialog(target: TargetConfig, config: Option[TaskConfig], parent: EditTaskDialogWrapper)
     extends JPanel
-    with EditDialogProvider[TaskConfig] {
+    with EditDialog[TaskConfig] {
 
   private val toolchainType = target.toolchain
   private val toolchain = Toolchain.toolchains(toolchainType) // FIXME: null?
