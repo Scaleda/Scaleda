@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.runner.task.edit.target
 
-import idea.runner.task.edit.{EditDialogProvider, EditTargetDialogWrapper}
+import idea.runner.task.edit.{EditDialog, EditTargetDialogWrapper}
 import idea.runner.task.edit.target.toolchain.{EmptyConfigPanel, ExtraConfigPanel, VivadoConfigPanel}
 import kernel.project.config.{ProjectConfig, TargetConfig}
 import kernel.toolchain.Toolchain
@@ -18,7 +18,7 @@ import java.awt.event.{ItemEvent, ItemListener}
 import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 
-class EditTargetDialog(config: Option[TargetConfig], parent: EditTargetDialogWrapper) extends JPanel with EditDialogProvider[TargetConfig] {
+class EditTargetDialog(config: Option[TargetConfig], parent: EditTargetDialogWrapper) extends JPanel with EditDialog[TargetConfig] {
 
   // use border layout
   setLayout(new BorderLayout())

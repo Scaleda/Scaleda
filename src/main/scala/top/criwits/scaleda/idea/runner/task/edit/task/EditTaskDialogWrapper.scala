@@ -35,7 +35,7 @@ class EditTaskDialogWrapper(target: TargetConfig, project: Project, config: Opti
   }
 
   override def doOKAction() = {
-    val task = inner.getData
+   val task = inner.getData
     checkData(targetName, task) match {
       case None => {
         ProjectConfig.insertOrReplaceTask(targetName, task) // FIXME!!!!!!
