@@ -6,6 +6,7 @@ import com.intellij.ide.SaveAndSyncHandler
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.vfs.VirtualFileManager
 import top.criwits.scaleda.idea.ScaledaBundle
+import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory
 import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
 import java.io.File
@@ -21,6 +22,10 @@ class ScaledaReloadTasksAction extends AnAction(
     SaveAndSyncHandler.getInstance().refreshOpenFiles();
     VirtualFileManager.getInstance().refreshAndFindFileByNioPath(new File(ProjectConfig.configFile.get).toPath)
 
-    // TODO: Refresh tree panel!
+    // Refresh tree panel
+    ScaledaRunWindowFactory.model.foreach(m => {
+      m.setRoot(ScaledaRunWindowFactory.getRootNode)
+      m.reload()
+    })
   }
 }

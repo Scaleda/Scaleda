@@ -34,7 +34,8 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
     DumbService
       .getInstance(project)
       .runWhenSmart(() => {
-        val model = new DefaultTreeModel(options.getRootNode)
+        val model = new DefaultTreeModel(ScaledaRunWindowFactory.getRootNode)
+        ScaledaRunWindowFactory.model = Some(model)
         val panel = new SimpleToolWindowPanel(true)
         val tree = new Tree(model) with DataProvider {
           override def getData(dataId: String): AnyRef = {
@@ -135,4 +136,16 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
 object ScaledaRunWindowFactory {
   val WINDOW_ID = "scaleda"
+  var model: Option[DefaultTreeModel] = None
+
+  def getRootNode: ScaledaRunRootNode = {
+    ProjectConfig
+      .getConfig()
+      .map(c => {
+        new ScaledaRunRootNode(
+          c.targets.map(t => new ScaledaRunTargetNode(t)).toList
+        )
+      })
+      .getOrElse(new ScaledaRunRootNode(Seq()))
+  }
 }
