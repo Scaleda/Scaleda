@@ -95,11 +95,12 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         group.addSeparator()
 
         val treeExpander = new DefaultTreeExpander(tree)
-        group.add(
-          CommonActionsManager
-            .getInstance()
-            .createExpandAllAction(treeExpander, tree)
-        )
+        val expandAll = CommonActionsManager
+          .getInstance()
+          .createExpandAllAction(treeExpander, tree)
+        group.add(expandAll)
+        // auto expand all after creation
+        ActionManager.getInstance().tryToExecute(expandAll, null, null, null, false)
         group.add(
           CommonActionsManager
             .getInstance()
