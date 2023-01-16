@@ -90,11 +90,14 @@ object CommandRunner {
 
   private def flushStream(
       stream: LinkedBlockingQueue[String],
-      handler: String => Unit
+      handler: String => Unit,
+      extraOutput: Boolean = false
   ): Unit = {
     try {
       while (stream.size() > 0) {
-        handler(stream.take())
+        val v = stream.take()
+        handler(v)
+        if (extraOutput) KernelLogger.debug("[local executor]", v)
       }
     } catch {
       case _: InterruptedException => {}
@@ -112,13 +115,14 @@ object CommandRunner {
       if (!ignoreErrors && meetErrors) return
       KernelLogger.info(s"running command: ${command.command}")
       handler.onShellCommand(command)
+      val isRemote = remoteCommandDeps.nonEmpty
       val runner = remoteCommandDeps
         .map(r => new RemoteCommandRunner(command, r))
         .getOrElse(new CommandRunner(command))
       val r = runner.run
       do {
-        flushStream(r.stdOut, handler.onStdout)
-        flushStream(r.stdErr, handler.onStderr)
+        flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
+        flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
         Thread.sleep(delay)
       } while (!r.returnValue.isCompleted && !handler.isTerminating)
       if (handler.isTerminating) {
@@ -127,8 +131,10 @@ object CommandRunner {
         while (!r.returnValue.isCompleted) Thread.sleep(delay)
       }
       // To ensure output & error are got for the last time
-      r.stdOut.forEach(s => handler.onStdout(s))
-      r.stdErr.forEach(s => handler.onStderr(s))
+      // r.stdOut.forEach(s => handler.onStdout(s))
+      // r.stdErr.forEach(s => handler.onStderr(s))
+      flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
+      flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
       val returnValue = r.returnValue.value.get.get
       handler.onReturn(returnValue)
       if (returnValue != handler.expectedReturnValue) meetErrors = true

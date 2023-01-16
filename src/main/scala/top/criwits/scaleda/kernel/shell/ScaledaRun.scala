@@ -130,6 +130,15 @@ object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
     KernelLogger.info(s"command done, returns $returnValue")
 }
 
+object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
+  override def onStdout(data: String): Unit = KernelLogger.info("[remote]", data)
+
+  override def onStderr(data: String): Unit = KernelLogger.error("[remote]", data)
+
+  override def onReturn(returnValue: Int): Unit =
+    KernelLogger.info("[remote]", s"command done, returns $returnValue")
+}
+
 class ScaledaRunHandlerToArray(
     returnValues: Option[ArrayBuffer[Int]],
     outputs: ArrayBuffer[String],

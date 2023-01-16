@@ -190,13 +190,14 @@ object ScaledaShellMain {
                             )
                           )
                         ScaledaRun.runTask(
-                          ScaledaRunKernelHandler,
+                          if (stub.nonEmpty) ScaledaRunKernelRemoteHandler
+                          else ScaledaRunKernelHandler,
                           workingDir,
                           target,
                           task,
                           profile = profile,
                           remoteDeps =
-                            if (stub.isEmpty)
+                            if (stub.nonEmpty)
                               Some(
                                 RemoteCommandDeps(
                                   host = shellConfig.serverHost,

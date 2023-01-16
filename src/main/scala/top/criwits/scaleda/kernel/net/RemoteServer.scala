@@ -9,6 +9,7 @@ import kernel.utils.{KernelLogger, OS}
 
 import io.grpc.stub.StreamObserver
 import io.grpc.{Server, ServerBuilder}
+import top.criwits.scaleda.kernel.shell.ScaledaRunHandler
 
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -58,36 +59,34 @@ class RemoteServer(executionContext: ExecutionContext) {
         request: RunRequest,
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
-      val runner = new CommandRunner(
-        CommandDeps(
-          request.command,
-          request.path,
-          request.envs.map(t => (t.a, t.b))
-        )
-      )
-      val r = runner.run
-      while (!r.returnValue.isCompleted) {
-        r.stdOut.forEach(s => {
-          KernelLogger.info(s)
+      CommandRunner.execute(Seq(CommandDeps(
+        request.command,
+        request.path,
+        request.envs.map(t => (t.a, t.b))
+      )), new ScaledaRunHandler {
+        override def onStdout(data: String) = {
+          KernelLogger.info("[remote executor stdout]", data)
           responseObserver.onNext(
-            new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = s)
+            new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = data)
           )
-        })
-        r.stdErr.forEach(s => {
-          KernelLogger.error(s)
+        }
+
+        override def onStderr(data: String) = {
+          KernelLogger.warn("[remote executor stderr]", data)
           responseObserver.onNext(
-            new RunReply(RUN_REPLY_TYPE_STDERR, strValue = s)
+            new RunReply(RUN_REPLY_TYPE_STDERR, strValue = data)
           )
-        })
-        Thread.sleep(300)
-      }
-      KernelLogger.info(s"return value: ${r.returnValue.value.get}")
-      responseObserver.onNext(
-        new RunReply(
-          RUN_REPLY_TYPE_RETURN,
-          intValue = r.returnValue.value.get.get
-        )
-      )
+        }
+
+        override def onReturn(returnValue: Int) = {
+          responseObserver.onNext(
+            new RunReply(
+              RUN_REPLY_TYPE_RETURN,
+              intValue = returnValue
+            )
+          )
+        }
+      })
       responseObserver.onCompleted()
     }
 
