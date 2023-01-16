@@ -55,6 +55,7 @@ class ScaledaMain extends StartupActivity {
       // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
       val toolWindow = toolWindowManager.registerToolWindow(builder.build())
     })
+    toolWindowManager.getToolWindow(ScaledaRunWindowFactory.WINDOW_ID).getContentManager
 
     MainLogger.info("Scaleda launched.")
 

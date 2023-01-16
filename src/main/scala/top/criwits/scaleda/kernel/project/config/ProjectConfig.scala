@@ -2,21 +2,20 @@ package top.criwits.scaleda
 package kernel.project.config
 
 import kernel.utils.KernelLogger
+import kernel.utils.serialise.{JSONHelper, YAMLHelper}
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import top.criwits.scaleda.kernel.utils.serialise.{JSONHelper, YAMLHelper}
 
 import java.io.File
 
-/**
- * Case class for project-level config, i.e. `scaleda.yml`
- * @param name Project name
- * @param `type` Project type, should be 'rtl'
- * @param source Project source folder
- * @param topModule Top module name, can be overriden by [[TargetConfig]] or [[TaskConfig]]
- * @param targets List of [[TargetConfig]]
- */
+/** Case class for project-level config, i.e. `scaleda.yml`
+  * @param name Project name
+  * @param `type` Project type, should be 'rtl'
+  * @param source Project source folder
+  * @param topModule Top module name, can be overriden by [[TargetConfig]] or [[TaskConfig]]
+  * @param targets List of [[TargetConfig]]
+  */
 @JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
@@ -118,12 +117,21 @@ object ProjectConfig {
         } else {
           val target = projectConfig.targets.find(_.name == targetName).get
           val r = if (target.tasks.exists(_.name == task.name)) {
+            // replace exist task in target and replace target in config
             val newTasks = target.tasks.filter(_.name != task.name) :+ task
             val newTarget = target.copy(tasks = newTasks)
-            projectConfig.copy(targets = projectConfig.targets :+ newTarget)
+            projectConfig.copy(targets =
+              projectConfig.targets.map(t =>
+                if (t.name == newTarget.name) newTarget else t
+              )
+            )
           } else {
-            val targets =
-              projectConfig.targets :+ target.copy(tasks = target.tasks :+ task)
+            // append task to target, and replace target in config
+            val targets = projectConfig.targets.map(t =>
+              if (t.name == target.name)
+                target.copy(tasks = target.tasks :+ task)
+              else t
+            )
             projectConfig.copy(targets = targets)
           }
           saveConfig(r)
