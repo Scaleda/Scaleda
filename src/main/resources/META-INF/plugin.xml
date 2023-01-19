@@ -85,6 +85,13 @@
 
     </extensions>
 
+    <!-- Module, Project and SDK -->
+    <extensions defaultExtensionNs="com.intellij">
+<!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
+        <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType" />
+        <newProjectWizard.language implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+    </extensions>
+
     <!-- Windows / Panels -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Scaleda"

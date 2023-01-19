@@ -14,6 +14,7 @@ object Icons {
     IconLoader.getIcon("/icons/icon-with-name", Icons.getClass)
   final val mainWithNamePlain =
     IconLoader.getIcon("/icons/icon-with-name-plain", Icons.getClass)
+  final val folder = IconLoader.getIcon("/icons/icon-over-folder", Icons.getClass)
   final val verilog = IconLoader.getIcon("/icons/verilog", Icons.getClass)
   final val tcl = IconLoader.getIcon("/icons/tcl", Icons.getClass)
   final val toolWindow =

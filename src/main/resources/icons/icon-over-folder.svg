@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file. -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg4"
+   xml:space="preserve"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs8" /><path
+     fill="#9AA7B0"
+     fill-opacity=".8"
+     fill-rule="evenodd"
+     d="M1,13 L15,13 L15,4 L7.98457,4 L6.69633,2.71149 C6.22161957,2.28559443 5.61570121,2.03457993 4.97888,2 L1.05128,2 C1.02295884,2 1,2.02295884 1,2.05128 L1,13 Z"
+     id="path2" /><path
+     style="fill:#898651;fill-opacity:1;stroke:none;stroke-width:1.68793;stroke-opacity:1"
+     d="M 7.4530586,7.9976163 V 8.9707796 H 6.5157167 V 9.591693 h 0.9373419 v 2.806051 H 6.5157167 v 0.620913 h 0.9373419 v 0.973162 h 3.5374154 a 3.2625035,2.9971816 0 0 0 0.003,0 3.2625035,2.9971816 0 0 0 2.823962,-1.498552 3.2625035,2.9971816 0 0 0 0.376131,-0.937339 h 1.167198 v -1.298544 h -1.206 A 3.2625035,2.9971816 0 0 0 13.817428,9.4961678 3.2625035,2.9971816 0 0 0 10.993464,7.9976163 h -0.003 z"
+     id="path371" /></svg>
