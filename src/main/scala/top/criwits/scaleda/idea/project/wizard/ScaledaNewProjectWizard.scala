@@ -4,11 +4,7 @@ package idea.project.wizard
 import idea.project.wizard.ScaledaNewProjectWizard.ScaledaLanguageText
 
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.ide.wizard.{
-  LanguageNewProjectWizard,
-  NewProjectWizardLanguageStep,
-  NewProjectWizardStep
-}
+import com.intellij.ide.wizard.{LanguageNewProjectWizard, NewProjectWizardLanguageStep, NewProjectWizardStep}
 
 /** Project wizard for new Scaleda project
   *

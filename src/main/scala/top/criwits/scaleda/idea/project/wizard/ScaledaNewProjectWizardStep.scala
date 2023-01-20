@@ -1,24 +1,41 @@
 package top.criwits.scaleda
 package idea.project.wizard
 
-import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardLanguageStep}
-import com.intellij.openapi.project.Project
-import com.intellij.ui.dsl.builder.Panel
-import top.criwits.scaleda.idea.project.ScaledaModuleBuilder
+import idea.project.ScaledaModuleBuilder
 
-/**
- * Class for project wizard step, or call it configuration?
- * @param parent NewProjectWizardLanguageStep
- */
+import com.intellij.ide.fileTemplates.FileTemplateManager
+import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardLanguageStep}
+import com.intellij.openapi.observable.properties.GraphProperty
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VfsUtil
+import kotlin.Unit.{INSTANCE => KUnit}
+import top.criwits.scaleda.idea.utils.{MainLogger, inWriteAction}
+
+import scala.jdk.CollectionConverters.MapHasAsJava
+
+/** Class for project wizard step, or call it configuration?
+  * @param parent NewProjectWizardLanguageStep
+  */
 class ScaledaNewProjectWizardStep(private val parent: NewProjectWizardLanguageStep)
-  extends AbstractNewProjectWizardStep(parent) {
+    extends AbstractNewProjectWizardStep(parent) {
+  // basic info
+  private val moduleNameProperty: GraphProperty[String] = getPropertyGraph.lazyProperty(() => parent.getName)
+  private def moduleName: String = moduleNameProperty.get()
+  private val projectRoot = getContext.getProjectDirectory.toAbsolutePath
+
+  // detect when Scaleda is selected
+  parent.getPropertyGraph.afterPropagation({() =>
+    if (parent.getLanguage == ScaledaNewProjectWizard.ScaledaLanguageText) {
+      // do something for preparation, if need!
+      // TODO
+    }
+    KUnit
+  })
 
   override def setupProject(project: Project): Unit = {
     val builder = new ScaledaModuleBuilder
-    builder.setName(parent.getName)
-    builder.setContentEntryPath(s"${parent.getPath}/${parent.getName}")
+    builder.setName(moduleName)
+    builder.setContentEntryPath(s"${projectRoot.toString}/$moduleName")
     builder.commit(project)
-
-    // TODO: Add something?
   }
 }

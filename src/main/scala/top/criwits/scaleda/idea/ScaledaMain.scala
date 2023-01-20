@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea
 
 import idea.settings.toolchains.ProfileDetectAction
-import idea.utils.{Icons, MainLogger}
+import idea.utils.{Icons, MainLogger, inReadAction}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
@@ -18,6 +18,7 @@ import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor,
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
+    MainLogger.warn("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
     // copy kernel logs to main logger
     KernelLogger.append(MainLogger)
     // init jinjia
@@ -25,23 +26,26 @@ class ScaledaMain extends StartupActivity {
 
     // check is having project config
     var searchedFile: Option[VirtualFile] = None
-    ProjectFileIndex
-      .getInstance(project)
-      .iterateContent(fileOrDir => {
-        if (
-          !fileOrDir.isDirectory && fileOrDir.getName == ProjectConfig.defaultConfigFile
-        ) {
-          searchedFile = Some(fileOrDir)
-        }
-        true
-      })
+    inReadAction {
+      ProjectFileIndex
+        .getInstance(project)
+        .iterateContent(fileOrDir => {
+          if (
+            !fileOrDir.isDirectory && fileOrDir.getName == ProjectConfig.defaultConfigFile
+          ) {
+            searchedFile = Some(fileOrDir)
+          }
+          true
+        })
+    }
+
     if (searchedFile.isEmpty) {
-      MainLogger.warn("there's no project config")
+      MainLogger.warn("No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project")
     } else {
       val f = searchedFile.get
       ProjectConfig.configFile = Some(f.getPath)
       ProjectConfig.projectBase = Some(f.getParent.getPath)
-      MainLogger.info(s"found config: $f")
+      MainLogger.info(s"Scaleda config file $f detected")
     }
 
     // setup tool window
@@ -55,8 +59,6 @@ class ScaledaMain extends StartupActivity {
       // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
       val toolWindow = toolWindowManager.registerToolWindow(builder.build())
     })
-
-    MainLogger.info("Scaleda launched.")
 
     // if no profiles loaded, detect all profiles and popup message
     if (Toolchain.profiles().isEmpty) {

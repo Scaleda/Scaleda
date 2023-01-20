@@ -1,0 +1,4 @@
+---
+name: ${PROJECT_NAME}
+type: ${PROJECT_TYPE}
+source: ${PROJECT_SOURCE_ROOT}

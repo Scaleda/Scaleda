@@ -16,7 +16,7 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
       c.headTask.foreach(t => configuration.taskName = t.name)
       true
     }).getOrElse({
-      MainLogger.warn("cannot load config when setting up configurations")
+      MainLogger.debug("cannot load config when setting up configurations")
       false
     })
   }
