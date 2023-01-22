@@ -64,7 +64,7 @@ public class IVerilogConfigPanel extends AbstractConfigPanel {
         mainPanel.setBorder(JBUI.Borders.empty(6));
 
         statusLabel.setIcon(AnimatedIcon.Default.INSTANCE);
-        statusLabel.append(ScaledaBundle.message("settings.waiting_for_verification"));
+        statusLabel.append(ScaledaBundle.message("settings.toolchains.waiting_for_verification"));
     }
 
     @Override
@@ -111,18 +111,18 @@ public class IVerilogConfigPanel extends AbstractConfigPanel {
         profileNameField = new JTextField();
         optionPanel.add(profileNameField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label1 = new JLabel();
-        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.iverilog_path"));
+        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.toolchains.iverilog_path"));
         optionPanel.add(label1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
-        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.profile_name"));
+        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.toolchains.profile_name"));
         optionPanel.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         statusLabel = new SimpleColoredComponent();
         optionPanel.add(statusLabel, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JLabel label3 = new JLabel();
-        this.$$$loadLabelText$$$(label3, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.iverilog_vpi_path"));
+        this.$$$loadLabelText$$$(label3, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.toolchains.iverilog_vpi_path"));
         optionPanel.add(label3, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label4 = new JLabel();
-        this.$$$loadLabelText$$$(label4, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.vvp_path"));
+        this.$$$loadLabelText$$$(label4, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.toolchains.vvp_path"));
         optionPanel.add(label4, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         iverilogVPIPathField = new TextFieldWithBrowseButton();
         optionPanel.add(iverilogVPIPathField, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));

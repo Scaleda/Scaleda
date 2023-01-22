@@ -45,7 +45,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
 
   // Right side, default panel is empty with 'No toolchain configured'
   val emptyPanel: JBPanelWithEmptyText = new JBPanelWithEmptyText()
-    .withEmptyText(ScaledaBundle.message("settings.no_tool_chain"))
+    .withEmptyText(ScaledaBundle.message("settings.toolchains.no_profile"))
     .withBorder(JBUI.Borders.emptyLeft(6))
   splitter.setSecondComponent(emptyPanel)
 
@@ -89,7 +89,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
         }
       }
 
-      updateStatusLabel(AnimatedIcon.Default.INSTANCE, ScaledaBundle.message("settings.verifying"))
+      updateStatusLabel(AnimatedIcon.Default.INSTANCE, ScaledaBundle.message("settings.toolchains.verifying"))
 
       val verifier = profile.getVerifier
       verifier match {

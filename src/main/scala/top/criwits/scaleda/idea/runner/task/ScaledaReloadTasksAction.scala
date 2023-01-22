@@ -7,12 +7,8 @@ import kernel.project.config.ProjectConfig
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.SaveAndSyncHandler
-import com.intellij.openapi.actionSystem.{
-  ActionManager,
-  AnAction,
-  AnActionEvent
-}
-import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent}
+import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFileManager}
 
 import java.io.File
 
@@ -23,14 +19,12 @@ class ScaledaReloadTasksAction
       AllIcons.Actions.Refresh
     ) {
   override def actionPerformed(e: AnActionEvent): Unit = {
-    // TODO: seems buggy
-
-    SaveAndSyncHandler.getInstance().refreshOpenFiles();
-    VirtualFileManager
+    LocalFileSystem
       .getInstance()
-      .refreshAndFindFileByNioPath(
-        new File(ProjectConfig.configFile.get).toPath
+      .refreshAndFindFileByIoFile(
+        new File(ProjectConfig.configFile.get)
       )
+    SaveAndSyncHandler.getInstance().refreshOpenFiles();
 
     // Refresh tree panel
     ScaledaRunWindowFactory.model.foreach(m => {

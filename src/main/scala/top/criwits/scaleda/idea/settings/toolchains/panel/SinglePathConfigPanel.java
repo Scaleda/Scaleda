@@ -1,6 +1,5 @@
 package top.criwits.scaleda.idea.settings.toolchains.panel;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -59,7 +58,7 @@ public class SinglePathConfigPanel extends AbstractConfigPanel {
         mainPanel.setBorder(JBUI.Borders.empty(6));
 
         statusLabel.setIcon(AnimatedIcon.Default.INSTANCE);
-        statusLabel.append(ScaledaBundle.message("settings.waiting_for_verification"));
+        statusLabel.append(ScaledaBundle.message("settings.toolchains.waiting_for_verification"));
     }
 
     @Override
@@ -99,10 +98,10 @@ public class SinglePathConfigPanel extends AbstractConfigPanel {
         profileNameField = new JTextField();
         optionPanel.add(profileNameField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label1 = new JLabel();
-        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.toolchain_path"));
+        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.toolchains.path"));
         optionPanel.add(label1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
-        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.profile_name"));
+        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "settings.toolchains.profile_name"));
         optionPanel.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         statusLabel = new SimpleColoredComponent();
         optionPanel.add(statusLabel, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
