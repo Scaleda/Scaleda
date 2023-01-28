@@ -25,6 +25,9 @@
     <applicationListeners>
     </applicationListeners>
 
+    <extensionPoints>
+    </extensionPoints>
+
     <!-- Startup Activities -->
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="top.criwits.scaleda.idea.ScaledaMain"/>
@@ -90,6 +93,8 @@
 <!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
         <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType" />
         <newProjectWizard.language implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+
+        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />
     </extensions>
 
     <!-- Windows / Panels -->

@@ -94,12 +94,12 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
       val verifier = profile.getVerifier
       verifier match {
         case None =>
-          updateStatusLabel(AllIcons.General.ExclMark, ScaledaBundle.message("settings.unsupported_toolchain"))
+          updateStatusLabel(AllIcons.General.ExclMark, ScaledaBundle.message("settings.toolchains.unsupported"))
         case Some(v) =>
           // Has valid verifier
           v.verifyCommandLine match {
             case None =>
-              updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.invalid_path"))
+              updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.toolchains.invalid_path"))
             case Some(cmdLine) =>
               // here has a command line
               var outputStrings: Seq[String] = Seq.empty
@@ -116,7 +116,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
                 case (true, Some(version)) =>
                   updateStatusLabel(AllIcons.General.InspectionsOK, version) // NonNls to Nls
                 case (_, _) =>
-                  updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.not_found"))
+                  updateStatusLabel(AllIcons.General.BalloonError, ScaledaBundle.message("settings.toolchains.not_found"))
               }
           }
       }

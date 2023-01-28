@@ -60,21 +60,19 @@ class ScaledaModuleBuilder extends ModuleBuilder {
     }
   }
 
+  /**
+   * We override [[createModule]] function to move IJ module file into `.idea`, which is usually ignored.
+   * @param moduleModel Current module model
+   * @return Model
+   */
   override def createModule(moduleModel: ModifiableModuleModel): module.Module = {
     setModuleFilePath({
       val file = new File(getModuleFilePath)
-      FileUtilRt.toSystemIndependentName(file.getParent) + "/.idea/idea-module/" + file.getName
+      FileUtilRt.toSystemIndependentName(file.getParent) + "/.idea/scaleda-module/" + file.getName
     })
     super.createModule(moduleModel)
   }
 
-//  override def getBuilderId: String = getClass.getName
-
-
-//  override def commitModule(project: Project, model: ModifiableModuleModel): module.Module = {
-//    val module = super.commitModule(project, model)
-//    module
-//  }
 }
 
 object ScaledaModuleBuilder {
@@ -88,8 +86,8 @@ object ScaledaModuleBuilder {
     * @param sourceRoot
     */
   def createProjectStructure(root: File, projectName: String, projectType: String, sourceRoot: String): Unit = {
-    MainLogger.warn(
-      s"Generate new Scaleda project structure, project name: $projectName, project root: ${root.getAbsolutePath}"
+    MainLogger.info(
+      s"Generated new Scaleda project structure, project name: $projectName, project root: ${root.getAbsolutePath}"
     )
     val configFile = new File(root, "scaleda.yml")
     val sourceDir  = new File(root, sourceRoot)
