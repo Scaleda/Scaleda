@@ -4,9 +4,10 @@ package idea.runner.task.edit
 import idea.ScaledaBundle
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
+import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
 import top.criwits.scaleda.idea.runner.task.edit.task.EditTaskDialogWrapper
 import top.criwits.scaleda.idea.windows.tasks.{ScaledaRunTargetNode, ScaledaRunTaskNode}
 import top.criwits.scaleda.kernel.project.config.TargetConfig
@@ -37,5 +38,6 @@ class ScaledaCreateNewTaskAction(tree: Tree, project: Project)
   override def actionPerformed(e: AnActionEvent) = {
     // when calling this function, target should never be None
     val _r = new EditTaskDialogWrapper(target.get, project, None).showAndGet()
+    ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
   }
 }

@@ -55,7 +55,7 @@ object Toolchain {
    * Profiles for different toolchains, loaded by [[ToolchainProfileLoader]]
    */
 
-  private val defaultConfigDirectory: String = Paths.permanentToolChainsDir.getAbsolutePath
+  private val defaultConfigDirectory: String = Paths.getToolchainsDir.getAbsolutePath
 
   private var cachedProfiles = new ListBuffer[ToolchainProfile]
 

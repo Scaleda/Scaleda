@@ -18,7 +18,7 @@ import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor,
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
-    MainLogger.warn("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
+    MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
     // copy kernel logs to main logger
     KernelLogger.append(MainLogger)
     // init jinjia

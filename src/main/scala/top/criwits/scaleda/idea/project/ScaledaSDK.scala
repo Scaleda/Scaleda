@@ -28,7 +28,7 @@ class ScaledaSDK extends SdkType("scaleda") {
       systemEnv.get(SCALEDA_HOME)
     } else {
       // suggest home/.scaleda
-      Paths.permanentConfigDir.getAbsolutePath
+      Paths.getConfigDir.getAbsolutePath
     }
   }
 

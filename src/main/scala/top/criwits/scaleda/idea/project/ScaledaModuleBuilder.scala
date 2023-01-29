@@ -1,8 +1,9 @@
 package top.criwits.scaleda
 package idea.project
 
-import idea.project.ScaledaModuleBuilder.{GROUP_NAME, ICON, createProjectStructure}
-import idea.utils.{Icons, MainLogger, invokeLater}
+import idea.project.ScaledaModuleBuilder.{GROUP_NAME, ICON}
+import idea.utils.{Icons, invokeLater}
+import kernel.init.InitHelper.createProjectStructure
 
 import com.intellij.ide.util.EditorHelper
 import com.intellij.ide.util.projectWizard.ModuleBuilder
@@ -10,7 +11,7 @@ import com.intellij.openapi.module
 import com.intellij.openapi.module.{ModifiableModuleModel, ModuleType}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModifiableRootModel
-import com.intellij.openapi.util.io.{FileUtil, FileUtilRt}
+import com.intellij.openapi.util.io.FileUtilRt
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFileManager}
 import com.intellij.psi.PsiManager
 
@@ -79,30 +80,4 @@ object ScaledaModuleBuilder {
   val GROUP_NAME: String = "Scaleda"
   val ICON: Icon         = Icons.mainSmall
 
-  /** Create project with initalising it's basic structure and file
-    * @param root
-    * @param projectName
-    * @param projectType
-    * @param sourceRoot
-    */
-  def createProjectStructure(root: File, projectName: String, projectType: String, sourceRoot: String): Unit = {
-    MainLogger.info(
-      s"Generated new Scaleda project structure, project name: $projectName, project root: ${root.getAbsolutePath}"
-    )
-    val configFile = new File(root, "scaleda.yml")
-    val sourceDir  = new File(root, sourceRoot)
-
-    if (configFile.createNewFile() && sourceDir.mkdir()) {
-      // write scaleda.yml
-      val configContent =
-        s"""---
-          |name: $projectName
-          |type: $projectType
-          |source: $sourceRoot
-          |""".stripMargin
-      FileUtil.writeToFile(configFile, configContent)
-    } else {
-      MainLogger.error(s"Cannot generate new Scaleda project $projectName")
-    }
-  }
 }

@@ -4,14 +4,30 @@ package kernel.utils
 import java.io.File
 
 object Paths {
+  val SCALEDA_HOME: String = "SCALEDA_HOME"
+
   def createDirIfNonExists(f: File): File = {
     if (!f.exists()) f.mkdirs()
     f
   }
 
-  def permanentConfigDir: File = createDirIfNonExists(new File(OS.getUserHome, ".scaleda"))
+  def getEnvHome: Option[String] = {
+    val systemEnv = System.getenv()
+    if (systemEnv.containsKey(SCALEDA_HOME)) {
+      Some(systemEnv.get(SCALEDA_HOME))
+    } else {
+      None
+    }
+  }
 
-  def permanentToolChainsDir: File = createDirIfNonExists(new File(permanentConfigDir, "toolchains"))
+  def getConfigDir: File = {
+    getEnvHome match {
+      case Some(path) => createDirIfNonExists(new File(path))
+      case None => createDirIfNonExists(new File(OS.getUserHome, ".scaleda"))
+    }
+  }
+
+  def getToolchainsDir: File = createDirIfNonExists(new File(getConfigDir, "toolchains"))
 
   def pwd = new File(System.getProperty("user.dir"))
 

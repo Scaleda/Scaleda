@@ -14,6 +14,7 @@ import com.intellij.ui._
 import com.intellij.ui.components.{JBList, JBPanelWithEmptyText}
 import com.intellij.util.ui.JBUI
 import org.jetbrains.annotations.Nls
+import top.criwits.scaleda.kernel.utils.Paths
 
 import java.awt.BorderLayout
 import java.util.concurrent.Executors
@@ -30,6 +31,14 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
   private val toolchainList = new JBList[ToolchainProfile](listModel)
   toolchainList.setCellRenderer(new MyCellRenderer)
   toolchainList.addListSelectionListener(onItemSelected)
+
+//  // Path panel
+//  val pathPanel = new JPanel(new BorderLayout)
+//  pathPanel.add(new JLabel("Profiles are stored at"), BorderLayout.WEST)
+//  val pathField = new JTextField(Paths.getToolchainsDir.getAbsolutePath)
+//  pathField.setEditable(false)
+//  pathPanel.add(pathField, BorderLayout.CENTER)
+//  add(pathPanel, BorderLayout.NORTH)
 
   // Splitter
   val splitter = new Splitter(false, 0.3f)

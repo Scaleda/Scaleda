@@ -4,8 +4,9 @@
  import idea.ScaledaBundle
 
  import com.intellij.icons.AllIcons
- import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+ import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent}
  import com.intellij.openapi.project.Project
+ import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
  import top.criwits.scaleda.kernel.project.config.TargetConfig
 
  class ScaledaCreateNewTargetAction(project: Project)
@@ -18,5 +19,6 @@
      ) {
    override def actionPerformed(e: AnActionEvent) = {
      val _r = new EditTargetDialogWrapper(project, None).showAndGet()
+     ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
    }
  }
