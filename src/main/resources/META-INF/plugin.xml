@@ -94,7 +94,7 @@
         <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType" />
         <newProjectWizard.language implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
-        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />
+<!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
     </extensions>
 
     <!-- Windows / Panels -->
