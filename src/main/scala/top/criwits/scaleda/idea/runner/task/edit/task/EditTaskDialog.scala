@@ -103,6 +103,6 @@ class EditTaskDialog(target: TargetConfig, config: Option[TaskConfig], parent: E
 
   override def validateConfig: Boolean =
     !panel.nameField.getText.isBlank &&
-      (parentTopModuleValid || panel.topModuleField.getText.isBlank) &&
+      (parentTopModuleValid || !panel.topModuleField.getText.isBlank) &&
       (panel.presetField.isSelected || !panel.tclField.getText.isBlank)
 }

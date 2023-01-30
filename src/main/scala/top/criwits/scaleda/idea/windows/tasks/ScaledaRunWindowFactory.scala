@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
-import idea.runner.task.{ScaledaReloadTasksAction, ScaledaRunToolWindowTaskAction}
+import idea.runner.task.{ScaledaReloadTasksAction, ScaledaRunToolWindowTaskAction, ScaledaTaskPopupMenuAction}
 import kernel.project.config.{ProjectConfig, TaskConfig}
 
 import com.intellij.execution.impl.RunManagerImpl
@@ -17,10 +17,11 @@ import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
 import top.criwits.scaleda.idea.runner.task.edit.{ScaledaCreateNewTargetAction, ScaledaCreateNewTaskAction}
+import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory.model
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
-import javax.swing.JPanel
+import javax.swing.{JPanel, SwingUtilities}
 import javax.swing.tree.DefaultTreeModel
 
 class ScaledaRunWindowFactory extends ToolWindowFactory {
@@ -34,10 +35,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
     DumbService
       .getInstance(project)
       .runWhenSmart(() => {
-        val model = new DefaultTreeModel(ScaledaRunWindowFactory.getRootNode)
-        ScaledaRunWindowFactory.model = Some(model)
+        model = Some(new DefaultTreeModel(null))
         val panel = new SimpleToolWindowPanel(true)
-        val tree = new Tree(model) with DataProvider {
+        val tree = new Tree(model.get) with DataProvider {
           override def getData(dataId: String): AnyRef = {
             if (
               /*PlatformCoreDataKeys.BGT_DATA_PROVIDER.is(dataId)*/
@@ -82,14 +82,24 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         tree.addMouseListener(new MouseAdapter {
           override def mousePressed(e: MouseEvent) = {
             if (
-              e != null & e.getClickCount == 2 && e.getButton == MouseEvent.BUTTON1
+              e != null && e.getClickCount == 2 && e.getButton == MouseEvent.BUTTON1
             ) {
               ActionManager
                 .getInstance()
                 .tryToExecute(runTaskAction, e, tree, "", true)
             }
+
           }
         })
+
+        tree.addMouseListener(new MouseAdapter {
+          override def mouseClicked(e: MouseEvent): Unit = {
+            if (SwingUtilities.isRightMouseButton(e)) {
+              ActionManager.getInstance().tryToExecute(new ScaledaTaskPopupMenuAction(tree, e, runTaskAction, project), e, tree, null, true)
+            }
+          }
+        })
+
         val group = new DefaultActionGroup()
         group.add(runTaskAction)
 
@@ -111,7 +121,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
         group.addSeparator()
 
-        val createTargetAction = new ScaledaCreateNewTargetAction(project)
+        val createTargetAction = new ScaledaCreateNewTargetAction(model.get, project)
         group.add(createTargetAction)
         val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
         group.add(createTaskAction)
@@ -145,9 +155,9 @@ object ScaledaRunWindowFactory {
       .getConfig()
       .map(c => {
         new ScaledaRunRootNode(
+          c.name,
           c.targets.map(t => new ScaledaRunTargetNode(t)).toList
         )
-      })
-      .getOrElse(new ScaledaRunRootNode(Seq()))
+      }).orNull
   }
 }

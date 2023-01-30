@@ -6,7 +6,9 @@ import idea.utils.MainLogger
 import kernel.project.config.{ProjectConfig, TargetConfig}
 import kernel.toolchain.Toolchain
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
+import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
 import top.criwits.scaleda.idea.runner.task.edit.target.{EditTargetDialog, TargetBasicPanel}
 
 import javax.swing.JPanel
@@ -36,6 +38,7 @@ class EditTargetDialogWrapper(project: Project, config: Option[TargetConfig])
       checkData(target) match {
         case None => {
           ProjectConfig.insertOrReplaceTarget(target)
+          ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
           super.doOKAction()
         }
         case Some(msg) => MainLogger.error("Cannot create/edit target:", msg)

@@ -6,7 +6,9 @@ import idea.runner.task.edit.EditDialogWrapper
 import idea.utils.MainLogger
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
+import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
 
 import javax.swing.JPanel
 
@@ -38,7 +40,8 @@ class EditTaskDialogWrapper(target: TargetConfig, project: Project, config: Opti
    val task = inner.getData
     checkData(targetName, task) match {
       case None => {
-        ProjectConfig.insertOrReplaceTask(targetName, task) // FIXME!!!!!!
+        ProjectConfig.insertOrReplaceTask(targetName, task)
+        ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
         super.doOKAction()
       }
       case Some(msg) => MainLogger.error("Cannot create/edit task:", msg)

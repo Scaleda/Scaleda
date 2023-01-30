@@ -38,6 +38,5 @@ class ScaledaCreateNewTaskAction(tree: Tree, project: Project)
   override def actionPerformed(e: AnActionEvent) = {
     // when calling this function, target should never be None
     val _r = new EditTaskDialogWrapper(target.get, project, None).showAndGet()
-    ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
   }
 }

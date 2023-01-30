@@ -9,7 +9,9 @@
  import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
  import top.criwits.scaleda.kernel.project.config.TargetConfig
 
- class ScaledaCreateNewTargetAction(project: Project)
+ import javax.swing.tree.DefaultTreeModel
+
+ class ScaledaCreateNewTargetAction(model: DefaultTreeModel, project: Project)
      extends AnAction(
        ScaledaBundle.message("tasks.action.run.tool.window.create.target.name"),
        ScaledaBundle.message(
@@ -17,8 +19,13 @@
        ),
        AllIcons.Actions.NewFolder
      ) {
+
+   override def update(e: AnActionEvent): Unit = {
+     val presentation = e.getPresentation
+     presentation.setEnabled(model.getRoot != null)
+   }
+
    override def actionPerformed(e: AnActionEvent) = {
      val _r = new EditTargetDialogWrapper(project, None).showAndGet()
-     ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
    }
  }

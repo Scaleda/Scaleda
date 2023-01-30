@@ -7,8 +7,8 @@ import javax.swing.Icon
 import javax.swing.tree.TreeNode
 import scala.jdk.javaapi.CollectionConverters
 
-class ScaledaRunRootNode(targets: Seq[ScaledaRunTargetNode])
-    extends ScaledaRunTreeNode("Scaleda") {
+class ScaledaRunRootNode(projectName: String, targets: Seq[ScaledaRunTargetNode])
+    extends ScaledaRunTreeNode(projectName) {
   targets.foreach(t => t.parent = Some(this))
   private val targetNodes = CollectionConverters.asJava(targets)
 
