@@ -6,6 +6,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{ActionManager, ActionPlaces, AnAction, AnActionEvent, DefaultActionGroup}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
+import top.criwits.scaleda.idea.runner.task.edit.{ScaledaEditTargetAction, ScaledaEditTaskAction}
 import top.criwits.scaleda.idea.utils.MainLogger
 import top.criwits.scaleda.idea.windows.tasks.{ScaledaRunRootNode, ScaledaRunTargetNode, ScaledaRunTaskNode}
 
@@ -17,11 +18,7 @@ class ScaledaTaskPopupMenuAction(
     event: MouseEvent,
     runAction: AnAction,
     project: Project
-) extends AnAction(
-      "Task popup", // FIXME: they will appear?
-      "Task popup",
-      AllIcons.General.Settings
-    ) {
+) extends AnAction() {
 
   override def actionPerformed(e: AnActionEvent): Unit = {
     // prepare group
@@ -32,9 +29,14 @@ class ScaledaTaskPopupMenuAction(
     val targetNode = tree.getSelectedNodes(classOf[ScaledaRunTargetNode], (_: ScaledaRunTargetNode) => true)
     val taskNode = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
 
+    if (targetNode.nonEmpty) {
+      group.add(new ScaledaEditTargetAction(targetNode.head.target, tree, project))
+    }
+
     if (taskNode.nonEmpty) {
       // root node
       group.add(runAction)
+      group.add(new ScaledaEditTaskAction(taskNode.head.task, tree, project))
     }
 
     val popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group)

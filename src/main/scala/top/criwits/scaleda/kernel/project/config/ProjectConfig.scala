@@ -86,12 +86,12 @@ object ProjectConfig {
     YAMLHelper(projectConfig, new File(configFile.get))
   }
 
-  def insertOrReplaceTarget(target: TargetConfig): ProjectConfig = {
+  def insertOrReplaceTarget(oldTargetName: String, target: TargetConfig): ProjectConfig = {
     ProjectConfig
       .getConfig()
       .map(c => {
-        val projectConfig = if (c.targets.exists(_.name == target.name)) {
-          val newTargets = c.targets.filter(_.name != target.name) :+ target
+        val projectConfig = if (c.targets.exists(_.name == oldTargetName)) {
+          val newTargets = c.targets.filter(_.name != oldTargetName) :+ target
           c.copy(targets = newTargets)
         } else {
           c.copy(targets = c.targets :+ target)
@@ -104,6 +104,7 @@ object ProjectConfig {
 
   def insertOrReplaceTask(
       targetName: String,
+      oldTaskName: String,
       task: TaskConfig
   ): ProjectConfig = {
     ProjectConfig
@@ -116,9 +117,9 @@ object ProjectConfig {
           null
         } else {
           val target = projectConfig.targets.find(_.name == targetName).get
-          val r = if (target.tasks.exists(_.name == task.name)) {
+          val r = if (target.tasks.exists(_.name == oldTaskName)) {
             // replace exist task in target and replace target in config
-            val newTasks = target.tasks.filter(_.name != task.name) :+ task
+            val newTasks = target.tasks.filter(_.name != oldTaskName) :+ task
             val newTarget = target.copy(tasks = newTasks)
             projectConfig.copy(targets =
               projectConfig.targets.map(t =>

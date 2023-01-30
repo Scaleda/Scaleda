@@ -21,6 +21,12 @@ class EditTargetDialogWrapper(project: Project, config: Option[TargetConfig])
 
   var inner: EditTargetDialog = _
 
+  private val oldTargetName: Option[String] = config match {
+    case Some(config) => Some(config.name)
+    case None => None
+  }
+
+
 //
 //  private def reInit: EditTargetDialog = { // why this? inner should never be null???
 //    if (inner == null) inner = new EditTargetDialog(config)
@@ -37,7 +43,7 @@ class EditTargetDialogWrapper(project: Project, config: Option[TargetConfig])
       val target = inner.getData
       checkData(target) match {
         case None => {
-          ProjectConfig.insertOrReplaceTarget(target)
+          ProjectConfig.insertOrReplaceTarget(oldTargetName.getOrElse(target.name), target)
           ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
           super.doOKAction()
         }

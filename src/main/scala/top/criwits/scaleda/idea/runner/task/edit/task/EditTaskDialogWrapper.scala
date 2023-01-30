@@ -19,6 +19,10 @@ class EditTaskDialogWrapper(target: TargetConfig, project: Project, config: Opti
     ) {
 
   private val targetName = target.name
+  private val oldTaskName: Option[String] = config match {
+    case Some(config) => Some(config.name)
+    case None => None
+  }
 
   var inner: EditTaskDialog = _
 
@@ -40,7 +44,7 @@ class EditTaskDialogWrapper(target: TargetConfig, project: Project, config: Opti
    val task = inner.getData
     checkData(targetName, task) match {
       case None => {
-        ProjectConfig.insertOrReplaceTask(targetName, task)
+        ProjectConfig.insertOrReplaceTask(targetName,  oldTaskName.getOrElse(task.name), task)
         ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
         super.doOKAction()
       }
