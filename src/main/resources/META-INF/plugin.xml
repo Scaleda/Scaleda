@@ -41,11 +41,14 @@
 
     <!-- Verilog Support -->
     <extensions defaultExtensionNs="com.intellij">
+        <!-- file type support -->
         <fileType
                 name="Verilog"
                 implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
                 language="Verilog"
                 extensions="v"/>
+
+        <!-- parser -->
         <lang.parserDefinition language="Verilog"
                                implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
         <lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
