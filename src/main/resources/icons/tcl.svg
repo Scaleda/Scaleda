@@ -7,8 +7,31 @@
    viewBox="0 0 16 16"
    version="1.1"
    id="svg14"
+   sodipodi:docname="tcl.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview4006"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="53.4375"
+     inkscape:cx="4.9497076"
+     inkscape:cy="8.0187135"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="1116"
+     inkscape:window-y="455"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="text961" />
   <defs
      id="defs18" />
   <g
@@ -26,15 +49,15 @@
     <path
        d="m 3.4953538,14.822077 v -4.005801 h -1.502768 v -0.815631 h 4.0246544 v 0.815631 H 4.5179269 v 4.005801 z"
        id="path3733"
-       style="font-size:6.90323px;opacity:0.961187;fill:#636e74;fill-opacity:0.839216;stroke-width:0.978411" />
+       style="font-size:6.90323px;opacity:1;fill:#231f20;fill-opacity:0.69803923;stroke-width:0.978411" />
     <path
        d="m 9.5591202,13.049395 0.9914818,0.299284 q -0.228006,0.789321 -0.7600206,1.174114 -0.5285601,0.381505 -1.343855,0.381505 -1.0087546,0 -1.6582266,-0.654478 -0.6494722,-0.657768 -0.6494722,-1.795704 0,-1.203714 0.6529268,-1.868059 0.6529268,-0.6676331 1.7169556,-0.6676331 0.9292978,0 1.509677,0.5229251 0.345465,0.30915 0.518196,0.887985 L 9.5245738,11.559553 Q 9.4347532,11.184625 9.1480182,10.967562 8.8647377,10.750499 8.4570904,10.750499 q -0.5631062,0 -0.9154793,0.384793 -0.3489186,0.384794 -0.3489186,1.246469 0,0.914297 0.3454638,1.302379 0.345464,0.388082 0.8982062,0.388082 0.4076474,0 0.7012917,-0.246662 0.2936443,-0.246662 0.421466,-0.776165 z"
        id="path3735"
-       style="font-size:6.90323px;opacity:0.961187;fill:#636e74;fill-opacity:0.839216;stroke-width:0.978411" />
+       style="font-size:6.90323px;opacity:1;fill:#231f20;fill-opacity:0.69803923;stroke-width:0.978411" />
     <path
        d="M 11.428148,14.822077 V 10.04011 h 1.022574 v 3.969625 h 2.542614 v 0.812342 z"
        id="path3737"
-       style="font-size:6.90323px;opacity:0.961187;fill:#636e74;fill-opacity:0.839216;stroke-width:0.978411" />
+       style="font-size:6.90323px;opacity:1;fill:#231f20;fill-opacity:0.69803923;stroke-width:0.978411" />
     <polygon
        fill="#9aa7b0"
        fill-opacity="0.8"

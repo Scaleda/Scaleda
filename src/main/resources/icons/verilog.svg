@@ -8,7 +8,7 @@
    version="1.1"
    id="svg14"
    sodipodi:docname="verilog.svg"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -27,14 +27,14 @@
      showgrid="false"
      showguides="true"
      inkscape:zoom="18.252194"
-     inkscape:cx="1.5614561"
-     inkscape:cy="11.204133"
+     inkscape:cx="-8.4099479"
+     inkscape:cy="11.25892"
      inkscape:window-width="1920"
      inkscape:window-height="1013"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
+     inkscape:window-x="1116"
+     inkscape:window-y="455"
      inkscape:window-maximized="1"
-     inkscape:current-layer="text961">
+     inkscape:current-layer="g3452">
     <sodipodi:guide
        position="2.0242131,4.9975787"
        orientation="1,0"
@@ -72,7 +72,7 @@
       <path
          d="M 3.8022878,14.935597 2.0191679,9.9469454 H 3.111499 L 4.373975,13.639092 5.5956163,9.9469454 H 6.664127 L 4.8776043,14.935597 Z"
          id="path1247"
-         style="opacity:0.49771689" />
+         style="opacity:1;fill:#231f20;fill-opacity:0.69803923" />
     </g>
   </g>
 </svg>

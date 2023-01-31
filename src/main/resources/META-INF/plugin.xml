@@ -54,6 +54,8 @@
         <lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
         <lang.syntaxHighlighterFactory language="Verilog"
                                        implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="Verilog"
+                                      implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory" />
         <completion.contributor language="Verilog"
                                 implementationClass="top.criwits.scaleda.verilog.completion.VerilogCompletionContributor"/>
         <annotator language="Verilog"

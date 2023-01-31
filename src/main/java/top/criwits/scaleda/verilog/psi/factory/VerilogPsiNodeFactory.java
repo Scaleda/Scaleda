@@ -84,6 +84,10 @@ public class VerilogPsiNodeFactory {
                 ParameterIdentifierPsiNode.class
         );
         ruleIElementTypeClassMap.put(
+                getRuleIElementType(VerilogParser.RULE_always_construct),
+                AlwaysConstructPsiNode.class
+        );
+        ruleIElementTypeClassMap.put(
                 getRuleIElementType(VerilogParser.RULE_statement),
                 StatementPsiNode.class
         );
