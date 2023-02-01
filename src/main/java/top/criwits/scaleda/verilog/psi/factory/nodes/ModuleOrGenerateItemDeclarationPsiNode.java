@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
 import top.criwits.scaleda.verilog.psi.TypedDeclaration;
+import top.criwits.scaleda.verilog.psi.factory.nodes.singal.RegDeclarationPsiNode;
 
 public class ModuleOrGenerateItemDeclarationPsiNode
         extends ANTLRPsiNode

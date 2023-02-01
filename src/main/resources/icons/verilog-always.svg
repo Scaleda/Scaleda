@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file. -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg8"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs12" />
+  <g
+     fill="none"
+     fill-rule="evenodd"
+     id="g6">
+    <path
+       fill="#F98B9E"
+       fill-opacity=".6"
+       d="M15,8 C15,11.866 11.866,15 8,15 C4.134,15 1,11.866 1,8 C1,4.134 4.134,1 8,1 C11.866,1 15,4.134 15,8"
+       id="path2"
+       style="fill:#ecae9e;fill-opacity:0.60000002" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#231f20;stroke-width:1.23106;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:0.698039"
+       id="path1385"
+       d="m -3.2806105,7.8425363 c -0.482656,-0.3074038 -0.295629,-1.0110616 0.066369,-1.3264326 0.6654242,-0.579715 1.6767555,-0.2665165 2.1451574,0.4026307 0.69523401,0.9931939 0.24063797,2.3539895 -0.7388927,2.963882 C -3.1217423,10.700616 -4.8433755,10.098962 -5.5905838,8.8074617 -6.534623,7.1757524 -5.7835013,5.0886519 -4.1791672,4.2061304 -2.2307368,3.1343264 0.22417989,4.0361341 1.2408888,5.953809 2.4414708,8.2182978 1.3882818,11.042392 -0.84305169,12.19259 -2.5801517,13.088022 -4.7209424,12.862218 -6.280167,11.703718"
+       transform="matrix(0.86510662,0,0,0.86510662,10.279301,0.92025804)" />
+  </g>
+</svg>

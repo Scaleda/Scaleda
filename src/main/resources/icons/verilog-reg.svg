@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file. -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="verilog-reg.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs12" />
+  <sodipodi:namedview
+     id="namedview10"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="18.893009"
+     inkscape:cx="3.6256797"
+     inkscape:cy="3.8373982"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="1116"
+     inkscape:window-y="455"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g6" />
+  <g
+     fill="none"
+     fill-rule="evenodd"
+     id="g6">
+    <path
+       fill="#F98B9E"
+       fill-opacity=".6"
+       d="M15,8 C15,11.866 11.866,15 8,15 C4.134,15 1,11.866 1,8 C1,4.134 4.134,1 8,1 C11.866,1 15,4.134 15,8"
+       id="path2" />
+    <path
+       d="M 5.4973685,11.674876 V 4.3251242 h 2.901484 q 1.2536028,0 1.9410625,0.6571305 0.697569,0.6470208 0.697569,1.7388684 0,0.7582275 -0.34373,1.2940416 -0.33362,0.5358142 -0.9604211,0.7986664 L 11.300336,11.674876 H 9.5816874 L 8.1865488,9.0665736 H 7.0542624 V 11.674876 Z M 7.0542624,7.8230804 h 1.0514088 q 1.3243707,0 1.3243707,-1.1019573 0,-1.1322864 -1.3243707,-1.1322864 H 7.0542624 Z"
+       id="path1907"
+       style="fill:#231f20;fill-opacity:0.698039;stroke-width:0.71046" />
+  </g>
+</svg>

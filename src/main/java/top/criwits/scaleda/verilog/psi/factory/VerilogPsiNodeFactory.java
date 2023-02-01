@@ -10,6 +10,13 @@ import top.criwits.scaleda.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.psi.factory.nodes.NamedPortConnectionPsiNode;
 import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.factory.nodes.*;
+import top.criwits.scaleda.verilog.psi.factory.nodes.always.AlwaysConstructPsiNode;
+import top.criwits.scaleda.verilog.psi.factory.nodes.always.DelayOrEventControlPsiNode;
+import top.criwits.scaleda.verilog.psi.factory.nodes.module.*;
+import top.criwits.scaleda.verilog.psi.factory.nodes.singal.NetDeclarationPsiNode;
+import top.criwits.scaleda.verilog.psi.factory.nodes.singal.NetIdentifierPsiNode;
+import top.criwits.scaleda.verilog.psi.factory.nodes.singal.RegDeclarationPsiNode;
+import top.criwits.scaleda.verilog.psi.factory.nodes.singal.VariableIdentifierPsiNode;
 import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode;
 
 import java.util.HashMap;
@@ -83,9 +90,15 @@ public class VerilogPsiNodeFactory {
                 getRuleIElementType(VerilogParser.RULE_parameter_identifier),
                 ParameterIdentifierPsiNode.class
         );
+
+        // Always construct
         ruleIElementTypeClassMap.put(
                 getRuleIElementType(VerilogParser.RULE_always_construct),
                 AlwaysConstructPsiNode.class
+        );
+        ruleIElementTypeClassMap.put(
+                getRuleIElementType(VerilogParser.RULE_delay_or_event_control),
+                DelayOrEventControlPsiNode.class
         );
         ruleIElementTypeClassMap.put(
                 getRuleIElementType(VerilogParser.RULE_statement),

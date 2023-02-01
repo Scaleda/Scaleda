@@ -5,7 +5,8 @@ import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
-import top.criwits.scaleda.verilog.psi.factory.nodes.{PortIdentifierPsiNode, ReferenceHolder}
+import top.criwits.scaleda.verilog.psi.factory.nodes.module.PortIdentifierPsiNode
+import top.criwits.scaleda.verilog.psi.factory.nodes.ReferenceHolder
 import top.criwits.scaleda.verilog.references.NamedPortConnectionReference
 
 class NamedPortConnectionPsiNode(node: ASTNode)

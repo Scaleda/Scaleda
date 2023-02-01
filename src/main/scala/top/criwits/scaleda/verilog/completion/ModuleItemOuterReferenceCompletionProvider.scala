@@ -1,7 +1,6 @@
 package top.criwits.scaleda
 package verilog.completion
 
-import verilog.psi.factory.nodes.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
 
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionProvider, CompletionResultSet}
 import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
@@ -9,6 +8,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import top.criwits.scaleda.verilog.VerilogFileType
+import top.criwits.scaleda.verilog.psi.factory.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
 import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode
 import top.criwits.scaleda.verilog.utils.FileUtils
 

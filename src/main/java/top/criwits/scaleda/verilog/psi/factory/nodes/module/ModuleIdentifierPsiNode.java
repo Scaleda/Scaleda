@@ -1,4 +1,4 @@
-package top.criwits.scaleda.verilog.psi.factory.nodes;
+package top.criwits.scaleda.verilog.psi.factory.nodes.module;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;

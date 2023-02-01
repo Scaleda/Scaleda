@@ -1,9 +1,8 @@
 package top.criwits.scaleda
 package verilog.references
 
-import verilog.psi.factory.nodes.ModuleDeclarationPsiNode
-
 import com.intellij.psi.{PsiElementResolveResult, PsiReferenceBase, ResolveResult}
+import top.criwits.scaleda.verilog.psi.factory.nodes.module.ModuleDeclarationPsiNode
 import top.criwits.scaleda.verilog.utils.FileUtils
 
 class ModuleInstantiationReference(element: ModuleInstantiationPsiNode)

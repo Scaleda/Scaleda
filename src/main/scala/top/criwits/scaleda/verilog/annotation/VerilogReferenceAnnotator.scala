@@ -1,11 +1,12 @@
 package top.criwits.scaleda
 package verilog.annotation
 
-import verilog.psi.factory.nodes.{ModuleIdentifierPsiNode, NamedPortConnectionPsiNode, PortIdentifierPsiNode, ReferenceHolder}
+import verilog.psi.factory.nodes.{NamedPortConnectionPsiNode, ReferenceHolder}
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiReferenceBase}
+import top.criwits.scaleda.verilog.psi.factory.nodes.module.{ModuleIdentifierPsiNode, PortIdentifierPsiNode}
 import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode
 
 class VerilogReferenceAnnotator extends Annotator {

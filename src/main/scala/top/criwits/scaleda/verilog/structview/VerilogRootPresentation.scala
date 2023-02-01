@@ -9,6 +9,6 @@ import com.intellij.psi.PsiFile
 import javax.swing.Icon
 
 class VerilogRootPresentation(val element: PsiFile) extends ItemPresentation {
-  override def getPresentableText: String     = element.getVirtualFile.getNameWithoutExtension
+  override def getPresentableText: String     = element.getVirtualFile.getName
   override def getIcon(unused: Boolean): Icon = Icons.verilog
 }

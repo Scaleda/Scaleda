@@ -10,11 +10,15 @@ import com.intellij.navigation.{ItemPresentation, NavigationItem}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiNamedElement, PsiRecursiveElementVisitor}
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import top.criwits.scaleda.verilog.psi.factory.nodes.always.AlwaysConstructPsiNode
+import top.criwits.scaleda.verilog.psi.factory.nodes.module.ModuleDeclarationPsiNode
+import top.criwits.scaleda.verilog.psi.factory.nodes.singal.{NetDeclarationPsiNode, NetIdentifierPsiNode, RegDeclarationPsiNode, VariableIdentifierPsiNode}
 
 import java.util
 import java.util.Collections
 import java.util.function.Consumer
 import scala.collection.mutable.ListBuffer
+import scala.jdk.CollectionConverters._
 
 class VerilogStructViewElement(val element: PsiElement) extends StructureViewTreeElement with SortableTreeElement {
   override def getValue: AnyRef = element
@@ -33,19 +37,35 @@ class VerilogStructViewElement(val element: PsiElement) extends StructureViewTre
         PsiTreeUtil.findChildrenOfAnyType(
           element,
           classOf[ModuleDeclarationPsiNode]
-        )
+        ).asScala
 
       case module: ModuleDeclarationPsiNode => // Module node
-        PsiTreeUtil.findChildrenOfAnyType(
+        // always blocks
+        val alwaysBlocks = PsiTreeUtil.findChildrenOfAnyType(
           element,
-          classOf[RegDeclarationPsiNode],
-          classOf[NetDeclarationPsiNode],
+//          classOf[RegDeclarationPsiNode],
+//          classOf[NetDeclarationPsiNode],
           classOf[AlwaysConstructPsiNode]
-        )
-      case _ => Collections.emptyList()
+        ).asScala
+
+        // reg
+        val regDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[RegDeclarationPsiNode]).asScala
+        val regs = regDeclarations.map(r => {
+          PsiTreeUtil.findChildrenOfAnyType(r, classOf[VariableIdentifierPsiNode]).asScala
+        }).reduce(_ ++ _)
+
+        // net
+        val netDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[NetDeclarationPsiNode]).asScala
+        val nets = netDeclarations.map(r => {
+          PsiTreeUtil.findChildrenOfAnyType(r, classOf[NetIdentifierPsiNode]).asScala
+        }).reduce(_ ++ _)
+
+        (alwaysBlocks ++ regs ++ nets)
+
+      case _ => Seq.empty
     }
 
-    children.forEach((t: ANTLRPsiNode) => treeElements.append(new VerilogStructViewElement(t)))
+    children.foreach(t => treeElements.append(new VerilogStructViewElement(t)))
     treeElements.toArray
   }
 

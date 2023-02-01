@@ -1,4 +1,4 @@
-package top.criwits.scaleda.verilog.psi.factory.nodes;
+package top.criwits.scaleda.verilog.psi.factory.nodes.module;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -7,11 +7,13 @@ import com.intellij.util.IncorrectOperationException;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.criwits.scaleda.verilog.parser.VerilogLexer;
+import top.criwits.scaleda.verilog.psi.factory.VerilogPsiLeafNodeFactory;
 
-public class ParameterIdentifierPsiNode extends ANTLRPsiNode
+public class PortIdentifierPsiNode extends ANTLRPsiNode
         implements PsiNameIdentifierOwner {
 
-    public ParameterIdentifierPsiNode(@NotNull ASTNode node) {
+    public PortIdentifierPsiNode(@NotNull ASTNode node) {
         super(node);
     }
 
@@ -30,6 +32,7 @@ public class ParameterIdentifierPsiNode extends ANTLRPsiNode
 
     @Override
     public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
-        return null;
+        return getFirstChild().replace(VerilogPsiLeafNodeFactory.create(VerilogLexer.Simple_identifier, s));
     }
+
 }

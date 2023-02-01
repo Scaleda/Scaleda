@@ -1,4 +1,4 @@
-package top.criwits.scaleda.verilog.psi.factory.nodes;
+package top.criwits.scaleda.verilog.psi.factory.nodes.module;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -9,21 +9,22 @@ import top.criwits.scaleda.verilog.psi.TypedDeclaration;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class NetDeclarationPsiNode extends ANTLRPsiNode implements TypedDeclaration {
+public class PortDeclarationPsiNode extends ANTLRPsiNode
+        implements TypedDeclaration {
 
-    public NetDeclarationPsiNode(@NotNull ASTNode node) {
+    public PortDeclarationPsiNode(@NotNull ASTNode node) {
         super(node);
     }
 
     /**
-     * in net_declaration all children except two last children is about type,
-     * e.g. "wire signed [15:0] WIRE_NAME;", so we will pass it to typeText
+     * in {input|output|inout}_declaration children except last child is about type,
+     * e.g. "output wire signed [15:0] OUTPUT_NAME", so we will pass it to typeText
      */
     @Override
     public String getTypeText() {
         PsiElement[] typeChildren = Arrays.copyOf(
-                this.getChildren(),
-                this.getChildren().length - 2
+                this.getLastChild().getChildren(),
+                this.getLastChild().getChildren().length - 1
         );
         return String.join(" ",
                 Arrays.stream(typeChildren)
@@ -31,4 +32,5 @@ public class NetDeclarationPsiNode extends ANTLRPsiNode implements TypedDeclarat
                         .collect(Collectors.toList())
         );
     }
+
 }

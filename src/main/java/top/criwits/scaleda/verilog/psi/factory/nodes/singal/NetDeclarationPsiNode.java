@@ -1,4 +1,4 @@
-package top.criwits.scaleda.verilog.psi.factory.nodes;
+package top.criwits.scaleda.verilog.psi.factory.nodes.singal;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -9,16 +9,15 @@ import top.criwits.scaleda.verilog.psi.TypedDeclaration;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class RegDeclarationPsiNode extends ANTLRPsiNode
-        implements TypedDeclaration {
+public class NetDeclarationPsiNode extends ANTLRPsiNode implements TypedDeclaration {
 
-    public RegDeclarationPsiNode(@NotNull ASTNode node) {
+    public NetDeclarationPsiNode(@NotNull ASTNode node) {
         super(node);
     }
 
     /**
-     * in reg_declaration all children except two last children is about type,
-     * e.g. "reg signed [15:0] REG_NAME;", so we will pass it to typeText
+     * in net_declaration all children except two last children is about type,
+     * e.g. "wire signed [15:0] WIRE_NAME;", so we will pass it to typeText
      */
     @Override
     public String getTypeText() {
@@ -32,5 +31,4 @@ public class RegDeclarationPsiNode extends ANTLRPsiNode
                         .collect(Collectors.toList())
         );
     }
-
 }
