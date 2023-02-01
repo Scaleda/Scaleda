@@ -4,7 +4,7 @@ package verilog.structview
 import verilog.VerilogPSIFileRoot
 
 import com.intellij.ide.structureView.{StructureViewModel, StructureViewModelBase, StructureViewTreeElement}
-import top.criwits.scaleda.verilog.psi.factory.nodes.module.ModuleDeclarationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 /** Structure view model of Verilog language.
   * @param root PSI File for the source file

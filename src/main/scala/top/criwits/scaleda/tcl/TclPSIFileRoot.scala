@@ -1,11 +1,10 @@
 package top.criwits.scaleda
 package tcl
 
-import verilog.psi.ScopeNode
-
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.psi.FileViewProvider
+import top.criwits.scaleda.verilog.psi.nodes.ScopeNode
 
 import javax.swing.Icon
 

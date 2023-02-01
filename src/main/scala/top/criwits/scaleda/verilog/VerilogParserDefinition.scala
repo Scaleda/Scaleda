@@ -2,7 +2,6 @@ package top.criwits.scaleda
 package verilog
 
 import verilog.parser._
-import verilog.psi.factory.VerilogPsiNodeFactory
 
 import com.intellij.lang.ParserDefinition.SpaceRequirements
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
@@ -13,6 +12,7 @@ import com.intellij.psi.{FileViewProvider, PsiFile}
 import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
+import top.criwits.scaleda.verilog.psi.VerilogPsiNodeFactory
 
 final class VerilogParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =

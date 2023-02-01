@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package verilog.highlight
 
-import verilog.psi.factory.nodes.DirectivePsiNode
+import top.criwits.scaleda.verilog.psi.nodes.DirectivePsiNode
 
 import com.intellij.ide.highlighter.JavaHighlightingColors
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}

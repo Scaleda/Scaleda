@@ -2,21 +2,21 @@ package top.criwits.scaleda
 package verilog.structview
 
 import verilog.VerilogPSIFileRoot
-import verilog.psi.factory.nodes._
+import top.criwits.scaleda.verilog.psi.nodes.always.AlwaysConstructPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.{
+  NetDeclarationPsiNode,
+  NetIdentifierPsiNode,
+  VariableDeclarationPsiNode,
+  VariableIdentifierPsiNode
+}
 
 import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.{SortableTreeElement, TreeElement}
 import com.intellij.navigation.{ItemPresentation, NavigationItem}
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{PsiElement, PsiNamedElement, PsiRecursiveElementVisitor}
-import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
-import top.criwits.scaleda.verilog.psi.factory.nodes.always.AlwaysConstructPsiNode
-import top.criwits.scaleda.verilog.psi.factory.nodes.module.ModuleDeclarationPsiNode
-import top.criwits.scaleda.verilog.psi.factory.nodes.singal.{NetDeclarationPsiNode, NetIdentifierPsiNode, RegDeclarationPsiNode, VariableIdentifierPsiNode}
+import com.intellij.psi.{PsiElement, PsiNamedElement}
 
-import java.util
-import java.util.Collections
-import java.util.function.Consumer
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
@@ -34,33 +34,39 @@ class VerilogStructViewElement(val element: PsiElement) extends StructureViewTre
     val treeElements = new ListBuffer[TreeElement]
     val children = element match {
       case root: VerilogPSIFileRoot => // Root node
-        PsiTreeUtil.findChildrenOfAnyType(
-          element,
-          classOf[ModuleDeclarationPsiNode]
-        ).asScala
+        PsiTreeUtil
+          .findChildrenOfAnyType(
+            element,
+            classOf[ModuleDeclarationPsiNode]
+          )
+          .asScala
 
       case module: ModuleDeclarationPsiNode => // Module node
         // always blocks
-        val alwaysBlocks = PsiTreeUtil.findChildrenOfAnyType(
-          element,
-//          classOf[RegDeclarationPsiNode],
-//          classOf[NetDeclarationPsiNode],
-          classOf[AlwaysConstructPsiNode]
-        ).asScala
+        val alwaysBlocks = PsiTreeUtil
+          .findChildrenOfAnyType(
+            element,
+            classOf[AlwaysConstructPsiNode]
+          )
+          .asScala
 
         // reg
-        val regDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[RegDeclarationPsiNode]).asScala
-        val regs = regDeclarations.map(r => {
-          PsiTreeUtil.findChildrenOfAnyType(r, classOf[VariableIdentifierPsiNode]).asScala
-        }).reduce(_ ++ _)
+        val regDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[VariableDeclarationPsiNode]).asScala
+        val regs = new ListBuffer[VariableIdentifierPsiNode]
+        regDeclarations
+          .map(r => {
+            regs.addAll(PsiTreeUtil.findChildrenOfAnyType(r, classOf[VariableIdentifierPsiNode]).asScala)
+          })
 
         // net
         val netDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[NetDeclarationPsiNode]).asScala
-        val nets = netDeclarations.map(r => {
-          PsiTreeUtil.findChildrenOfAnyType(r, classOf[NetIdentifierPsiNode]).asScala
-        }).reduce(_ ++ _)
+        val nets = new ListBuffer[NetIdentifierPsiNode]
+        netDeclarations
+          .foreach(r => {
+            nets.addAll(PsiTreeUtil.findChildrenOfAnyType(r, classOf[NetIdentifierPsiNode]).asScala)
+          })
 
-        (alwaysBlocks ++ regs ++ nets)
+        alwaysBlocks ++ regs ++ nets
 
       case _ => Seq.empty
     }

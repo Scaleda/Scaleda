@@ -8,8 +8,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import top.criwits.scaleda.verilog.VerilogFileType
-import top.criwits.scaleda.verilog.psi.factory.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
-import top.criwits.scaleda.verilog.references.ModuleInstantiationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
 import top.criwits.scaleda.verilog.utils.FileUtils
 
 class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[CompletionParameters] {

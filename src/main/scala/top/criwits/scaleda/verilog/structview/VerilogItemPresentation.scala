@@ -5,10 +5,10 @@ import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 import top.criwits.scaleda.idea.utils.Icons
-import top.criwits.scaleda.verilog.psi.StructureViewNode
-import top.criwits.scaleda.verilog.psi.factory.nodes.always.AlwaysConstructPsiNode
-import top.criwits.scaleda.verilog.psi.factory.nodes.module.ModuleDeclarationPsiNode
-import top.criwits.scaleda.verilog.psi.factory.nodes.singal.{NetDeclarationPsiNode, NetIdentifierPsiNode, RegDeclarationPsiNode, VariableIdentifierPsiNode}
+import top.criwits.scaleda.verilog.psi.nodes.StructureViewNode
+import top.criwits.scaleda.verilog.psi.nodes.always.AlwaysConstructPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.{NetDeclarationPsiNode, NetIdentifierPsiNode, VariableDeclarationPsiNode, VariableIdentifierPsiNode}
 
 import javax.swing.Icon
 

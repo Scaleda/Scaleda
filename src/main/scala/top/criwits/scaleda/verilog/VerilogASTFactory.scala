@@ -2,10 +2,10 @@ package top.criwits.scaleda
 package verilog
 
 import VerilogLogger.Log
-import verilog.psi.factory.VerilogPsiLeafNodeFactory
 
 import com.intellij.lang.DefaultASTFactoryImpl
 import com.intellij.psi.tree.IElementType
+import top.criwits.scaleda.verilog.psi.VerilogPsiLeafNodeFactory
 
 class VerilogASTFactory extends DefaultASTFactoryImpl {
   override def createLeaf(tpe: IElementType, text: CharSequence) = {

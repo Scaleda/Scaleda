@@ -1,11 +1,10 @@
 package top.criwits.scaleda
 package verilog.references
 
-import verilog.psi.factory.nodes.NamedPortConnectionPsiNode
-
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElementResolveResult, PsiReferenceBase, ResolveResult}
-import top.criwits.scaleda.verilog.psi.factory.nodes.module.ModuleDeclarationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NamedPortConnectionPsiNode}
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 class NamedPortConnectionReference(element: NamedPortConnectionPsiNode)
   extends PsiReferenceBase.Poly[NamedPortConnectionPsiNode](

@@ -1,13 +1,12 @@
 package top.criwits.scaleda
 package verilog
 
-import verilog.psi.ScopeNode
-
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{FileViewProvider, PsiNamedElement}
-import top.criwits.scaleda.verilog.psi.factory.nodes.module.ModuleDeclarationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.ScopeNode
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import javax.swing.Icon
 
