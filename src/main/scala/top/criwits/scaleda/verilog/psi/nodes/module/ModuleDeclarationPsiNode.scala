@@ -11,6 +11,8 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import top.criwits.scaleda.verilog.psi.VerilogPsiLeafNodeFactory
 import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode
 
+import scala.jdk.CollectionConverters._
+
 class ModuleDeclarationPsiNode(node: ASTNode)
   extends ANTLRPsiNode(node)
     with PsiNameIdentifierOwner
@@ -72,6 +74,6 @@ class ModuleDeclarationPsiNode(node: ASTNode)
   override def getElementName: String = getName
 
   def getPorts: Iterable[PortDeclarationPsiNode] = {
-    Iterable.empty
+    PsiTreeUtil.findChildrenOfAnyType(this, classOf[PortDeclarationPsiNode]).asScala
   }
 }

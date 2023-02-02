@@ -13,6 +13,7 @@ class NamedPortConnectionReference(element: NamedPortConnectionPsiNode)
     true
   ) {
   override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] = {
+    // first: find which module
     val moduleInstantiationPsiNode = PsiTreeUtil.getParentOfType(myElement, classOf[ModuleInstantiationPsiNode])
     if (moduleInstantiationPsiNode == null) return Array.empty
 
@@ -20,9 +21,10 @@ class NamedPortConnectionReference(element: NamedPortConnectionPsiNode)
       .map(it => it.getElement)
       .filter(it => it.isInstanceOf[ModuleDeclarationPsiNode])
       .map(it => it.asInstanceOf[ModuleDeclarationPsiNode])
-      // .flatMap
-      .filter(it => it.getName == myElement.getHoldPsiNode.getName)
-      .map(new PsiElementResolveResult(_))
+      .map(it => it.getPorts)
+      .reduce(_ ++ _)
+      .filter(_.getIdentifier.getName == element.getHoldPsiNode.getName)
+      .map(new PsiElementResolveResult((_)))
       .toArray
   }
 
