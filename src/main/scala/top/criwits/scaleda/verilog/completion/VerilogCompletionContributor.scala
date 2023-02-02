@@ -7,7 +7,7 @@ import com.intellij.codeInsight.completion.{CompletionContributor, CompletionTyp
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.StandardPatterns.{and, not}
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.NamedPortConnectionPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.module.PortIdentifierPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.PortIdentifierPsiNode
 import top.criwits.scaleda.verilog.{VerilogFileType, VerilogKeywords}
 
 class VerilogCompletionContributor extends CompletionContributor {

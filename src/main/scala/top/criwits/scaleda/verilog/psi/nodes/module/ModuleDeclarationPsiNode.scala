@@ -9,6 +9,7 @@ import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import top.criwits.scaleda.verilog.psi.VerilogPsiLeafNodeFactory
+import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode
 
 class ModuleDeclarationPsiNode(node: ASTNode)
   extends ANTLRPsiNode(node)
@@ -50,6 +51,7 @@ class ModuleDeclarationPsiNode(node: ASTNode)
 //            .filterIsInstance(PsiNamedElement::class.java)
 //    }
 
+
   override def getNameIdentifier: PsiElement = {
     val identifier = PsiTreeUtil.findChildOfAnyType(this, classOf[ModuleIdentifierPsiNode])
     identifier // FIXME: if null?
@@ -68,4 +70,8 @@ class ModuleDeclarationPsiNode(node: ASTNode)
   }
 
   override def getElementName: String = getName
+
+  def getPorts: Iterable[PortDeclarationPsiNode] = {
+    Iterable.empty
+  }
 }

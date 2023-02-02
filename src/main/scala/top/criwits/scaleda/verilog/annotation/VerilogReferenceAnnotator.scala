@@ -7,7 +7,8 @@ import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSever
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiReferenceBase}
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NamedPortConnectionPsiNode}
-import top.criwits.scaleda.verilog.psi.nodes.module.{ModuleIdentifierPsiNode, PortIdentifierPsiNode}
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleIdentifierPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.PortIdentifierPsiNode
 
 class VerilogReferenceAnnotator extends Annotator {
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {

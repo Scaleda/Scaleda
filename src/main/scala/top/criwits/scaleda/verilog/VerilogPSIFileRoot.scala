@@ -11,7 +11,7 @@ import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 import javax.swing.Icon
 
 class VerilogPSIFileRoot(viewProvider: FileViewProvider)
-  extends PsiFileBase(viewProvider, VerilogLanguage) with ScopeNode {
+  extends PsiFileBase(viewProvider, VerilogLanguage) /* with ScopeNode */ {
 
   override def getFileType: FileType = VerilogFileType.instance.asInstanceOf[FileType]
 
@@ -26,6 +26,6 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
       .toArray
       .map(x => x.asInstanceOf[PsiNamedElement])
 
-  override def getAvailableNamedElements =
-    PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
+//  override def getAvailableNamedElements =
+//    PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
 }

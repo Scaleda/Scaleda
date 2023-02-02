@@ -15,10 +15,7 @@ import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPs
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.NamedPortConnectionPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.module.*;
-import top.criwits.scaleda.verilog.psi.nodes.signal.NetDeclarationPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.signal.NetIdentifierPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.signal.VariableDeclarationPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.signal.VariableIdentifierPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.signal.*;
 
 import java.util.HashMap;
 import java.util.Map;

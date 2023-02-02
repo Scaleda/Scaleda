@@ -10,7 +10,7 @@ import top.criwits.scaleda.verilog.{VerilogFileType, VerilogPSIFileRoot}
 import scala.jdk.javaapi.CollectionConverters
 
 object FileUtils {
-  def getAllVerilogFiles(project: Project): List[VerilogPSIFileRoot] = {
+  def getAllVerilogFiles(project: Project): List[VerilogPSIFileRoot] = { // FIXME: if source not in src/ will also match
     FileTypeIndex.getFiles(VerilogFileType.instance, GlobalSearchScope.allScope(project))
       .toArray
       .map(it => PsiManager.getInstance(project).findFile(it.asInstanceOf[VirtualFile]))
