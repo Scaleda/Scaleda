@@ -11,6 +11,7 @@
     <depends>com.intellij.properties</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.java</depends> <!-- see https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ -->
 
     <resource-bundle>bundles.ScaledaBundle</resource-bundle>
 
@@ -53,7 +54,7 @@
                                implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
         <lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
         <lang.syntaxHighlighterFactory language="Verilog"
-                                       implementationClass="top.criwits.scaleda.verilog.VerilogSyntaxHighlighterFactory"/>
+                                       implementationClass="top.criwits.scaleda.verilog.highlight.VerilogSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="Verilog"
                                       implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory" />
         <completion.contributor language="Verilog"
@@ -90,6 +91,7 @@
                                  key="settings.toolchains"
                                  id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
                                  instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
+        <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage" />
 
     </extensions>
 
