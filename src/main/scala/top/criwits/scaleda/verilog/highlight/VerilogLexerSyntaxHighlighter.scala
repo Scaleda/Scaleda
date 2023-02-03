@@ -17,6 +17,7 @@ class VerilogLexerSyntaxHighlighter extends SyntaxHighlighterBase {
     new ANTLRLexerAdaptor(VerilogLanguage, new VerilogLexer(null))
 
   override def getTokenHighlights(tokenType: IElementType): Array[TextAttributesKey] = {
+    if (!tokenType.isInstanceOf[TokenIElementType]) return Array.empty
     val tokenIElementType = tokenType.asInstanceOf[TokenIElementType]
     val t                 = tokenIElementType.getANTLRTokenType
     import VerilogLexerSyntaxHighlighter._
@@ -54,20 +55,26 @@ object VerilogLexerSyntaxHighlighter {
   val VERILOG_SEMICOLON = createTextAttributesKey("VERILOG_SEMICOLON", DLHC.SEMICOLON)
   val VERILOG_COMMA     = createTextAttributesKey("VERILOG_COMMA", DLHC.COMMA)
 
+
+
+  // Signals
+  val VERILOG_SIGNAL_NET       = createTextAttributesKey("VERILOG_SIGNAL_NET", DLHC.STATIC_FIELD)
+  val VERILOG_SIGNAL_REG       = createTextAttributesKey("VERILOG_SIGNAL_REG", DLHC.INSTANCE_FIELD)
+  val VERILOG_SIGNAL_PARAMETER = createTextAttributesKey("VERILOG_SIGNAL_PARAMETER", DLHC.PARAMETER)
+
   // Module
   val VERILOG_MODULE_IDENTIFIER    = createTextAttributesKey("VERILOG_MODULE_IDENTIFIER", DLHC.CLASS_NAME)
   val VERILOG_MODULE_INSTANTIATION = createTextAttributesKey("VERILOG_MODULE_INSTANTIATION", DLHC.FUNCTION_DECLARATION)
+  val VERILOG_PORT_INPUT = createTextAttributesKey("VERILOG_PORT_INPUT", VERILOG_SIGNAL_NET)
+  val VERILOG_PORT_INOUT = createTextAttributesKey("VERILOG_PORT_INOUT", VERILOG_SIGNAL_NET)
+  val VERILOG_PORT_OUTPUT = createTextAttributesKey("VERILOG_PORT_OUTPUT", VERILOG_SIGNAL_NET)
+  val VERILOG_PORT_OUTPUT_REG = createTextAttributesKey("VERILOG_PORT_OUTPUT_REG", VERILOG_SIGNAL_REG)
 
   // Comments
   val VERILOG_BLOCK_COMMENT =
     createTextAttributesKey("VERILOG_BLOCK_COMMENT", DLHC.BLOCK_COMMENT)
   val VERILOG_LINE_COMMENT =
     createTextAttributesKey("VERILOG_LINE_COMMENT", DLHC.LINE_COMMENT)
-
-  // Signals
-  val VERILOG_SIGNAL_NET       = createTextAttributesKey("VERILOG_SIGNAL_NET", DLHC.STATIC_FIELD)
-  val VERILOG_SIGNAL_REG       = createTextAttributesKey("VERILOG_SIGNAL_REG", DLHC.INSTANCE_FIELD)
-  val VERILOG_SIGNAL_PARAMETER = createTextAttributesKey("VERILOG_SIGNAL_PARAMETER", DLHC.PARAMETER)
 
   // Numbers
   val VERILOG_NUMBER = createTextAttributesKey("VERILOG_NUMBER", DLHC.NUMBER)

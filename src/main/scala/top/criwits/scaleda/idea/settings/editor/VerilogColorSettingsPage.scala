@@ -16,7 +16,40 @@ class VerilogColorSettingsPage extends ColorSettingsPage {
 
   override def getHighlighter: SyntaxHighlighter = new VerilogLexerSyntaxHighlighter
 
-  override def getDemoText: String = "" // TODO
+  override def getDemoText: String = "`timescale 1ns / 1ps\n" +
+"\n" +
+"module full_adder #(\n" +
+"    parameter SOURCE_WIDTH = 32, RESULT_WIDTH = 32\n" +
+") (\n" +
+"    input clk,\n" +
+"    input rst,\n" +
+"    input [SOURCE_WIDTH - 1:0] a,\n" +
+"    input [SOURCE_WIDTH - 1:0] b,\n" +
+"    output reg [RESULT_WIDTH - 1:0] c\n" +
+");\n" +
+"\n" +
+"    wire [RESULT_WIDTH - 1:0] a_regulated;\n" +
+"    wire [RESULT_WIDTH - 1:0] b_regulated;\n" +
+"\n" +
+"    regulator #(SOURCE_WIDTH, RESULT_WIDTH) u_regulator_a (\n" +
+"        .in (a),\n" +
+"        .out (a_regulated)\n" +
+"    );\n" +
+"\n" +
+"    regulator #(SOURCE_WIDTH, RESULT_WIDTH) u_regulator_b (\n" +
+"        .in (b),\n" +
+"        .out (b_regulated)\n" +
+"    );\n" +
+"\n" +
+"    always @(posedge clk or posedge rst) begin\n" +
+"        if (rst) c <= RESULT_WIDTH'h0;\n" +
+"        else begin\n" +
+"            c <= a_regulated + b_regulated;\n" +
+"            $display(\"Calculated result: %x\n\", c);\n" +
+"        end\n" +
+"    end\n" +
+"\n" +
+"endmodule\n"  // TODO
 
   override def getAdditionalHighlightingTagToDescriptorMap: util.Map[String, TextAttributesKey] = Map("" +
     "module_identifier" -> VerilogLexerSyntaxHighlighter.VERILOG_MODULE_IDENTIFIER).asJava

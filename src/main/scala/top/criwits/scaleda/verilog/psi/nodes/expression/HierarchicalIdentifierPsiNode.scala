@@ -9,6 +9,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.{SignalDeclarationPsiNode, SignalIdentifierPsiNode}
 
 /**
  * Represents references in expressions, for example, `clk` in `always @(posedge clk)` or `rst` in `if (rst)`
@@ -33,6 +34,13 @@ class HierarchicalIdentifierPsiNode(node: ASTNode)
 
   override def getReference: PsiReference = {
     new HierarchicalIdentifierReference(this)
+  }
+
+  def resolveReferenceIdentifier: SignalIdentifierPsiNode = {
+    val reference = getReference
+    if (reference == null) return null
+
+    reference.resolve().asInstanceOf[SignalIdentifierPsiNode]
   }
 
 }

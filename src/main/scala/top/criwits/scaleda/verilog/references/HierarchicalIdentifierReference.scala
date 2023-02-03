@@ -6,6 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiReferenceBase}
 import top.criwits.scaleda.verilog.psi.nodes.IdentifierPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
 
 import scala.jdk.CollectionConverters._
 
@@ -19,21 +20,11 @@ class HierarchicalIdentifierReference(element: HierarchicalIdentifierPsiNode)
       element.getHoldPsiNodeRelativeTextRange()
     ) {
 
-//    override def resolve(): PsiElement? {
-//        return (PsiTreeUtil
-//            .getParentOfType(
-//                myElement,
-//                ModuleDeclarationPsiNode::class.java
-//            ) ?: return null)
-////                .availableNamedElements
-////                .find { it.name == myElement.name }
-//    }
-
   override def resolve(): PsiElement = {
     val module = PsiTreeUtil.getParentOfType(myElement, classOf[ModuleDeclarationPsiNode])
     if (module == null) return null
 
-    val identifiers = PsiTreeUtil.findChildrenOfAnyType(module, classOf[IdentifierPsiNode]).asScala
+    val identifiers = PsiTreeUtil.findChildrenOfAnyType(module, classOf[SignalIdentifierPsiNode]).asScala
     identifiers.find(p => p.getName == element.getName).orNull
   }
 

@@ -2,15 +2,18 @@ package top.criwits.scaleda
 package verilog.highlight
 
 import verilog.psi.nodes.DirectivePsiNode
+import verilog.psi.nodes.expression.HierarchicalIdentifierPsiNode
+import verilog.psi.nodes.module.ModuleIdentifierPsiNode
+import verilog.psi.nodes.signal.{
+  NetIdentifierPsiNode,
+  PortDeclarationPsiNode,
+  PortIdentifierPsiNode,
+  VariableIdentifierPsiNode
+}
 
-import com.intellij.ide.highlighter.JavaHighlightingColors
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
 import com.intellij.psi.PsiElement
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleIdentifierPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.{NetIdentifierPsiNode, VariableIdentifierPsiNode}
 
 /** Dynamic, parser-based highlighter!
   */
@@ -19,13 +22,42 @@ class VerilogHighlightingAnnotator extends Annotator {
     implicit val annotationHolder: AnnotationHolder = holder
 
     element match {
-      case _: DirectivePsiNode => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_DIRECTIVE)
+      case _: DirectivePsiNode        => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_DIRECTIVE)
       case _: ModuleIdentifierPsiNode => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_MODULE_IDENTIFIER)
-      case _: NetIdentifierPsiNode => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_SIGNAL_NET)
+      case n: PortIdentifierPsiNode =>
+        n.getPortType match {
+          case PortDeclarationPsiNode.INPUT  => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_INPUT)
+          case PortDeclarationPsiNode.INOUT  => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_INOUT)
+          case PortDeclarationPsiNode.OUTPUT => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_OUTPUT)
+          case PortDeclarationPsiNode.OUTPUT_REG =>
+            highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_OUTPUT_REG)
+          case _ =>
+        }
+
+      case _: NetIdentifierPsiNode      => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_SIGNAL_NET)
       case _: VariableIdentifierPsiNode => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_SIGNAL_REG)
+
+      case n: HierarchicalIdentifierPsiNode =>
+        n.resolveReferenceIdentifier match {
+          case _: NetIdentifierPsiNode =>
+            highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_SIGNAL_NET)
+          case _: VariableIdentifierPsiNode =>
+            highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_SIGNAL_REG)
+          case m: PortIdentifierPsiNode =>
+            m.getPortType match {
+              case PortDeclarationPsiNode.INPUT => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_INPUT)
+              case PortDeclarationPsiNode.INOUT => highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_INOUT)
+              case PortDeclarationPsiNode.OUTPUT =>
+                highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_OUTPUT)
+              case PortDeclarationPsiNode.OUTPUT_REG =>
+                highlight(element, VerilogLexerSyntaxHighlighter.VERILOG_PORT_OUTPUT_REG)
+              case _ =>
+            }
+          case _ =>
+        }
+
       case _ =>
     }
-
   }
 
   private def highlight(element: PsiElement, attribute: TextAttributesKey)(implicit

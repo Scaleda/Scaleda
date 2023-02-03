@@ -20,6 +20,8 @@ abstract class SignalIdentifierPsiNode(node: ASTNode)
     getNameIdentifier.getText
   }
 
+  def getDeclaration: SignalDeclarationPsiNode = PsiTreeUtil.getParentOfType(this, classOf[SignalDeclarationPsiNode])
+
   override def getNameIdentifier: PsiElement = getFirstChild.getFirstChild // TODO: really?
 
   @throws[IncorrectOperationException]
@@ -28,7 +30,7 @@ abstract class SignalIdentifierPsiNode(node: ASTNode)
 
   override def getElementName: String = if (getName == null) "(unknown)"
   else {
-    val parent = PsiTreeUtil.getParentOfType(this, classOf[SignalDeclarationPsiNode])
+    val parent = getDeclaration
     if (parent != null) getName + ": " + parent.getTypeText
     else getName + ": (unknown type)"
   }
