@@ -43,9 +43,10 @@ final class TclParserDefinition extends ParserDefinition {
     SpaceRequirements.MAY
 }
 
+//noinspection DuplicatedCode
 object TclParserDefinition {
   private val vocabulary = TclParser.VOCABULARY
-  val tokenNames = (0 until vocabulary.getMaxTokenType)
+  val tokenNames = (0 to vocabulary.getMaxTokenType) // LONG RINGS THE ALARM BELL
     .map(x => (x, vocabulary.getLiteralName(x)))
     .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
     .map(x => if (x._2 == null) "<INVALID>" else x._2)

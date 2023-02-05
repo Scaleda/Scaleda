@@ -12,6 +12,12 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
 import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, TokenIElementType}
 
+/**
+ * Syntax highlighter for Verilog
+ *
+ * Registered by [[VerilogSyntaxHighlighterFactory]], providing lexer-based highlighting functionality.
+ * Note that grammar-based highlighting is implemented by [[VerilogHighlightingAnnotator]].
+ */
 class VerilogLexerSyntaxHighlighter extends SyntaxHighlighterBase {
   override def getHighlightingLexer: Lexer =
     new ANTLRLexerAdaptor(VerilogLanguage, new VerilogLexer(null))
