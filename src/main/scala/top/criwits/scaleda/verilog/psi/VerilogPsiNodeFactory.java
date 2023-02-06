@@ -35,6 +35,11 @@ public class VerilogPsiNodeFactory {
     );
 
     // Module
+    /// Module keywords
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_module_keyword),
+        ModuleKeywordPsiNode.class
+    );
     /// Module declaration
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_module_declaration),
@@ -45,10 +50,19 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_module_identifier),
         ModuleIdentifierPsiNode.class
     );
+    /// Module parameter
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_module_parameter_port_list),
+        ModuleParameterPortListPsiNode.class
+    );
     /// Port declarations list
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_list_of_port_declarations),
         ListOfPortDeclarationsPsiNode.class
+    );
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_list_of_ports),
+        ListOfPortsPsiNode.class
     );
     /// Port declaration
     ruleIElementTypeClassMap.put(
@@ -62,7 +76,7 @@ public class VerilogPsiNodeFactory {
     );
     /// Parameter declaration
     ruleIElementTypeClassMap.put(
-        getRuleIElementType(VerilogParser.RULE_parameter_declaration),
+        getRuleIElementType(VerilogParser.RULE_parameter_declaration_), // this without ';'
         ParameterDeclarationPsiNode.class
     );
     /// Parameter identifier

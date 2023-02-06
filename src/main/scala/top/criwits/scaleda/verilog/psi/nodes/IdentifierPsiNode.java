@@ -30,7 +30,11 @@ public class IdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifier
     public PsiElement getNameIdentifier() {
         // we are sure that RULE_identifier always has only one
         // leaf child which is either Simple_identifier or Escaped_identifier
-        return this.getNode().getFirstChildNode().getPsi();
+        try {
+            return this.getNode().getFirstChildNode().getPsi();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     @Override
