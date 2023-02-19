@@ -1,0 +1,43 @@
+package top.criwits.scaleda
+package verilog
+
+import com.intellij.lang.{BracePair, PairedBraceMatcher}
+import com.intellij.psi.PsiFile
+import com.intellij.psi.tree.IElementType
+import org.antlr.intellij.adaptor.lexer.{PSIElementTypeFactory, TokenIElementType}
+import top.criwits.scaleda.verilog.VerilogBraceMatcherProvider.PAIRS
+import top.criwits.scaleda.verilog.parser.VerilogLexer
+
+class VerilogBraceMatcherProvider extends PairedBraceMatcher {
+  override def getPairs: Array[BracePair] = PAIRS
+
+  override def isPairedBracesAllowedBeforeType(lbraceType: IElementType, contextType: IElementType): Boolean = true
+
+  override def getCodeConstructStart(file: PsiFile, openingBraceOffset: Int): Int = openingBraceOffset
+}
+
+object VerilogBraceMatcherProvider {
+  final val PAIRS: Array[BracePair] = Array(
+    new BracePair(
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Left_brace),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_brace),
+      false
+    ),
+    new BracePair(
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Left_bracket),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_bracket),
+      false
+    ),
+    new BracePair(
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Left_parenthes),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_parenthes),
+      false
+    ),
+    new BracePair(
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_begin),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_end),
+      true
+    ),
+  )
+
+}

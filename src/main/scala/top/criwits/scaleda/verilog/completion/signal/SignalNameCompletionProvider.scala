@@ -1,9 +1,10 @@
 package top.criwits.scaleda
-package verilog.completion
+package verilog.completion.signal
 
 import idea.utils.Icons
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
-import verilog.psi.nodes.signal.{NetDeclarationPsiNode, NetIdentifierPsiNode, PortDeclarationPsiNode, PortIdentifierPsiNode, VariableDeclarationPsiNode, VariableIdentifierPsiNode}
+import verilog.psi.nodes.signal.PortDeclarationPsiNode._
+import verilog.psi.nodes.signal._
 
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionProvider, CompletionResultSet}
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -11,9 +12,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 
 import scala.jdk.CollectionConverters._
-import verilog.psi.nodes.signal.PortDeclarationPsiNode._
-
-import com.intellij.icons.AllIcons
 
 class SignalNameCompletionProvider(
     net: Boolean = true,

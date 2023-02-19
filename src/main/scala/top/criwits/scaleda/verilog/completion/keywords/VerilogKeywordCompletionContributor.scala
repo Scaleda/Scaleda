@@ -1,7 +1,5 @@
 package top.criwits.scaleda
-package verilog.completion
-
-import verilog.completion.keywords._
+package verilog.completion.keywords
 
 import com.intellij.codeInsight.completion._
 import com.intellij.codeInsight.lookup.LookupElementBuilder

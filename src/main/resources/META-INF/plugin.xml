@@ -57,10 +57,12 @@
                                        implementationClass="top.criwits.scaleda.verilog.highlight.VerilogSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="Verilog"
                                       implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory" />
+        <lang.braceMatcher language="Verilog"
+                           implementationClass="top.criwits.scaleda.verilog.VerilogBraceMatcherProvider" />
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.verilog.completion.SignalNameCompletionContributor" />
+                                implementationClass="top.criwits.scaleda.verilog.completion.signal.SignalNameCompletionContributor" />
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.verilog.completion.VerilogKeywordCompletionContributor"/>
+                                implementationClass="top.criwits.scaleda.verilog.completion.keywords.VerilogKeywordCompletionContributor"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"

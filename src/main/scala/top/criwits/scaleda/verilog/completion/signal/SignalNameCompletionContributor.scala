@@ -1,15 +1,9 @@
 package top.criwits.scaleda
-package verilog.completion
-
-import verilog.psi.nodes.expression.{ExpressionPsiNode, HierarchicalIdentifierPsiNode}
+package verilog.completion.signal
 
 import com.intellij.codeInsight.completion.{CompletionContributor, CompletionType}
 import com.intellij.patterns.PlatformPatterns
-import com.intellij.patterns.StandardPatterns.{and, not}
 import com.intellij.psi.filters.position.FilterPattern
-import top.criwits.scaleda.verilog.completion.signal.RightExpressionFilter
-import top.criwits.scaleda.verilog.psi.nodes.DirectivePsiNode
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 class SignalNameCompletionContributor extends CompletionContributor {
   extend(
@@ -17,4 +11,11 @@ class SignalNameCompletionContributor extends CompletionContributor {
     PlatformPatterns.psiElement.and(new FilterPattern(new RightExpressionFilter)),
     new SignalNameCompletionProvider
   )
+
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns.psiElement.and(new FilterPattern(new LeftExpressionFilter)),
+    new SignalNameCompletionProvider(net = false, reg = true, input = false, output = false, outputReg = true)
+  )
+
 }
