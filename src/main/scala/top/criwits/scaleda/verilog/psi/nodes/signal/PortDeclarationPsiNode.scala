@@ -17,6 +17,8 @@ class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(nod
       else return OUTPUT
     }
 
+    // TODO: In this case, should search source code!!!
+
     INPUT // FIXME: ?
   }
 }

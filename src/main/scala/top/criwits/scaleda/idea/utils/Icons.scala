@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package idea.utils
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
 
 import javax.swing.Icon
@@ -25,6 +26,11 @@ object Icons {
   final val verilogWire = getIcon("/icons/verilog-wire")
   final val verilogReg = getIcon("/icons/verilog-reg")
   final val verilogAlways = getIcon("/icons/verilog-always")
+
+  final val verilogInput =AllIcons.Nodes.Interface
+  final val verilogOutput = getIcon("/icons/verilog-output")
+  final val verilogInout = getIcon("/icons/verilog-inout")
+  final val verilogOutputReg = getIcon("/icons/verilog-output-reg")
 
   final val tcl = IconLoader.getIcon("/icons/tcl", Icons.getClass)
   final val toolWindow =

@@ -3,7 +3,7 @@ package verilog.completion
 
 import idea.utils.Icons
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
-import verilog.psi.nodes.signal.{NetDeclarationPsiNode, NetIdentifierPsiNode}
+import verilog.psi.nodes.signal.{NetDeclarationPsiNode, NetIdentifierPsiNode, PortDeclarationPsiNode, PortIdentifierPsiNode, VariableDeclarationPsiNode, VariableIdentifierPsiNode}
 
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionProvider, CompletionResultSet}
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -11,6 +11,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 
 import scala.jdk.CollectionConverters._
+import verilog.psi.nodes.signal.PortDeclarationPsiNode._
+
+import com.intellij.icons.AllIcons
 
 class SignalNameCompletionProvider(
     net: Boolean = true,
@@ -42,11 +45,41 @@ class SignalNameCompletionProvider(
           )
         )
       })
-
     }
 
     if (reg) {
+      val regDeclarations =
+        PsiTreeUtil.findChildrenOfAnyType(currentModuleDeclaration, classOf[VariableDeclarationPsiNode]).asScala
+      regDeclarations.foreach(f => {
+        val regIdentifiers = PsiTreeUtil.findChildrenOfAnyType(f, classOf[VariableIdentifierPsiNode]).asScala
 
+        regIdentifiers.foreach(id => result.addElement(LookupElementBuilder.create(id.getName).withIcon(Icons.verilogReg).withTypeText(f.getTypeText)))
+      })
     }
+
+    val portDeclarations =
+      PsiTreeUtil.findChildrenOfAnyType(currentModuleDeclaration, classOf[PortDeclarationPsiNode]).asScala
+
+    portDeclarations.foreach(f => {
+      val identifiers = PsiTreeUtil.findChildrenOfAnyType(f, classOf[PortIdentifierPsiNode]).asScala
+
+      identifiers.foreach(id => {
+          f.getPortType match {
+            case INPUT => if (input) {
+              result.addElement(LookupElementBuilder.create(id.getName).withIcon(Icons.verilogInput).withTypeText("input"))
+            }
+            case OUTPUT => if (output) {
+              result.addElement(LookupElementBuilder.create(id.getName).withIcon(Icons.verilogOutput).withTypeText("output"))
+            }
+            case INOUT => if (input || output) {
+              result.addElement(LookupElementBuilder.create(id.getName).withIcon(Icons.verilogInout).withTypeText("inout"))
+            }
+            case OUTPUT_REG => if (outputReg) {
+              result.addElement(LookupElementBuilder.create(id.getName).withIcon(Icons.verilogOutputReg).withTypeText("output reg"))
+            }
+          }
+      })
+
+    })
   }
 }
