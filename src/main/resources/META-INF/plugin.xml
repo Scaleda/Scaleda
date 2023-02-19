@@ -58,6 +58,8 @@
         <lang.psiStructureViewFactory language="Verilog"
                                       implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory" />
         <completion.contributor language="Verilog"
+                                implementationClass="top.criwits.scaleda.verilog.completion.SignalNameCompletionContributor" />
+        <completion.contributor language="Verilog"
                                 implementationClass="top.criwits.scaleda.verilog.completion.VerilogKeywordCompletionContributor"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
