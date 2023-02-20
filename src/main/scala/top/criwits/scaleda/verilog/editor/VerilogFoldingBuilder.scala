@@ -4,7 +4,7 @@ package verilog.editor
 import verilog.VerilogPSIFileRoot
 import verilog.editor.VerilogFoldingBuilder.folding
 import verilog.parser.VerilogParser
-import verilog.psi.nodes.block.SeqBlockPsiNode
+import verilog.psi.nodes.block.{CaseStatementPsiNode, SeqBlockPsiNode}
 import verilog.psi.nodes.module.{ListOfPortDeclarationsPsiNode, ModuleDeclarationPsiNode}
 
 import com.intellij.lang.ASTNode
@@ -71,7 +71,26 @@ object VerilogFoldingBuilder {
       classOf[ListOfPortDeclarationsPsiNode],
       foldBlock,
       (_: ASTNode) => "(...)"
-    )
+    ),
+    (
+      VerilogParser.RULE_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
+      case Some(expression) => expression.getText
+      case None => "???"
+    }}) ...endcase"
+    ),
+    (
+      VerilogParser.RULE_function_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
+      case Some(expression) => expression.getText
+      case None => "???"
+    }}) ...endcase"
+    ),
+    (
+      VerilogParser.RULE_generate_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
+      case Some(expression) => expression.getText
+      case None => "???"
+    }}) ...endcase"
+    ),
+
 
     // TODO: Add more!
   )
