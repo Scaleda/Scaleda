@@ -11,6 +11,7 @@ import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.nodes.*;
 import top.criwits.scaleda.verilog.psi.nodes.always.AlwaysConstructPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.always.DelayOrEventControlPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.block.SeqBlockPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.expression.ExpressionPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode;
@@ -123,6 +124,11 @@ public class VerilogPsiNodeFactory {
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_variable_identifier),
         VariableIdentifierPsiNode.class
+    );
+
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_seq_block),
+        SeqBlockPsiNode.class
     );
 
     ruleIElementTypeClassMap.put(

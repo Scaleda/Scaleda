@@ -58,7 +58,7 @@
         <lang.psiStructureViewFactory language="Verilog"
                                       implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory" />
         <lang.braceMatcher language="Verilog"
-                           implementationClass="top.criwits.scaleda.verilog.VerilogBraceMatcherProvider" />
+                           implementationClass="top.criwits.scaleda.verilog.editor.VerilogBraceMatcherProvider" />
         <completion.contributor language="Verilog"
                                 implementationClass="top.criwits.scaleda.verilog.completion.signal.SignalNameCompletionContributor" />
         <completion.contributor language="Verilog"
@@ -72,6 +72,7 @@
         
         <!-- editor -->
         <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterBeginHandler" />
+        <lang.foldingBuilder language="Verilog" implementationClass="top.criwits.scaleda.verilog.editor.VerilogFoldingBuilder" />
 <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
 
     </extensions>

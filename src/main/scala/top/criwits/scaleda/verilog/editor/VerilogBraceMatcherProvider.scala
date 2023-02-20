@@ -1,12 +1,14 @@
 package top.criwits.scaleda
-package verilog
+package verilog.editor
+
+import verilog.VerilogLanguage
+import verilog.editor.VerilogBraceMatcherProvider.PAIRS
+import verilog.parser.VerilogLexer
 
 import com.intellij.lang.{BracePair, PairedBraceMatcher}
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
-import org.antlr.intellij.adaptor.lexer.{PSIElementTypeFactory, TokenIElementType}
-import top.criwits.scaleda.verilog.VerilogBraceMatcherProvider.PAIRS
-import top.criwits.scaleda.verilog.parser.VerilogLexer
+import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory
 
 class VerilogBraceMatcherProvider extends PairedBraceMatcher {
   override def getPairs: Array[BracePair] = PAIRS
