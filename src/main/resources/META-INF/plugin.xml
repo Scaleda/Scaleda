@@ -69,6 +69,10 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.VerilogReferenceAnnotator"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
+        
+        <!-- editor -->
+        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterBeginHandler" />
+<!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
 
     </extensions>
 

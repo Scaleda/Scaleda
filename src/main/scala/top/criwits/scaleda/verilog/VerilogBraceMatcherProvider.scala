@@ -18,6 +18,7 @@ class VerilogBraceMatcherProvider extends PairedBraceMatcher {
 
 object VerilogBraceMatcherProvider {
   final val PAIRS: Array[BracePair] = Array(
+    // {} [] ()
     new BracePair(
       PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Left_brace),
       PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_brace),
@@ -33,9 +34,22 @@ object VerilogBraceMatcherProvider {
       PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_parenthes),
       false
     ),
+    // begin ... end
     new BracePair(
       PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_begin),
       PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_end),
+      true
+    ),
+    // case ... endcase
+    new BracePair(
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_case),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_endcase),
+      true
+    ),
+    // module ... endmodule
+    new BracePair(
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_module),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_endmodule),
       true
     ),
   )
