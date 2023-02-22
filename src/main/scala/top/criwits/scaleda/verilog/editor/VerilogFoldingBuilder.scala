@@ -28,7 +28,7 @@ class VerilogFoldingBuilder extends CustomFoldingBuilder {
     if (!root.isInstanceOf[VerilogPSIFileRoot]) return
     folding.foreach(fold => {
       val elements = PsiTreeUtil.findChildrenOfAnyType(root, fold._2).asScala
-      (fold._3)(descriptors, elements, document)
+      fold._3(descriptors, elements, document)
     })
   }
 
