@@ -1,8 +1,8 @@
 package top.criwits.scaleda
-package verilog.editor
+package verilog.editor.folding
 
 import verilog.VerilogPSIFileRoot
-import verilog.editor.VerilogFoldingBuilder.folding
+import verilog.editor.folding.VerilogFoldingBuilder.folding
 import verilog.parser.VerilogParser
 import verilog.psi.nodes.block.{CaseStatementPsiNode, SeqBlockPsiNode}
 import verilog.psi.nodes.module.{ListOfPortDeclarationsPsiNode, ModuleDeclarationPsiNode}

@@ -1,20 +1,17 @@
 package top.criwits.scaleda
-package verilog.smart
+package verilog.editor.enter
 
 import verilog.VerilogPSIFileRoot
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate.Result
 import com.intellij.codeInsight.editorActions.enter.{EnterHandlerDelegate, EnterHandlerDelegateAdapter}
-import com.intellij.codeInsight.highlighting.{BraceMatcher, BraceMatchingUtil}
-import com.intellij.lang.Language
+import com.intellij.codeInsight.highlighting.BraceMatchingUtil
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
-import com.intellij.openapi.editor.highlighter.{EditorHighlighter, HighlighterIterator}
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.util.Ref
-import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile}
 
@@ -106,8 +103,7 @@ class VerilogEnterBeginHandler extends EnterHandlerDelegateAdapter {
       iterator.advance()
     }
 
-    return lBracesBeforeOffset - rBracesAfterOffset
-
+    lBracesBeforeOffset - rBracesAfterOffset
   }
 
 }

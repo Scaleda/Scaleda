@@ -1,8 +1,8 @@
 package top.criwits.scaleda
-package verilog.editor
+package verilog.editor.brace
 
 import verilog.VerilogLanguage
-import verilog.editor.VerilogBraceMatcherProvider.PAIRS
+import verilog.editor.brace.VerilogBraceMatcherProvider.PAIRS
 import verilog.parser.VerilogLexer
 
 import com.intellij.lang.{BracePair, PairedBraceMatcher}

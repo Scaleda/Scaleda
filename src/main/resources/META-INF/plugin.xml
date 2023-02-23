@@ -58,7 +58,7 @@
         <lang.psiStructureViewFactory language="Verilog"
                                       implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory" />
         <lang.braceMatcher language="Verilog"
-                           implementationClass="top.criwits.scaleda.verilog.editor.VerilogBraceMatcherProvider" />
+                           implementationClass="top.criwits.scaleda.verilog.editor.brace.VerilogBraceMatcherProvider" />
         <completion.contributor language="Verilog"
                                 implementationClass="top.criwits.scaleda.verilog.completion.signal.SignalNameCompletionContributor" />
         <completion.contributor language="Verilog"
@@ -71,9 +71,10 @@
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
         
         <!-- editor -->
-        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterBeginHandler" />
-        <lang.foldingBuilder language="Verilog" implementationClass="top.criwits.scaleda.verilog.editor.VerilogFoldingBuilder" />
-<!--        <lineIndentProvider implementation="top.criwits.scaleda.verilog.formatter.VerilogLineIndentProvider" />-->
+        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterBeginHandler" />
+        <lang.foldingBuilder language="Verilog" implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder" />
+<!--        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.formatter.VerilogFormattingBuilderModel" />-->
+        <lineIndentProvider implementation="top.criwits.scaleda.verilog.formatter.VerilogLineIndentProvider" />
 <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
 
     </extensions>
