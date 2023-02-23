@@ -11,46 +11,40 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.util.text.CharArrayUtil
+import top.criwits.scaleda.verilog.formatter.VerilogLineIndentProvider.{getIndentString, moveAtEndOfPreviousLine}
 
 class VerilogLineIndentProvider extends LineIndentProvider {
 
   override def getLineIndent(project: Project, editor: Editor, language: Language, offset: Int): String = {
     if (offset > 0) {
       val pos = VerilogSemanticEditorPosition.createEditorPosition(editor, offset - 1)
-      if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.White_space))) {
+      if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.White_space))) { // This seems is needed to check if it is enter event
         moveAtEndOfPreviousLine(pos)
         if (pos.isAtAnyOf(
           VerilogLanguage.getTokenType(VerilogLexer.K_begin),
-          VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter] => ) \n
-          VerilogLanguage.getTokenType(VerilogLexer.Left_parenthes)
+          VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter]
+          VerilogLanguage.getTokenType(VerilogLexer.Left_parenthes), // (<caret> [Enter])
+          VerilogLanguage.getTokenType(VerilogLexer.K_else) // else <carent> [Enter]
         )) {
-          return getIndentString(editor, pos.getStartOffset, true)
+          return getIndentString(editor, pos.getStartOffset, 1)
         }
-        if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.Semicolon))) {
-          // for ...); <caret> [Enter]
-          pos.moveBeforeOptionalMix(
-            VerilogLanguage.getTokenType(VerilogLexer.Semicolon),
-            VerilogLanguage.getTokenType(VerilogLexer.White_space))
-          if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes))) {
-            return getIndentString(editor, pos.getStartOffset, true)
-          }
-        }
+
+        // TODO: check if `);`
+
+        return getIndentString(editor, pos.getStartOffset, 0)
       }
-//
-//      if (element.textMatches("begin")) {
-//        moveAtEndOfPreviousLine(pos)
-//        if (pos.isAtAnyOf(getTokenType(VerilogLexer.K_begin))) {
-//          println("begin detected")
-//          return getIndentString(editor, pos.getStartOffset, true)
-//        }
-//      }
+
     }
     null
   }
 
   override def isSuitableFor(language: Language): Boolean = language.isInstanceOf[VerilogLanguage.type] // ?
 
-  private def moveAtEndOfPreviousLine(pos: VerilogSemanticEditorPosition): Unit = {
+
+}
+
+object VerilogLineIndentProvider {
+  def moveAtEndOfPreviousLine(pos: VerilogSemanticEditorPosition): Unit = {
     pos.moveBeforeOptionalMix(VerilogLanguage.getTokenType(VerilogLexer.White_space))
     // should be enough
   }
@@ -59,10 +53,10 @@ class VerilogLineIndentProvider extends LineIndentProvider {
    * Magic?
    * @param editor
    * @param offset
-   * @param shouldExpand
+   * @param policy -1: shrink 0: hold 1: expand
    * @return
    */
-  private def getIndentString(editor: Editor, offset: Int, shouldExpand: Boolean): String = {
+  def getIndentString(editor: Editor, offset: Int, policy: Int): String = {
     val docChars = editor.getDocument.getCharsSequence
     val settings = CodeStyle.getSettings(editor)
     val indentOptions = settings.getIndentOptions(VerilogFileType.instance)
@@ -74,13 +68,13 @@ class VerilogLineIndentProvider extends LineIndentProvider {
         val indentEnd = CharArrayUtil.shiftForward(docChars, indentStart, " \t")
         val diff = indentEnd - indentStart
         if (diff > 0) {
-          if (shouldExpand) baseIndent = docChars.subSequence(indentStart, indentEnd).toString
+          if (policy >= 0) baseIndent = docChars.subSequence(indentStart, indentEnd).toString
           else if (diff >= 4) baseIndent = docChars.subSequence(indentStart, indentEnd - 4).toString
         }
       }
     }
 
-    if (shouldExpand) {
+    if (policy == 1) {
       baseIndent += new IndentInfo(0, 4, 0).generateNewWhiteSpace(indentOptions)
     }
     baseIndent
