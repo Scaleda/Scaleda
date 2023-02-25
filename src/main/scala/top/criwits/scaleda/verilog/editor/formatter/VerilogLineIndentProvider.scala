@@ -69,6 +69,12 @@ class VerilogLineIndentProvider extends LineIndentProvider {
         }
 
         // if () shrink indent
+        /// TODO: cannot shrink for
+        /// if ()
+        ///   if ()
+        ///     if ()
+        ///       foobar()
+        ///     | <= here
         if (currentElement != null && posStartElement != null) {
           val currentParent = PsiTreeUtil.getParentOfType(currentElement, classOf[ConditionalStatementPsiNode])
           val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ConditionalStatementPsiNode])

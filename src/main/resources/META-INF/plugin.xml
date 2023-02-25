@@ -74,6 +74,7 @@
         <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler" />
         <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler" />
         <lang.foldingBuilder language="Verilog" implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder" />
+        <lang.findUsagesProvider language="Verilog" implementationClass="top.criwits.scaleda.verilog.references.VerilogFindUsagesProvider" />
 <!--        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.formatter.VerilogFormattingBuilderModel" />-->
         <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider" />
 <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
