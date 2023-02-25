@@ -168,6 +168,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitModule_declaration(VerilogParser.Module_declarationContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#module_head}.
+	 * @param ctx the parse tree
+	 */
+	void enterModule_head(VerilogParser.Module_headContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#module_head}.
+	 * @param ctx the parse tree
+	 */
+	void exitModule_head(VerilogParser.Module_headContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#module_keyword}.
 	 * @param ctx the parse tree
 	 */
@@ -1298,6 +1308,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitGenerate_case_statement(VerilogParser.Generate_case_statementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#generate_case_body}.
+	 * @param ctx the parse tree
+	 */
+	void enterGenerate_case_body(VerilogParser.Generate_case_bodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#generate_case_body}.
+	 * @param ctx the parse tree
+	 */
+	void exitGenerate_case_body(VerilogParser.Generate_case_bodyContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#genvar_case_item}.
 	 * @param ctx the parse tree
 	 */
@@ -1648,6 +1668,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitCase_statement(VerilogParser.Case_statementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#case_body}.
+	 * @param ctx the parse tree
+	 */
+	void enterCase_body(VerilogParser.Case_bodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#case_body}.
+	 * @param ctx the parse tree
+	 */
+	void exitCase_body(VerilogParser.Case_bodyContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#case_item}.
 	 * @param ctx the parse tree
 	 */
@@ -1667,6 +1697,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunction_case_statement(VerilogParser.Function_case_statementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#function_case_body}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunction_case_body(VerilogParser.Function_case_bodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#function_case_body}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunction_case_body(VerilogParser.Function_case_bodyContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link VerilogParser#function_case_item}.
 	 * @param ctx the parse tree

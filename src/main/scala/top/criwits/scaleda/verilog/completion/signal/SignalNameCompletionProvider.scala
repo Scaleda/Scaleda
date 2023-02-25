@@ -62,6 +62,7 @@ class SignalNameCompletionProvider(
       val identifiers = PsiTreeUtil.findChildrenOfAnyType(f, classOf[PortIdentifierPsiNode]).asScala
 
       identifiers.foreach(id => {
+        if (id != null && id.getName != null && id.getName != "") {
           f.getPortType match {
             case INPUT => if (input) {
               result.addElement(LookupElementBuilder.create(id.getName).withIcon(Icons.verilogInput).withTypeText("input"))
@@ -76,6 +77,7 @@ class SignalNameCompletionProvider(
               result.addElement(LookupElementBuilder.create(id.getName).withIcon(Icons.verilogOutputReg).withTypeText("output reg"))
             }
           }
+        }
       })
 
     })

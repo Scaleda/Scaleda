@@ -107,6 +107,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitModule_declaration(VerilogParser.Module_declarationContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#module_head}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitModule_head(VerilogParser.Module_headContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#module_keyword}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -785,6 +791,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitGenerate_case_statement(VerilogParser.Generate_case_statementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#generate_case_body}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGenerate_case_body(VerilogParser.Generate_case_bodyContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#genvar_case_item}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -995,6 +1007,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCase_statement(VerilogParser.Case_statementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#case_body}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCase_body(VerilogParser.Case_bodyContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#case_item}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1006,6 +1024,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFunction_case_statement(VerilogParser.Function_case_statementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#function_case_body}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunction_case_body(VerilogParser.Function_case_bodyContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#function_case_item}.
 	 * @param ctx the parse tree

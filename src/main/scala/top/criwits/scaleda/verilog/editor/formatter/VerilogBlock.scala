@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package verilog.formatter
+package verilog.editor.formatter
 
 import verilog.VerilogLanguage.getRuleType
 import verilog.parser.{VerilogLexer, VerilogParser}

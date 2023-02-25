@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package verilog.formatter
+package verilog.editor.formatter
 
 import verilog.parser.VerilogLexer
 import verilog.{VerilogFileType, VerilogLanguage}
@@ -11,25 +11,59 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.util.text.CharArrayUtil
-import top.criwits.scaleda.verilog.formatter.VerilogLineIndentProvider.{getIndentString, moveAtEndOfPreviousLine}
+import VerilogLineIndentProvider.getIndentString
+import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.util.PsiTreeUtil
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleHeadPsiNode
 
 class VerilogLineIndentProvider extends LineIndentProvider {
 
+  //noinspection DuplicatedCode
   override def getLineIndent(project: Project, editor: Editor, language: Language, offset: Int): String = {
     if (offset > 0) {
       val pos = VerilogSemanticEditorPosition.createEditorPosition(editor, offset - 1)
       if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.White_space))) { // This seems is needed to check if it is enter event
-        moveAtEndOfPreviousLine(pos)
+        pos.moveAtEndOfPreviousLine()
+
+        // Semantic-based check
         if (pos.isAtAnyOf(
-          VerilogLanguage.getTokenType(VerilogLexer.K_begin),
           VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter]
           VerilogLanguage.getTokenType(VerilogLexer.Left_parenthes), // (<caret> [Enter])
-          VerilogLanguage.getTokenType(VerilogLexer.K_else) // else <carent> [Enter]
+          VerilogLanguage.getTokenType(VerilogLexer.K_else) // else <carent> [Enter] // TODO
         )) {
           return getIndentString(editor, pos.getStartOffset, 1)
         }
 
-        // TODO: check if `);`
+        if (pos.isAtAnyOf(
+          VerilogLanguage.getTokenType(VerilogLexer.K_begin)
+        )) {
+          return getIndentString(editor, pos.getStartOffset, 1)
+        }
+
+        // PSI-based check, update PSI
+        PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
+        val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument)
+
+        val currentElement = psiFile.findElementAt(offset)
+        val posStartElement = psiFile.findElementAt(pos.getStartOffset)
+
+        // indent after module head
+        /// if currentElement == null, should just reach the end
+        if (posStartElement != null) {
+          if (currentElement != null) {
+            val currentParent = PsiTreeUtil.getParentOfType(currentElement, classOf[ModuleHeadPsiNode])
+            val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ModuleHeadPsiNode])
+            if (currentParent == null && posStartParent != null)
+              return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 1)
+          } else {
+            val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ModuleHeadPsiNode])
+            if (posStartParent != null)
+              return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 1)
+          }
+        }
+
+
+
 
         return getIndentString(editor, pos.getStartOffset, 0)
       }
@@ -40,15 +74,9 @@ class VerilogLineIndentProvider extends LineIndentProvider {
 
   override def isSuitableFor(language: Language): Boolean = language.isInstanceOf[VerilogLanguage.type] // ?
 
-
 }
 
 object VerilogLineIndentProvider {
-  def moveAtEndOfPreviousLine(pos: VerilogSemanticEditorPosition): Unit = {
-    pos.moveBeforeOptionalMix(VerilogLanguage.getTokenType(VerilogLexer.White_space))
-    // should be enough
-  }
-
   /**
    * Magic?
    * @param editor

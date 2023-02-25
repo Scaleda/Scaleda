@@ -11,7 +11,9 @@ import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.nodes.*;
 import top.criwits.scaleda.verilog.psi.nodes.always.AlwaysConstructPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.always.DelayOrEventControlPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.block.CaseBodyPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseStatementPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.SeqBlockPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.expression.ExpressionPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPsiNode;
@@ -48,6 +50,11 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_module_declaration),
         ModuleDeclarationPsiNode.class
     );
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_module_head),
+        ModuleHeadPsiNode.class
+    );
+
     /// Module identifier
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_module_identifier),
@@ -133,6 +140,21 @@ public class VerilogPsiNodeFactory {
     );
 
     ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_case_body),
+        CaseBodyPsiNode.class
+    );
+
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_generate_case_body),
+        CaseBodyPsiNode.class
+    );
+
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_function_case_body),
+        CaseBodyPsiNode.class
+    );
+
+    ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_case_statement),
         CaseStatementPsiNode.class
     );
@@ -145,6 +167,11 @@ public class VerilogPsiNodeFactory {
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_function_case_statement),
         CaseStatementPsiNode.class
+    );
+
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_conditional_statement),
+        ConditionalStatementPsiNode.class
     );
 
 

@@ -4,7 +4,7 @@ package verilog.editor.folding
 import verilog.VerilogPSIFileRoot
 import verilog.editor.folding.VerilogFoldingBuilder.folding
 import verilog.parser.VerilogParser
-import verilog.psi.nodes.block.{CaseStatementPsiNode, SeqBlockPsiNode}
+import verilog.psi.nodes.block.{CaseBodyPsiNode, CaseStatementPsiNode, SeqBlockPsiNode}
 import verilog.psi.nodes.module.{ListOfPortDeclarationsPsiNode, ModuleDeclarationPsiNode}
 
 import com.intellij.lang.ASTNode
@@ -73,23 +73,27 @@ object VerilogFoldingBuilder {
       (_: ASTNode) => "(...)"
     ),
     (
-      VerilogParser.RULE_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
-      case Some(expression) => expression.getText
-      case None => "???"
-    }}) ...endcase"
+      VerilogParser.RULE_case_body, classOf[CaseBodyPsiNode], foldBlock,  (_: ASTNode) => "..."
     ),
     (
-      VerilogParser.RULE_function_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
-      case Some(expression) => expression.getText
-      case None => "???"
-    }}) ...endcase"
+      VerilogParser.RULE_function_case_body, classOf[CaseBodyPsiNode], foldBlock,  (_: ASTNode) => "..."
     ),
     (
-      VerilogParser.RULE_generate_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
-      case Some(expression) => expression.getText
-      case None => "???"
-    }}) ...endcase"
+      VerilogParser.RULE_generate_case_body, classOf[CaseBodyPsiNode], foldBlock,  (_: ASTNode) => "..."
     ),
+
+//    (
+//      VerilogParser.RULE_function_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
+//      case Some(expression) => expression.getText
+//      case None => "???"
+//    }}) ...endcase"
+//    ),
+//    (
+//      VerilogParser.RULE_generate_case_statement, classOf[CaseStatementPsiNode], foldBlock, (node: ASTNode) => f"case (${node.getPsi.asInstanceOf[CaseStatementPsiNode].getExpression match {
+//      case Some(expression) => expression.getText
+//      case None => "???"
+//    }}) ...endcase"
+//    ),
 
 
     // TODO: Add more!

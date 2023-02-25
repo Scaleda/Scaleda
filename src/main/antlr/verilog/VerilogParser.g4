@@ -127,12 +127,16 @@ description
 
 module_declaration
    : attribute_instance*
-     module_keyword module_identifier
-     (module_parameter_port_list)?
-     (list_of_port_declarations | list_of_ports)? ';'
+     module_head
      module_item*
      'endmodule'
    ;
+
+module_head
+  : module_keyword module_identifier
+    (module_parameter_port_list)?
+    (list_of_port_declarations | list_of_ports)? ';'
+  ;
 
 module_keyword
    : 'module'
@@ -751,7 +755,11 @@ generate_conditional_statement
    ;
 
 generate_case_statement
-   : 'case' '(' constant_expression ')' genvar_case_item (genvar_case_item)* 'endcase'
+   : 'case' '(' constant_expression ')' generate_case_body 'endcase'
+   ;
+
+generate_case_body
+   : (genvar_case_item)*
    ;
 
 genvar_case_item
@@ -1006,9 +1014,13 @@ function_if_else_if_statement
 
 // 6.7 Case statements
 case_statement
-   : 'case' '(' expression ')' case_item (case_item)* 'endcase'
-   | 'casez' '(' expression ')' case_item (case_item)* 'endcase'
-   | 'casex' '(' expression ')' case_item (case_item)* 'endcase'
+   : 'case' '(' expression ')' case_body 'endcase'
+   | 'casez' '(' expression ')' case_body 'endcase'
+   | 'casex' '(' expression ')' case_body 'endcase'
+   ;
+
+case_body
+   : (case_item)*
    ;
 
 case_item
@@ -1017,9 +1029,13 @@ case_item
    ;
 
 function_case_statement
-   : 'case' '(' expression ')' function_case_item (function_case_item)* 'endcase'
-   | 'casez' '(' expression ')' function_case_item (function_case_item)* 'endcase'
-   | 'casex' '(' expression ')' function_case_item (function_case_item)* 'endcase'
+   : 'case' '(' expression ')' function_case_body 'endcase'
+   | 'casez' '(' expression ')' function_case_body 'endcase'
+   | 'casex' '(' expression ')' function_case_body 'endcase'
+   ;
+
+function_case_body
+   : (function_case_item)*
    ;
 
 function_case_item

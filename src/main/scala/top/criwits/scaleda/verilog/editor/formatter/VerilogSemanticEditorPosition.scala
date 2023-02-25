@@ -1,10 +1,12 @@
 package top.criwits.scaleda
-package verilog.formatter
+package verilog.editor.formatter
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.highlighter.HighlighterIterator
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.annotations.NotNull
+import top.criwits.scaleda.verilog.VerilogLanguage
+import top.criwits.scaleda.verilog.parser.VerilogLexer
 
 /**
  * Copied from IDEA Shell plugin
@@ -41,5 +43,11 @@ final class VerilogSemanticEditorPosition private(val editor: Editor, val offset
   def isAt(elementType: IElementType): Boolean = !myIterator.atEnd && (myIterator.getTokenType == elementType)
 
   def getStartOffset: Int = if (!myIterator.atEnd) myIterator.getStart else -1
+
+  def moveAtEndOfPreviousLine(): Unit = {
+    moveBeforeOptionalMix(VerilogLanguage.getTokenType(VerilogLexer.White_space))
+    // should be enough
+  }
+
 }
 
