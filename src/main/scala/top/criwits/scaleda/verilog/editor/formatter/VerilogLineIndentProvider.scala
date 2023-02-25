@@ -14,6 +14,7 @@ import com.intellij.util.text.CharArrayUtil
 import VerilogLineIndentProvider.getIndentString
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.util.PsiTreeUtil
+import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.module.ModuleHeadPsiNode
 
 class VerilogLineIndentProvider extends LineIndentProvider {
@@ -40,6 +41,12 @@ class VerilogLineIndentProvider extends LineIndentProvider {
           return getIndentString(editor, pos.getStartOffset, 1)
         }
 
+        if (pos.isAtAnyOf(
+          VerilogLanguage.getTokenType(VerilogLexer.K_end)
+        )) {
+          return getIndentString(editor, pos.getStartOffset, 0)
+        }
+
         // PSI-based check, update PSI
         PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
         val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument)
@@ -47,8 +54,7 @@ class VerilogLineIndentProvider extends LineIndentProvider {
         val currentElement = psiFile.findElementAt(offset)
         val posStartElement = psiFile.findElementAt(pos.getStartOffset)
 
-        // indent after module head
-        /// if currentElement == null, should just reach the end
+        // module head indent
         if (posStartElement != null) {
           if (currentElement != null) {
             val currentParent = PsiTreeUtil.getParentOfType(currentElement, classOf[ModuleHeadPsiNode])
@@ -59,6 +65,15 @@ class VerilogLineIndentProvider extends LineIndentProvider {
             val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ModuleHeadPsiNode])
             if (posStartParent != null)
               return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 1)
+          }
+        }
+
+        // if () shrink indent
+        if (currentElement != null && posStartElement != null) {
+          val currentParent = PsiTreeUtil.getParentOfType(currentElement, classOf[ConditionalStatementPsiNode])
+          val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ConditionalStatementPsiNode])
+          if ((currentParent == null && posStartParent != null) || (currentParent != posStartParent)) {
+            return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 0)
           }
         }
 
