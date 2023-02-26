@@ -19,8 +19,14 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
   override def getName: String = userFriendlyName
 
   override def simulate(task: TaskConfig) = {
-    // TODO: ADD $DUMPVCD
-    // TODO: iverilog output file
+    // get testbench info
+    val testbench = task.findTopModule.get
+    val testbenchFile = KernelFileUtils.getModuleFile(testbench, true)
+
+    // add dumpvcd instruction
+
+
+
     // val outputFile = "simulation"
     val outputFile = s"\"${task.topModule.get}\""
     val sources = KernelFileUtils.getAllSourceFiles()

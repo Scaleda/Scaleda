@@ -1,34 +1,35 @@
 package top.criwits.scaleda
 package kernel.utils
 
-import org.antlr.v4.runtime.tree.ParseTreeWalker
-import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
-import top.criwits.scaleda.kernel.project.config.ProjectConfig
-import top.criwits.scaleda.kernel.project.config.ProjectConfig.config
-import top.criwits.scaleda.verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseVisitor}
+import kernel.project.config.ProjectConfig
+import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseVisitor}
 
-import java.io.{File, FileInputStream, FilenameFilter}
-import java.util.regex.Pattern
+import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
+
+import java.io.{File, FileInputStream, FileOutputStream, FilenameFilter}
+import java.util
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 object KernelFileUtils {
-  def getAllSourceFiles(sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath,
-    ProjectConfig.config.source), suffixing: Set[String] = Set("v")): Seq[File] =
-    sourceDir.listFiles(new FilenameFilter {
-      override def accept(file: File, s: String) =
-        suffixing.map(suffix => s.endsWith(s".${suffix}"))
-          .reduceOption((a, b) => a || b).getOrElse(false)
-    }).toList
+  def getAllSourceFiles(
+      sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.source),
+      suffixing: Set[String] = Set("v")
+  ): Seq[File] =
+    sourceDir
+      .listFiles(new FilenameFilter {
+        override def accept(file: File, s: String) =
+          suffixing
+            .map(suffix => s.endsWith(s".${suffix}"))
+            .reduceOption((a, b) => a || b)
+            .getOrElse(false)
+      })
+      .toList
 
-
-  def getAllTestFiles(sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath,
-    ProjectConfig.config.test), suffixing: Set[String] = Set("v")): Seq[File] =
-    sourceDir.listFiles(new FilenameFilter {
-      override def accept(file: File, s: String) =
-        suffixing.map(suffix => s.endsWith(s".${suffix}"))
-          .reduceOption((a, b) => a || b).getOrElse(false)
-    }).toList
+  def getAllTestFiles(): Seq[File] = getAllSourceFiles(
+    new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
+  )
 
   def getAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
     val file = new File(path)
@@ -44,13 +45,13 @@ object KernelFileUtils {
   }
 
   def getModuleTitle(verilogFile: File): Seq[String] = {
-    val stream = new FileInputStream(verilogFile)
+    val stream     = new FileInputStream(verilogFile)
     val charStream = CharStreams.fromStream(stream)
     stream.close()
-    val lexer = new VerilogLexer(charStream)
+    val lexer  = new VerilogLexer(charStream)
     val tokens = new CommonTokenStream(lexer)
     val parser = new VerilogParser(tokens)
-    val tree = parser.source_text()
+    val tree   = parser.source_text()
 
     class ModuleIdentifierVisitor extends VerilogParserBaseVisitor[String] {
       val title = new ListBuffer[String]
@@ -71,19 +72,10 @@ object KernelFileUtils {
     val visitor = new ModuleIdentifierVisitor
     visitor.visit(tree)
     visitor.title.toSeq
-
-//
-//    val p = Pattern.compile("((.|\\n|\\r)*?)(module)(\\s)(\\w+)(\\s*)(((#)(\\s*)(\\((.|\\n|\\r)*?\\))(\\s*))?)(\\((.|\\n|\\r)*?\\))(\\s*)(;)((.|\\n|\\r)*?)(endmodule)((.|\\n|\\r)*?)")
-//    val m = p.matcher(content)
-//    if (m.find()) {
-//      Some(m.group(5))
-//    } else {
-//      None
-//    }
   }
 
-  def getModuleFile(module: String): Option[File] = {
-    getAllSourceFiles().foreach(f => {
+  def getModuleFile(module: String, testbench: Boolean = false): Option[File] = {
+    (if (testbench) getAllTestFiles() else getAllSourceFiles()).foreach(f => {
       val matched = getModuleTitle(f).filter(_ == module)
       if (matched.nonEmpty) {
         return Some(f) // FIXME
@@ -91,5 +83,49 @@ object KernelFileUtils {
     })
     None
   }
-}
 
+  def insertAfterModuleHead(original: File, output: File, moduleName: String, insert: String): Unit = {
+    val stream     = new FileInputStream(original)
+    val charStream = CharStreams.fromStream(stream)
+    stream.close()
+    val lexer  = new VerilogLexer(charStream)
+    val tokens = new CommonTokenStream(lexer)
+    val parser = new VerilogParser(tokens)
+    val tree   = parser.source_text()
+
+    class ModuleHeadVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
+      var headerEndAt: Int = -1
+
+      override def visitModule_head(ctx: VerilogParser.Module_headContext): Int= {
+        val identifier = ctx.module_identifier()
+        if (identifier != null) {
+          val _identifier = identifier.identifier()
+          if (_identifier != null) {
+            val simpleIdentifier = _identifier.Simple_identifier()
+            if (simpleIdentifier != null) {
+              if (simpleIdentifier.getText == moduleName) {
+                val line = ctx.getStop.getStopIndex
+                headerEndAt = line
+                return line
+              }
+            }
+          }
+        }
+
+        -1
+      }
+    }
+
+    val visitor = new ModuleHeadVisitor(moduleName)
+    visitor.visit(tree)
+
+    val source = Source.fromFile(original)
+    val newText =new mutable.StringBuilder(source.mkString).insert(visitor.headerEndAt + 1,
+      insert).toString()
+    source.close()
+
+    val outputStream = new FileOutputStream(output)
+    outputStream.write(newText.getBytes())
+    outputStream.close()
+  }
+}
