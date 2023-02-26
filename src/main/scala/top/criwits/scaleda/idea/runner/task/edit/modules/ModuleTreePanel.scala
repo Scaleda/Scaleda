@@ -44,6 +44,8 @@ class ModuleTreePanel(project: Project, dialog: SelectModuleDialogWrapper) exten
   new ListSpeedSearch(myList)
 
   val decorator: ToolbarDecorator = ToolbarDecorator.createDecorator(myList)
+    .disableRemoveAction()
+    .disableUpDownActions()
 
   add(decorator.createPanel(), BorderLayout.CENTER)
 

@@ -1,20 +1,22 @@
 package top.criwits.scaleda
 package idea.runner.task.edit.task
 
-import idea.runner.task.edit.EditDialog
+import idea.runner.task.edit.{EditDialog, ScaledaSelectModuleAction}
 import kernel.project.config.{TargetConfig, TaskConfig}
 
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.project.Project
 import com.intellij.ui.DocumentAdapter
 import org.jdesktop.swingx.prompt.PromptSupport
 import top.criwits.scaleda.idea.ScaledaBundle
 import top.criwits.scaleda.kernel.toolchain.Toolchain
 
 import java.awt.{BorderLayout, Color, Font}
-import java.awt.event.ItemEvent
+import java.awt.event.{ActionEvent, ActionListener, ItemEvent}
 import javax.swing.JPanel
 import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent}
 
-class EditTaskDialog(target: TargetConfig, config: Option[TaskConfig], parent: EditTaskDialogWrapper)
+class EditTaskDialog(project: Project, target: TargetConfig, config: Option[TaskConfig], parent: EditTaskDialogWrapper)
     extends JPanel
     with EditDialog[TaskConfig] {
 
@@ -100,6 +102,19 @@ class EditTaskDialog(target: TargetConfig, config: Option[TaskConfig], parent: E
     panel.presetField.isSelected,
     if (panel.presetField.isSelected) None else Some(panel.tclField.getText)
   )
+
+  panel.chooseTopModuleButton.addActionListener(new ActionListener {
+    override def actionPerformed(e: ActionEvent): Unit = {
+      val selectModuleAction = new ScaledaSelectModuleAction(project)
+      ActionManager.getInstance().tryToExecute(selectModuleAction, null, null, null, true)
+      val module = selectModuleAction.module
+
+      if (module != null) {
+        val moduleName = module.getName
+        panel.topModuleField.setText(moduleName)
+      }
+    }
+  })
 
   override def validateConfig: Boolean =
     !panel.nameField.getText.isBlank &&

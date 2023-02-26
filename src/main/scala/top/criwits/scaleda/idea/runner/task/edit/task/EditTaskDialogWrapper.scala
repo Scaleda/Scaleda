@@ -53,7 +53,7 @@ class EditTaskDialogWrapper(target: TargetConfig, project: Project, config: Opti
   }
 
   override def createMainPanel: JPanel = {
-    inner = new EditTaskDialog(target, config, this)
+    inner = new EditTaskDialog(project, target, config, this)
     updateOKStatus()
     inner.getMainPanel
   }
