@@ -13,6 +13,7 @@ import java.io.File
   * @param name Project name
   * @param `type` Project type, should be 'rtl'
   * @param source Project source folder
+  * @param test Project test folder
   * @param topModule Top module name, can be overriden by [[TargetConfig]] or [[TaskConfig]]
   * @param targets List of [[TargetConfig]]
   */
@@ -21,6 +22,7 @@ case class ProjectConfig(
     name: String = "default-project",
     `type`: String = "rtl",
     source: String = "src/",
+    test: String = "test/",
     topModule: Option[String] = None,
     targets: Array[TargetConfig] = Array()
 ) extends ConfigNode() {

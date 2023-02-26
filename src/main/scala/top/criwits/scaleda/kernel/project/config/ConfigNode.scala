@@ -1,8 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
+import com.fasterxml.jackson.annotation.JsonIgnore
 
 abstract class ConfigNode() {
   @JsonIgnore

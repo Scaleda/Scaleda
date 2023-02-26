@@ -19,8 +19,8 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
       |);
       |
       |  always @ (posedge clk or posedge rst) begin
-      |    if (rst) output = 0;
-      |    else output = 1;
+      |    if (rst) dingzhen = 0;
+      |    else dingzhen = 1;
       |  end
       |
       |endmodule
@@ -38,7 +38,7 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "parse verilog module name" in {
-    assert(KernelFileUtils.getModuleTitle(testFile).get == "li_tangDingZhen114514")
+    assert(KernelFileUtils.getModuleTitle(testFile).head == "li_tangDingZhen114514")
   }
 
   it should "delete test file" in {
