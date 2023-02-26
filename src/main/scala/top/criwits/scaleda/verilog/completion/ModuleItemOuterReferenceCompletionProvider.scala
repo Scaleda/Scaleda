@@ -27,7 +27,7 @@ class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[Comp
       .toSet
     if (element.getProject == null) return
     FileUtils.getAllVerilogFiles(element.getProject)
-      .flatMap(it => it.getAvailableNamedElementsScala)
+      .flatMap(it => it.getModuleDeclarations)
       .filter(it => it.isInstanceOf[ModuleDeclarationPsiNode])
       .filter(it => !currentModuleInstantiationNames.contains(it.getName))
       .filter(it => it != currentModuleDeclaration)

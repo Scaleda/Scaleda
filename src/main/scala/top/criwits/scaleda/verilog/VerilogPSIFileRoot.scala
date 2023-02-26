@@ -1,17 +1,20 @@
 package top.criwits.scaleda
 package verilog
 
+import verilog.psi.nodes.ScopeNode
+import verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
+import verilog.psi.nodes.module.ModuleDeclarationPsiNode
+
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.psi.FileViewProvider
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{FileViewProvider, PsiNamedElement}
-import top.criwits.scaleda.verilog.psi.nodes.ScopeNode
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import javax.swing.Icon
+import scala.jdk.CollectionConverters._
 
 class VerilogPSIFileRoot(viewProvider: FileViewProvider)
-  extends PsiFileBase(viewProvider, VerilogLanguage) /* with ScopeNode */ {
+    extends PsiFileBase(viewProvider, VerilogLanguage) /* with ScopeNode */ {
 
   override def getFileType: FileType = VerilogFileType.instance.asInstanceOf[FileType]
 
@@ -21,11 +24,25 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
 
   override def getContext: ScopeNode = null
 
-  def getAvailableNamedElementsScala: Array[PsiNamedElement] =
-    PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
+  def getModuleDeclarations: Array[ModuleDeclarationPsiNode] =
+    PsiTreeUtil
+      .findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
       .toArray
-      .map(x => x.asInstanceOf[PsiNamedElement])
+      .map(x => x.asInstanceOf[ModuleDeclarationPsiNode])
 
+  def getInstantiatedModules: Array[ModuleDeclarationPsiNode] = {
+    val instantiations = PsiTreeUtil.findChildrenOfType(this, classOf[ModuleInstantiationPsiNode]).asScala
+    instantiations
+      .map(_.getReference.multiResolve(false))
+      .reduce(_ ++ _)
+      .filter(_.isValidResult)
+      .map(_.getElement)
+      .filter(_.isInstanceOf[ModuleDeclarationPsiNode])
+      .map(_.asInstanceOf[ModuleDeclarationPsiNode])
+      .foldLeft(Array.empty[ModuleDeclarationPsiNode]){
+        (seen, current) => if (seen.map(_.getName).contains(current.getName)) seen else seen :+ current
+      }
+  }
 //  override def getAvailableNamedElements =
 //    PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
 }

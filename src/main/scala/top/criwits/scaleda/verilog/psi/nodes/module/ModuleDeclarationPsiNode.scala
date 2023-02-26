@@ -8,6 +8,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import org.jetbrains.annotations.Nls
 import top.criwits.scaleda.verilog.psi.VerilogPsiLeafNodeFactory
 import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode
 
@@ -59,6 +60,7 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     identifier // FIXME: if null?
   }
 
+  @Nls
   override def getName: String = getNameIdentifier match {
     case element: PsiElement => element.getText
     case null => "(unknown)"

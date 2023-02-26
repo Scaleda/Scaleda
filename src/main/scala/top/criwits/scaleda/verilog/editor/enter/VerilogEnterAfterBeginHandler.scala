@@ -37,6 +37,9 @@ class VerilogEnterAfterBeginHandler extends EnterHandlerDelegateAdapter {
       return Result.Continue
     }
 
+    //
+//    println(file.asInstanceOf[VerilogPSIFileRoot].getInstantiatedModules.mkString("Array(", ", ", ")"))
+
     if (caretOffset.isNull) return Result.Continue
     val offset = caretOffset.get
 
