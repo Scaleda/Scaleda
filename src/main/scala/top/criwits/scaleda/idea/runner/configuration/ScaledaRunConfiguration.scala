@@ -12,7 +12,7 @@ import kernel.toolchain.Toolchain
 
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
-import com.intellij.execution.process.ProcessHandler
+import com.intellij.execution.process.{ProcessHandler, ProcessTerminatedListener}
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
@@ -27,6 +27,12 @@ import java.io.File
 import scala.collection.mutable
 import scala.language.existentials
 
+/**
+ * A configuration representing a specific Scaleda task as well as corresponding toolchain
+ * @param project
+ * @param factory
+ * @param name
+ */
 class ScaledaRunConfiguration(
     project: Project,
     factory: ScaledaRunConfigurationFactory,
@@ -35,6 +41,7 @@ class ScaledaRunConfiguration(
 
   var targetName = ""
   var taskName = ""
+  // TODO: Add toolchain profile
   val extraEnvs = new mutable.HashMap[String, String]
 
   private val STORAGE_ID: String = "scaleda"
@@ -74,11 +81,17 @@ class ScaledaRunConfiguration(
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScaledaRunConfigurationEditor(project)
 
+  /**
+   * Returns a [[RunProfileState]], which is actually used to run
+   * @param executor
+   * @param environment
+   * @return
+   */
   override def getState(
       executor: Executor,
       environment: ExecutionEnvironment
   ): RunProfileState = {
-    MainLogger.warn(s"executing: taskName=$taskName, targetName=$targetName")
+    MainLogger.info(s"getState: taskName=$taskName, targetName=$targetName")
     ProjectConfig
       .getConfig()
       .flatMap(c => {
@@ -106,9 +119,11 @@ class ScaledaRunConfiguration(
               val searchScope =
                 ExecutionSearchScopes
                   .executionScope(project, environment.getRunProfile)
+
               val myConsoleBuilder =
                 TextConsoleBuilderFactory.getInstance
                   .createBuilder(project, searchScope)
+
               val console = myConsoleBuilder.getConsole
 
               val handler =
@@ -120,11 +135,21 @@ class ScaledaRunConfiguration(
                     )
                   )
                 )
+
               val state = new RunProfileState {
                 override def execute(
                     executor: Executor,
                     runner: ProgramRunner[_]
-                ) = {
+                ): ExecutionResult = {
+                  ScaledaRun.runTaskBackground(
+                    handler,
+                    new File(ProjectConfig.projectBase.get),
+                    target,
+                    task
+                  )
+
+                  ProcessTerminatedListener.attach(handler)
+
                   new ExecutionResult {
                     override def getExecutionConsole: ExecutionConsole = console
 
@@ -134,12 +159,7 @@ class ScaledaRunConfiguration(
                   }
                 }
               }
-              ScaledaRun.runTaskBackground(
-                handler,
-                new File(ProjectConfig.projectBase.get),
-                target,
-                task
-              )
+
               state
             }
           })

@@ -24,10 +24,12 @@ class ScaledaRunProcessHandler(logger: BasicLogger)
       s"destroyProcessImpl, running: ${terminated}, stopping: ${terminating}"
     )
     terminating = true
+    notifyProcessTerminated(ret)
   }
 
   override def detachProcessImpl(): Unit = {
     MainLogger.warn("detachProcessImpl")
+    notifyProcessDetached()
   }
 
   override def detachIsDefault(): Boolean = {
@@ -63,8 +65,11 @@ class ScaledaRunProcessHandler(logger: BasicLogger)
 
   override def onStderr(data: String): Unit = logger.warn(data)
 
+  var ret: Int = 0
+
   override def onReturn(returnValue: Int, finishedAll: Boolean): Unit = {
     logger.info(ScaledaBundle.message("task.run.return.text", returnValue))
+    ret = returnValue
     if (finishedAll) {
       terminating = false
       terminated = true
