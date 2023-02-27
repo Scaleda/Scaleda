@@ -39,19 +39,21 @@ class ScaledaRunConfiguration(
 
   private val STORAGE_ID: String = "scaleda"
 
-  override def writeExternal(element: Element) = {
+  override def writeExternal(element: Element): Unit = {
     super.writeExternal(element)
     val child = element.getChild(STORAGE_ID)
     if (child != null) {
       child.setAttribute("taskName", taskName)
+      child.setAttribute("targetName", targetName)
     } else {
       val c = new Element(STORAGE_ID)
       c.setAttribute("taskName", taskName)
+      c.setAttribute("targetName", targetName)
       element.addContent(c)
     }
   }
 
-  override def readExternal(element: Element) = {
+  override def readExternal(element: Element): Unit = {
     super.readExternal(element)
     val child = element.getChild(STORAGE_ID)
     if (child != null) {
@@ -59,7 +61,8 @@ class ScaledaRunConfiguration(
         .getConfig()
         .foreach(c => {
           val t = child.getAttributeValue("taskName")
-          c.taskByName(t)
+          val r = child.getAttributeValue("targetName")
+          c.taskByName(t, r)
             .foreach(f => {
               targetName = f._1.name
               taskName = f._2.name
@@ -79,7 +82,7 @@ class ScaledaRunConfiguration(
     ProjectConfig
       .getConfig()
       .flatMap(c => {
-        c.taskByName(taskName)
+        c.taskByName(taskName, targetName)
           .map(f => {
             val (target, task) = f
             var remoteProfiles: Option[Seq[RemoteProfile]] = None

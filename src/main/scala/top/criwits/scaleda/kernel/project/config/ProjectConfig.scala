@@ -40,17 +40,17 @@ case class ProjectConfig(
 
   def taskNames = targets.flatMap(_.tasks).map(_.name)
 
-  def taskByName(name: String): Option[(TargetConfig, TaskConfig)] = {
-    val r = targets
-      .map(task => (task, task.tasks))
-      .filter(f => f._2.exists(t => t.name == name))
-      .map(f =>
-        (f._1, f._2.reduceOption((a, b) => if (a.name == name) a else b))
-      )
+  def taskByName(taskName: String, targetName: String): Option[(TargetConfig, TaskConfig)] = {
+    val r = targets.filter(_.name == targetName)
     if (r.isEmpty) return None
-    val h = r.head
-    if (h._2.isEmpty) return None
-    Some((h._1, h._2.get))
+
+    assert(r.length == 1)
+    val target = r.head
+    val tasks = target.tasks.filter(_.name == taskName)
+    if (tasks.isEmpty) return None
+
+    assert(tasks.length == 1)
+    Some(target, tasks.head)
   }
 
   def headTarget = targets.headOption

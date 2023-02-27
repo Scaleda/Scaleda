@@ -20,6 +20,7 @@ object ShellRunMode extends Enumeration {
 
 case class ShellArgs(
     task: String = "",
+    target: String = "",
     workingDir: File = new File("."),
     runMode: ShellRunMode.Value = ShellRunMode.None,
     serverHost: String = "",
@@ -99,21 +100,21 @@ object ScaledaShellMain {
           .text("Run task")
           .action((_, c) => c.copy(runMode = ShellRunMode.Run))
           .children(
+            opt[String]('r', "target")
+              .action((x, c) => c.copy(target = x))
+              .text("Specify the target"),
             opt[String]('t', "task")
               .action((x, c) => c.copy(task = x))
-              .text(s"Available tasks: ${ProjectConfig
-                .getConfig()
-                .map(config => config.taskNames.mkString(", "))
-                .getOrElse("None")}")
-              .validate(name =>
-                if (
-                  ProjectConfig
-                    .getConfig()
-                    .exists(c => c.taskNames.contains(name))
-                )
-                  success
-                else failure(s"no task ${name} found!")
-              ),
+              .text("Specify the task"),
+//              .validate(name =>
+//                if (
+//                  ProjectConfig
+//                    .getConfig()
+//                    .exists(c => c.taskNames.contains(name))
+//                )
+//                  success
+//                else failure(s"no task ${name} found!")
+//              ),
             opt[String]('p', "profile")
               .action((x, c) => c.copy(profileName = Some(x)))
               .text("Specify profile name")
@@ -167,7 +168,7 @@ object ScaledaShellMain {
                 ProjectConfig
                   .getConfig()
                   .foreach(
-                    _.taskByName(shellConfig.task)
+                    _.taskByName(shellConfig.task, shellConfig.target)
                       .map(f => {
                         val (target, task) = f
                         val profile = shellConfig.profileName

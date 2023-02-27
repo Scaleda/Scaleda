@@ -52,7 +52,7 @@ class ScaledaRunToolWindowTaskAction(
             (_: ScaledaRunTaskNode) => true
           )
         selectedNodes.headOption.map(selected => {
-          c.taskByName(selected.name)
+          c.taskByName(selected.name, selected.parent.get.name) // FIXME: can get????
             .foreach(f => {
               val (target, task) = f
               // val dataContext = SimpleDataContext.getSimpleContext(

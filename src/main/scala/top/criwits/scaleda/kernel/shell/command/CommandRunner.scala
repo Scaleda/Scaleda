@@ -21,7 +21,8 @@ case class CommandOutputStream(
 case class CommandDeps(
     command: String,
     path: String = "",
-    envs: Seq[(String, String)] = Seq()
+    envs: Seq[(String, String)] = Seq(),
+    description: String = ""
 )
 
 class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {

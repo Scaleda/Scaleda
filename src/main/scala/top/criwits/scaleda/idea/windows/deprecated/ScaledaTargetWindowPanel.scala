@@ -55,7 +55,7 @@ class ScaledaTargetWindowPanel(project: Project) extends SimpleToolWindowPanel(t
             val t = new Thread(() => {
               MainLogger.warn(s"ScaledaRun: task name ${n.target.name}") // <== Double Click here
               ProjectConfig.getConfig().map(config => {
-                config.taskByName(if (n.target.name == "Vivado") "Vivado Synth" else "").map(f => {
+                config.taskByName(if (n.target.name == "Vivado") "Vivado Synth" else "", "").map(f => { // Deprecated
                   val (target, task) = f
                   ScaledaRun.runTask(new ScaledaRunIdeaHandler(project), new File(ProjectConfig.projectBase.get), target, task)
                 })

@@ -93,6 +93,17 @@ object KernelFileUtils {
     val parser = new VerilogParser(tokens)
     val tree   = parser.source_text()
 
+//    class ModuleVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
+//      override def visitModule_declaration(ctx: VerilogParser.Module_declarationContext): Int = {
+//        val identifier = ctx.module_head()
+//        if (identifier == null) return -1
+//        val _identifier = identifier.module_identifier()
+//        if (_identifier == null) return -1
+//        val __identifier = _identifier.identifier()
+//        if (__identifier == null) return -1
+//      }
+//    }
+
     class ModuleHeadVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
       var headerEndAt: Int = -1
 
