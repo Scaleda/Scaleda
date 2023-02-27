@@ -18,8 +18,11 @@
     <!-- Actions -->
     <actions>
         <action id="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction"
-                class="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction" text="Run last Scaleda Task"
+                class="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction" text="Run Last Scaleda Task"
                 description="Run last Scaleda task"/>
+        <action id="top.criwits.scaleda.kernel.rvcd.RvcdLaunchAction"
+                class="top.criwits.scaleda.kernel.rvcd.RvcdLaunchAction" text="Launch Rvcd"
+                description="Launch Rvcd if not running"/>
     </actions>
 
     <!-- Listeners -->
@@ -38,7 +41,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
         <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
-        <projectService serviceImplementation="top.criwits.scaleda.vcd.RvcdService"/>
+        <projectService serviceImplementation="top.criwits.scaleda.kernel.rvcd.RvcdService"/>
     </extensions>
 
     <!-- Verilog Support -->

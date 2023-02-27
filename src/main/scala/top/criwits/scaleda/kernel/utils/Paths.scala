@@ -29,6 +29,8 @@ object Paths {
 
   def getToolchainsDir: File = createDirIfNonExists(new File(getConfigDir, "toolchains"))
 
+  def getBinaryDir: File = createDirIfNonExists(new File(getConfigDir, "bin"))
+
   def pwd = new File(System.getProperty("user.dir"))
 
   def findExecutableOnPath(name: String): Option[String] = {

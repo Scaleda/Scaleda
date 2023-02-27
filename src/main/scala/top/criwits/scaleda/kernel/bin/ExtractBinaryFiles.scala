@@ -7,7 +7,7 @@ import java.io.{File, FileOutputStream}
 import scala.collection.mutable.ArrayBuffer
 
 object ExtractBinaryFiles {
-  private val targetDirectory = new File(Paths.getConfigDir, "bin")
+  private val targetDirectory = Paths.getBinaryDir
   private val binaryList      = Array("rvcd", "rvcd.exe")
   private val resourcePath    = "bin/"
   def run(force: Boolean = false): Seq[String] = {

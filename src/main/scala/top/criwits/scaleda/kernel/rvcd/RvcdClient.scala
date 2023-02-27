@@ -1,8 +1,9 @@
 package top.criwits.scaleda
 package kernel.rvcd
 
-import io.grpc.ManagedChannelBuilder
+import io.grpc.{ManagedChannelBuilder, StatusRuntimeException}
 import rvcd.rvcd.{RvcdOpenFile, RvcdRpcGrpc}
+import top.criwits.scaleda.kernel.utils.KernelLogger
 
 import scala.language.existentials
 
@@ -17,6 +18,7 @@ object RvcdClient {
 }
 
 object RvcdTest extends App {
-  private val stub = RvcdClient("localhost")
+  private val stub = RvcdClient("127.0.0.1")
   stub.openFile(RvcdOpenFile.of("/home/chiro/programs/rvcd/data/testbench0.vcd"))
+  KernelLogger.info("done")
 }

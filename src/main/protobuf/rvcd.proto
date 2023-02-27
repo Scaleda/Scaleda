@@ -9,6 +9,8 @@ service RvcdRpc {
     rpc GotoSignal (RvcdSignalPath) returns (RvcdEmpty) {}
     // For clients to sync data with manager
     rpc ClientInfo (RvcdManagedInfo) returns (RvcdEmpty) {}
+    // See if this manage available
+    rpc Ping (RvcdEmpty) returns (RvcdEmpty) {}
 }
 
 message RvcdEmpty {}
