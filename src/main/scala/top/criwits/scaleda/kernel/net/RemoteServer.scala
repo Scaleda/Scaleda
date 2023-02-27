@@ -60,9 +60,9 @@ class RemoteServer(executionContext: ExecutionContext) {
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
       CommandRunner.execute(Seq(CommandDeps(
-        request.command,
-        request.path,
-        request.envs.map(t => (t.a, t.b))
+        commands = request.commands,
+        path = request.path,
+        envs = request.envs.map(t => (t.a, t.b))
       )), new ScaledaRunHandler {
         override def onStdout(data: String) = {
           KernelLogger.info("[remote executor stdout]", data)

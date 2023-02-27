@@ -80,7 +80,7 @@ object IVerilog {
         return None
       }
 
-      Some(iverilogFiles.map(f => CommandDeps(OS.shell(s"${f.getAbsolutePath} -V"))))
+      Some(iverilogFiles.map(f => CommandDeps(commands = Seq(f.getAbsolutePath, "-V"))))
     }
 
     /**

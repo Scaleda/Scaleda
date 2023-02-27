@@ -27,9 +27,9 @@ class RemoteCommandRunner(
   )
   builder.usePlaintext()
   val request = new RunRequest(
-    deps.command,
-    deps.path,
-    deps.envs.map(t => new StringTriple(t._1, t._2))
+    commands = deps.commands,
+    path = deps.path,
+    envs = deps.envs.map(t => new StringTriple(t._1, t._2))
   )
   override val thread = new Thread(() => {
     val channel = builder.build()

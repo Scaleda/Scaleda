@@ -36,7 +36,7 @@ class RemoteTester extends AnyFlatSpec with should.Matchers {
     val remoteCommandDeps = RemoteCommandDeps()
     val commands = Seq(
       // CommandDeps("ping -c 3 127.0.0.1"),
-      CommandDeps("echo hi")
+      CommandDeps(Seq("echo", "hi"))
     )
     RemoteCommandRunner.execute(
       remoteCommandDeps,

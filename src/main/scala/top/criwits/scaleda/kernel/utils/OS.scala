@@ -21,12 +21,13 @@ object OS extends Enumeration {
 
   def isWindows: Boolean = getOSType == Windows
 
+  @Deprecated
   def getShell: String = if (isWindows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"
-
+  @Deprecated
   def getShellCommands: Seq[String] = if (isWindows) Seq("C:\\Windows\\System32\\cmd.exe", "/c") else Seq("/bin/sh", "-c")
-
+  @Deprecated
   def shell(command: String): String = s"$getShell '$command'"
-
+  @Deprecated
   def shellCommands(commands: Seq[String]): Seq[String] = getShellCommands ++ commands
 
   /**

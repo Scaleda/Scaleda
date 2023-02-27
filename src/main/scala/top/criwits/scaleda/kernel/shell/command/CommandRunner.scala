@@ -20,18 +20,15 @@ case class CommandOutputStream(
 )
 
 case class CommandDeps(
-    @Deprecated
-    command: String = "",
+    commands: Seq[String] = Seq(),
     path: String = "",
     envs: Seq[(String, String)] = Seq(),
     description: String = "",
-    commands: Seq[String] = Seq()
 )
 
 class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val path: String =
     if (deps.path.isEmpty) System.getProperty("user.dir") else deps.path
-  val command: String             = deps.command
   val commands                    = deps.commands
   val envs: Seq[(String, String)] = deps.envs
   val workingDir                  = new File(path)
@@ -39,15 +36,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   // TODO: Envs
   KernelLogger.warn("exec deps:", deps)
   private val procBuilder = new ProcessBuilder()
-  if (command.nonEmpty) {
-    assert(commands.isEmpty)
-    procBuilder.command(command)
-  }
-  // for (c <- commands) procBuilder.command(c)
-  if (commands.nonEmpty) {
-    assert(command.isEmpty)
-    procBuilder.command(CollectionConverters.asJava(commands))
-  }
+  procBuilder.command(CollectionConverters.asJava(commands))
   procBuilder.directory(workingDir)
   private var process: Option[Process] = None
   private var terminate: Boolean       = false
@@ -141,7 +130,7 @@ object CommandRunner {
     var meetErrors = false
     commands.foreach(command => {
       if (!ignoreErrors && meetErrors) return
-      KernelLogger.info(s"running command: ${command.command}")
+      KernelLogger.info(s"running command: ${command.commands.mkString(" ")}")
       handler.onShellCommand(command)
       val isRemote = remoteCommandDeps.nonEmpty
       val runner = remoteCommandDeps

@@ -16,7 +16,7 @@ message StringTriple {
 }
 
 message RunRequest {
-  string command = 1;
+  repeated string commands = 1;
   string path = 2;
   repeated StringTriple envs = 3;
 }

@@ -33,10 +33,10 @@ class Vivado(executor: Executor)
       )
     Seq(
       CommandDeps(
-        OS.shell(
-          s"${getVivadoExec(executor.profile.path)} -mode batch -source ${task.tcl.getOrElse("run_synth.tcl")}"
+        commands = Seq(
+          getVivadoExec(executor.profile.path), "-mode", "batch", "-source", task.tcl.getOrElse("run_synth.tcl")
         ),
-        executor.workingDir.getAbsolutePath
+        path = executor.workingDir.getAbsolutePath
       )
     )
   }
@@ -48,10 +48,10 @@ class Vivado(executor: Executor)
       )
     Seq(
       CommandDeps(
-        OS.shell(
-          s"${getVivadoExec(executor.profile.path)} -mode batch -source ${task.tcl.getOrElse("run_impl.tcl")}"
+        commands = Seq(
+          getVivadoExec(executor.profile.path), "-mode", "batch", "-source", task.tcl.getOrElse("run_impl.tcl")
         ),
-        executor.workingDir.getAbsolutePath
+        path = executor.workingDir.getAbsolutePath
       )
     )
   }
@@ -81,8 +81,7 @@ object Vivado extends ToolchainProfileDetector {
       if (!vivadoFile.exists()) {
         return None
       }
-      val cmdLine = OS.shell(s"${vivadoFile.getAbsolutePath} -version")
-      Some(Seq(CommandDeps(cmdLine)))
+      Some(Seq(CommandDeps(commands = Seq(vivadoFile.getAbsolutePath, "-version"))))
     }
 
     override def parseVersionInfo(
@@ -167,7 +166,7 @@ object Vivado extends ToolchainProfileDetector {
       case Some(vivadoPath) =>
         val vivadoFile = new File(vivadoPath)
         val commands = Seq(
-          CommandDeps(OS.shell(s"${vivadoFile.getAbsolutePath} -version"))
+          CommandDeps(commands = Seq(vivadoFile.getAbsolutePath, "-version"))
         )
         val outputStrings = ArrayBuffer[String]()
         val returnValues = await(
