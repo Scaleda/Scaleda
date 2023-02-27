@@ -20,7 +20,7 @@ class ScaledaRunConfigurationFactory(
       target: TargetConfig,
       task: TaskConfig
   ): ScaledaRunConfiguration = {
-    val c = new ScaledaRunConfiguration(project, this, task.name)
+    val c = new ScaledaRunConfiguration(project, this, target.name + "-" + task.name)
     c.targetName = target.name
     c.taskName = task.name
     c

@@ -9,6 +9,7 @@ import com.intellij.openapi.util.Key
 
 import java.io.OutputStreamWriter
 
+@Deprecated
 class ConsoleProcessHandler(
                            private val consoleView: ConsoleView,
                            commandLine: GeneralCommandLine,

@@ -74,6 +74,7 @@ class ScaledaRunToolWindowTaskAction(
               //   .asInstanceOf[RunManagerEx]
               //   .setTemporaryConfiguration(configuration)
               runManager.setTemporaryConfiguration(configuration)
+
               ExecutionUtil.runConfiguration(
                 configuration,
                 Executor.EXECUTOR_EXTENSION_NAME.getExtensionList.get(0)
