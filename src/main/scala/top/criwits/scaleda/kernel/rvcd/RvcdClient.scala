@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.rvcd
 
 import io.grpc.ManagedChannelBuilder
+import rvcd.rvcd.{RvcdOpenFile, RvcdRpcGrpc}
 
 import scala.language.existentials
 

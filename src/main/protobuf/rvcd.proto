@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package top.criwits.scaleda.kernel;
+package rvcd;
 
 service RvcdRpc {
     // When scaleda wants to open vcd file
