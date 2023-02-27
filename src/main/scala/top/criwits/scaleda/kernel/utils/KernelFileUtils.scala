@@ -29,12 +29,18 @@ object KernelFileUtils {
       })
       .toList
 
-  def getAllTestFiles(): Seq[File] = try {
-    getAllSourceFiles(
-      new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
-    )
-  } catch {
-    case _e: Throwable => Seq()
+  def getAllTestFiles(): Seq[File] = {
+    val target = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
+    try {
+      val v = getAllSourceFiles(target)
+      KernelLogger.debug("getAllTestFiles normally returns", v.mkString(", "))
+      v
+    } catch {
+      case e: Throwable =>
+        KernelLogger.warn(s"cannot get test files from $target!", e)
+        e.printStackTrace()
+        Seq()
+    }
   }
 
   def getAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
@@ -82,11 +88,16 @@ object KernelFileUtils {
 
   def getModuleFile(module: String, testbench: Boolean = false): Option[File] = {
     (if (testbench) getAllTestFiles() else getAllSourceFiles()).foreach(f => {
-      val matched = getModuleTitle(f).filter(_ == module)
+      val readModule = getModuleTitle(f)
+      val matched    = readModule.filter(_ == module)
+      KernelLogger.debug(
+        s"getModuleFile filter for $f, target module: $module, read module: $readModule, matched: $matched"
+      )
       if (matched.nonEmpty) {
         return Some(f) // FIXME
       } else None
     })
+    KernelLogger.warn("cannot get module file!")
     None
   }
 

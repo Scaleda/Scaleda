@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package rvcd;
+
+service RvcdRpc {
+    // When scaleda wants to open vcd file
+    rpc OpenFile (RvcdOpenFile) returns (RvcdEmpty) {}
+    // For scaleda to request goto signal by path
+    rpc GotoSignal (RvcdSignalPath) returns (RvcdEmpty) {}
+    // For clients to sync data with manager
+    rpc ClientInfo (RvcdManagedInfo) returns (RvcdEmpty) {}
+}
+
+message RvcdEmpty {}
+
+message RvcdOpenFile {
+    string path = 1;
+}
+
+service RvcdClient {
+    rpc Info (RvcdEmpty) returns (RvcdManagedInfo) {}
+    rpc Ping (RvcdEmpty) returns (RvcdEmpty) {}
+    rpc GotoSignal (RvcdSignalPath) returns (RvcdEmpty) {}
+}
+
+message RvcdManagedInfo {
+    uint32 client_port = 1;
+    repeated string paths = 2;
+    string wave_file = 3;
+}
+
+message RvcdSignalPath {
+    string file = 1;
+    repeated string path = 2;
+}

@@ -1,12 +1,11 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
+import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.Executor
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.{KernelFileUtils, OS}
-
-import top.criwits.scaleda.kernel.project.config.{TaskConfig, TaskType}
 
 import java.io.File
 
@@ -46,7 +45,9 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
     Seq(
       CommandDeps(OS.shell(
-        s"${executor.profile.iverilogPath} -s ${testbench} -o ${simExecutorName} ${newTestbenchFile.getAbsolutePath} ${sources.map(_.getAbsolutePath).mkString(" ")}"),
+        s"${executor.profile.iverilogPath} -s \"${testbench}\" " +
+          s"-o \"${simExecutorName}\" \"${newTestbenchFile.getAbsolutePath}\" " +
+          s"${sources.map(_.getAbsolutePath).map(s => s"\"${s}\"").mkString(" ")}"),
         workingDir.getAbsolutePath, description = "Compiling designs"),
       CommandDeps(OS.shell(
         s"${executor.profile.vvpPath} $simExecutorName"),
