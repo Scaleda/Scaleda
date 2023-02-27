@@ -4,13 +4,14 @@ package kernel.shell.command
 import kernel.shell.ScaledaRunHandler
 import kernel.utils.KernelLogger
 
-import java.io.File
+import java.io.{BufferedReader, File, InputStreamReader}
+import java.util.Scanner
 import java.util.concurrent.LinkedBlockingQueue
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{Future, Promise}
-import scala.sys.process._
+import scala.jdk.javaapi.CollectionConverters
 
 case class CommandOutputStream(
     returnValue: Future[Int],
@@ -19,38 +20,63 @@ case class CommandOutputStream(
 )
 
 case class CommandDeps(
-    command: String,
+    @Deprecated
+    command: String = "",
     path: String = "",
     envs: Seq[(String, String)] = Seq(),
-    description: String = ""
+    description: String = "",
+    commands: Seq[String] = Seq()
 )
 
 class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val path: String =
     if (deps.path.isEmpty) System.getProperty("user.dir") else deps.path
-  val command: String = deps.command
+  val command: String             = deps.command
+  val commands                    = deps.commands
   val envs: Seq[(String, String)] = deps.envs
-  val workingDir = new File(path)
+  val workingDir                  = new File(path)
   if (!workingDir.exists()) workingDir.mkdirs()
-  private val procBuilder = Process(command, workingDir, envs: _*)
+  // TODO: Envs
+  KernelLogger.warn("exec deps:", deps)
+  private val procBuilder = new ProcessBuilder()
+  if (command.nonEmpty) {
+    assert(commands.isEmpty)
+    procBuilder.command(command)
+  }
+  // for (c <- commands) procBuilder.command(c)
+  if (commands.nonEmpty) {
+    assert(command.isEmpty)
+    procBuilder.command(CollectionConverters.asJava(commands))
+  }
+  procBuilder.directory(workingDir)
   private var process: Option[Process] = None
-  private var terminate: Boolean = false
-  private var terminating: Boolean = false
-  private var terminated: Boolean = false
-  protected val returnValue = Promise[Int]()
-  protected val stdOut = new LinkedBlockingQueue[String]
-  protected val stdErr = new LinkedBlockingQueue[String]
-  private val delay = 100
+  private var terminate: Boolean       = false
+  private var terminating: Boolean     = false
+  private var terminated: Boolean      = false
+  protected val returnValue            = Promise[Int]()
+  protected val stdOut                 = new LinkedBlockingQueue[String]
+  protected val stdErr                 = new LinkedBlockingQueue[String]
+  private val delay                    = 100
   val thread = new Thread(() => {
     try {
-      process = Some(procBuilder.run(ProcessLogger(
-        out => stdOut.put(out),
-        err => stdErr.put(err)
-      )))
-      while (process.get.isAlive()) {
+      process = Some(procBuilder.start())
+      val out = process.get.getInputStream
+      val err = process.get.getErrorStream
+      val outScanner = new Scanner(out)
+      val errScanner = new Scanner(err)
+      new Thread(() => {
+        while (outScanner.hasNextLine) {
+          stdOut.put(outScanner.nextLine())
+        }
+        while (errScanner.hasNextLine) {
+          stdErr.put(errScanner.nextLine())
+        }
+      }).start()
+      while (process.get.isAlive) {
         if (terminate && !terminating) {
           terminating = true
           process.get.destroy()
+          // process.get.destroyForcibly()
         }
         Thread.sleep(delay)
       }
@@ -59,7 +85,8 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
       terminated = true
       returnValue.success(process.get.exitValue())
     } catch {
-      case e: Throwable => stdErr.put(e.toString)
+      case e: Throwable =>
+        stdErr.put(e.toString)
         throw e
     } finally {
       if (terminate) terminate = false
@@ -145,11 +172,12 @@ object CommandRunner {
   def execute(commands: Seq[CommandDeps], handler: ScaledaRunHandler, ignoreErrors: Boolean = false): Unit =
     executeLocalOrRemote(None, commands, handler, ignoreErrors)
 
-  def executeAsyncLocalOrRemote
-  (remoteCommandDeps: Option[RemoteCommandDeps],
-   commands: Seq[CommandDeps],
-   handler: ScaledaRunHandler,
-   ignoreErrors: Boolean = false): Future[Seq[Int]] = async {
+  def executeAsyncLocalOrRemote(
+      remoteCommandDeps: Option[RemoteCommandDeps],
+      commands: Seq[CommandDeps],
+      handler: ScaledaRunHandler,
+      ignoreErrors: Boolean = false
+  ): Future[Seq[Int]] = async {
     val returnValues = ArrayBuffer[Int]()
     val returnValueHandler = new ScaledaRunHandler {
       override def onStdout(data: String): Unit = handler.onStdout(data)
@@ -171,6 +199,10 @@ object CommandRunner {
     returnValues.toSeq
   }
 
-  def executeAsync(commands: Seq[CommandDeps], handler: ScaledaRunHandler, ignoreErrors: Boolean = false): Future[Seq[Int]] =
+  def executeAsync(
+      commands: Seq[CommandDeps],
+      handler: ScaledaRunHandler,
+      ignoreErrors: Boolean = false
+  ): Future[Seq[Int]] =
     executeAsyncLocalOrRemote(None, commands, handler, ignoreErrors)
 }

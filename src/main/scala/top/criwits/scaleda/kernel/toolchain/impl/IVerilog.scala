@@ -44,14 +44,13 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     val simExecutorName = testbench + "_iverilog_executor"
 
     Seq(
-      CommandDeps(OS.shell(
-        s"${executor.profile.iverilogPath} -s \"${testbench}\" " +
-          s"-o \"${simExecutorName}\" \"${newTestbenchFile.getAbsolutePath}\" " +
-          s"${sources.map(_.getAbsolutePath).map(s => s"\"${s}\"").mkString(" ")}"),
-        workingDir.getAbsolutePath, description = "Compiling designs"),
-      CommandDeps(OS.shell(
-        s"${executor.profile.vvpPath} $simExecutorName"),
-        workingDir.getAbsolutePath, description = "Running simulation"),
+      CommandDeps(commands = Seq(
+        executor.profile.iverilogPath,
+        "-s", testbench, "-o", simExecutorName, newTestbenchFile.getAbsolutePath,
+      ) ++ sources.map(_.getAbsolutePath),
+        path = workingDir.getAbsolutePath, description = "Compiling designs"),
+      CommandDeps(commands = Seq(executor.profile.vvpPath, simExecutorName),
+        path = workingDir.getAbsolutePath, description = "Running simulation"),
     )
   }
 }

@@ -23,7 +23,11 @@ object OS extends Enumeration {
 
   def getShell: String = if (isWindows) "C:\\Windows\\System32\\cmd.exe /c" else "/bin/sh -c"
 
+  def getShellCommands: Seq[String] = if (isWindows) Seq("C:\\Windows\\System32\\cmd.exe", "/c") else Seq("/bin/sh", "-c")
+
   def shell(command: String): String = s"$getShell '$command'"
+
+  def shellCommands(commands: Seq[String]): Seq[String] = getShellCommands ++ commands
 
   /**
    * Get user home directory path, i.e. `~`
