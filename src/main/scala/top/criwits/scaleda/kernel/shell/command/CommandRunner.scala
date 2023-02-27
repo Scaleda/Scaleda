@@ -128,10 +128,17 @@ object CommandRunner {
       ignoreErrors: Boolean = false
   ): Unit = {
     var meetErrors = false
+    var step = 1
+    val steps = commands.length
     commands.foreach(command => {
       if (!ignoreErrors && meetErrors) return
       KernelLogger.info(s"running command: ${command.commands.mkString(" ")}")
-      handler.onShellCommand(command)
+      val stepHint = (s"-- Step ($step/$steps)") + (
+        if (command.description != "") ": " + command.description
+        else ""
+      )
+      handler.onStepDescription(stepHint)
+//      handler.onShellCommand(command)
       val isRemote = remoteCommandDeps.nonEmpty
       val runner = remoteCommandDeps
         .map(r => new RemoteCommandRunner(command, r))
@@ -155,6 +162,7 @@ object CommandRunner {
       val returnValue = r.returnValue.value.get.get
       handler.onReturn(returnValue, commands.last == command)
       if (returnValue != handler.expectedReturnValue) meetErrors = true
+      step += 1
     })
   }
 
