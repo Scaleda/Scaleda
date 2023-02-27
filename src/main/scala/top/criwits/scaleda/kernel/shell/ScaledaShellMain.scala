@@ -11,11 +11,12 @@ import kernel.utils.serialise.JSONHelper
 import kernel.utils.{KernelLogger, Paths}
 
 import scopt.OParser
+import top.criwits.scaleda.kernel.bin.ExtractBinaryFiles
 
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Run, ListProfiles, ListTasks, Serve = Value
+  val None, Install, Run, ListProfiles, ListTasks, Serve = Value
 }
 
 case class ShellArgs(
@@ -61,6 +62,10 @@ object ScaledaShellMain {
     KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
     Template.initJinja()
 
+    // install binaries
+    if (ExtractBinaryFiles.run().isEmpty)
+      KernelLogger.info("all binaries ready")
+
     // preparse workdir
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(_))
     // preparse server host
@@ -87,6 +92,9 @@ object ScaledaShellMain {
           .action((x, c) => c.copy(serverPort = x))
           .text("Set server port for RPC")
           .hidden(),
+        cmd("install")
+          .text("Install necessary binaries force")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Install)),
         cmd("serve")
           .text("Run as server")
           .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
@@ -215,6 +223,10 @@ object ScaledaShellMain {
           }
           case ShellRunMode.None => {
             KernelLogger.warn("no action specified, do nothing")
+          }
+          case ShellRunMode.Install => {
+            val r = ExtractBinaryFiles.run(force = true)
+            KernelLogger.info("Installed binaries:", r)
           }
           case _ => {
             KernelLogger.error("not implemented.")

@@ -6,8 +6,10 @@ import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseVisitor}
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 
-import java.io.{File, FileInputStream, FileOutputStream, FilenameFilter}
-import java.util
+import java.io._
+import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
+import java.security.{MessageDigest, NoSuchAlgorithmException}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -107,7 +109,7 @@ object KernelFileUtils {
     class ModuleHeadVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
       var headerEndAt: Int = -1
 
-      override def visitModule_head(ctx: VerilogParser.Module_headContext): Int= {
+      override def visitModule_head(ctx: VerilogParser.Module_headContext): Int = {
         val identifier = ctx.module_identifier()
         if (identifier != null) {
           val _identifier = identifier.identifier()
@@ -130,13 +132,71 @@ object KernelFileUtils {
     val visitor = new ModuleHeadVisitor(moduleName)
     visitor.visit(tree)
 
-    val source = Source.fromFile(original)
-    val newText =new mutable.StringBuilder(source.mkString).insert(visitor.headerEndAt + 1,
-      insert).toString()
+    val source  = Source.fromFile(original)
+    val newText = new mutable.StringBuilder(source.mkString).insert(visitor.headerEndAt + 1, insert).toString()
     source.close()
 
     val outputStream = new FileOutputStream(output)
     outputStream.write(newText.getBytes())
     outputStream.close()
+  }
+
+  def getFileMD5(file: File) = {
+    var in: FileInputStream = null
+    try {
+      in = new FileInputStream(file)
+      val ch = in.getChannel
+      MD5(ch.map(FileChannel.MapMode.READ_ONLY, 0, file.length))
+    } catch {
+      case e: FileNotFoundException =>
+        ""
+      case e: IOException =>
+        ""
+    } finally if (in != null)
+      try {
+        in.close()
+      } catch {
+        case e: IOException =>
+        // 关闭流产生的错误一般都可以忽略
+      }
+  }
+
+  private val hexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
+
+  private def MD5(buffer: ByteBuffer) = {
+    var s = ""
+    try {
+      val md = MessageDigest.getInstance("MD5")
+      md.update(buffer)
+      val tmp = md.digest // MD5 的计算结果是一个 128 位的长整数，
+
+      // 用字节表示就是 16 个字节
+      val str = new Array[Char](16 * 2) // 每个字节用 16 进制表示的话，使用两个字符，
+
+      // 所以表示成 16 进制需要 32 个字符
+      var k = 0 // 表示转换结果中对应的字符位置
+
+      for (i <- 0 until 16) { // 从第一个字节开始，对 MD5 的每一个字节
+        // 转换成 16 进制字符的转换
+        val byte0 = tmp(i) // 取第 i 个字节
+
+        str({
+          k += 1;
+          k - 1
+        }) = hexDigits(byte0 >>> 4 & 0xf) // 取字节中高 4 位的数字转换, >>>,
+
+        // 逻辑右移，将符号位一起右移
+        str({
+          k += 1;
+          k - 1
+        }) = hexDigits(byte0 & 0xf) // 取字节中低 4 位的数字转换
+
+      }
+      s = new String(str) // 换后的结果转换为字符串
+    } catch {
+      case e: NoSuchAlgorithmException =>
+        e.printStackTrace()
+    }
+    s
   }
 }
