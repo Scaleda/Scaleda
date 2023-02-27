@@ -78,7 +78,7 @@ class RemoteServer(executionContext: ExecutionContext) {
           )
         }
 
-        override def onReturn(returnValue: Int) = {
+        override def onReturn(returnValue: Int, finishedAll: Boolean) = {
           responseObserver.onNext(
             new RunReply(
               RUN_REPLY_TYPE_RETURN,

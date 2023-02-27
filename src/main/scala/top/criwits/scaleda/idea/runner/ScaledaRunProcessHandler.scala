@@ -63,10 +63,12 @@ class ScaledaRunProcessHandler(logger: BasicLogger)
 
   override def onStderr(data: String): Unit = logger.warn(data)
 
-  override def onReturn(returnValue: Int): Unit = {
+  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit = {
     logger.info(ScaledaBundle.message("task.run.return.text", returnValue))
-    terminating = false
-    terminated = true
+    if (finishedAll) {
+      terminating = false
+      terminated = true
+    }
   }
 
   override def isTerminating: Boolean = terminating

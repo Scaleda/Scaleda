@@ -23,7 +23,7 @@ class ScaledaRunIdeaHandler(project: Project) extends ScaledaRunHandler {
 
   override def onStderr(data: String): Unit = OutputLogger(project).error(data)
 
-  override def onReturn(returnValue: Int): Unit = OutputLogger(project).info(s"command done, returns ${returnValue}")
+  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit = OutputLogger(project).info(s"command done, returns ${returnValue}, finishedAll: ${finishedAll}")
 }
 
 @Deprecated

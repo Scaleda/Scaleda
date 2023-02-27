@@ -108,7 +108,7 @@ trait ScaledaRunHandler {
 
   def onStderr(data: String): Unit
 
-  def onReturn(returnValue: Int): Unit
+  def onReturn(returnValue: Int, finishedAll: Boolean): Unit
 
   def isTerminating: Boolean = false
 
@@ -128,8 +128,8 @@ object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
 
   override def onStderr(data: String): Unit = KernelLogger.error(data)
 
-  override def onReturn(returnValue: Int): Unit =
-    KernelLogger.info(s"command done, returns $returnValue")
+  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
+    KernelLogger.info(s"command done, returns $returnValue, finishedAll: $finishedAll")
 }
 
 object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
@@ -137,7 +137,7 @@ object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
 
   override def onStderr(data: String): Unit = KernelLogger.error("[remote]", data)
 
-  override def onReturn(returnValue: Int): Unit =
+  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
     KernelLogger.info("[remote]", s"command done, returns $returnValue")
 }
 
@@ -151,6 +151,6 @@ class ScaledaRunHandlerToArray(
   override def onStderr(data: String): Unit =
     errors.map(_.addOne(data)).getOrElse(onStdout(data))
 
-  override def onReturn(returnValue: Int): Unit =
+  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
     returnValues.foreach(_.addOne(returnValue))
 }
