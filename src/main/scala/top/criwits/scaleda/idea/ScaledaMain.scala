@@ -16,6 +16,7 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
 import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
+import top.criwits.scaleda.kernel.bin.ExtractBinaryFiles
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
@@ -67,5 +68,8 @@ class ScaledaMain extends StartupActivity {
       ActionManager.getInstance()
         .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
     }
+
+    // install binaries
+    ExtractBinaryFiles.run()
   }
 }

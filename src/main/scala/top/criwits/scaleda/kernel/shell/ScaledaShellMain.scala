@@ -11,6 +11,7 @@ import kernel.utils.serialise.JSONHelper
 import kernel.utils.{KernelLogger, Paths}
 
 import scopt.OParser
+import top.criwits.scaleda.kernel.bin.ExtractBinaryFiles
 
 import java.io.File
 
@@ -59,6 +60,10 @@ object ScaledaShellMain {
   def main(args: Array[String]): Unit = {
     KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
     Template.initJinja()
+
+    // install binaries
+    if (ExtractBinaryFiles.run().isEmpty)
+      KernelLogger.info("all binaries ready")
 
     // preparse workdir
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(_))
