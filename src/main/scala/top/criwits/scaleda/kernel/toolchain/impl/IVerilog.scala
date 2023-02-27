@@ -19,21 +19,38 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
   override def getName: String = userFriendlyName
 
   override def simulate(task: TaskConfig) = {
+    // create working directory
+    val workingDir = executor.workingDir
+    workingDir.mkdirs()
+    assert(workingDir.exists(), f"Cannot create working directory ${workingDir.getAbsolutePath}")
+
     // get testbench info
     val testbench = task.findTopModule.get
-    val testbenchFile = KernelFileUtils.getModuleFile(testbench, true)
+    val testbenchFile = KernelFileUtils.getModuleFile(testbench, true).get
 
-    // add dumpvcd instruction
+    // generate new testbench file
+    val newTestbench = testbench + "_generated"
+    val newTestbenchFile = new File(workingDir, newTestbench + ".v")
 
+    KernelFileUtils.insertAfterModuleHead(testbenchFile, newTestbenchFile, testbench,
+      s"""
+        |initial begin
+        |  $$dumpfile(\"${testbench + "_waveform.vcd"}\");
+        |  $$dumpvars;
+        |end
+        |""".stripMargin)
 
-
-    // val outputFile = "simulation"
-    val outputFile = s"\"${task.topModule.get}\""
     val sources = KernelFileUtils.getAllSourceFiles()
+
+    val simExecutorName = testbench + "_iverilog_executor"
+
     Seq(
-      CommandDeps(OS.shell(s"${executor.profile.iverilogPath} -o $outputFile ${sources.map(_.getAbsolutePath).mkString(" ")}"),
-        executor.workingDir.getAbsolutePath),
-      CommandDeps(OS.shell(s"${executor.profile.vvpPath} $outputFile"), executor.workingDir.getAbsolutePath),
+      CommandDeps(OS.shell(
+        s"${executor.profile.iverilogPath} -s ${testbench} -o ${simExecutorName} ${newTestbenchFile.getAbsolutePath} ${sources.map(_.getAbsolutePath).mkString(" ")}"),
+        workingDir.getAbsolutePath, description = "Compiling designs"),
+      CommandDeps(OS.shell(
+        s"${executor.profile.vvpPath} $simExecutorName"),
+        workingDir.getAbsolutePath, description = "Running simulation"),
     )
   }
 }

@@ -27,7 +27,7 @@ object ScaledaRun {
       task: TaskConfig,
       profile: Option[ToolchainProfile] = None,
       remoteDeps: Option[RemoteCommandDeps] = None
-  ) = {
+  ): Unit = {
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
 
     val info = Toolchain.toolchains(target.toolchain)
@@ -41,22 +41,23 @@ object ScaledaRun {
     profileUse
       .map(profile => {
         // generate executor
+        val workingDirName = target.name + "-" + task.name
         val executor = task.taskType match {
           case TaskType.Simulation =>
             SimulationExecutor(
-              workingDir = new File(new File(workingDir, ".sim"), task.name),
+              workingDir = new File(new File(workingDir, ".sim"), workingDirName),
               topModule = task.findTopModule.get, // FIXME
               profile = profile
             )
           case TaskType.Synthesis =>
             SynthesisExecutor(
-              workingDir = new File(new File(workingDir, ".synth"), task.name),
+              workingDir = new File(new File(workingDir, ".synth"), workingDirName),
               topModule = task.findTopModule.get,
               profile = profile
             )
           case TaskType.Implement =>
             ImplementExecutor(
-              workingDir = new File(new File(workingDir, ".impl"), task.name),
+              workingDir = new File(new File(workingDir, ".impl"), workingDirName),
               topModule = task.findTopModule.get,
               profile = profile
             )
