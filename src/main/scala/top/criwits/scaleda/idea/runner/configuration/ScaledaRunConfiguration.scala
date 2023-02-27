@@ -18,6 +18,7 @@ import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.options.SettingsEditor
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import io.grpc.ManagedChannelBuilder
@@ -141,14 +142,16 @@ class ScaledaRunConfiguration(
                     executor: Executor,
                     runner: ProgramRunner[_]
                 ): ExecutionResult = {
-                  ScaledaRun.runTaskBackground(
-                    handler,
-                    new File(ProjectConfig.projectBase.get),
-                    target,
-                    task
+                  ProcessTerminatedListener.attach(handler)
+
+                  val process = ScaledaRun.runTaskBackground(
+                      handler,
+                      new File(ProjectConfig.projectBase.get),
+                      target,
+                      task
                   )
 
-                  ProcessTerminatedListener.attach(handler)
+                  process.start()
 
                   new ExecutionResult {
                     override def getExecutionConsole: ExecutionConsole = console

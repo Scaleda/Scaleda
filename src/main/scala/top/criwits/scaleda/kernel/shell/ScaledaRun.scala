@@ -8,6 +8,8 @@ import kernel.toolchain.impl.{IVerilog, Vivado}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
+import com.intellij.openapi.progress.ProgressManager
+
 import java.io.File
 import scala.collection.mutable.ArrayBuffer
 
@@ -99,7 +101,6 @@ object ScaledaRun {
   ): Thread = {
     val t = new Thread(() => runTask(handler, workingDir, target, task))
     t.setDaemon(daemon)
-    t.start()
     t
   }
 }
@@ -114,6 +115,8 @@ trait ScaledaRunHandler {
   def isTerminating: Boolean = false
 
   def onShellCommand(command: CommandDeps): Unit = {}
+
+  def onStepDescription(data: String): Unit = {}
 
   def expectedReturnValue: Int = 0
 }
