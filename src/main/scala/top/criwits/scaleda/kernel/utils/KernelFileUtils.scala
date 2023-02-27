@@ -29,9 +29,13 @@ object KernelFileUtils {
       })
       .toList
 
-  def getAllTestFiles(): Seq[File] = getAllSourceFiles(
-    new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
-  )
+  def getAllTestFiles(): Seq[File] = try {
+    getAllSourceFiles(
+      new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
+    )
+  } catch {
+    case _e: Throwable => Seq()
+  }
 
   def getAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
     val file = new File(path)
