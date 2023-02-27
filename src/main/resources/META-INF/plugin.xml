@@ -38,6 +38,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
         <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
+        <projectService serviceImplementation="top.criwits.scaleda.vcd.RvcdService"/>
     </extensions>
 
     <!-- Verilog Support -->
