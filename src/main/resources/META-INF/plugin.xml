@@ -20,9 +20,14 @@
         <action id="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction"
                 class="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction" text="Run Last Scaleda Task"
                 description="Run last Scaleda task"/>
-        <action id="top.criwits.scaleda.kernel.rvcd.RvcdLaunchAction"
-                class="top.criwits.scaleda.kernel.rvcd.RvcdLaunchAction" text="Launch Rvcd"
+        <action id="top.criwits.scaleda.idea.rvcd.RvcdLaunchAction"
+                class="top.criwits.scaleda.idea.rvcd.RvcdLaunchAction" text="Launch Rvcd"
                 description="Launch Rvcd if not running"/>
+        <action id="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
+                class="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
+                text="Jump to Waveform" >
+                <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
+        </action>
     </actions>
 
     <!-- Listeners -->
@@ -41,7 +46,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
         <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
-        <projectService serviceImplementation="top.criwits.scaleda.kernel.rvcd.RvcdService"/>
+        <projectService serviceImplementation="top.criwits.scaleda.idea.rvcd.RvcdService"/>
     </extensions>
 
     <!-- Verilog Support -->

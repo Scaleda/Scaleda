@@ -1,5 +1,7 @@
 package top.criwits.scaleda
-package kernel.rvcd
+package idea.rvcd
+
+import kernel.rvcd.RvcdClient
 
 import com.intellij.openapi.Disposable
 import rvcd.rvcd.RvcdEmpty

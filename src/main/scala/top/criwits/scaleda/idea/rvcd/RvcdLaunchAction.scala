@@ -1,9 +1,9 @@
 package top.criwits.scaleda
-package kernel.rvcd
+package idea.rvcd
 
 import idea.utils.{MainLogger, OutputLogger}
 import kernel.shell.command.{CommandDeps, CommandRunner}
-import kernel.utils.{KernelLogger, OS, Paths}
+import kernel.utils.{OS, Paths}
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import rvcd.rvcd.RvcdEmpty
