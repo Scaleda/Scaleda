@@ -36,7 +36,7 @@ class RpcService extends Disposable {
         server.get.awaitTermination()
       } catch {
         case _e: Throwable => {
-          MainLogger.warn("trying", _e)
+          MainLogger.debug("trying", _e)
           _e.printStackTrace()
           Thread.sleep(3000)
         }
