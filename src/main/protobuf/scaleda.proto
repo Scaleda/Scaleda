@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package scaleda;
+
+service ScaledaRpc {
+    rpc Ping (ScaledaEmpty) returns (ScaledaEmpty) {}
+    rpc GotoSource (ScaledaGotoSource) returns (ScaledaEmpty) {}
+}
+
+message ScaledaEmpty {}
+
+message ScaledaGotoSource {
+    string file = 1;
+    repeated string path = 2;
+    uint32 line = 3;
+    uint32 column = 4;
+}

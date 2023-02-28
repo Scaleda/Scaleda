@@ -25,7 +25,7 @@
                 description="Launch Rvcd if not running"/>
         <action id="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
                 class="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
-                text="Jump to Waveform" >
+                text="Waveform" >
                 <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
         </action>
     </actions>
@@ -47,6 +47,7 @@
         <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
         <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
         <projectService serviceImplementation="top.criwits.scaleda.idea.rvcd.RvcdService"/>
+        <projectService serviceImplementation="top.criwits.scaleda.idea.utils.RpcService"/>
     </extensions>
 
     <!-- Verilog Support -->
