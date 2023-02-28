@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea
 
 import idea.settings.toolchains.ProfileDetectAction
-import idea.utils.{Icons, MainLogger, inReadAction}
+import idea.utils.{Icons, MainLogger, RpcService, inReadAction}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import kernel.project.config.ProjectConfig
 import kernel.template.Template
@@ -16,7 +16,9 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
 import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
+import top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService
 import top.criwits.scaleda.kernel.bin.ExtractBinaryFiles
+import top.criwits.scaleda.kernel.rvcd.RvcdService
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
@@ -71,5 +73,11 @@ class ScaledaMain extends StartupActivity {
 
     // install binaries
     ExtractBinaryFiles.run()
+
+    // notify services
+    project.getService(classOf[ScaledaMainService])
+    project.getService(classOf[RpcService])
+    project.getService(classOf[ScaledaLoggingService])
+    project.getService(classOf[RvcdService])
   }
 }
