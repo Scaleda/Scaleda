@@ -42,6 +42,7 @@
         <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
         <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
         <projectService serviceImplementation="top.criwits.scaleda.kernel.rvcd.RvcdService"/>
+        <projectService serviceImplementation="top.criwits.scaleda.idea.utils.RpcService"/>
     </extensions>
 
     <!-- Verilog Support -->
