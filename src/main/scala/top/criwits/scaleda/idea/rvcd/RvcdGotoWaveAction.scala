@@ -2,7 +2,9 @@ package top.criwits.scaleda
 package idea.rvcd
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
+import top.criwits.scaleda.idea.utils.MainLogger
 import top.criwits.scaleda.verilog.VerilogPSIFileRoot
+import top.criwits.scaleda.verilog.psi.nodes.IdentifierPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
 
 /** <b>Go To | Waveform</b> context option for HDL files.
@@ -26,16 +28,36 @@ class RvcdGotoWaveAction extends AnAction {
 
     // if selected is not signal, disable
     val psiElement = e.getData(CommonDataKeys.PSI_ELEMENT)
-    if (!psiElement.isInstanceOf[SignalIdentifierPsiNode]) {
-      presentation.setEnabled(false)
-      return
-    }
 
-    presentation.setEnabled(true)
+    psiElement match {
+      case _: SignalIdentifierPsiNode =>
+        // This indicates caret is at some reference (not the declaration itself)
+        presentation.setEnabled(true)
+      case _: IdentifierPsiNode =>
+        // Tricky
+        val parent = psiElement.getParent
+        if (parent != null && parent.isInstanceOf[SignalIdentifierPsiNode]) {
+          presentation.setEnabled(true)
+        } else
+          presentation.setEnabled(false)
+      case _ =>
+        presentation.setEnabled(false)
+    }
   }
 
   override def actionPerformed(e: AnActionEvent): Unit = {
-    // TODO
-    println(e.getData(CommonDataKeys.PSI_ELEMENT))
+    val psiElement = e.getData(CommonDataKeys.PSI_ELEMENT)
+
+    val currentSignal = psiElement match {
+      case _: SignalIdentifierPsiNode => psiElement
+      case _: IdentifierPsiNode =>
+        val parent = psiElement.getParent
+        parent.asInstanceOf[SignalIdentifierPsiNode]
+      case _ => null // should never reach
+    }
+
+    // TODO: Stub!
+    MainLogger.warn(s"RvcdGotoWaveAction: psi=$currentSignal, signal=${currentSignal.getText}")
+
   }
 }
