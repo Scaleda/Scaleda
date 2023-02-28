@@ -59,12 +59,12 @@ object ScaledaShellMain {
   }
 
   def main(args: Array[String]): Unit = {
-    KernelLogger.info(s"Scaleda shell! args: ${args.mkString(" ")}")
+    KernelLogger.info(s"This is Scaleda shell! Args: ${args.mkString(" ")}")
     Template.initJinja()
 
     // install binaries
-    if (ExtractBinaryFiles.run().isEmpty)
-      KernelLogger.info("all binaries ready")
+    if (ExtractBinaryFiles.isInstalled)
+      KernelLogger.info("All binary assets are installed")
 
     // preparse workdir
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(_))
@@ -75,7 +75,7 @@ object ScaledaShellMain {
       loadConfig(Paths.pwd.getAbsolutePath)
     }
     if (ProjectConfig.configFile.isEmpty)
-      KernelLogger.info("no project config detected!")
+      KernelLogger.info("No project config detected!")
     val shellParser = {
       val builder = OParser.builder[ShellArgs]
       import builder._
@@ -225,8 +225,7 @@ object ScaledaShellMain {
             KernelLogger.warn("no action specified, do nothing")
           }
           case ShellRunMode.Install => {
-            val r = ExtractBinaryFiles.run(force = true)
-            KernelLogger.info("Installed binaries:", r)
+            ExtractBinaryFiles.run()
           }
           case _ => {
             KernelLogger.error("not implemented.")

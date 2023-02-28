@@ -10,6 +10,8 @@ import kernel.toolchain.Toolchain
 import kernel.utils.KernelLogger
 
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.impl.CoreProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
@@ -71,8 +73,12 @@ class ScaledaMain extends StartupActivity {
         .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
     }
 
-    // install binaries
-    ExtractBinaryFiles.run()
+    // check binaries
+    if (!ExtractBinaryFiles.isInstalled) {
+      ProgressManager.getInstance().runProcessWithProgressSynchronously(new Runnable {
+        override def run(): Unit = ExtractBinaryFiles.run()
+      }, ScaledaBundle.message("utils.installing.assets"), false, project)
+    }
 
     // notify services
     project.getService(classOf[ScaledaMainService])
