@@ -20,7 +20,6 @@ class RvcdGotoWaveAction extends AnAction {
     }
 
     // if rvcd is not running OR rvcd is not working for current simulation, disable
-    // TODO
     if (!RvcdService.hasInstance) {
       presentation.setEnabled(false)
       return

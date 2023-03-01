@@ -50,7 +50,6 @@ class RvcdService extends Disposable {
         new OutputLogger.Handler(myProject)
       )
     } else {
-      // TODO: RPC Open
       client.openFileWith(
         rvcd.rvcd.RvcdOpenFileWith.of(waveform.getAbsolutePath, "", source.map(f => f.getAbsolutePath), None)
       )
@@ -82,7 +81,7 @@ object RvcdService {
       }
     } catch {
       case e: Throwable =>
-        e.printStackTrace()
+        // e.printStackTrace()
         false
     }
   }
