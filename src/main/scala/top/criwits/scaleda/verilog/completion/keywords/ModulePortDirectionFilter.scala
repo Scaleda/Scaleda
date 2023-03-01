@@ -3,6 +3,8 @@ package verilog.completion.keywords
 
 import com.intellij.psi.{PsiComment, PsiElement}
 import com.intellij.psi.filters.ElementFilter
+import com.intellij.psi.util.PsiTreeUtil
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.signal.PortIdentifierPsiNode
 
 class ModulePortDirectionFilter extends ElementFilter {
@@ -14,7 +16,12 @@ class ModulePortDirectionFilter extends ElementFilter {
     val port = identifier.getParent
     if (port != null) {
       return port match {
-        case _: PortIdentifierPsiNode => return true
+        case _: PortIdentifierPsiNode => {
+          val isInstantiation = PsiTreeUtil.getParentOfType(context, classOf[ModuleInstantiationPsiNode])
+          if (isInstantiation == null)
+          return true
+          else return false
+        }
         case _ => return false
       }
     }

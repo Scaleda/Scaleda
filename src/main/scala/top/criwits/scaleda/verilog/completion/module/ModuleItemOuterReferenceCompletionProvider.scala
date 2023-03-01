@@ -30,7 +30,7 @@ class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[Comp
     FileUtils.getAllVerilogFiles(element.getProject)
       .flatMap(it => it.getModuleDeclarations)
       .filter(it => it.isInstanceOf[ModuleDeclarationPsiNode])
-      .filter(it => !currentModuleInstantiationNames.contains(it.getName))
+//      .filter(it => !currentModuleInstantiationNames.contains(it.getName))
       .filter(it => it != currentModuleDeclaration)
       .map(it => buildLookupElementForModuleDeclaration(it.asInstanceOf[ModuleDeclarationPsiNode]))
       .foreach(it => result.addElement(it))
