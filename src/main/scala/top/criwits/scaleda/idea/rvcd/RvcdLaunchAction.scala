@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.rvcd
 
 import idea.utils.OutputLogger
-import kernel.rvcd.RvcdClient
+import kernel.rvcd.Rvcd
 import kernel.shell.command.{CommandDeps, CommandRunner}
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
@@ -26,7 +26,7 @@ class RvcdLaunchAction extends AnAction {
 
 class RvcdLaunchActionWith(request: RvcdOpenFileWith) extends AnAction {
   override def actionPerformed(event: AnActionEvent): Unit = {
-    val (client, shutdown) = RvcdClient()
+    val (client, shutdown) = Rvcd()
     client.openFileWith(request)
     shutdown()
   }
