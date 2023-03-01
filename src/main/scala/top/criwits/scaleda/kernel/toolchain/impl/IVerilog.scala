@@ -38,7 +38,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     KernelFileUtils.insertAfterModuleHead(testbenchFile, newTestbenchFile, testbench,
       s"""
         |initial begin
-        |  $$dumpfile(\"${vcdFile.getAbsolutePath}\");
+        |  $$dumpfile(\"${vcdFile.getName}\");
         |  $$dumpvars;
         |end
         |""".stripMargin)
