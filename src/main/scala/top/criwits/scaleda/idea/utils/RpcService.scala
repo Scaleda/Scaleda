@@ -4,7 +4,7 @@ package idea.utils
 import kernel.utils.KernelLogger
 
 import com.intellij.openapi.Disposable
-import io.grpc.{Server, ServerBuilder}
+import io.grpc.{ManagedChannelBuilder, Server, ServerBuilder}
 import scaleda.scaleda.{ScaledaEmpty, ScaledaGotoSource, ScaledaRpcGrpc}
 
 import scala.async.Async.async
@@ -14,10 +14,12 @@ import scala.language.existentials
 
 class ScaledaRpcServerImpl extends ScaledaRpcGrpc.ScaledaRpc {
   override def ping(request: ScaledaEmpty): Future[ScaledaEmpty] = async {
+    KernelLogger.info("grpc ping")
     ScaledaEmpty.of()
   }
 
   override def gotoSource(request: ScaledaGotoSource): Future[ScaledaEmpty] = async {
+    KernelLogger.info(s"grpc gotoSource($request)")
     ScaledaEmpty.of()
   }
 }
@@ -35,8 +37,8 @@ class RpcService extends Disposable {
         method.setAccessible(true)
         val builder = method.invoke(provider, DEFAULT_PORT).asInstanceOf[ServerBuilder[_]]
         builder.addService(ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl, ExecutionContext.global))
-        server = Some(builder.build().start())
         MainLogger.info("scaleda grpc server serve at port", DEFAULT_PORT)
+        server = Some(builder.build().start())
         server.get.awaitTermination()
       } catch {
         case _e: Throwable => {
@@ -59,13 +61,42 @@ object RpcServiceTest extends App {
   private final val DEFAULT_PORT = 4151
   val loader                     = getClass.getClassLoader
   KernelLogger.info(s"loader: $loader")
-  // val _builder = ServerBuilder.forPort(4151)
-  private val provider = RpcPatch.getDefaultServerProvider
-  private val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
-  method.setAccessible(true)
-  val builder = method.invoke(provider, DEFAULT_PORT).asInstanceOf[ServerBuilder[_]]
+  private val usePatch = false
+  val builder = if (usePatch) {
+    val provider = RpcPatch.getDefaultServerProvider
+    val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
+    method.setAccessible(true)
+    method.invoke(provider, DEFAULT_PORT).asInstanceOf[ServerBuilder[_]]
+  } else {
+    ServerBuilder.forPort(DEFAULT_PORT)
+  }
   builder.addService(ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl, ExecutionContext.global))
+  KernelLogger.info("before start()")
   val server = builder.build().start()
-  server.awaitTermination()
+  val serverThread = new Thread(() => {
+    server.awaitTermination()
+  })
+  serverThread.start()
+
+  private val clientBuilder = ManagedChannelBuilder.forAddress("127.0.0.1", DEFAULT_PORT)
+  clientBuilder.usePlaintext()
+  val channel = clientBuilder.build()
+  val stub = ScaledaRpcGrpc.blockingStub(channel)
+  stub.ping(ScaledaEmpty.of())
+  channel.shutdownNow()
+
+  server.shutdownNow()
+  KernelLogger.info("done")
+}
+
+
+object RpcServiceClientTest extends App {
+  private final val DEFAULT_PORT = 4151
+    private val clientBuilder = ManagedChannelBuilder.forAddress("127.0.0.1", DEFAULT_PORT)
+  clientBuilder.usePlaintext()
+  val channel = clientBuilder.build()
+  val stub = ScaledaRpcGrpc.blockingStub(channel)
+  stub.ping(ScaledaEmpty.of())
+  channel.shutdownNow()
   KernelLogger.info("done")
 }
