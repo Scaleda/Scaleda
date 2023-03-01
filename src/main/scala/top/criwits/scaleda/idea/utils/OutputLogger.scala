@@ -49,4 +49,8 @@ object OutputLogger {
     override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
       OutputLogger(project).info(s"command done, returns ${returnValue}, finishedAll: ${finishedAll}")
   }
+
+  class StdErrToWarningHandler(project: Project) extends Handler(project) {
+    override def onStderr(data: String): Unit = OutputLogger(project).warn(data)
+  }
 }

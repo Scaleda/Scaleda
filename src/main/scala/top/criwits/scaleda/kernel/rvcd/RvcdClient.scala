@@ -9,7 +9,7 @@ import scala.language.existentials
 
 object RvcdClient {
   private final val DEFAULT_PORT = 5411
-  def apply(host: String, port: Int = DEFAULT_PORT) = {
+  def apply(host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
     val builder = ManagedChannelBuilder.forAddress(host, port)
     builder.usePlaintext()
     val channel = builder.build()
@@ -18,7 +18,7 @@ object RvcdClient {
 }
 
 object RvcdTest extends App {
-  private val stub = RvcdClient("127.0.0.1")
+  private val stub = RvcdClient()
   stub.openFile(RvcdOpenFile.of("/home/chiro/programs/rvcd/data/testbench0.vcd"))
   KernelLogger.info("done")
 }

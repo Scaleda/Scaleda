@@ -16,7 +16,6 @@ import java.io.File
  * Daemon service for RVCD, the waveform viewer of Scaleda.
  */
 class RvcdService extends Disposable {
-  private val rvcdFile = new File(Paths.getBinaryDir, "rvcd" + (if (OS.isWindows) ".exe" else ""))
   private def stub: RvcdRpcGrpc.RvcdRpcBlockingStub = RvcdClient("127.0.0.1")
 
   private var myProject: Project = _
@@ -37,13 +36,13 @@ class RvcdService extends Disposable {
   def launchWithWaveformAndSource(waveform: File, source: Seq[File]): Unit = {
     if (!hasInstance) {
       // No instance is running, launch
-      if (!rvcdFile.canExecute) {
+      if (!RvcdService.rvcdFile.canExecute) {
         throw new RuntimeException()
       }
 
       // generate rvcd startup arguments
       // TODO NO SOURCE
-      val cmdLine = Seq(rvcdFile.getAbsolutePath)  ++ Seq(waveform.getAbsolutePath)
+      val cmdLine = Seq(RvcdService.rvcdFile.getAbsolutePath)  ++ Seq(waveform.getAbsolutePath)
 //      val cmdLine = Seq(rvcdFile.getAbsolutePath) ++ source.map(s => Seq("-i", s.getAbsolutePath)).reduce(_ ++ _) ++ Seq(waveform.getAbsolutePath)
       MainLogger.info(s"Starting RVCD with command line: ${cmdLine.mkString(" ")}")
 
@@ -63,4 +62,8 @@ class RvcdService extends Disposable {
 
   override def dispose(): Unit = {
   }
+}
+
+object RvcdService {
+  final val rvcdFile = new File(Paths.getBinaryDir, "rvcd" + (if (OS.isWindows) ".exe" else ""))
 }
