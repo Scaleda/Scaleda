@@ -58,7 +58,8 @@ class ScaledaMain extends StartupActivity {
     }
 
     // Remote
-    project.getService(classOf[RpcService])
+    val rpcService = project.getService(classOf[RpcService])
+    rpcService.setProject(project)
     project.getService(classOf[RvcdService]).setProject(project)
   }
 }
