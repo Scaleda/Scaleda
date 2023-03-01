@@ -73,6 +73,8 @@
                                 implementationClass="top.criwits.scaleda.verilog.completion.signal.SignalNameCompletionContributor" />
         <completion.contributor language="Verilog"
                                 implementationClass="top.criwits.scaleda.verilog.completion.keywords.VerilogKeywordCompletionContributor"/>
+        <completion.contributor language="Verilog"
+                                implementationClass="top.criwits.scaleda.verilog.completion.module.ModuleItemOuterReferenceCompletionContributor" />
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"

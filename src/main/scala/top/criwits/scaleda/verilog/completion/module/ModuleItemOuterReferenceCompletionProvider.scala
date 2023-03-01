@@ -1,16 +1,17 @@
 package top.criwits.scaleda
-package verilog.completion
+package verilog.completion.module
 
+import verilog.VerilogFileType
+import verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
+import verilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
+import verilog.utils.FileUtils
 
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionProvider, CompletionResultSet}
 import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import top.criwits.scaleda.verilog.VerilogFileType
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
-import top.criwits.scaleda.verilog.utils.FileUtils
+import top.criwits.scaleda.idea.utils.Icons
 
 class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[CompletionParameters] {
   override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
@@ -38,7 +39,7 @@ class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[Comp
   def buildLookupElementForModuleDeclaration(moduleDeclarationPsiNode: ModuleDeclarationPsiNode): LookupElement = {
     LookupElementBuilder
       .create(moduleDeclarationPsiNode)
-      .withIcon(VerilogFileType.DefaultIcon)
+      .withIcon(Icons.verilogModule)
       .withTypeText("module")
       .withTailText(s" (in \"${moduleDeclarationPsiNode.getContainingFile.getName}\")")
 
