@@ -25,34 +25,11 @@ import top.criwits.scaleda.idea.rvcd.RvcdService
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
-    // copy kernel logs to main logger
-    KernelLogger.append(MainLogger)
-    // init jinjia
-    Template.initJinja()
-//
-//    // check is having project config
-//    var searchedFile: Option[VirtualFile] = None
-//    inReadAction {
-//      ProjectFileIndex
-//        .getInstance(project)
-//        .iterateContent(fileOrDir => {
-//          if (
-//            !fileOrDir.isDirectory && fileOrDir.getName == ProjectConfig.defaultConfigFile
-//          ) {
-//            searchedFile = Some(fileOrDir)
-//          }
-//          true
-//        })
-//    }
-//
-//    if (searchedFile.isEmpty) {
-//      MainLogger.warn("No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project")
-//    } else {
-//      val f = searchedFile.get
-//      ProjectConfig.configFile = Some(f.getPath)
-//      ProjectConfig.projectBase = Some(f.getParent.getPath)
-//      MainLogger.info(s"Scaleda config file $f detected")
-//    }
+
+    // Logging service
+    project.getService(classOf[ScaledaLoggingService])
+
+    project.getService(classOf[ScaledaMainService])
 
     // setup tool window
     val toolWindowManager = ToolWindowManager.getInstance(project)
@@ -80,10 +57,8 @@ class ScaledaMain extends StartupActivity {
       }, ScaledaBundle.message("utils.installing.assets"), false, project)
     }
 
-    // notify services
-    project.getService(classOf[ScaledaMainService])
+    // Remote
     project.getService(classOf[RpcService])
-    project.getService(classOf[ScaledaLoggingService])
-    project.getService(classOf[RvcdService])
+    project.getService(classOf[RvcdService]).setProject(project)
   }
 }

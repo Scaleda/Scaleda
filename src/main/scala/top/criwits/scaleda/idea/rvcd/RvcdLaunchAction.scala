@@ -10,27 +10,9 @@ import rvcd.rvcd.RvcdEmpty
 
 import java.io.File
 
-class RvcdLaunchAction extends AnAction {
+class RvcdLaunchAction(waveform: File, source: Seq[File]) extends AnAction {
   override def actionPerformed(event: AnActionEvent): Unit = {
-    try {
-      val service = event.getProject.getService(classOf[RvcdService])
-      service.stub.ping(RvcdEmpty.of())
-    } catch {
-      case e: Throwable =>
-        MainLogger.info("rvcd service missing", e, "starting new")
-        new Thread(() => {
-          CommandRunner.execute(
-            Seq(
-              CommandDeps(commands =
-                Seq(
-                  new File(Paths.getBinaryDir, if (OS.isWindows) "rvcd.exe" else "rvcd").getAbsolutePath
-                )
-              )
-            ),
-            new OutputLogger.Handler(event.getProject)
-          )
-          MainLogger.info("rvcd finished")
-        }).start()
-    }
+    val service = event.getProject.getService(classOf[RvcdService])
+    service.launchWithWaveformAndSource(waveform, source)
   }
 }

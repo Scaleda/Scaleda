@@ -11,7 +11,7 @@ import top.criwits.scaleda.kernel.shell.command.CommandDeps
 
 import java.io.OutputStream
 
-class ScaledaRunProcessHandler(logger: BasicLogger)
+class ScaledaRunProcessHandler(logger: BasicLogger, invokeAfterFinish: => Unit = {})
     extends ProcessHandler
     with ScaledaRunHandler {
   var terminated = false
@@ -75,6 +75,8 @@ class ScaledaRunProcessHandler(logger: BasicLogger)
     if (finishedAll) {
       terminating = false
       terminated = true
+      // invoke
+      invokeAfterFinish
     }
   }
 

@@ -5,5 +5,5 @@ import com.intellij.openapi.project.{Project, ProjectManager}
 
 object ProjectNow {
   def apply(): Option[Project] =
-    ProjectManager.getInstance().getOpenProjects.headOption
+    ProjectManager.getInstance().getOpenProjects.headOption // FIXME: what would happen if multiple projects are opened?
 }
