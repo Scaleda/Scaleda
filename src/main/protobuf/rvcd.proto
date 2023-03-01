@@ -3,7 +3,7 @@ syntax = "proto3";
 package rvcd;
 
 service RvcdRpc {
-    // When scaleda wants to open vcd file
+    // When scaleda wants to open vcd file, source dir is based on history and shell argument
     rpc OpenFile (RvcdOpenFile) returns (RvcdEmpty) {}
     // For scaleda to request goto signal by path
     rpc GotoSignal (RvcdSignalPath) returns (RvcdEmpty) {}
@@ -11,6 +11,12 @@ service RvcdRpc {
     rpc ClientInfo (RvcdManagedInfo) returns (RvcdEmpty) {}
     // See if this manage available
     rpc Ping (RvcdEmpty) returns (RvcdEmpty) {}
+    // Set source dir, available for all rvcd apps
+    rpc LoadSourceDir (RvcdLoadSourceDir) returns (RvcdEmpty) {}
+    // Load source files, available for all rvcd apps
+    rpc LoadSource (RvcdLoadSources) returns (RvcdEmpty) {}
+    // Open file with arguments
+    rpc OpenFileWith (RvcdOpenFileWith) returns (RvcdEmpty) {}
 }
 
 message RvcdEmpty {}
@@ -34,4 +40,19 @@ message RvcdManagedInfo {
 message RvcdSignalPath {
     string file = 1;
     repeated string path = 2;
+}
+
+message RvcdLoadSourceDir {
+    string path = 1;
+}
+
+message RvcdLoadSources {
+    repeated string files = 1;
+}
+
+message RvcdOpenFileWith {
+    string file = 1;
+    string source_dir = 2;
+    repeated string source_files = 3;
+    RvcdSignalPath goto = 4;
 }

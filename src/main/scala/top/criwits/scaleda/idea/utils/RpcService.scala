@@ -30,7 +30,7 @@ class RpcService extends Disposable {
   new Thread(() => {
     while (!stop) {
       try {
-        val provider = RpcServicePatch.getDefaultServerProvider
+        val provider = RpcPatch.getDefaultServerProvider
         val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
         method.setAccessible(true)
         val builder = method.invoke(provider, DEFAULT_PORT).asInstanceOf[ServerBuilder[_]]
@@ -60,7 +60,7 @@ object RpcServiceTest extends App {
   val loader                     = getClass.getClassLoader
   KernelLogger.info(s"loader: $loader")
   // val _builder = ServerBuilder.forPort(4151)
-  private val provider = RpcServicePatch.getDefaultServerProvider
+  private val provider = RpcPatch.getDefaultServerProvider
   private val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
   method.setAccessible(true)
   val builder = method.invoke(provider, DEFAULT_PORT).asInstanceOf[ServerBuilder[_]]
