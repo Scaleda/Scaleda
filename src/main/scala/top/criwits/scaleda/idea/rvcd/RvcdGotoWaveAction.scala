@@ -1,18 +1,25 @@
 package top.criwits.scaleda
 package idea.rvcd
 
+import idea.utils.MainLogger
+import verilog.VerilogPSIFileRoot
+import verilog.psi.nodes.IdentifierPsiNode
+import verilog.psi.nodes.module.ModuleDeclarationPsiNode
+import verilog.psi.nodes.signal.SignalIdentifierPsiNode
+
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
-import top.criwits.scaleda.idea.utils.MainLogger
-import top.criwits.scaleda.verilog.VerilogPSIFileRoot
-import top.criwits.scaleda.verilog.psi.nodes.IdentifierPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
+import com.intellij.psi.util.PsiTreeUtil
+import rvcd.rvcd.RvcdSignalPath
+import top.criwits.scaleda.kernel.rvcd.Rvcd
+
+import scala.collection.mutable.ArrayBuffer
 
 /** <b>Go To | Waveform</b> context option for HDL files.
   */
 class RvcdGotoWaveAction extends AnAction {
   override def update(e: AnActionEvent): Unit = {
     val presentation = e.getPresentation
-    val psiFile = e.getData(CommonDataKeys.PSI_FILE)
+    val psiFile      = e.getData(CommonDataKeys.PSI_FILE)
     // if not verilog file, disable
     if (!psiFile.isInstanceOf[VerilogPSIFileRoot]) {
       presentation.setEnabled(false)
@@ -54,9 +61,22 @@ class RvcdGotoWaveAction extends AnAction {
         parent.asInstanceOf[SignalIdentifierPsiNode]
       case _ => null // should never reach
     }
+    var paths   = ArrayBuffer[String]()
+    var psiNode = currentSignal
+    while (psiNode != null && psiNode.getParent != null) {
+      MainLogger.info(s"psi now: $psiNode")
+      (psiNode match {
+        case p: SignalIdentifierPsiNode  => Some(p.getNameIdentifier.getText)
+        case m: ModuleDeclarationPsiNode => Some(m.getNameIdentifier.getText)
+        case _                           => None
+      }).foreach(paths.addOne)
+      psiNode = PsiTreeUtil.getParentOfType(psiNode, classOf[ModuleDeclarationPsiNode])
+    }
 
-    // TODO: Stub!
-    MainLogger.warn(s"RvcdGotoWaveAction: psi=$currentSignal, signal=${currentSignal.getText}")
-
+    paths = paths.reverse
+    MainLogger.info(s"RvcdGotoWaveAction: psi=$currentSignal, signal=${currentSignal.getText}, paths=$paths")
+    val (client, shutdown) = Rvcd()
+    client.gotoSignal(RvcdSignalPath.of("", paths.toSeq))
+    shutdown()
   }
 }

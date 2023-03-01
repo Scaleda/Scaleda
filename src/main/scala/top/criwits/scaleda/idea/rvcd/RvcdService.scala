@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.rvcd
 
 import idea.utils.{MainLogger, OutputLogger}
-import kernel.rvcd.RvcdClient
+import kernel.rvcd.Rvcd
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.utils.{OS, Paths}
 
@@ -22,7 +22,7 @@ class RvcdService extends Disposable {
     myProject = project
   }
 
-  var (client, shutdown) = RvcdClient()
+  var (client, shutdown) = Rvcd()
 
   def launchWithWaveformAndSource(waveform: File, source: Seq[File]): Unit = {
     if (!hasInstance) {
@@ -32,7 +32,6 @@ class RvcdService extends Disposable {
       }
 
       // generate rvcd startup arguments
-      // TODO NO SOURCE
       // val cmdLine = Seq(RvcdService.rvcdFile.getAbsolutePath)  ++ Seq(waveform.getAbsolutePath)
       val cmdLine = Seq(RvcdService.rvcdFile.getAbsolutePath) ++ source
         .map(s => Seq("-i", s.getAbsolutePath))
@@ -65,24 +64,28 @@ object RvcdService {
   final val rvcdFile = new File(Paths.getBinaryDir, "rvcd" + (if (OS.isWindows) ".exe" else ""))
 
   final def hasInstance: Boolean = {
-    var (client, shutdown) = RvcdClient()
-    try {
+    var (client, shutdown) = Rvcd()
+    val ret = {
       try {
-        client.ping(RvcdEmpty.of())
-        true
-      } catch {
-        case _e: io.grpc.StatusRuntimeException =>
-          shutdown()
-          val r = RvcdClient()
-          client = r._1
-          shutdown = r._2
+        try {
           client.ping(RvcdEmpty.of())
           true
+        } catch {
+          case _e: io.grpc.StatusRuntimeException =>
+            shutdown()
+            val r = Rvcd()
+            client = r._1
+            shutdown = r._2
+            client.ping(RvcdEmpty.of())
+            true
+        }
+      } catch {
+        case e: Throwable =>
+          // e.printStackTrace()
+          false
       }
-    } catch {
-      case e: Throwable =>
-        // e.printStackTrace()
-        false
     }
+    shutdown()
+    ret
   }
 }
