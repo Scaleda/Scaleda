@@ -6,23 +6,25 @@ import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.ScaledaMessageTab
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.net.remote.{Empty, RemoteGrpc, RemoteProfile}
-import kernel.project.config.ProjectConfig
+import kernel.project.config.{ProjectConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
 
+import top.criwits.scaleda.kernel.toolchain.executor.{SimulationExecutor, Executor => SExecutor}
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.process.{ProcessHandler, ProcessTerminatedListener}
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
-import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.{ActionManager, AnAction}
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import io.grpc.ManagedChannelBuilder
 import org.jdom.Element
+import top.criwits.scaleda.idea.rvcd.{RvcdLaunchAction, RvcdService}
 
 import java.io.File
 import scala.collection.mutable
@@ -127,6 +129,19 @@ class ScaledaRunConfiguration(
 
               val console = myConsoleBuilder.getConsole
 
+              def startRvcdAfterExecution(task: TaskConfig, executor: SExecutor): Unit = {
+                task.taskType match {
+                  case TaskType.Simulation =>
+//                    val action = new RvcdLaunchAction()
+//                    ActionManager.getInstance().tryToExecute(
+//                      action, null, null, null, true
+//                    )
+                    project.getService(classOf[RvcdService]).launchWithWaveformAndSource(executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
+                    // TODO / FIXME: Source is not given
+                  case _ =>
+                }
+              }
+
               val handler =
                 new ScaledaRunProcessHandler(
                   new ConsoleLogger(
@@ -134,7 +149,7 @@ class ScaledaRunConfiguration(
                     logSourceId = Some(
                       s"${ScaledaMessageTab.MESSAGE_ID}-${target.toolchain}"
                     )
-                  )
+                  ), task, startRvcdAfterExecution
                 )
 
 
@@ -143,8 +158,10 @@ class ScaledaRunConfiguration(
                     executor: Executor,
                     runner: ProgramRunner[_]
                 ): ExecutionResult = {
+                  // attach listener to control the green dot
                   ProcessTerminatedListener.attach(handler)
 
+                  // prepare process
                   val process = ScaledaRun.runTaskBackground(
                       handler,
                       new File(ProjectConfig.projectBase.get),
@@ -152,8 +169,10 @@ class ScaledaRunConfiguration(
                       task
                   )
 
+                  // run process in the background
                   process.start()
 
+                  // return result
                   new ExecutionResult {
                     override def getExecutionConsole: ExecutionConsole = console
 

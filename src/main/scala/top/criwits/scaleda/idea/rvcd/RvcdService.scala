@@ -42,7 +42,9 @@ class RvcdService extends Disposable {
       }
 
       // generate rvcd startup arguments
-      val cmdLine = Seq(rvcdFile.getAbsolutePath) ++ source.map(s => Seq("-i", s.getAbsolutePath)).reduce(_ ++ _) ++ Seq(waveform.getAbsolutePath)
+      // TODO NO SOURCE
+      val cmdLine = Seq(rvcdFile.getAbsolutePath)  ++ Seq(waveform.getAbsolutePath)
+//      val cmdLine = Seq(rvcdFile.getAbsolutePath) ++ source.map(s => Seq("-i", s.getAbsolutePath)).reduce(_ ++ _) ++ Seq(waveform.getAbsolutePath)
       MainLogger.info(s"Starting RVCD with command line: ${cmdLine.mkString(" ")}")
 
       // run

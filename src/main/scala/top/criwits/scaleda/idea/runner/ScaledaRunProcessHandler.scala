@@ -7,11 +7,13 @@ import kernel.shell.ScaledaRunHandler
 import kernel.utils.BasicLogger
 
 import com.intellij.execution.process.ProcessHandler
+import top.criwits.scaleda.kernel.project.config.TaskConfig
 import top.criwits.scaleda.kernel.shell.command.CommandDeps
+import top.criwits.scaleda.kernel.toolchain.executor.Executor
 
 import java.io.OutputStream
 
-class ScaledaRunProcessHandler(logger: BasicLogger, invokeAfterFinish: => Unit = {})
+class ScaledaRunProcessHandler(logger: BasicLogger, task: TaskConfig, invokeAfterFinish: (TaskConfig, Executor) => Unit = (_: TaskConfig, _: Executor) => {})
     extends ProcessHandler
     with ScaledaRunHandler {
   var terminated = false
@@ -76,7 +78,7 @@ class ScaledaRunProcessHandler(logger: BasicLogger, invokeAfterFinish: => Unit =
       terminating = false
       terminated = true
       // invoke
-      invokeAfterFinish
+      invokeAfterFinish(task, executor)
     }
   }
 

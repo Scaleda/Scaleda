@@ -3,12 +3,13 @@ package kernel.shell
 
 import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
-import kernel.toolchain.executor.{ImplementExecutor, SimulationExecutor, SynthesisExecutor}
+import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.impl.{IVerilog, Vivado}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
 import com.intellij.openapi.progress.ProgressManager
+import top.criwits.scaleda.idea.runner.ScaledaRunProcessHandler
 
 import java.io.File
 import scala.collection.mutable.ArrayBuffer
@@ -46,9 +47,12 @@ object ScaledaRun {
         val workingDirName = target.name + "-" + task.name
         val executor = task.taskType match {
           case TaskType.Simulation =>
+            val testbench = task.findTopModule.get // FIXME: should not get if None, but...
+            val workingPlace = new File(new File(workingDir, ".sim"), workingDirName)
             SimulationExecutor(
-              workingDir = new File(new File(workingDir, ".sim"), workingDirName),
-              topModule = task.findTopModule.get, // FIXME
+              workingDir = workingPlace,
+              topModule = testbench,
+              vcdFile = new File(workingPlace, testbench + "_waveform.vcd"),
               profile = profile
             )
           case TaskType.Synthesis =>
@@ -64,6 +68,8 @@ object ScaledaRun {
               profile = profile
             )
         }
+        // FIXME: Tricky?
+        handler.executor = executor
         val taskUse =
           if (task.preset) {
             target.toolchain match {
@@ -119,6 +125,8 @@ trait ScaledaRunHandler {
   def onStepDescription(data: String): Unit = {}
 
   def expectedReturnValue: Int = 0
+
+  var executor: Executor = _
 }
 
 trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {

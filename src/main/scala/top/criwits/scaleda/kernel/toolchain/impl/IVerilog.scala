@@ -3,7 +3,7 @@ package kernel.toolchain.impl
 
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
-import kernel.toolchain.executor.Executor
+import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.{KernelFileUtils, OS}
 
@@ -18,23 +18,27 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
   override def getName: String = userFriendlyName
 
   override def simulate(task: TaskConfig) = {
+    val simExecutor = executor.asInstanceOf[SimulationExecutor]
     // create working directory
-    val workingDir = executor.workingDir
+    val workingDir = simExecutor.workingDir
     workingDir.mkdirs()
     assert(workingDir.exists(), f"Cannot create working directory ${workingDir.getAbsolutePath}")
 
     // get testbench info
-    val testbench = task.findTopModule.get
+    val testbench = simExecutor.topModule
     val testbenchFile = KernelFileUtils.getModuleFile(testbench, true).get
 
     // generate new testbench file
     val newTestbench = testbench + "_generated"
     val newTestbenchFile = new File(workingDir, newTestbench + ".v")
 
+    // vcd file
+    val vcdFile = simExecutor.vcdFile
+
     KernelFileUtils.insertAfterModuleHead(testbenchFile, newTestbenchFile, testbench,
       s"""
         |initial begin
-        |  $$dumpfile(\"${testbench + "_waveform.vcd"}\");
+        |  $$dumpfile(\"${vcdFile.getAbsolutePath}\");
         |  $$dumpvars;
         |end
         |""".stripMargin)
