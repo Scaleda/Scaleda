@@ -9,6 +9,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.LocalFilePath
 import com.intellij.psi.PsiManager
+import com.intellij.util.messages.Topic
 import io.grpc.{ManagedChannelBuilder, Server, ServerBuilder}
 import scaleda.scaleda.{ScaledaEmpty, ScaledaGotoSource, ScaledaRpcGrpc}
 
@@ -27,14 +28,23 @@ class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.Scaled
     KernelLogger.info(s"grpc gotoSource($request)")
     // TODO: follows not work. do navigation
     inReadAction {
-      val psi = PsiManager
-        .getInstance(project())
-        .findFile(new LocalFilePath(request.file, false).getVirtualFile)
-        .asInstanceOf[VerilogPSIFileRoot]
-      KernelLogger.warn(s"psi: $psi, canNavigate: ${psi.canNavigate}, canNavigateToSource: ${psi.canNavigateToSource}")
+      // val psi = PsiManager
+      //   .getInstance(project())
+      //   .findFile(new LocalFilePath(request.file, false).getVirtualFile)
+      //   .asInstanceOf[VerilogPSIFileRoot]
+      // KernelLogger.warn(s"psi: $psi, canNavigate: ${psi.canNavigate}, canNavigateToSource: ${psi.canNavigateToSource}")
 
-      NavigationUtil.activateFileWithPsiElement(psi, true)
+      // NavigationUtil.activateFileWithPsiElement(psi, true)
+      // PsiNavigationSupport.getInstance
+      //   .createNavigatable(project(), new LocalFilePath(request.file, false).getVirtualFile, 0)
+      //   .navigate(true)
       // psi.navigate(true)
+
+      // val descriptor = new OpenFileDescriptor(project(), new LocalFilePath(request.file, false).getVirtualFile, 0)
+      // KernelLogger.info("descriptor", descriptor)
+      // descriptor.navigate(true)
+
+      project().getMessageBus.syncPublisher(RpcService.TOPIC).navigate(project(), request)
 
       // val reqService: NavigationRequest = NavigationService.instance().sourceNavigationRequest(new LocalFilePath(request.file, false).getVirtualFile, 0)
       // KernelLogger.warn(s"reqService: $reqService")
@@ -115,6 +125,22 @@ object RpcServiceTest extends App {
 
   server.shutdownNow()
   KernelLogger.info("done")
+}
+
+object RpcService {
+  class RpcGotoTopic {
+    def navigate(project: Project, request: ScaledaGotoSource) = {
+      KernelLogger.info(s"RpcGotoTopic(request=$request)")
+      val psi = PsiManager
+        .getInstance(project)
+        .findFile(new LocalFilePath(request.file, false).getVirtualFile)
+        .asInstanceOf[VerilogPSIFileRoot]
+      NavigationUtil.activateFileWithPsiElement(psi, true)
+      psi.navigate(true)
+    }
+  }
+
+  final val TOPIC: Topic[RpcGotoTopic] = Topic.create("Scaleda RPC", classOf[RpcGotoTopic])
 }
 
 object RpcServiceClientTest extends App {
