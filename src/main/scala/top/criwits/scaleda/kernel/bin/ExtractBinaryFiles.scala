@@ -29,27 +29,32 @@ object ExtractBinaryFiles {
 
     while (zipEntry != null) {
       val fileName = zipEntry.getName
-      val newFile = new File(targetDirectory, fileName)
-      KernelLogger.info(s"Extracting asset file $fileName")
-      new File(newFile.getParent).mkdirs()
-      val fileOutputStream = new FileOutputStream(newFile)
-      var len = 0
-      while ( {
-        len = zipInputStream.read(buffer)
-        len > 0
-      }) {
-        fileOutputStream.write(buffer, 0, len)
+
+      if (!zipEntry.isDirectory) {
+        val newFile = new File(targetDirectory, fileName)
+        KernelLogger.info(s"Extracting asset file $fileName")
+        new File(newFile.getParent).mkdirs()
+        val fileOutputStream = new FileOutputStream(newFile)
+        var len = 0
+        while ( {
+          len = zipInputStream.read(buffer)
+          len > 0
+        }) {
+          fileOutputStream.write(buffer, 0, len)
+        }
+        fileOutputStream.close()
+
+        // chmod for *nix
+        if (!OS.isWindows && binaryList.contains(fileName)) {
+          import sys.process._
+          s"chmod +x ${newFile.getAbsolutePath}".!
+        }
       }
-      fileOutputStream.close()
       zipInputStream.closeEntry()
 
-      // chmod for *nix
-      if (!OS.isWindows && binaryList.contains(fileName)) {
-        import sys.process._
-        s"chmod +x ${newFile.getAbsolutePath}".!
-      }
       zipEntry = zipInputStream.getNextEntry
     }
+
     zipInputStream.closeEntry()
     zipInputStream.close()
     resourceStream.close()
