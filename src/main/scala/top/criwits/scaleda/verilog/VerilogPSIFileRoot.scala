@@ -7,7 +7,7 @@ import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
-import com.intellij.psi.FileViewProvider
+import com.intellij.psi.{FileViewProvider, ResolveResult}
 import com.intellij.psi.util.PsiTreeUtil
 
 import javax.swing.Icon
@@ -34,7 +34,7 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
     val instantiations = PsiTreeUtil.findChildrenOfType(this, classOf[ModuleInstantiationPsiNode]).asScala
     instantiations
       .map(_.getReference.multiResolve(false))
-      .reduce(_ ++ _)
+      .foldLeft(Seq[ResolveResult]())(_ ++ _)
       .filter(_.isValidResult)
       .map(_.getElement)
       .filter(_.isInstanceOf[ModuleDeclarationPsiNode])

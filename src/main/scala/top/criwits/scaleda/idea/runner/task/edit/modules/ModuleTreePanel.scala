@@ -17,7 +17,7 @@ class ModuleTreePanel(project: Project, dialog: SelectModuleDialogWrapper) exten
   setLayout(new BorderLayout)
 
   val modules: Array[ModuleDeclarationPsiNode] =
-    FileUtils.getAllVerilogFiles(project).map(_.getModuleDeclarations).reduce(_ ++ _)
+    FileUtils.getAllVerilogFiles(project).map(_.getModuleDeclarations).foldLeft(Seq[ModuleDeclarationPsiNode]())(_ ++ _).toArray
 
   val listModel = new DefaultListModel[ModuleDeclarationPsiNode]
   modules.foreach(module => listModel.addElement(module))

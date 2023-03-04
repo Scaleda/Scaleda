@@ -13,7 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import top.criwits.scaleda.idea.utils.Icons
 
-class ModuleItemOuterReferenceCompletionProvider extends CompletionProvider[CompletionParameters] {
+class ModuleInstantiationProvider extends CompletionProvider[CompletionParameters] {
   override def addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet): Unit = {
     val element = parameters.getOriginalPosition
     val currentModuleDeclaration = PsiTreeUtil.getParentOfType(element, classOf[ModuleDeclarationPsiNode])

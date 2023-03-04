@@ -9,6 +9,18 @@ class ModuleItemOuterReferenceCompletionContributor extends CompletionContributo
   extend(
     CompletionType.BASIC,
     PlatformPatterns.psiElement.and(new FilterPattern(new ModuleInstantiationFilter)),
-    new ModuleItemOuterReferenceCompletionProvider
+    new ModuleInstantiationProvider
+  )
+
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns.psiElement.and(new FilterPattern(new ModulePortFilter)),
+    new ModulePortProvider
+  )
+
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns.psiElement.and(new FilterPattern(new ModuleInstanceNameFilter)),
+    new ModuleInstanceNameProvider
   )
 }
