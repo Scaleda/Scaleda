@@ -79,6 +79,10 @@
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.VerilogReferenceAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.ModuleInstantiationAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.ModulePortConnectionAnnotator" />
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
         

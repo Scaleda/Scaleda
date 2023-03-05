@@ -1,34 +1,28 @@
 package top.criwits.scaleda
 package idea
 
+import idea.runner.task.ScaledaReloadTasksAction
+import idea.rvcd.RvcdService
 import idea.settings.toolchains.ProfileDetectAction
-import idea.utils.{Icons, MainLogger, RpcService, inReadAction}
+import idea.utils.{Icons, MainLogger, RpcService}
 import idea.windows.tasks.ScaledaRunWindowFactory
-import kernel.project.config.ProjectConfig
-import kernel.template.Template
+import idea.windows.tool.logging.ScaledaLoggingService
+import kernel.bin.ExtractBinaryFiles
 import kernel.toolchain.Toolchain
-import kernel.utils.KernelLogger
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.impl.CoreProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.startup.StartupActivity
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
-import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
-import top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService
-import top.criwits.scaleda.kernel.bin.ExtractBinaryFiles
-import top.criwits.scaleda.idea.rvcd.RvcdService
 
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
 
-    // Logging service
+    // Logging service, handling IDEA log output
     project.getService(classOf[ScaledaLoggingService])
-
+    // Main service, init jinja and kernel log
     project.getService(classOf[ScaledaMainService])
 
     // setup tool window
@@ -41,6 +35,8 @@ class ScaledaMain extends StartupActivity {
       builder.anchor = ToolWindowAnchor.RIGHT
       // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
       val toolWindow = toolWindowManager.registerToolWindow(builder.build())
+
+      // reload tasks
       ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
     })
 

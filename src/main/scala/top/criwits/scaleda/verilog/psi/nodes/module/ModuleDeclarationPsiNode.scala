@@ -9,6 +9,7 @@ import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import org.jetbrains.annotations.Nls
+import top.criwits.scaleda.verilog.VerilogPSIFileRoot
 import top.criwits.scaleda.verilog.psi.VerilogPsiLeafNodeFactory
 import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode
 
@@ -66,6 +67,7 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     case null => "(unknown)"
   }
 
+
   override def setName(name: String): PsiElement = {
     val child = PsiTreeUtil.findChildOfType(this.getNameIdentifier, classOf[SimpleIdentifierPsiLeafNode])
     if (child == null) null else {
@@ -77,5 +79,10 @@ class ModuleDeclarationPsiNode(node: ASTNode)
 
   def getPorts: Iterable[PortDeclarationPsiNode] = {
     PsiTreeUtil.findChildrenOfAnyType(this, classOf[PortDeclarationPsiNode]).asScala
+  }
+
+  def getFile: VerilogPSIFileRoot = {
+    val file = PsiTreeUtil.getParentOfType(this, classOf[VerilogPSIFileRoot])
+    file
   }
 }

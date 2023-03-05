@@ -10,6 +10,9 @@ import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ModuleInstantiationP
 import top.criwits.scaleda.verilog.psi.nodes.module.ModuleIdentifierPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.signal.PortIdentifierPsiNode
 
+/**
+ * This [[Annotator]] annotates invalid references
+ */
 class VerilogReferenceAnnotator extends Annotator {
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {
     val reference = element match {
