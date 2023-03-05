@@ -44,7 +44,7 @@ object OutputLogger {
   class Handler(project: Project) extends ScaledaRunHandler {
     override def onStdout(data: String): Unit = OutputLogger(project).info(data)
 
-    override def onStderr(data: String): Unit = OutputLogger(project).error(data)
+    override def onStderr(data: String): Unit = OutputLogger(project).warn(data)
 
     override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
       OutputLogger(project).info(s"command done, returns ${returnValue}, finishedAll: ${finishedAll}")

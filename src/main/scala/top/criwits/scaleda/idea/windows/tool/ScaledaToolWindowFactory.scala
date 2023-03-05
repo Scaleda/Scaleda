@@ -10,6 +10,7 @@ import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory, ToolWindowManager
 import top.criwits.scaleda.idea.ScaledaBundle
 import top.criwits.scaleda.idea.windows.tool.message.ScaledaMessageTab
 
+// FIXME: this tool window will not load after start
 class ScaledaToolWindowFactory extends ToolWindowFactory {
   override def createToolWindowContent(
       project: Project,

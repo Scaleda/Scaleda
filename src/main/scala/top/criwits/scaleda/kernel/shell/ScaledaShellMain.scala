@@ -179,6 +179,7 @@ object ScaledaShellMain {
                     _.taskByName(shellConfig.task, shellConfig.target)
                       .map(f => {
                         val (target, task) = f
+                        // TODO: specify toolchain in shell
                         val profile = shellConfig.profileName
                           .flatMap(name => {
                             // if remote host specified, use remote name
@@ -192,6 +193,7 @@ object ScaledaShellMain {
                               .find(_ == name)
                           })
                           .map(name =>
+                            // FIXME
                             new ToolchainProfile(
                               name,
                               "vivado",
