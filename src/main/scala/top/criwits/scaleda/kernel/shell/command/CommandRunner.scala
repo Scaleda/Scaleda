@@ -4,12 +4,12 @@ package kernel.shell.command
 import kernel.shell.ScaledaRunHandler
 import kernel.utils.KernelLogger
 
-import java.io.{BufferedReader, File, InputStreamReader}
+import java.io.File
 import java.util.Scanner
 import java.util.concurrent.LinkedBlockingQueue
 import scala.async.Async.async
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.jdk.javaapi.CollectionConverters
 
@@ -23,7 +23,7 @@ case class CommandDeps(
     commands: Seq[String] = Seq(),
     path: String = "",
     envs: Seq[(String, String)] = Seq(),
-    description: String = "",
+    description: String = ""
 )
 
 class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
@@ -33,11 +33,11 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val envs: Seq[(String, String)] = deps.envs
   val workingDir                  = new File(path)
   if (!workingDir.exists()) workingDir.mkdirs()
-  // TODO: Envs
   KernelLogger.warn("exec deps:", deps)
   private val procBuilder = new ProcessBuilder()
   procBuilder.command(CollectionConverters.asJava(commands))
   procBuilder.directory(workingDir)
+  deps.envs.foreach(d => procBuilder.environment().put(d._1, d._2))
   private var process: Option[Process] = None
   private var terminate: Boolean       = false
   private var terminating: Boolean     = false
@@ -49,8 +49,8 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val thread = new Thread(() => {
     try {
       process = Some(procBuilder.start())
-      val out = process.get.getInputStream
-      val err = process.get.getErrorStream
+      val out        = process.get.getInputStream
+      val err        = process.get.getErrorStream
       val outScanner = new Scanner(out)
       val errScanner = new Scanner(err)
       new Thread(() => {
@@ -128,8 +128,8 @@ object CommandRunner {
       ignoreErrors: Boolean = false
   ): Unit = {
     var meetErrors = false
-    var step = 1
-    val steps = commands.length
+    var step       = 1
+    val steps      = commands.length
     commands.foreach(command => {
       if (!ignoreErrors && meetErrors) return
       KernelLogger.info(s"running command: ${command.commands.mkString(" ")}")
