@@ -8,9 +8,6 @@ import kernel.toolchain.impl.{IVerilog, Vivado}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
-import com.intellij.openapi.progress.ProgressManager
-import top.criwits.scaleda.idea.runner.ScaledaRunProcessHandler
-
 import java.io.File
 import scala.collection.mutable.ArrayBuffer
 
@@ -47,7 +44,7 @@ object ScaledaRun {
         val workingDirName = target.name + "-" + task.name
         val executor = task.taskType match {
           case TaskType.Simulation =>
-            val testbench = task.findTopModule.get // FIXME: should not get if None, but...
+            val testbench    = task.findTopModule.get // FIXME: should not get if None, but...
             val workingPlace = new File(new File(workingDir, ".sim"), workingDirName)
             SimulationExecutor(
               workingDir = workingPlace,
@@ -92,7 +89,7 @@ object ScaledaRun {
             }
           } else task
         val toolchain = info._2(executor)
-        val commands = toolchain.commands(taskUse)
+        val commands  = toolchain.commands(taskUse)
         CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
       })
       .getOrElse(KernelLogger.error("No profile found!"))
@@ -116,19 +113,32 @@ trait ScaledaRunHandler {
 
   def onStderr(data: String): Unit
 
+  /** Invoked when one return value captured, and [[finishedAll]] == true after all commands done
+    * @param returnValue return value
+    * @param finishedAll is all commands finished
+    */
   def onReturn(returnValue: Int, finishedAll: Boolean): Unit
 
+  /** Return true if handler is stopping this process
+    * @return terminating
+    */
   def isTerminating: Boolean = false
 
+  /** Invoked before every command call
+    * @param command command
+    */
   def onShellCommand(command: CommandDeps): Unit = {}
 
   def onStepDescription(data: String): Unit = {}
 
   def expectedReturnValue: Int = 0
 
+  // FIXME: What's for
   var executor: Executor = _
 }
 
+/** RunHandler that logging outputs to [[KernelLogger]]
+  */
 trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {
   override def onStdout(data: String): Unit = KernelLogger.info(data)
 
@@ -136,12 +146,10 @@ trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {
 }
 
 object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
-  override def onStdout(data: String): Unit = KernelLogger.info(data)
-
-  override def onStderr(data: String): Unit = KernelLogger.error(data)
-
-  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
+  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit = {
+    // TODO: i18n
     KernelLogger.info(s"command done, returns $returnValue, finishedAll: $finishedAll")
+  }
 }
 
 object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
@@ -150,9 +158,15 @@ object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onStderr(data: String): Unit = KernelLogger.error("[remote]", data)
 
   override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
+    // TODO: i18n
     KernelLogger.info("[remote]", s"command done, returns $returnValue")
 }
 
+/** RunHandler that records return value and outputs to [[returnValues]]
+  * @param returnValues optional array to store results
+  * @param outputs array to store stdout outputs
+  * @param errors array to store stderr outputs
+  */
 class ScaledaRunHandlerToArray(
     returnValues: Option[ArrayBuffer[Int]],
     outputs: ArrayBuffer[String],

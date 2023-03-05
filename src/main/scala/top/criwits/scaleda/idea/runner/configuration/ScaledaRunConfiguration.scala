@@ -63,6 +63,7 @@ class ScaledaRunConfiguration(
     }
   }
 
+  // FIXME: configuration cannot load from storage
   override def readExternal(element: Element): Unit = {
     super.readExternal(element)
     val child = element.getChild(STORAGE_ID)
@@ -104,10 +105,12 @@ class ScaledaRunConfiguration(
             var remoteProfiles: Option[Seq[RemoteProfile]] = None
             val hasProfile =
               if (task.host.isEmpty) {
+                // Run locally if no host argument provided
                 Toolchain
                   .profiles()
                   .exists(_.toolchainType == target.toolchain)
               } else {
+                // TODO: add proxy
                 val stub = RemoteClient(task.host.get, RemoteServer.port)
                 remoteProfiles = Some(stub.getProfiles(Empty()).profiles)
                 remoteProfiles.get.exists(_.toolchainType == target.toolchain)
@@ -131,11 +134,8 @@ class ScaledaRunConfiguration(
 
               def startRvcdAfterExecution(task: TaskConfig, executor: SExecutor): Unit = {
                 task.taskType match {
+                  // Only call rvcd when simulate
                   case TaskType.Simulation =>
-//                    val action = new RvcdLaunchAction()
-//                    ActionManager.getInstance().tryToExecute(
-//                      action, null, null, null, true
-//                    )
                     project.getService(classOf[RvcdService]).launchWithWaveformAndSource(executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
                     // TODO / FIXME: Source is not given
                   case _ =>

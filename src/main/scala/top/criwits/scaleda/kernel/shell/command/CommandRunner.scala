@@ -138,7 +138,7 @@ object CommandRunner {
         else ""
       )
       handler.onStepDescription(stepHint)
-//      handler.onShellCommand(command)
+      handler.onShellCommand(command)
       val isRemote = remoteCommandDeps.nonEmpty
       val runner = remoteCommandDeps
         .map(r => new RemoteCommandRunner(command, r))
@@ -155,8 +155,6 @@ object CommandRunner {
         while (!r.returnValue.isCompleted) Thread.sleep(delay)
       }
       // To ensure output & error are got for the last time
-      // r.stdOut.forEach(s => handler.onStdout(s))
-      // r.stdErr.forEach(s => handler.onStderr(s))
       flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
       flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
       val returnValue = r.returnValue.value.get.get

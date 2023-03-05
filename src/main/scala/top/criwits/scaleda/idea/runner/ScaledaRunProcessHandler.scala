@@ -13,14 +13,23 @@ import top.criwits.scaleda.kernel.toolchain.executor.Executor
 
 import java.io.OutputStream
 
+/**
+ * Handle a task process locally or remotely
+ * @param logger using logger
+ * @param task task
+ * @param invokeAfterFinish will emit with [[task]] and [[Executor]] after `finishedAll`
+ */
 class ScaledaRunProcessHandler(logger: BasicLogger, task: TaskConfig, invokeAfterFinish: (TaskConfig, Executor) => Unit = (_: TaskConfig, _: Executor) => {})
     extends ProcessHandler
     with ScaledaRunHandler {
-  var terminated = false
+  // Set terminating <- `true` to invoke stopping
   var terminating = false
+  // terminated will be set `true` after process really terminated
+  var terminated = false
 
-  // val logger = new ConsoleLogger(console)
-
+  /**
+   * Called when destroy button clicked
+   */
   override def destroyProcessImpl(): Unit = {
     MainLogger.warn(
       s"destroyProcessImpl, running: ${terminated}, stopping: ${terminating}"
@@ -34,34 +43,22 @@ class ScaledaRunProcessHandler(logger: BasicLogger, task: TaskConfig, invokeAfte
     notifyProcessDetached()
   }
 
-  override def detachIsDefault(): Boolean = {
-    // MainLogger.warn("detachIsDefault", false)
-    false
-  }
+  override def detachIsDefault(): Boolean = false
 
-  override def isProcessTerminated: Boolean = {
-    // MainLogger.warn("isProcessTerminated", terminated)
-    terminated
-  }
+  override def isProcessTerminated: Boolean = terminated
 
-  override def isProcessTerminating: Boolean = {
-    // MainLogger.warn("isProcessTerminating", terminating)
-    terminating
-  }
+  override def isProcessTerminating: Boolean = terminating
 
+  // Not in use
   private val outputStream = new OutputStream {
     override def write(i: Int): Unit = MainLogger.warn("getProcessInput:", i)
   }
-  override def getProcessInput: OutputStream = {
-    // new OutputStream {
-    //   override def write(i: Int) = MainLogger.warn("getProcessInput:", i)
-    // }
-    // streamOutput
-    // null
-    outputStream
-  }
+  override def getProcessInput: OutputStream = outputStream
 
-  override def onShellCommand(command: CommandDeps) = logger.debug("cd", s"\"${command.path}\"", "&&", command.commands.mkString(" "))
+  override def onShellCommand(command: CommandDeps) = {
+    // FIXME: cd {workdir} && {command} may not available when using `commands`. Delete this or fix it
+    // logger.debug("cd", s"\"${command.path}\"", "&&", command.commands.mkString(" "))
+  }
 
   override def onStepDescription(data: String): Unit = logger.debug(data)
 

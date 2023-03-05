@@ -9,6 +9,12 @@ import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.diagnostic.Logger
 import sourcecode.{File, Line, Name}
 
+/**
+ * Create a logger binding to a console view.<br/>
+ * Send logging messages to console directly and to logging service
+ * @param consoleView console view
+ * @param logSourceId log id for logging service
+ */
 class ConsoleLogger(
     consoleView: ConsoleView,
     logSourceId: Option[String] = None
