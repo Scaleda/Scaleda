@@ -7,6 +7,7 @@ import scala.language.existentials
 
 object RemoteClient {
   def apply(host: String, port: Int) = {
+    // FIXME: running in IDEA Service
     val builder = ManagedChannelBuilder.forAddress(host, port)
     builder.usePlaintext()
     val channel = builder.build()

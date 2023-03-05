@@ -60,31 +60,3 @@ object ExtractBinaryFiles {
     resourceStream.close()
   }
 }
-
-//    for (binary <- binaryList) {
-//      val resource = resourcePath + binary
-//      try {
-//        val target         = new File(targetDirectory, binary)
-//        val resourceStream =
-//        if (force || !target.exists()) {
-//          resourceStream.transferTo(new FileOutputStream(target))
-//          if (!OS.isWindows) {
-//
-//          }
-//          copiedList += binary
-//        }
-//      } catch {
-//        case _e: NullPointerException => {}
-//        case e: Throwable =>
-//          KernelLogger.warn("Cannot extract binary file", binary, ": ", e)
-//          e.printStackTrace()
-//      }
-//    }
-//    if (copiedList.nonEmpty) KernelLogger.info("copied binaries:", copiedList.mkString(", "))
-//    copiedList.toSeq
-//  }
-//}
-
-// object ExtractTest extends App {
-//   ExtractBinaryFiles.run()
-// }

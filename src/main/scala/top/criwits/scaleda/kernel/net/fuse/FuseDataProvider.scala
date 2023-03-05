@@ -19,7 +19,9 @@ import scala.concurrent.Future
 import scala.sys.process._
 
 /**
- * gRPC data provider for filesystem sync
+ * gRPC data provider for filesystem sync.<br/>
+ * This thread starts in Scaleda Client side, but actually is a gRPC server.
+ * FIXME: add Intranet penetration proxy 内网穿透代理
  * @param sourcePath source data path
  */
 class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {

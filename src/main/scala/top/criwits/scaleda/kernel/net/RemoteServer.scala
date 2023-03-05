@@ -33,6 +33,7 @@ class RemoteServer(executionContext: ExecutionContext) {
   private[this] var server: Option[Server] = None
 
   private def start(): Unit = {
+    // FIXME: running in IDEA Service
     val builder = ServerBuilder.forPort(RemoteServer.port)
     builder.addService(RemoteGrpc.bindService(new RemoteImpl, executionContext))
     server = Some(builder.build().start())

@@ -18,6 +18,7 @@ import javax.swing.{BoxLayout, DefaultListModel, JPanel}
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.javaapi.CollectionConverters
 
+// FIXME: sometimes messages in this tab can disappear for a moment
 class ScaledaMessageTab(project: Project)
     extends SimpleToolWindowPanel(false, true)
     with Disposable {

@@ -67,6 +67,8 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
       s"chmod 777 $path".!
       println(s"attr after ${FuseUtils.fileAttrsUnixString(file)}: ${Integer.toOctalString(FuseUtils.fileAttrsUnixToInt(file))}")
       s"chmod 755 $path".!
+    } else {
+      // TODO: test Fuse on Windows platform
     }
   }
   // will not run this by default,
