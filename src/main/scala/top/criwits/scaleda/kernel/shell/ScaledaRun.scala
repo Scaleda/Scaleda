@@ -44,6 +44,7 @@ object ScaledaRun {
         val workingDirName = target.name + "-" + task.name
         val executor = task.taskType match {
           case TaskType.Simulation =>
+            // FIXME: GENERATE TESTBENCH?
             val testbench    = task.findTopModule.get // FIXME: should not get if None, but...
             val workingPlace = new File(new File(workingDir, ".sim"), workingDirName)
             SimulationExecutor(
