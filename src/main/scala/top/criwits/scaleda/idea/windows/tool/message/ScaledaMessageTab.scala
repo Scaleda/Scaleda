@@ -112,7 +112,7 @@ class ScaledaMessageTab(project: Project)
 
   override def dispose() = {
     val service = project.getService(classOf[ScaledaLoggingService])
-    service.stop(msgSourceId)
+    service.removeListener(msgSourceId)
   }
 }
 

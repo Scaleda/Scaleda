@@ -13,6 +13,6 @@ class ConsoleTab(project: Project, logSourceId: String) extends Disposable {
 
   override def dispose() = {
     val service = project.getService(classOf[ScaledaLoggingService])
-    service.stop(logSourceId)
+    service.removeListener(logSourceId)
   }
 }
