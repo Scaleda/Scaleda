@@ -1,8 +1,10 @@
 package top.criwits.scaleda
 package kernel.net
 
+import kernel.utils.KernelLogger
+
 import io.grpc.InternalServiceProviders.getCandidatesViaServiceLoader
-import io.grpc.{Channel, ManagedChannelBuilder, ManagedChannelProvider, ServerProvider}
+import io.grpc._
 
 import scala.language.existentials
 
@@ -21,5 +23,15 @@ object RpcPatch {
     builder.usePlaintext()
     val channel = builder.build()
     (channelType(channel), () => channel.shutdownNow())
+  }
+
+  def getServer(services: => Seq[ServerServiceDefinition], port: Int): Server = {
+    val provider = RpcPatch.getDefaultServerProvider
+    val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
+    method.setAccessible(true)
+    val builder = method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
+    services.foreach(service => builder.addService(service))
+    KernelLogger.info("scaleda grpc server serve at port", port)
+    builder.build().start()
   }
 }
