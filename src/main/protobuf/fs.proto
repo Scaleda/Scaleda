@@ -82,3 +82,14 @@ message ReaddirReply {
   uint32 r = 1;
   repeated string name = 2;
 }
+
+service RemoteFuseTransfer {
+  rpc login(stream FuseLoginMessage) returns (stream FuseLoginMessage) {}
+}
+
+message FuseLoginMessage {
+  uint64 id = 1;
+  string token = 2;
+  string function = 3;
+  bytes message = 4;
+}

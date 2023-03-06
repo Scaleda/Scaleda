@@ -12,6 +12,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.util.messages.Topic
 import io.grpc.{ManagedChannelBuilder, Server, ServerBuilder}
 import scaleda.scaleda.{ScaledaEmpty, ScaledaGotoSource, ScaledaRpcGrpc}
+import top.criwits.scaleda.kernel.net.RpcPatch
 
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
