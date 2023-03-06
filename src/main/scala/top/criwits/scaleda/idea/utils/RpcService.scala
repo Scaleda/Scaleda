@@ -78,7 +78,9 @@ class RpcService extends Disposable {
         server = Some(
           RpcPatch.getServer(
             Seq(
+              // IDEA interaction
               ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), executionContext),
+              // Fuse as data provider
               RemoteFuseGrpc.bindService(
                 new FuseDataProvider(sourcePath),
                 executionContext
