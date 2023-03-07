@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageToolchainParser}
+import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageParser, ScaledaMessageToolchainParser}
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
@@ -169,7 +169,6 @@ object Vivado extends ToolchainProfileDetector {
   object MessageParser extends ScaledaMessageToolchainParser {
     override def parse(source: String, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
       if (source.contains(Vivado.internalID)) {
-        // Vivado message
         val p = Pattern.compile("(INFO|WARNING|ERROR): \\[(.+)\\] ?(.+)")
         val m = p.matcher(text)
         if (m.find()) {
@@ -195,6 +194,7 @@ object Vivado extends ToolchainProfileDetector {
       }
     }
   }
+  ScaledaMessageParser.registerParser(MessageParser)
 
   override def detectProfiles = async {
     Paths.findExecutableOnPath("vivado") match {
