@@ -31,6 +31,8 @@ object Paths {
 
   def getBinaryDir: File = createDirIfNonExists(new File(getConfigDir, "bin"))
 
+  def getDatabaseDir: File = createDirIfNonExists(new File(getConfigDir, "database"))
+
   def pwd = new File(System.getProperty("user.dir"))
 
   def findExecutableOnPath(name: String): Option[String] = {
