@@ -48,7 +48,6 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
 
   override def simulate(task: TaskConfig) = {
     val tclUse = getTclFromTask(task, "run_sim.tcl")
-    // TODO: Vivado simulation
     commandDepsForSingleTcl(tclUse)
   }
 
