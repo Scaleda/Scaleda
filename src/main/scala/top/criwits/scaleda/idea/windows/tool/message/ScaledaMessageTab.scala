@@ -4,7 +4,6 @@ package idea.windows.tool.message
 import idea.ScaledaBundle
 import idea.utils.MainLogger
 import idea.windows.tool.logging.ScaledaLoggingService
-import kernel.toolchain.Toolchain
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
@@ -15,17 +14,13 @@ import com.intellij.ui.components.{JBList, JBScrollPane}
 
 import javax.swing.event.ListSelectionEvent
 import javax.swing.{BoxLayout, DefaultListModel, JPanel}
-import scala.collection.mutable.ArrayBuffer
-import scala.jdk.javaapi.CollectionConverters
 
 // FIXME: sometimes messages in this tab can disappear for a moment
-class ScaledaMessageTab(project: Project)
-    extends SimpleToolWindowPanel(false, true)
-    with Disposable {
+class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, true) with Disposable {
   private val msgSourceId = ScaledaMessageTab.MESSAGE_ID
   // private val data = ArrayBuffer[ScaledaMessage]()
   private var sortByLevel = false
-  private val dataModel = new DefaultListModel[ScaledaMessage]()
+  private val dataModel   = new DefaultListModel[ScaledaMessage]()
 
   def flushData(): Unit = {
     // if (sortByLevel) {
@@ -45,13 +40,18 @@ class ScaledaMessageTab(project: Project)
     dataModel.addElement(message)
     flushData()
   })
-  private val service = project.getService(classOf[ScaledaLoggingService])
+  def attachToLogger(sourceId: String): Unit = {
+    val service = project.getService(classOf[ScaledaLoggingService])
+    service.addListener(sourceId, messageParser)
+  }
+  def detachFromLogger(sourceId: String): Unit = {
+    val service = project.getService(classOf[ScaledaLoggingService])
+    service.removeListener(sourceId)
+  }
   // add all known toolchain types
-  Toolchain.toolchains.keys.foreach(toolchain =>
-    service.addListener(s"$msgSourceId-$toolchain", messageParser)
-  )
+  // Toolchain.toolchains.keys.foreach(toolchain => service.addListener(s"$msgSourceId-$toolchain", messageParser))
   private val listComponent = new JBList[ScaledaMessage](dataModel)
-  private val scrollbar = new JBScrollPane()
+  private val scrollbar     = new JBScrollPane()
   // listComponent.setAutoscrolls(true)
   listComponent.setAutoscrolls(false)
   private val renderer = new ScaledaMessageRenderer
@@ -85,15 +85,13 @@ class ScaledaMessageTab(project: Project)
   //
   //   override def contentsChanged(listDataEvent: ListDataEvent): Unit = ???
   // })
-  listComponent.addListSelectionListener(
-    (listSelectionEvent: ListSelectionEvent) => {
-      MainLogger.info(
-        listSelectionEvent.toString,
-        listSelectionEvent.getFirstIndex,
-        listSelectionEvent.getLastIndex
-      )
-    }
-  )
+  listComponent.addListSelectionListener((listSelectionEvent: ListSelectionEvent) => {
+    MainLogger.info(
+      listSelectionEvent.toString,
+      listSelectionEvent.getFirstIndex,
+      listSelectionEvent.getLastIndex
+    )
+  })
 
   val group = new DefaultActionGroup()
   group.add(clearMessageAction)
@@ -111,7 +109,10 @@ class ScaledaMessageTab(project: Project)
   panel.add(scrollbar)
   setContent(panel)
 
+  ScaledaMessageTab.INSTANCE = this
+
   override def dispose() = {
+    ScaledaMessageTab.INSTANCE = null
     val service = project.getService(classOf[ScaledaLoggingService])
     service.removeListener(msgSourceId)
   }
@@ -119,4 +120,8 @@ class ScaledaMessageTab(project: Project)
 
 object ScaledaMessageTab {
   val MESSAGE_ID = "scaleda-message"
+
+  private var INSTANCE: ScaledaMessageTab = _
+
+  def instance = INSTANCE
 }

@@ -79,8 +79,10 @@ object ScaledaRun {
                 )
                 r.render()
                 task.copy(tcl = Some(task.taskType match {
+                  case TaskType.Simulation => "run_sim.tcl"
+                  case TaskType.Synthesis => "run_synth.tcl"
                   case TaskType.Implement => "run_impl.tcl"
-                  case _                  => "run_synth.tcl"
+                  case TaskType.Programming => "run_program.tcl"
                 }))
               case IVerilog.internalID =>
                 task

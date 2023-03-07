@@ -7,12 +7,12 @@ create_project $project_name $project_dir -part $part -force
 
 {% for s in sourceList %}
 puts "Importing source: {{ s }}"
-add_files -fileset sources_1 {{ s }}
+add_files -fileset sources_1 "{{ s }}"
 {% endfor %}
 
 {% if sim %}
 puts "Importing testbench: {{ testbenchSource }}"
-add_files -fileset sim_1 {{ testbenchSource }}"
+add_files -fileset sim_1 "{{ testbenchSource }}"
 set_property top {{ top }} [get_filesets sim_1]
 {% else %}
 set_property top {{ top }} [get_filesets sources_1]

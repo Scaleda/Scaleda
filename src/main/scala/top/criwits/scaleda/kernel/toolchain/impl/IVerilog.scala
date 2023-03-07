@@ -1,11 +1,12 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
+import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageToolchainParser, ScaledaMessageToolchainParserProvider}
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
-import kernel.utils.{KernelFileUtils, OS}
+import kernel.utils.{KernelFileUtils, LogLevel}
 
 import java.io.File
 
@@ -25,54 +26,68 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     assert(workingDir.exists(), f"Cannot create working directory ${workingDir.getAbsolutePath}")
 
     // get testbench info
-    val testbench = simExecutor.topModule
-    val testbenchFile = KernelFileUtils.getModuleFile(testbench, true).get
+    val testbench     = simExecutor.topModule
+    val testbenchFile = KernelFileUtils.getModuleFile(testbench, testbench = true).get
 
     // generate new testbench file
-    val newTestbench = testbench + "_generated"
+    val newTestbench     = testbench + "_generated"
     val newTestbenchFile = new File(workingDir, newTestbench + ".v")
 
     // vcd file
     val vcdFile = simExecutor.vcdFile
 
-    KernelFileUtils.insertAfterModuleHead(testbenchFile, newTestbenchFile, testbench,
+    KernelFileUtils.insertAfterModuleHead(
+      testbenchFile,
+      newTestbenchFile,
+      testbench,
       s"""
         |initial begin
         |  $$dumpfile(\"${vcdFile.getName}\");
         |  $$dumpvars;
         |end
-        |""".stripMargin)
+        |""".stripMargin
+    )
 
     val sources = KernelFileUtils.getAllSourceFiles()
 
     val simExecutorName = testbench + "_iverilog_executor"
 
     Seq(
-      CommandDeps(commands = Seq(
-        executor.profile.iverilogPath,
-        "-s", testbench, "-o", simExecutorName, newTestbenchFile.getAbsolutePath,
-      ) ++ sources.map(_.getAbsolutePath),
-        path = workingDir.getAbsolutePath, description = "Compiling designs"),
-      CommandDeps(commands = Seq(executor.profile.vvpPath, simExecutorName),
-        path = workingDir.getAbsolutePath, description = "Running simulation"),
+      CommandDeps(
+        commands = Seq(
+          executor.profile.iverilogPath,
+          "-s",
+          testbench,
+          "-o",
+          simExecutorName,
+          newTestbenchFile.getAbsolutePath
+        ) ++ sources.map(_.getAbsolutePath),
+        path = workingDir.getAbsolutePath,
+        description = "Compiling designs"
+      ),
+      CommandDeps(
+        commands = Seq(executor.profile.vvpPath, simExecutorName),
+        path = workingDir.getAbsolutePath,
+        description = "Running simulation"
+      )
     )
   }
 }
 
-object IVerilog {
+object IVerilog extends ScaledaMessageToolchainParserProvider {
   val userFriendlyName: String = "Icarus Verilog"
-  val internalID: String = "iverilog"
+  val internalID: String       = "iverilog"
 
   val supportedTask: Set[TaskType.Value] = Set(
     TaskType.Simulation
   )
 
   class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
-    /**
-     * Generate command line(s) used to verify toolchain profile
-     *
-     * @return One or more than one command line(s)
-     */
+
+    /** Generate command line(s) used to verify toolchain profile
+      *
+      * @return One or more than one command line(s)
+      */
     override def verifyCommandLine: Option[Seq[CommandDeps]] = {
       val iverilogFiles: Seq[File] = Seq(
         new File(toolchainProfile.iverilogPath),
@@ -87,24 +102,38 @@ object IVerilog {
       Some(iverilogFiles.map(f => CommandDeps(commands = Seq(f.getAbsolutePath, "-V"))))
     }
 
-    /**
-     * Parse toolchain version information from output of command lines of [[verifyCommandLine]]
-     *
-     * @param returnValues Return values of commands
-     * @param outputs      Output strings of commands
-     * @return
-     */
+    /** Parse toolchain version information from output of command lines of [[verifyCommandLine]]
+      *
+      * @param returnValues Return values of commands
+      * @param outputs      Output strings of commands
+      * @return
+      */
     override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
-      if (!Seq(
-        outputs.exists(_.contains("Icarus Verilog version")),
-        outputs.exists(_.contains("iverilog-vpi")),
-        outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
-      ).reduce(_ && _)) {
+      if (
+        !Seq(
+          outputs.exists(_.contains("Icarus Verilog version")),
+          outputs.exists(_.contains("iverilog-vpi")),
+          outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
+        ).reduce(_ && _)
+      ) {
         (false, None)
       } else {
         (true, Some(outputs.filter(_.contains("Icarus Verilog version")).head))
       }
 
     }
-}
+  }
+
+  private object MessageParser extends ScaledaMessageToolchainParser {
+    override def parse(source: String, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+      if (source.contains(internalID)) {
+        // TODO: implement iverilog parser here
+        Some(ScaledaMessage(text = text))
+      } else {
+        None
+      }
+    }
+  }
+
+  override def parser: ScaledaMessageToolchainParser = MessageParser
 }

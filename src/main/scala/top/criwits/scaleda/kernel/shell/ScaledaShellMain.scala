@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell
 
+import kernel.bin.ExtractAssets
 import kernel.net.remote.Empty
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
@@ -11,7 +12,6 @@ import kernel.utils.serialise.JSONHelper
 import kernel.utils.{KernelLogger, Paths}
 
 import scopt.OParser
-import top.criwits.scaleda.kernel.bin.ExtractBinaryFiles
 
 import java.io.File
 
@@ -40,7 +40,7 @@ object ScaledaShellMain {
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
       ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
       val config = ProjectConfig.getConfig()
-      KernelLogger.info(s"project config: ${config}")
+      KernelLogger.info(s"project config: $config")
     }
   }
 
@@ -63,8 +63,10 @@ object ScaledaShellMain {
     Template.initJinja()
 
     // install binaries
-    if (ExtractBinaryFiles.isInstalled)
-      KernelLogger.info("All binary assets are installed")
+    if (!ExtractAssets.isInstalled) {
+      ExtractAssets.run()
+      KernelLogger.info("All assets ready")
+    }
 
     // preparse workdir
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(_))
@@ -138,10 +140,10 @@ object ScaledaShellMain {
             Some(RemoteClient(shellConfig.serverHost, shellConfig.serverPort))
           else None
         val workingDir = shellConfig.workingDir
-        val config = ProjectConfig.getConfig()
-        KernelLogger.info(s"shell config: ${shellConfig}")
+        val config     = ProjectConfig.getConfig()
+        KernelLogger.info(s"shell config: $shellConfig")
         shellConfig.runMode match {
-          case ShellRunMode.ListProfiles => {
+          case ShellRunMode.ListProfiles =>
             KernelLogger.info("local profile list:")
             for (p <- Toolchain.profiles()) {
               KernelLogger.info(s"${JSONHelper(p)}")
@@ -154,8 +156,7 @@ object ScaledaShellMain {
                   KernelLogger.info(s"${JSONHelper(p)}")
               }
             })
-          }
-          case ShellRunMode.ListTasks => {
+          case ShellRunMode.ListTasks =>
             KernelLogger.info("task list:")
             ProjectConfig
               .getConfig()
@@ -165,12 +166,10 @@ object ScaledaShellMain {
                 }
               )
               .getOrElse(KernelLogger.info("no task loaded"))
-          }
-          case ShellRunMode.Serve => {
+          case ShellRunMode.Serve =>
             // run as server
             RemoteServer.start()
-          }
-          case ShellRunMode.Run => {
+          case ShellRunMode.Run =>
             config
               .map(c => {
                 ProjectConfig
@@ -184,9 +183,7 @@ object ScaledaShellMain {
                           .flatMap(name => {
                             // if remote host specified, use remote name
                             stub
-                              .map(stub =>
-                                stub.getProfiles(Empty()).profiles.map(_.name)
-                              )
+                              .map(stub => stub.getProfiles(Empty()).profiles.map(_.name))
                               .getOrElse(
                                 Toolchain.profiles().map(_.profileName).toSeq
                               )
@@ -222,16 +219,12 @@ object ScaledaShellMain {
                   )
               })
               .getOrElse(KernelLogger.error("no config loaded!"))
-          }
-          case ShellRunMode.None => {
+          case ShellRunMode.None =>
             KernelLogger.warn("no action specified, do nothing")
-          }
-          case ShellRunMode.Install => {
-            ExtractBinaryFiles.run()
-          }
-          case _ => {
+          case ShellRunMode.Install =>
+            ExtractAssets.run()
+          case _ =>
             KernelLogger.error("not implemented.")
-          }
         }
       })
   }

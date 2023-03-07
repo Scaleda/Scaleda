@@ -1,16 +1,18 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
+import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageToolchainParser, ScaledaMessageToolchainParserProvider}
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
-import kernel.toolchain.executor.Executor
+import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.impl.Vivado.{getVivadoExec, internalID, userFriendlyName}
 import kernel.toolchain.{Toolchain, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
 import java.io.File
+import java.util.regex.Pattern
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,54 +21,64 @@ import scala.concurrent.ExecutionContext.Implicits.global
   *
   * @param executor An [[Executor]] used to hold information like configurations.
   */
-class Vivado(executor: Executor)
-    extends Toolchain(executor)
-    with ToolchainProfileDetector {
+class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfileDetector {
   override def getInternalID: String = internalID
 
   override def getName: String = userFriendlyName
 
-  override def synthesise(task: TaskConfig) = {
+  private def getTclFromTask(task: TaskConfig, defaultTcl: String): String = {
+    val tclUse = task.tcl.getOrElse(defaultTcl)
     if (task.tcl.isEmpty)
-      KernelLogger.warn(
-        "did not specify tcl for vivado target, fallback to default"
-      )
-    Seq(
-      CommandDeps(
-        commands = Seq(
-          getVivadoExec(executor.profile.path), "-mode", "batch", "-source", task.tcl.getOrElse("run_synth.tcl")
-        ),
-        path = executor.workingDir.getAbsolutePath
-      )
+      KernelLogger.warn("did not specify tcl for vivado target, fallback to default", tclUse)
+    tclUse
+  }
+
+  private def commandDepsForSingleTcl(tclUse: String) = Seq(
+    CommandDeps(
+      commands = Seq(
+        getVivadoExec(executor.profile.path),
+        "-mode",
+        "batch",
+        "-source",
+        tclUse
+      ),
+      path = executor.workingDir.getAbsolutePath
     )
+  )
+
+  override def simulate(task: TaskConfig) = {
+    val tclUse = getTclFromTask(task, "run_sim.tcl")
+    commandDepsForSingleTcl(tclUse)
+  }
+
+  override def synthesise(task: TaskConfig) = {
+    val tclUse = getTclFromTask(task, "run_synth.tcl")
+    commandDepsForSingleTcl(tclUse)
   }
 
   override def implement(task: TaskConfig) = {
-    if (task.tcl.isEmpty)
-      KernelLogger.warn(
-        "did not specify tcl for vivado target, fallback to default"
-      )
-    Seq(
-      CommandDeps(
-        commands = Seq(
-          getVivadoExec(executor.profile.path), "-mode", "batch", "-source", task.tcl.getOrElse("run_impl.tcl")
-        ),
-        path = executor.workingDir.getAbsolutePath
-      )
-    )
+    val tclUse = getTclFromTask(task, "run_impl.tcl")
+    commandDepsForSingleTcl(tclUse)
+  }
+
+  override def programming(task: TaskConfig) = {
+    val tclUse = getTclFromTask(task, "run_program.tcl")
+    // TODO: Vivado programming
+    commandDepsForSingleTcl(tclUse)
   }
 
   override def detectProfiles = Vivado.detectProfiles
 }
 
-object Vivado extends ToolchainProfileDetector {
+object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParserProvider {
   val userFriendlyName: String = "Xilinx Vivado"
-  val internalID: String = "vivado"
+  val internalID: String       = "vivado"
 
   val supportedTask: Set[TaskType.Value] = Set(
     TaskType.Simulation,
     TaskType.Synthesis,
-    TaskType.Implement
+    TaskType.Implement,
+    TaskType.Programming
   )
 
   def getVivadoExec(path: String): String = new File(
@@ -74,8 +86,7 @@ object Vivado extends ToolchainProfileDetector {
     "/bin/vivado" + (if (OS.isWindows) ".bat" else "")
   ).getAbsolutePath
 
-  class Verifier(override val toolchainProfile: ToolchainProfile)
-      extends ToolchainProfile.Verifier(toolchainProfile) {
+  class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
     override def verifyCommandLine: Option[Seq[CommandDeps]] = {
       val vivadoFile = new File(getVivadoExec(toolchainProfile.path))
       if (!vivadoFile.exists()) {
@@ -111,13 +122,13 @@ object Vivado extends ToolchainProfileDetector {
       `package`: String,
       speed: String,
       jobs: Int = OS.cpuCount,
-      sourceList: Seq[String] =
-        Seq(), // NOTE: simulation top file is EXCLUDED here!
+      sourceList: Seq[String] = Seq(), // NOTE: simulation top file is EXCLUDED here!
       sim: Boolean,
       testbenchSource: String, // empty if no testbench is given
       ipList: Seq[String] = Seq(),
       xdcList: Seq[String] = Seq(),
-      timingReport: Boolean = false
+      timingReport: Boolean = false,
+      vcdFile: String,
   )
 
   class TemplateRenderer(
@@ -128,10 +139,12 @@ object Vivado extends ToolchainProfileDetector {
         "tcl/vivado",
         executor.workingDir.getAbsolutePath,
         Map(
-          "args.tcl.j2" -> "args.tcl",
+          "args.tcl.j2"           -> "args.tcl",
           "create_project.tcl.j2" -> "create_project.tcl",
-          "run_synth.tcl.j2" -> "run_synth.tcl",
-          "run_impl.tcl.j2" -> "run_impl.tcl"
+          "run_sim.tcl.j2"        -> "run_sim.tcl",
+          "run_synth.tcl.j2"      -> "run_synth.tcl",
+          "run_impl.tcl.j2"       -> "run_impl.tcl",
+          "run_program.tcl.j2"    -> "run_program.tcl"
         )
       ) {
     val config = ProjectConfig.getConfig()
@@ -140,26 +153,56 @@ object Vivado extends ToolchainProfileDetector {
       .map(config => {
         val top =
           taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
-        val topFile = KernelFileUtils.getModuleFile(top).get // TODO / FIXME
-        val sim = taskConfig.`type` == "simulation"
+        val sim     = taskConfig.`type` == "simulation"
+        val topFile = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
         val context = Vivado.TemplateContext(
           top = top,
           workDir = executor.workingDir.getAbsolutePath,
-          device = targetConfig.options.get("device"), // FIXME
+          device = targetConfig.options.get("device"),     // FIXME
           `package` = targetConfig.options.get("package"), // FIXME
-          speed = targetConfig.options.get("speed"), // FIXME
+          speed = targetConfig.options.get("speed"),       // FIXME
           sourceList = KernelFileUtils
             .getAllSourceFiles()
             .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
             .map(_.getAbsolutePath.replace('\\', '/')),
           sim = sim,
-          testbenchSource =
-            topFile.getAbsolutePath // if sim == false, then this will not be used
+          testbenchSource = topFile.getAbsolutePath, // if sim == false, then this will not be used
+          vcdFile = if (sim) executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath else ""
         )
         Serialization.getCCParams(context)
       })
       .getOrElse(Map())
   }
+
+  object MessageParser extends ScaledaMessageToolchainParser {
+    override def parse(source: String, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+      if (source.contains(Vivado.internalID)) {
+        val p = Pattern.compile("(INFO|WARNING|ERROR): \\[(.+)\\] ?(.+)")
+        val m = p.matcher(text)
+        if (m.find()) {
+          val (levelText, tag, message) = (m.group(1), m.group(2), m.group(3))
+          import LogLevel._
+          val textedLevel = levelText match {
+            case "INFO"    => Info
+            case "WARNING" => Warn
+            case _         => Error
+          }
+          Some(
+            ScaledaMessage(
+              text = s"[$tag] $message",
+              level = textedLevel,
+              time = System.currentTimeMillis()
+            )
+          )
+        } else {
+          None
+        }
+      } else {
+        None
+      }
+    }
+  }
+  // ScaledaMessageParser.registerParser(MessageParser)
 
   override def detectProfiles = async {
     Paths.findExecutableOnPath("vivado") match {
@@ -192,4 +235,6 @@ object Vivado extends ToolchainProfileDetector {
     }
   }
   ToolchainProfileDetector.registerDetector(this)
+
+  override def parser: ScaledaMessageToolchainParser = MessageParser
 }

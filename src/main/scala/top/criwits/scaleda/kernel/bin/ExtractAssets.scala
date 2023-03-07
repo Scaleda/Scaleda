@@ -7,7 +7,7 @@ import java.io.{File, FileOutputStream}
 import java.util.zip.{ZipEntry, ZipInputStream}
 import scala.collection.mutable.ArrayBuffer
 
-object ExtractBinaryFiles {
+object ExtractAssets {
   private val ZIP_BUFFER_SIZE = 1024
 
   private val targetDirectory = Paths.getBinaryDir
@@ -20,7 +20,7 @@ object ExtractBinaryFiles {
 
   def run(): Unit = {
     val copiedList = ArrayBuffer[String]()
-    if (!targetDirectory.exists()) targetDirectory.mkdirs();
+    if (!targetDirectory.exists()) targetDirectory.mkdirs()
     val resourceStream = getClass.getClassLoader.getResourceAsStream(resourceFile)
     val zipInputStream = new ZipInputStream(resourceStream)
     var zipEntry = zipInputStream.getNextEntry

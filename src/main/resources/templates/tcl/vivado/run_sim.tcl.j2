@@ -1,0 +1,20 @@
+source create_project.tcl
+open_project $project_dir/$project_name
+
+launch_simulation
+
+# add_wave -r /*
+
+open_vcd "{{ vcdFile }}"
+log_vcd [ get_object -r * ]
+
+# WARN: relaunch_sim and close_vcd will make vivado crash
+# relaunch_sim
+run -all
+close_vcd
+
+save_wave_config "{{ top }}"
+close_sim -force
+
+close_project
+puts "Simulate done!"

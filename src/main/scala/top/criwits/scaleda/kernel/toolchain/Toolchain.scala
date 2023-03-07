@@ -8,6 +8,8 @@ import kernel.toolchain.impl._
 import kernel.utils.serialise.YAMLHelper
 import kernel.utils.{KernelLogger, Paths}
 
+import top.criwits.scaleda.idea.windows.tool.message.ScaledaMessageToolchainParserProvider
+
 import java.io.{File, FilenameFilter}
 import scala.collection.mutable.ListBuffer
 
@@ -28,10 +30,13 @@ abstract class Toolchain(val executor: Executor) {
 
   def implement(task: TaskConfig): Seq[CommandDeps] = ???
 
+  def programming(task: TaskConfig): Seq[CommandDeps] = ???
+
   def commands(task: TaskConfig) = task.taskType match {
     case TaskType.Simulation => simulate(task)
     case TaskType.Synthesis => synthesise(task)
     case TaskType.Implement => implement(task)
+    case TaskType.Programming => programming(task)
   }
 }
 
@@ -50,6 +55,11 @@ object Toolchain {
   def toolchainIds = toolchains.keys.toArray
 
   def toolchainNames = toolchains.map(_._2._1).toArray
+
+  def toolchainMessageParser: Map[String, ScaledaMessageToolchainParserProvider] = Map(
+    Vivado.internalID -> Vivado,
+    IVerilog.internalID -> IVerilog,
+  )
 
   /**
    * Profiles for different toolchains, loaded by [[ToolchainProfileLoader]]
