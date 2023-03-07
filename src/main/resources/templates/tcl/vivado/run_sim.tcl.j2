@@ -3,9 +3,12 @@ open_project $project_dir/$project_name
 
 launch_simulation
 
+# TODO: not all the signals will be added
+add_wave -r /*
+
 open_vcd "{{ vcdFile }}"
 log_vcd [ get_object /* ]
-run
+run -all
 close_vcd
 
 save_wave_config "{{ top }}.wcfg"
