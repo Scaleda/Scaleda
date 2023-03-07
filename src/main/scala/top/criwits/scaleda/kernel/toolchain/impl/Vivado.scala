@@ -33,49 +33,39 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
     tclUse
   }
 
+  private def commandDepsForSingleTcl(tclUse: String) = Seq(
+    CommandDeps(
+      commands = Seq(
+        getVivadoExec(executor.profile.path),
+        "-mode",
+        "batch",
+        "-source",
+        tclUse
+      ),
+      path = executor.workingDir.getAbsolutePath
+    )
+  )
+
   override def simulate(task: TaskConfig) = {
     val tclUse = getTclFromTask(task, "run_sim.tcl")
     // TODO: Vivado simulation
-    ???
+    commandDepsForSingleTcl(tclUse)
   }
 
   override def synthesise(task: TaskConfig) = {
     val tclUse = getTclFromTask(task, "run_synth.tcl")
-    Seq(
-      CommandDeps(
-        commands = Seq(
-          getVivadoExec(executor.profile.path),
-          "-mode",
-          "batch",
-          "-source",
-          tclUse
-        ),
-        path = executor.workingDir.getAbsolutePath
-      )
-    )
+    commandDepsForSingleTcl(tclUse)
   }
 
   override def implement(task: TaskConfig) = {
     val tclUse = getTclFromTask(task, "run_impl.tcl")
-    Seq(
-      CommandDeps(
-        commands = Seq(
-          getVivadoExec(executor.profile.path),
-          "-mode",
-          "batch",
-          "-source",
-          tclUse
-        ),
-        path = executor.workingDir.getAbsolutePath
-      )
-    )
+    commandDepsForSingleTcl(tclUse)
   }
-
 
   override def programming(task: TaskConfig) = {
     val tclUse = getTclFromTask(task, "run_program.tcl")
     // TODO: Vivado programming
-    ???
+    commandDepsForSingleTcl(tclUse)
   }
 
   override def detectProfiles = Vivado.detectProfiles
@@ -89,7 +79,7 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
     TaskType.Simulation,
     TaskType.Synthesis,
     TaskType.Implement,
-    TaskType.Programming,
+    TaskType.Programming
   )
 
   def getVivadoExec(path: String): String = new File(
@@ -151,8 +141,10 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
         Map(
           "args.tcl.j2"           -> "args.tcl",
           "create_project.tcl.j2" -> "create_project.tcl",
+          "run_sim.tcl.j2"        -> "run_sim.tcl",
           "run_synth.tcl.j2"      -> "run_synth.tcl",
-          "run_impl.tcl.j2"       -> "run_impl.tcl"
+          "run_impl.tcl.j2"       -> "run_impl.tcl",
+          "run_program.tcl.j2"    -> "run_program.tcl",
         )
       ) {
     val config = ProjectConfig.getConfig()
@@ -161,8 +153,8 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
       .map(config => {
         val top =
           taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
-        val topFile = KernelFileUtils.getModuleFile(top).get // TODO / FIXME
         val sim     = taskConfig.`type` == "simulation"
+        val topFile = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
         val context = Vivado.TemplateContext(
           top = top,
           workDir = executor.workingDir.getAbsolutePath,

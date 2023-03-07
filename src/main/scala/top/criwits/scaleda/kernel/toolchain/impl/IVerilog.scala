@@ -27,7 +27,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
     // get testbench info
     val testbench     = simExecutor.topModule
-    val testbenchFile = KernelFileUtils.getModuleFile(testbench, true).get
+    val testbenchFile = KernelFileUtils.getModuleFile(testbench, testbench = true).get
 
     // generate new testbench file
     val newTestbench     = testbench + "_generated"

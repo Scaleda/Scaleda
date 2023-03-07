@@ -36,6 +36,7 @@ abstract class Toolchain(val executor: Executor) {
     case TaskType.Simulation => simulate(task)
     case TaskType.Synthesis => synthesise(task)
     case TaskType.Implement => implement(task)
+    case TaskType.Programming => programming(task)
   }
 }
 
