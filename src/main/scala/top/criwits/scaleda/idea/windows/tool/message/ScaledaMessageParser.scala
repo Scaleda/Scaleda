@@ -4,16 +4,22 @@ package idea.windows.tool.message
 import idea.windows.tool.logging.ScaledaLogReceiver
 import kernel.utils.LogLevel
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
 
 trait ScaledaMessageToolchainParser {
   def parse(source: String, text: String, level: LogLevel.Value): Option[ScaledaMessage]
 }
 
+trait ScaledaMessageToolchainParserProvider {
+  def parser: ScaledaMessageToolchainParser
+}
+
 object ScaledaMessageParser {
-  private val allParsers = ArrayBuffer[ScaledaMessageToolchainParser]()
-  def registerParser(parser: ScaledaMessageToolchainParser): Unit =
-    allParsers.addOne(parser)
+  private val allParsers = new mutable.HashMap[String, ScaledaMessageToolchainParser]()
+  def registerParser(key: String, parser: ScaledaMessageToolchainParser): Unit =
+    allParsers.put(key, parser)
+
+  def removeParser(key: String) = allParsers.remove(key)
 }
 
 class ScaledaMessageParser(
@@ -25,7 +31,7 @@ class ScaledaMessageParser(
       level: LogLevel.Value
   ): Unit = {
     var parseDone = false
-    for (parser <- ScaledaMessageParser.allParsers) {
+    for ((_k, parser) <- ScaledaMessageParser.allParsers) {
       if (!parseDone) {
         val result = parser.parse(source, text, level)
         if (result.nonEmpty) {

@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageParser, ScaledaMessageToolchainParser}
+import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageToolchainParser, ScaledaMessageToolchainParserProvider}
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
@@ -67,7 +67,7 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
   override def detectProfiles = Vivado.detectProfiles
 }
 
-object Vivado extends ToolchainProfileDetector {
+object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParserProvider {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String       = "vivado"
 
@@ -194,7 +194,7 @@ object Vivado extends ToolchainProfileDetector {
       }
     }
   }
-  ScaledaMessageParser.registerParser(MessageParser)
+  // ScaledaMessageParser.registerParser(MessageParser)
 
   override def detectProfiles = async {
     Paths.findExecutableOnPath("vivado") match {
@@ -227,4 +227,6 @@ object Vivado extends ToolchainProfileDetector {
     }
   }
   ToolchainProfileDetector.registerDetector(this)
+
+  override def parser: ScaledaMessageToolchainParser = MessageParser
 }

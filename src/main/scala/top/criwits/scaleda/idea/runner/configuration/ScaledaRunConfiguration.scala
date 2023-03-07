@@ -2,40 +2,37 @@ package top.criwits.scaleda
 package idea.runner.configuration
 
 import idea.runner.ScaledaRunProcessHandler
+import idea.rvcd.RvcdService
 import idea.utils.{ConsoleLogger, MainLogger, Notification}
-import idea.windows.tool.message.ScaledaMessageTab
+import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
+import kernel.net.remote.{Empty, RemoteProfile}
 import kernel.net.{RemoteClient, RemoteServer}
-import kernel.net.remote.{Empty, RemoteGrpc, RemoteProfile}
 import kernel.project.config.{ProjectConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
+import kernel.toolchain.executor.{SimulationExecutor, Executor => SExecutor}
 
-import top.criwits.scaleda.kernel.toolchain.executor.{SimulationExecutor, Executor => SExecutor}
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.process.{ProcessHandler, ProcessTerminatedListener}
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
-import com.intellij.openapi.actionSystem.{ActionManager, AnAction}
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.options.SettingsEditor
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
-import io.grpc.ManagedChannelBuilder
 import org.jdom.Element
-import top.criwits.scaleda.idea.rvcd.{RvcdLaunchAction, RvcdService}
 
 import java.io.File
 import scala.collection.mutable
 import scala.language.existentials
 
-/**
- * A configuration representing a specific Scaleda task as well as corresponding toolchain
- * @param project
- * @param factory
- * @param name
- */
+/** A configuration representing a specific Scaleda task as well as corresponding toolchain
+  * @param project
+  * @param factory
+  * @param name
+  */
 class ScaledaRunConfiguration(
     project: Project,
     factory: ScaledaRunConfigurationFactory,
@@ -43,7 +40,7 @@ class ScaledaRunConfiguration(
 ) extends LocatableConfigurationBase[RunProfileState](project, factory, name) {
 
   var targetName = ""
-  var taskName = ""
+  var taskName   = ""
   // TODO: Add toolchain profile
   val extraEnvs = new mutable.HashMap[String, String]
 
@@ -85,12 +82,11 @@ class ScaledaRunConfiguration(
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScaledaRunConfigurationEditor(project)
 
-  /**
-   * Returns a [[RunProfileState]], which is actually used to run
-   * @param executor
-   * @param environment
-   * @return
-   */
+  /** Returns a [[RunProfileState]], which is actually used to run
+    * @param executor
+    * @param environment
+    * @return
+    */
   override def getState(
       executor: Executor,
       environment: ExecutionEnvironment
@@ -101,7 +97,7 @@ class ScaledaRunConfiguration(
       .flatMap(c => {
         c.taskByName(taskName, targetName)
           .map(f => {
-            val (target, task) = f
+            val (target, task)                             = f
             var remoteProfiles: Option[Seq[RemoteProfile]] = None
             val hasProfile =
               if (task.host.isEmpty) {
@@ -132,26 +128,29 @@ class ScaledaRunConfiguration(
 
               val console = myConsoleBuilder.getConsole
 
-              def startRvcdAfterExecution(task: TaskConfig, executor: SExecutor): Unit = {
+              val sourceId = s"${ScaledaMessageTab.MESSAGE_ID}-${target.toolchain}-${target.name}-${task.name}"
+
+              def afterExecution(task: TaskConfig, executor: SExecutor): Unit = {
+                // remove message listeners
+                ScaledaMessageTab.instance.detachFromLogger(sourceId)
+                ScaledaMessageParser.removeParser(sourceId)
                 task.taskType match {
                   // Only call rvcd when simulate
                   case TaskType.Simulation =>
-                    project.getService(classOf[RvcdService]).launchWithWaveformAndSource(executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
-                    // TODO / FIXME: Source is not given
+                    project
+                      .getService(classOf[RvcdService])
+                      .launchWithWaveformAndSource(executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
+                  // TODO / FIXME: Source is not given
                   case _ =>
                 }
               }
 
               val handler =
                 new ScaledaRunProcessHandler(
-                  new ConsoleLogger(
-                    console,
-                    logSourceId = Some(
-                      s"${ScaledaMessageTab.MESSAGE_ID}-${target.toolchain}"
-                    )
-                  ), task, startRvcdAfterExecution
+                  new ConsoleLogger(console, logSourceId = Some(sourceId)),
+                  task,
+                  afterExecution
                 )
-
 
               val state = new RunProfileState {
                 override def execute(
@@ -162,15 +161,21 @@ class ScaledaRunConfiguration(
                   ProcessTerminatedListener.attach(handler)
 
                   // prepare process
-                  val process = ScaledaRun.runTaskBackground(
-                      handler,
-                      new File(ProjectConfig.projectBase.get),
-                      target,
-                      task
+                  val thread = ScaledaRun.runTaskBackground(
+                    handler,
+                    new File(ProjectConfig.projectBase.get),
+                    target,
+                    task
                   )
 
+                  // attach message parser listener
+                  ScaledaMessageTab.instance.attachToLogger(sourceId)
+                  Toolchain.toolchainMessageParser
+                    .get(target.toolchain)
+                    .foreach(parserProvider => ScaledaMessageParser.registerParser(sourceId, parserProvider.parser))
+
                   // run process in the background
-                  process.start()
+                  thread.start()
 
                   // return result
                   new ExecutionResult {
