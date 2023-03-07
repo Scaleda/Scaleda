@@ -26,11 +26,21 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
 
   override def getName: String = userFriendlyName
 
-  override def synthesise(task: TaskConfig) = {
+  private def getTclFromTask(task: TaskConfig, defaultTcl: String): String = {
+    val tclUse = task.tcl.getOrElse(defaultTcl)
     if (task.tcl.isEmpty)
-      KernelLogger.warn(
-        "did not specify tcl for vivado target, fallback to default"
-      )
+      KernelLogger.warn("did not specify tcl for vivado target, fallback to default", tclUse)
+    tclUse
+  }
+
+  override def simulate(task: TaskConfig) = {
+    val tclUse = getTclFromTask(task, "run_sim.tcl")
+    // TODO: Vivado simulation
+    ???
+  }
+
+  override def synthesise(task: TaskConfig) = {
+    val tclUse = getTclFromTask(task, "run_synth.tcl")
     Seq(
       CommandDeps(
         commands = Seq(
@@ -38,7 +48,7 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
           "-mode",
           "batch",
           "-source",
-          task.tcl.getOrElse("run_synth.tcl")
+          tclUse
         ),
         path = executor.workingDir.getAbsolutePath
       )
@@ -46,10 +56,7 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
   }
 
   override def implement(task: TaskConfig) = {
-    if (task.tcl.isEmpty)
-      KernelLogger.warn(
-        "did not specify tcl for vivado target, fallback to default"
-      )
+    val tclUse = getTclFromTask(task, "run_impl.tcl")
     Seq(
       CommandDeps(
         commands = Seq(
@@ -57,11 +64,18 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
           "-mode",
           "batch",
           "-source",
-          task.tcl.getOrElse("run_impl.tcl")
+          tclUse
         ),
         path = executor.workingDir.getAbsolutePath
       )
     )
+  }
+
+
+  override def programming(task: TaskConfig) = {
+    val tclUse = getTclFromTask(task, "run_program.tcl")
+    // TODO: Vivado programming
+    ???
   }
 
   override def detectProfiles = Vivado.detectProfiles
@@ -74,7 +88,8 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
   val supportedTask: Set[TaskType.Value] = Set(
     TaskType.Simulation,
     TaskType.Synthesis,
-    TaskType.Implement
+    TaskType.Implement,
+    TaskType.Programming,
   )
 
   def getVivadoExec(path: String): String = new File(

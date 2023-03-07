@@ -30,6 +30,8 @@ abstract class Toolchain(val executor: Executor) {
 
   def implement(task: TaskConfig): Seq[CommandDeps] = ???
 
+  def programming(task: TaskConfig): Seq[CommandDeps] = ???
+
   def commands(task: TaskConfig) = task.taskType match {
     case TaskType.Simulation => simulate(task)
     case TaskType.Synthesis => synthesise(task)

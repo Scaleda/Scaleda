@@ -30,7 +30,7 @@ case class TaskConfig(
 }
 
 object TaskType extends Enumeration {
-  val Simulation, Synthesis, Implement = Value
+  val Simulation, Synthesis, Implement, Programming = Value
 }
 
 object TaskConfig extends HasDefault[TaskConfig] {
