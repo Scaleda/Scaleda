@@ -14,6 +14,12 @@ object BinarySerializeHelper {
     dataOut.toByteArray
   }
 
+  def fromAny(value: Any): ByteString = {
+    val bytes  = apply(value)
+    val dataIn = new ByteArrayInputStream(bytes)
+    ByteString.readFrom(dataIn)
+  }
+
   def fromBytes[T](bytes: Array[Byte]): T = {
     val dataIn = new ByteArrayInputStream(bytes)
     val in     = new ObjectInputStream(dataIn)
