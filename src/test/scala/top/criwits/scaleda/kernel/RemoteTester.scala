@@ -16,23 +16,23 @@ class RemoteTester extends AnyFlatSpec with should.Matchers {
   behavior of "CommandRunner"
 
   def startServer(): Thread = {
-    val serverThread = new Thread(() => RemoteServer.start())
+    val serverThread = new Thread(() => RemoteServer.serve())
     serverThread.setDaemon(true)
     serverThread.start()
     serverThread
   }
 
-  def getStub(host: String = "localhost", port: Int = RemoteServer.port) = {
+  def getStub(host: String = "localhost", port: Int = RemoteServer.DEFAULT_PORT) = {
     val builder =
       ManagedChannelBuilder.forAddress(host, port)
     builder.usePlaintext()
     val channel = builder.build()
-    val stub = RemoteGrpc.blockingStub(channel)
+    val stub    = RemoteGrpc.blockingStub(channel)
     stub
   }
 
   it should "test remote command execution" in {
-    val t = startServer()
+    val t                 = startServer()
     val remoteCommandDeps = RemoteCommandDeps()
     val commands = Seq(
       // CommandDeps("ping -c 3 127.0.0.1"),

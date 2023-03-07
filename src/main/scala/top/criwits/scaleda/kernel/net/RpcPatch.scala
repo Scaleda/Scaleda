@@ -25,13 +25,19 @@ object RpcPatch {
     (channelType(channel), () => channel.shutdownNow())
   }
 
-  def getServer(services: => Seq[ServerServiceDefinition], port: Int): Server = {
+  def getStartServer(services: => Seq[ServerServiceDefinition], port: Int): Server = {
     val provider = RpcPatch.getDefaultServerProvider
     val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
     method.setAccessible(true)
     val builder = method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
     services.foreach(service => builder.addService(service))
     KernelLogger.info("scaleda grpc server serve at port", port)
-    builder.build().start()
+    val server = builder.build().start()
+    sys.addShutdownHook {
+      KernelLogger.info("gRPC server shutting down")
+      server.shutdown()
+      KernelLogger.info("gRPC server shutdown")
+    }
+    server
   }
 }

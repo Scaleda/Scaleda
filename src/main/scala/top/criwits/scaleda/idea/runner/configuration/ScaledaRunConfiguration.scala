@@ -107,7 +107,7 @@ class ScaledaRunConfiguration(
                   .exists(_.toolchainType == target.toolchain)
               } else {
                 // TODO: add proxy
-                val stub = RemoteClient(task.host.get, RemoteServer.port)
+                val stub = RemoteClient(task.host.get, RemoteServer.DEFAULT_PORT)
                 remoteProfiles = Some(stub.getProfiles(Empty()).profiles)
                 remoteProfiles.get.exists(_.toolchainType == target.toolchain)
               }

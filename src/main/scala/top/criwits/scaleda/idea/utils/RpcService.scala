@@ -76,7 +76,7 @@ class RpcService extends Disposable {
       try {
         // TODO: Add all IDEA grpc services here
         server = Some(
-          RpcPatch.getServer(
+          RpcPatch.getStartServer(
             Seq(
               // IDEA interaction
               ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), executionContext),

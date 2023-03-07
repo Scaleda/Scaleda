@@ -5,6 +5,7 @@ import kernel.bin.ExtractAssets
 import kernel.net.remote.Empty
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
+import kernel.server.ScaledaServerMain
 import kernel.shell.command.RemoteCommandDeps
 import kernel.template.Template
 import kernel.toolchain.{Toolchain, ToolchainProfile}
@@ -20,13 +21,13 @@ object ShellRunMode extends Enumeration {
 }
 
 case class ShellArgs(
-    task: String = "",
-    target: String = "",
-    workingDir: File = new File("."),
-    runMode: ShellRunMode.Value = ShellRunMode.None,
-    serverHost: String = "",
-    serverPort: Int = RemoteServer.port,
-    profileName: Option[String] = None
+                      task: String = "",
+                      target: String = "",
+                      workingDir: File = new File("."),
+                      runMode: ShellRunMode.Value = ShellRunMode.None,
+                      serverHost: String = "",
+                      serverPort: Int = RemoteServer.DEFAULT_PORT,
+                      profileName: Option[String] = None
 )
 
 object ScaledaShellMain {
@@ -168,7 +169,7 @@ object ScaledaShellMain {
               .getOrElse(KernelLogger.info("no task loaded"))
           case ShellRunMode.Serve =>
             // run as server
-            RemoteServer.start()
+            ScaledaServerMain.run(shellConfig)
           case ShellRunMode.Run =>
             config
               .map(c => {
