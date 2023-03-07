@@ -11,10 +11,10 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
 import java.security.spec.{PKCS8EncodedKeySpec, X509EncodedKeySpec}
 import java.security.{KeyFactory, KeyPairGenerator, SecureRandom}
-import java.util.Base64
+import java.time.Duration
+import java.util.{Base64, Date}
 
 object JwtManager {
-  // TODO: set private key in env
   val publicKey  = EnvironmentUtils.Backup.env("JWT_RSA_PUBLIC_KEY")
   val privateKey = EnvironmentUtils.Backup.env("JWT_RSA_PRIVATE_KEY")
   val rsaPublicKey =
@@ -28,10 +28,14 @@ object JwtManager {
       .generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder.decode(privateKey)))
       .asInstanceOf[RSAPrivateKey]
 
-  def create(): Option[String] = {
+  def create(validTime: Duration): Option[String] = {
+    val now = new Date()
     try {
       val algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey)
-      val token     = JWT.create.withIssuer("auth0").sign(algorithm)
+      val token = JWT.create
+        .withIssuer("auth0")
+        .withExpiresAt(new Date(now.getTime + validTime.toMillis))
+        .sign(algorithm)
       Some(token)
     } catch {
       case exception: JWTCreationException =>
@@ -39,6 +43,10 @@ object JwtManager {
         None
     }
   }
+
+  def createToken(validTime: Duration = Duration.ofHours(2))        = create(validTime)
+  def createRefreshToken(validTime: Duration = Duration.ofDays(30)) = create(validTime)
+
   def decode(token: String): Option[DecodedJWT] = {
     try {
       val algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey)
@@ -54,10 +62,7 @@ object JwtManager {
 }
 
 object JwtTest extends App {
-  for ((k, v) <- sys.env) {
-    KernelLogger.info(s"[$k]: $v")
-  }
-  val token = JwtManager.create().get
+  val token = JwtManager.createToken().get
   KernelLogger.info(s"token = $token")
   val decoded = JwtManager.decode(token).get
   KernelLogger.info(s"decoded = ${decoded}")

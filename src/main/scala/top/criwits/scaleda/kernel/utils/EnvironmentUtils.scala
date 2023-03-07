@@ -12,7 +12,7 @@ object EnvironmentUtils {
     LoadManually.run()
   }
 
-  object LoadManually {
+  private object LoadManually {
     def run(): Unit = {
       try {
         for (line <- Source.fromFile(new File(".env")).getLines()) {
