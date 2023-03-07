@@ -12,10 +12,10 @@ CREATE TABLE IF NOT EXISTS t_token
     exp      datetime     NOT NULL
 );
 
-CREATE TRIGGER IF NOT EXISTS clean_token
-    AFTER INSERT
-    ON t_token
-    FOR EACH ROW
-BEGIN
-    DELETE FROM t_token WHERE exp > CURRENT_TIMESTAMP;
-END;
+-- CREATE TRIGGER IF NOT EXISTS clean_token
+--     AFTER INSERT
+--     ON t_token
+--     FOR EACH ROW
+-- BEGIN
+--     DELETE FROM t_token WHERE exp < CURRENT_TIMESTAMP;
+-- END;

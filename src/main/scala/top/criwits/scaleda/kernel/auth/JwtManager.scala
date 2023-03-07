@@ -28,24 +28,28 @@ object JwtManager {
       .generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder.decode(privateKey)))
       .asInstanceOf[RSAPrivateKey]
 
-  def create(validTime: Duration): Option[String] = {
+  def create(validTime: Duration, claims: Map[String, String] = Map()): Option[String] = {
     val now = new Date()
     try {
       val algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey)
-      val token = JWT.create
+      var builder = JWT.create
         .withIssuer("auth0")
         .withExpiresAt(new Date(now.getTime + validTime.toMillis))
-        .sign(algorithm)
+      for ((k, v) <- claims) builder = builder.withClaim(k, v)
+      val token = builder.sign(algorithm)
       Some(token)
     } catch {
-      case exception: JWTCreationException =>
+      case e: JWTCreationException =>
         // Invalid Signing configuration / Couldn't convert Claims.
+        KernelLogger.error(e)
         None
     }
   }
 
-  def createToken(validTime: Duration = Duration.ofHours(2))        = create(validTime)
-  def createRefreshToken(validTime: Duration = Duration.ofDays(30)) = create(validTime)
+  def createToken(validTime: Duration = Duration.ofSeconds(2), claims: Map[String, String] = Map()) =
+    create(validTime, claims)
+  def createRefreshToken(validTime: Duration = Duration.ofDays(30), claims: Map[String, String] = Map()) =
+    create(validTime, claims)
 
   def decode(token: String): Option[DecodedJWT] = {
     try {
