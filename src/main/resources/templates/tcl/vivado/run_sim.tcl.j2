@@ -3,16 +3,18 @@ open_project $project_dir/$project_name
 
 launch_simulation
 
-# TODO: not all the signals will be added
-add_wave -r /*
+# add_wave -r /*
 
 open_vcd "{{ vcdFile }}"
-log_vcd [ get_object /* ]
+log_vcd [ get_object -r * ]
+
+# WARN: relaunch_sim and close_vcd will make vivado crash
+# relaunch_sim
 run -all
 close_vcd
 
-save_wave_config "{{ top }}.wcfg"
-close_sim
+save_wave_config "{{ top }}"
+close_sim -force
 
 close_project
 puts "Simulate done!"
