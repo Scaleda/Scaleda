@@ -6,6 +6,7 @@ import kernel.net.fuse.fs._
 import com.google.protobuf.ByteString
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
+import top.criwits.scaleda.kernel.utils.KernelLogger
 
 import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
@@ -211,6 +212,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   }
 
   override def create(request: PathModeRequest): Future[IntReply] = async {
+    throw new RuntimeException("test create error")
     val file = getFile(request.path)
     // s"touch ${file.getAbsolutePath}".!
     if (file.exists() && file.isDirectory) IntReply(-ErrorCodes.EISDIR)
