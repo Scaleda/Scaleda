@@ -2,7 +2,14 @@ source create_project.tcl
 open_project $project_dir/$project_name
 
 launch_simulation
-source "{{ top }}.tcl"
-close_project
 
+open_vcd "{{ vcdFile }}"
+log_vcd [ get_object /* ]
+run
+close_vcd
+
+save_wave_config "{{ top }}.wcfg"
+close_sim
+
+close_project
 puts "Simulate done!"

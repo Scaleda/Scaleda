@@ -6,7 +6,7 @@ import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
-import kernel.toolchain.executor.Executor
+import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.impl.Vivado.{getVivadoExec, internalID, userFriendlyName}
 import kernel.toolchain.{Toolchain, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
@@ -128,7 +128,8 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
       testbenchSource: String, // empty if no testbench is given
       ipList: Seq[String] = Seq(),
       xdcList: Seq[String] = Seq(),
-      timingReport: Boolean = false
+      timingReport: Boolean = false,
+      vcdFile: String,
   )
 
   class TemplateRenderer(
@@ -144,7 +145,7 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
           "run_sim.tcl.j2"        -> "run_sim.tcl",
           "run_synth.tcl.j2"      -> "run_synth.tcl",
           "run_impl.tcl.j2"       -> "run_impl.tcl",
-          "run_program.tcl.j2"    -> "run_program.tcl",
+          "run_program.tcl.j2"    -> "run_program.tcl"
         )
       ) {
     val config = ProjectConfig.getConfig()
@@ -166,7 +167,8 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
             .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
             .map(_.getAbsolutePath.replace('\\', '/')),
           sim = sim,
-          testbenchSource = topFile.getAbsolutePath // if sim == false, then this will not be used
+          testbenchSource = topFile.getAbsolutePath, // if sim == false, then this will not be used
+          vcdFile = if (sim) executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath else ""
         )
         Serialization.getCCParams(context)
       })
