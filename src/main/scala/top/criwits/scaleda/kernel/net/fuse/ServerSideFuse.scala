@@ -27,7 +27,7 @@ class ServerSideFuse(
   val builder = ManagedChannelBuilder.forAddress(host, port)
   builder.usePlaintext()
   val channel = builder.build()
-  val stub = RemoteFuseGrpc.blockingStub(channel)
+  val stub: RemoteFuseGrpc.RemoteFuseBlockingClient = RemoteFuseGrpc.blockingStub(channel)
 
   override def getattr(path: String, stat: FileStat): Int = {
     val reply = stub.getattr(PathRequest(path))

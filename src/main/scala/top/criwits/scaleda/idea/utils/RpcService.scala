@@ -1,7 +1,10 @@
 package top.criwits.scaleda
 package idea.utils
 
-import kernel.utils.KernelLogger
+import kernel.net.RpcPatch
+import kernel.net.fuse.FuseDataProvider
+import kernel.net.fuse.fs.RemoteFuseGrpc
+import kernel.utils.{KernelLogger, Paths}
 import verilog.VerilogPSIFileRoot
 
 import com.intellij.codeInsight.navigation.NavigationUtil
@@ -10,7 +13,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.LocalFilePath
 import com.intellij.psi.PsiManager
 import com.intellij.util.messages.Topic
-import io.grpc.{ManagedChannelBuilder, Server, ServerBuilder}
+import io.grpc.Server
 import scaleda.scaleda.{ScaledaEmpty, ScaledaGotoSource, ScaledaRpcGrpc}
 
 import scala.async.Async.async
@@ -66,32 +69,44 @@ class RpcService extends Disposable {
 
   var stop                   = false
   var server: Option[Server] = None
-  new Thread(() => {
+  val thread = new Thread(() => {
     while (!stop) {
+      val sourcePath       = Paths.pwd.getAbsolutePath
+      val executionContext = ExecutionContext.global
       try {
-        val provider = RpcPatch.getDefaultServerProvider
-        val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
-        method.setAccessible(true)
-        val builder = method.invoke(provider, DEFAULT_PORT).asInstanceOf[ServerBuilder[_]]
-        builder.addService(
-          ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), ExecutionContext.global)
+        // TODO: Add all IDEA grpc services here
+        server = Some(
+          RpcPatch.getServer(
+            Seq(
+              // IDEA interaction
+              ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), executionContext),
+              // Fuse as data provider
+              RemoteFuseGrpc.bindService(
+                new FuseDataProvider(sourcePath),
+                executionContext
+              )
+            ),
+            DEFAULT_PORT
+          )
         )
-        MainLogger.info("scaleda grpc server serve at port", DEFAULT_PORT)
-        server = Some(builder.build().start())
         server.get.awaitTermination()
       } catch {
+        case _: InterruptedException =>
+          KernelLogger.warn("gRPC Service stopped")
         case _e: Throwable =>
           MainLogger.warn("trying", _e)
           _e.printStackTrace()
           Thread.sleep(3000)
       }
     }
-  }).start()
+  })
+  thread.start()
 
   override def dispose() = {
     stop = true
     server.foreach(s => s.shutdown())
     server = None
+    thread.interrupt()
   }
 }
 
