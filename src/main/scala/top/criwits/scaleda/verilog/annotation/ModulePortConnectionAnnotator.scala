@@ -1,15 +1,14 @@
 package top.criwits.scaleda
 package verilog.annotation
 
+import idea.{ScaledaBundle => SB}
 import verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NamedPortConnectionPsiNode}
 import verilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
+import verilog.psi.nodes.signal.PortDeclarationPsiNode
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode
-
-import top.criwits.scaleda.idea.{ScaledaBundle => SB}
 
 import scala.jdk.CollectionConverters._
 
