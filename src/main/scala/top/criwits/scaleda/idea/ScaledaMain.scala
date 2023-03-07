@@ -4,14 +4,13 @@ package idea
 import idea.runner.task.ScaledaReloadTasksAction
 import idea.rvcd.RvcdService
 import idea.settings.toolchains.ProfileDetectAction
-import idea.utils.{Icons, MainLogger, RpcService}
+import idea.utils.{AssetsInstallAction, Icons, MainLogger, RpcService}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import idea.windows.tool.logging.ScaledaLoggingService
-import kernel.bin.ExtractBinaryFiles
+import kernel.bin.ExtractAssets
 import kernel.toolchain.Toolchain
 
 import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
@@ -42,15 +41,16 @@ class ScaledaMain extends StartupActivity {
 
     // if no profiles loaded, detect all profiles and popup message
     if (Toolchain.profiles().isEmpty) {
-      ActionManager.getInstance()
+      ActionManager
+        .getInstance()
         .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
     }
 
     // check binaries
-    if (!ExtractBinaryFiles.isInstalled) {
-      ProgressManager.getInstance().runProcessWithProgressSynchronously(new Runnable {
-        override def run(): Unit = ExtractBinaryFiles.run()
-      }, ScaledaBundle.message("utils.installing.assets"), false, project)
+    if (!ExtractAssets.isInstalled) {
+      ActionManager
+        .getInstance()
+        .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
     }
 
     // Remote
