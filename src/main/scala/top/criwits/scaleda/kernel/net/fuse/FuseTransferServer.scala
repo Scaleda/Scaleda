@@ -212,7 +212,7 @@ object FuseTransferClient {
     RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port)
   def asStream(dataProvider: FuseDataProvider, host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
     val (client, shutdown) = FuseTransferClient(host, port)
-    val clientStream       = new FuseTransferClientObserver(new FuseDataProvider("/tmp"))
+    val clientStream       = new FuseTransferClientObserver(dataProvider)
     val stream             = client.login(clientStream)
     clientStream.setTx(stream)
     (stream, shutdown)

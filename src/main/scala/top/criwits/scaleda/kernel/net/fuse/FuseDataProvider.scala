@@ -6,7 +6,6 @@ import kernel.net.fuse.fs._
 import com.google.protobuf.ByteString
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
-import top.criwits.scaleda.kernel.utils.KernelLogger
 
 import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
@@ -19,12 +18,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.sys.process._
 
-/**
- * gRPC data provider for filesystem sync.<br/>
- * This thread starts in Scaleda Client side, but actually is a gRPC server.
- * FIXME: add Intranet penetration proxy 内网穿透代理
- * @param sourcePath source data path
- */
+/** gRPC data provider for filesystem sync.<br/>
+  * This thread starts in Scaleda Client side, but actually is a gRPC server.
+  * @param sourcePath source data path
+  */
 class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   val logger = LoggerFactory.getLogger(getClass)
 
@@ -48,7 +45,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       if (Files.isSymbolicLink(file.toPath)) {
         mode = (mode & 0xfff) | (0xa << 12)
       }
-      val p = file.toPath
+      val p     = file.toPath
       val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
       GetAttrReply(
         mode = mode,
@@ -67,7 +64,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
         StringTupleReply(-ErrorCodes.ENOENT)
       else {
         // val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
-        val run = s"readlink ${file.getAbsolutePath}"
+        val run   = s"readlink ${file.getAbsolutePath}"
         val array = mutable.ArrayBuffer[String]()
         val r = run ! ProcessLogger(
           stdout => array.addOne(stdout),
