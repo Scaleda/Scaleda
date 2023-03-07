@@ -217,7 +217,6 @@ object FuseTransferTester extends App {
 
     override def onError(t: Throwable) = {
       KernelLogger.warn("client onError:", t)
-      t.printStackTrace()
     }
 
     override def onCompleted() = {
@@ -225,34 +224,14 @@ object FuseTransferTester extends App {
     }
   })
   stream.onNext(FuseLoginMessage.of(0, "token", "login", ByteString.EMPTY))
-  Thread.sleep(500)
+  Thread.sleep(100)
   FuseTransferServer.requestThread.start()
   // val resp = FuseTransferServer.request(FuseTransferMessage(1, "token", "init", EmptyReq()))
   val resp = FuseTransferServer.request(FuseTransferMessage(1, "token", "create", PathModeRequest.of("test", 0x1ed)))
   KernelLogger.info("resp: ", resp)
-  Thread.sleep(500)
+  // Thread.sleep(500)
   stream.onCompleted()
-  Thread.sleep(500)
+  // Thread.sleep(500)
   FuseTransferServer.requestThread.interrupt()
   shutdown()
-}
-
-object ScalaAsyncTest extends App {
-  val future1 = async {
-    1
-  }
-  val future2 = async {
-    throw new RuntimeException("stop!")
-    2
-  }
-  val calculate = async {
-    await(future1) + await(future2)
-  }
-  try {
-    val result = Await.result(calculate, 10 seconds)
-  } catch {
-    case e: Throwable =>
-      KernelLogger.warn(e)
-      e.printStackTrace()
-  }
 }
