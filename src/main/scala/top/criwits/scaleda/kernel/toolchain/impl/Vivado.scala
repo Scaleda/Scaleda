@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
+import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageToolchainParser}
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
@@ -11,6 +12,7 @@ import kernel.toolchain.{Toolchain, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
 import java.io.File
+import java.util.regex.Pattern
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,9 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   *
   * @param executor An [[Executor]] used to hold information like configurations.
   */
-class Vivado(executor: Executor)
-    extends Toolchain(executor)
-    with ToolchainProfileDetector {
+class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfileDetector {
   override def getInternalID: String = internalID
 
   override def getName: String = userFriendlyName
@@ -34,7 +34,11 @@ class Vivado(executor: Executor)
     Seq(
       CommandDeps(
         commands = Seq(
-          getVivadoExec(executor.profile.path), "-mode", "batch", "-source", task.tcl.getOrElse("run_synth.tcl")
+          getVivadoExec(executor.profile.path),
+          "-mode",
+          "batch",
+          "-source",
+          task.tcl.getOrElse("run_synth.tcl")
         ),
         path = executor.workingDir.getAbsolutePath
       )
@@ -49,7 +53,11 @@ class Vivado(executor: Executor)
     Seq(
       CommandDeps(
         commands = Seq(
-          getVivadoExec(executor.profile.path), "-mode", "batch", "-source", task.tcl.getOrElse("run_impl.tcl")
+          getVivadoExec(executor.profile.path),
+          "-mode",
+          "batch",
+          "-source",
+          task.tcl.getOrElse("run_impl.tcl")
         ),
         path = executor.workingDir.getAbsolutePath
       )
@@ -61,7 +69,7 @@ class Vivado(executor: Executor)
 
 object Vivado extends ToolchainProfileDetector {
   val userFriendlyName: String = "Xilinx Vivado"
-  val internalID: String = "vivado"
+  val internalID: String       = "vivado"
 
   val supportedTask: Set[TaskType.Value] = Set(
     TaskType.Simulation,
@@ -74,8 +82,7 @@ object Vivado extends ToolchainProfileDetector {
     "/bin/vivado" + (if (OS.isWindows) ".bat" else "")
   ).getAbsolutePath
 
-  class Verifier(override val toolchainProfile: ToolchainProfile)
-      extends ToolchainProfile.Verifier(toolchainProfile) {
+  class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
     override def verifyCommandLine: Option[Seq[CommandDeps]] = {
       val vivadoFile = new File(getVivadoExec(toolchainProfile.path))
       if (!vivadoFile.exists()) {
@@ -111,8 +118,7 @@ object Vivado extends ToolchainProfileDetector {
       `package`: String,
       speed: String,
       jobs: Int = OS.cpuCount,
-      sourceList: Seq[String] =
-        Seq(), // NOTE: simulation top file is EXCLUDED here!
+      sourceList: Seq[String] = Seq(), // NOTE: simulation top file is EXCLUDED here!
       sim: Boolean,
       testbenchSource: String, // empty if no testbench is given
       ipList: Seq[String] = Seq(),
@@ -128,10 +134,10 @@ object Vivado extends ToolchainProfileDetector {
         "tcl/vivado",
         executor.workingDir.getAbsolutePath,
         Map(
-          "args.tcl.j2" -> "args.tcl",
+          "args.tcl.j2"           -> "args.tcl",
           "create_project.tcl.j2" -> "create_project.tcl",
-          "run_synth.tcl.j2" -> "run_synth.tcl",
-          "run_impl.tcl.j2" -> "run_impl.tcl"
+          "run_synth.tcl.j2"      -> "run_synth.tcl",
+          "run_impl.tcl.j2"       -> "run_impl.tcl"
         )
       ) {
     val config = ProjectConfig.getConfig()
@@ -141,24 +147,53 @@ object Vivado extends ToolchainProfileDetector {
         val top =
           taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
         val topFile = KernelFileUtils.getModuleFile(top).get // TODO / FIXME
-        val sim = taskConfig.`type` == "simulation"
+        val sim     = taskConfig.`type` == "simulation"
         val context = Vivado.TemplateContext(
           top = top,
           workDir = executor.workingDir.getAbsolutePath,
-          device = targetConfig.options.get("device"), // FIXME
+          device = targetConfig.options.get("device"),     // FIXME
           `package` = targetConfig.options.get("package"), // FIXME
-          speed = targetConfig.options.get("speed"), // FIXME
+          speed = targetConfig.options.get("speed"),       // FIXME
           sourceList = KernelFileUtils
             .getAllSourceFiles()
             .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
             .map(_.getAbsolutePath.replace('\\', '/')),
           sim = sim,
-          testbenchSource =
-            topFile.getAbsolutePath // if sim == false, then this will not be used
+          testbenchSource = topFile.getAbsolutePath // if sim == false, then this will not be used
         )
         Serialization.getCCParams(context)
       })
       .getOrElse(Map())
+  }
+
+  object MessageParser extends ScaledaMessageToolchainParser {
+    override def parse(source: String, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+      if (source.contains(Vivado.internalID)) {
+        // Vivado message
+        val p = Pattern.compile("(INFO|WARNING|ERROR): \\[(.+)\\] ?(.+)")
+        val m = p.matcher(text)
+        if (m.find()) {
+          val (levelText, tag, message) = (m.group(1), m.group(2), m.group(3))
+          import LogLevel._
+          val textedLevel = levelText match {
+            case "INFO"    => Info
+            case "WARNING" => Warn
+            case _         => Error
+          }
+          Some(
+            ScaledaMessage(
+              text = s"[$tag] $message",
+              level = textedLevel,
+              time = System.currentTimeMillis()
+            )
+          )
+        } else {
+          None
+        }
+      } else {
+        None
+      }
+    }
   }
 
   override def detectProfiles = async {
