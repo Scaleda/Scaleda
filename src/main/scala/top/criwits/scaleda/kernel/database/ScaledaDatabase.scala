@@ -124,6 +124,8 @@ class ScaledaDatabase {
     val resultSet = preparing.executeQuery()
     resultSet.next()
   }
+
+  // t_token
 }
 
 object ScaledaDatabaseTest extends App {
