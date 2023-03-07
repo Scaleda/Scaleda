@@ -169,7 +169,8 @@ class ScaledaRunConfiguration(
                   )
 
                   // attach message parser listener
-                  ScaledaMessageTab.instance.attachToLogger(sourceId)
+                  if (ScaledaMessageTab.instance != null)
+                    ScaledaMessageTab.instance.attachToLogger(sourceId)
                   Toolchain.toolchainMessageParser
                     .get(target.toolchain)
                     .foreach(parserProvider => ScaledaMessageParser.registerParser(sourceId, parserProvider.parser))

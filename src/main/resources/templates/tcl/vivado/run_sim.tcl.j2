@@ -1,1 +1,8 @@
+source create_project.tcl
+open_project $project_dir/$project_name
+
+launch_simulation
+source "{{ top }}.tcl"
+close_project
+
 puts "Simulate done!"
