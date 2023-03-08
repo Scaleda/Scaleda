@@ -9,7 +9,7 @@ object VeribleFormatterHelper {
   private val VERIBLE = "verible"
   private val WIN64 = "win64"
   private val LINUX64 = "lin64"
-  private val FORMATTER = "verible-verilog-formatter"
+  private val FORMATTER = "verible-verilog-format"
 
   private val path = VERIBLE + "/" + (OS.getOSType match {
     case OS.Windows => WIN64 // TODO: 32 bit

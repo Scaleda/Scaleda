@@ -7,7 +7,7 @@ import com.intellij.formatting.service.AsyncDocumentFormattingService.Formatting
 import com.intellij.formatting.service.{AsyncDocumentFormattingService, AsyncFormattingRequest, FormattingService}
 import com.intellij.psi.PsiFile
 import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.idea.utils.Notification
+import top.criwits.scaleda.idea.utils.{MainLogger, Notification}
 import top.criwits.scaleda.verilog.{VerilogFileType, VerilogLanguage, VerilogPSIFileRoot}
 import top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettings
 
