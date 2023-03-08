@@ -2,9 +2,11 @@ package top.criwits.scaleda
 package kernel.server
 
 import kernel.database.ScaledaDatabase
+import kernel.database.dao.User
 import kernel.net.fuse.FuseTransferServer
-import kernel.net.remote.{RemoteLoginRequest, RemoteRefreshRequest, RemoteRegisterLoginGrpc, RemoteRegisterRequest}
-import kernel.net.{RemoteClient, RemoteServer, RpcPatch}
+import kernel.net.remote._
+import kernel.net.user.ScaledaRegisterLogin
+import kernel.net.{RemoteServer, RpcPatch}
 import kernel.shell.ShellArgs
 import kernel.utils.KernelLogger
 
@@ -38,7 +40,10 @@ object ScaledaServerMainRunTest extends App {
 }
 
 object ScaledaServerMainTest extends App {
-  val thread = new Thread(() => ScaledaServerMain.run(ShellArgs()))
+  // val thread = new Thread(() => ScaledaServerMain.run(ShellArgs()))
+  val thread = new Thread(() => {
+    RemoteServer.serve()
+  })
   thread.start()
 
   val db = new ScaledaDatabase
@@ -59,12 +64,28 @@ object ScaledaServerMainTest extends App {
     val refreshReply  = client.refresh(RemoteRefreshRequest.of(refreshToken))
     val tokenNew      = refreshReply.token
     KernelLogger.info("refresh token", refreshToken, "token", token, "new token", tokenNew)
+    shutdown()
   }
   {
-    val (client, shutdown) = RemoteClient("127.0.0.1")
-    val reply              = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of())
+    val username = "user"
+    val password = "pass"
+    val req      = new ScaledaRegisterLogin("127.0.0.1")
+    req.register(new User(username, password, username))
+    req.login(username, password)
+
+    // val (client, shutdown) = RemoteClient("127.0.0.1")
+    // val reply              = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of())
+    // KernelLogger.info("remote profiles", reply.profiles)
+    // shutdown()
+
+    val client = RpcPatch.getNativeClient(
+      RemoteGrpc.blockingStub,
+      "127.0.0.1",
+      RemoteServer.DEFAULT_PORT,
+      enableAuthProvide = true
+    )
+    val reply = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of())
     KernelLogger.info("remote profiles", reply.profiles)
-    shutdown()
   }
 
   thread.interrupt()

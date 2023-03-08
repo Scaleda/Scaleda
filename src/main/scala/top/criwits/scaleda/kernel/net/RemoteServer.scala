@@ -73,7 +73,7 @@ object RemoteServer {
     override def getProfiles(request: Empty): Future[ProfilesReply] = async {
       val profiles = Toolchain.profiles().toSeq.map(_.asRemoteProfile)
       KernelLogger.info("remote profiles:", profiles)
-      ProfilesReply(profiles)
+      ProfilesReply.of(profiles)
     }
 
     override def getRemoteInfo(request: Empty): Future[RemoteInfo] = async {
@@ -95,6 +95,7 @@ object RemoteServer {
       ),
       port,
       enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE")
+      // useReflection = false
     )
     server.awaitTermination()
   }

@@ -21,6 +21,7 @@ class RemoteCommandRunner(
     remoteCommandDeps: RemoteCommandDeps
 ) extends CommandRunner(deps)
     with AbstractCommandRunner {
+  // TODO: update this to run in IDEA
   val builder = ManagedChannelBuilder.forAddress(
     remoteCommandDeps.host,
     remoteCommandDeps.port

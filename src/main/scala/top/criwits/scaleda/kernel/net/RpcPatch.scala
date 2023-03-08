@@ -36,15 +36,38 @@ object RpcPatch {
     (stub, () => channel.shutdownNow())
   }
 
+  def getNativeClient[T <: AbstractStub[T]](
+      channelType: Channel => T,
+      host: String,
+      port: Int,
+      enableAuthProvide: Boolean = false
+  ) = {
+    val builder = ManagedChannelBuilder.forAddress(host, port)
+    builder.usePlaintext()
+    val channel = builder.build()
+    var stub    = channelType(channel)
+    if (enableAuthProvide) {
+      stub = stub.withCallCredentials(new AuthorizationProvideCredentials)
+    }
+    stub
+  }
+
   def getStartServer(
       services: => Seq[ServerServiceDefinition],
       port: Int,
-      enableAuthCheck: Boolean = false
+      enableAuthCheck: Boolean = false,
+      useReflection: Boolean = true
   ): Server = {
-    val provider = RpcPatch.getDefaultServerProvider
-    val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
-    method.setAccessible(true)
-    val builder = method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
+    val builder: ServerBuilder[_] = if (useReflection) {
+      KernelLogger.info("use reflection")
+      val provider = RpcPatch.getDefaultServerProvider
+      val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
+      method.setAccessible(true)
+      method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
+    } else {
+      KernelLogger.info("not use reflection")
+      ServerBuilder.forPort(port)
+    }
     services.foreach(service => builder.addService(service))
     KernelLogger.info("scaleda grpc server serve at port", port)
     if (enableAuthCheck) {
