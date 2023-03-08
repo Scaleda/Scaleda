@@ -26,14 +26,15 @@ class RemoteRegisterLoginImpl extends RemoteRegisterLoginGrpc.RemoteRegisterLogi
       val db   = new ScaledaDatabase
       val user = db.findUser(request.username, password = Some(request.password))
       if (user.nonEmpty) {
-        val token = db.createToken(request.username, claims => JwtManager.createRefreshToken(claims = claims))
-        RemoteLoginReply.of(ok = true, token.getToken, "ok")
+        val token        = db.createToken(request.username, claims => JwtManager.createToken(claims = claims))
+        val refreshToken = db.createToken(request.username, claims => JwtManager.createRefreshToken(claims = claims))
+        RemoteLoginReply.of(ok = true, token.getToken, refreshToken.getToken, "ok")
       } else {
         // TODO: i18n
-        RemoteLoginReply.of(ok = false, "", "username or password error")
+        RemoteLoginReply.of(ok = false, "", "", "username or password error")
       }
     } catch {
-      case e: UserException => RemoteLoginReply.of(ok = false, "", e.getMessage)
+      case e: UserException => RemoteLoginReply.of(ok = false, "", "", e.getMessage)
     }
   }
 

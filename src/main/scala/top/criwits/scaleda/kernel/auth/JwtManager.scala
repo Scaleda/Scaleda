@@ -34,9 +34,11 @@ object JwtManager {
       val algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey)
       var builder = JWT.create
         .withIssuer("auth0")
-        .withExpiresAt(new Date(now.getTime + validTime.toMillis))
+        .withExpiresAt(new Date(now.getTime + validTime.toMillis).toInstant)
       for ((k, v) <- claims) builder = builder.withClaim(k, v)
+      builder = builder.withClaim("random", Integer.valueOf(new SecureRandom().nextInt()))
       val token = builder.sign(algorithm)
+      KernelLogger.info("create token (hash):", token.hashCode)
       Some(token)
     } catch {
       case e: JWTCreationException =>

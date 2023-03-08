@@ -29,8 +29,9 @@ message RemoteLoginRequest {
 }
 message RemoteLoginReply {
   bool ok = 1;
-  string token = 2;
-  string reason = 3;
+  string refreshToken = 2;
+  string token = 3;
+  string reason = 4;
 }
 message RemoteRefreshRequest {
   string refreshToken = 1;
