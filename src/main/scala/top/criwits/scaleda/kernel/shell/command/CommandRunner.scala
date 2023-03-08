@@ -158,8 +158,8 @@ object CommandRunner {
       flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
       flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
       val returnValue = r.returnValue.value.get.get
-      handler.onReturn(returnValue, commands.last == command)
       if (returnValue != handler.expectedReturnValue) meetErrors = true
+      handler.onReturn(returnValue, commands.last == command || meetErrors)
       step += 1
     })
   }
