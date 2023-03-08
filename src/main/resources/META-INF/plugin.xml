@@ -11,8 +11,8 @@
     <depends>com.intellij.properties</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.java
-    </depends> <!-- see https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ -->
+    <!-- see https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ -->
+    <depends>com.intellij.java</depends>
 
     <resource-bundle>bundles.ScaledaBundle</resource-bundle>
 

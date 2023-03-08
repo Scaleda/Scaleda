@@ -1,29 +1,48 @@
 package top.criwits.scaleda
 package idea.windows.tool.message
 
+import idea.utils.Icons
+
 import com.intellij.icons.AllIcons
-import top.criwits.scaleda.idea.utils.Icons
+import com.intellij.ui.ColoredListCellRenderer
 
-import java.awt.{Color, Component}
-import javax.swing.{JLabel, JList, ListCellRenderer}
+import javax.swing.JList
 
-class ScaledaMessageRenderer extends ListCellRenderer[ScaledaMessage] {
-  override def getListCellRendererComponent(
-      jList: JList[_ <: ScaledaMessage],
-      e: ScaledaMessage,
-      i: Int,
-      b: Boolean,
-      b1: Boolean
-  ): Component = {
-    val label = new JLabel(e.text)
+class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
+  // override def getListCellRendererComponent(
+  //     list: JList[_ <: ScaledaMessage],
+  //     value: ScaledaMessage,
+  //     index: Int,
+  //     selected: Boolean,
+  //     hasFocus: Boolean
+  // ): Component = {
+  //   val label = new JLabel(value.text)
+  //   import top.criwits.scaleda.kernel.utils.LogLevel._
+  //   val icon = value.level match {
+  //     case Debug => Icons.logVerbose
+  //     case Info  => AllIcons.General.Information
+  //     case Warn  => AllIcons.General.Warning
+  //     case _     => AllIcons.General.Error
+  //   }
+  //   label.setIcon(icon)
+  //   label
+  // }
+
+  override def customizeCellRenderer(
+      list: JList[_ <: ScaledaMessage],
+      value: ScaledaMessage,
+      index: Int,
+      selected: Boolean,
+      hasFocus: Boolean
+  ): Unit = {
     import top.criwits.scaleda.kernel.utils.LogLevel._
-    val icon = e.level match {
+    val icon = value.level match {
       case Debug => Icons.logVerbose
-      case Info => AllIcons.General.Information
-      case Warn => AllIcons.General.Warning
-      case _ => AllIcons.General.Error
+      case Info  => AllIcons.General.Information
+      case Warn  => AllIcons.General.Warning
+      case _     => AllIcons.General.Error
     }
-    label.setIcon(icon)
-    label
+    setIcon(icon)
+    append(value.text)
   }
 }
