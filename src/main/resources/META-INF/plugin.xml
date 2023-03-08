@@ -127,7 +127,7 @@
                                  id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
                                  instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
         <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage"/>
-
+        <langCodeStyleSettingsProvider implementation="top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettingsProvider" />
     </extensions>
 
     <!-- Module, Project and SDK -->
