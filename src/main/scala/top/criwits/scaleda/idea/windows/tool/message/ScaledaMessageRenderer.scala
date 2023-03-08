@@ -8,6 +8,7 @@ import com.intellij.ui.{ColoredListCellRenderer, SimpleTextAttributes}
 
 import javax.swing.JList
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.matching.Regex
 
 class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
@@ -28,9 +29,44 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
       case _     => AllIcons.General.Error
     }
     setIcon(icon)
-    val fileMatches = fileRegex.findAllMatchIn(value.text).toSeq.sortBy(d => d.start - d.end)
+    // val ranges          = ArrayBuffer[(Int, Int)]()
+    // val matches         = fileOptionalLineNumberRegex.findAllMatchIn(value.text).toSeq.sortBy(d => d.start - d.end)
+    // val selectedMatches = ArrayBuffer[Regex.Match]()
+    // for (m <- matches) {
+    //   if (
+    //     !ranges.exists(i =>
+    //       (i._1 <= m.start && m.start <= i._2) || (i._1 <= m.end && m.end <= i._2) || (i._1 <= m.start && m.end <= i._2)
+    //     )
+    //   ) {
+    //     // if range not covered, select this match
+    //     ranges.addOne((m.start, m.end))
+    //     selectedMatches.addOne(m)
+    //   }
+    // }
+    val results = ArrayBuffer[(String, Option[SimpleTextAttributes])]()
+    val text    = value.text
+    val matches = fileOptionalLineNumberRegex.findAllMatchIn(text).toSeq.sortBy(_.start)
+    // val ranges  = matches.map(m => (m.start, m.end)).toSeq
+    // KernelLogger.warn("ranges", ranges)
+    // handle start
+    matches.headOption.foreach(m => {
+      val s = text.slice(0, m.start)
+      if (s.nonEmpty) results.addOne((s, None))
+    })
+    for (i <- matches.indices) {
+      // handle this match and next plain text
+      results.addOne((matches(i).matched, Some(SimpleTextAttributes.LINK_ATTRIBUTES)))
+      if (i < matches.size - 1) {
+        if (matches(i).end < text.length - 1) {
+          results.addOne((text.slice(matches(i).end + 1, matches(i + 1).start), None))
+        }
+      } else {
+        results.addOne((text.slice(matches(i).end + 1, text.length), None))
+      }
+    }
 
-    Seq((value.text, None))
+    // Seq((value.text, None))
+    results.toSeq
   }
 
   override final def customizeCellRenderer(
@@ -49,10 +85,12 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
 object ScaledaMessageRendererImpl extends ScaledaMessageRenderer
 
 object ScaledaMessageRenderer {
-  val fileRegexString = "((\\w+\\:)*?[^\\s'\"/\\\\\\?\\:]*?/?((/[^\\&]+/)|(\\\\[^\\&]+\\\\))?)((\\w+)\\.(\\w+))"
-  val fileLineNumberRegexString = fileRegexString + "\\:(\\w+)"
-  val fileRegex = new Regex(fileRegexString)
-  val fileLineNumberRegex = new Regex(fileRegexString)
+  val fileRegexString                   = "((\\w+\\:)*?[^\\s'\"/\\\\\\?\\:]*?/?((/[^\\&]+/)|(\\\\[^\\&]+\\\\))?)((\\w+)\\.(\\w+))"
+  val fileLineNumberRegexString         = fileRegexString + "\\:(\\w+)"
+  val fileOptionalLineNumberRegexString = fileRegexString + "(\\:(\\w+))?"
+  val fileRegex                         = new Regex(fileRegexString)
+  val fileLineNumberRegex               = new Regex(fileRegexString)
+  val fileOptionalLineNumberRegex       = new Regex(fileOptionalLineNumberRegexString)
 
   private val allRenderers = new mutable.HashMap[String, ScaledaMessageRenderer]()
 
@@ -72,4 +110,5 @@ object TestFileMatches extends App {
       " C:\\Scaleda\\a.txt - caleda.vv"
   val fileMatches = fileRegex.findAllMatchIn(text).toSeq.sortBy(d => d.start - d.end)
   fileMatches.foreach(p => println("[" + p + "]"))
+  println("slice:", "0123456789".slice(0, 1))
 }
