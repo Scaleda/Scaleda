@@ -56,8 +56,10 @@ class ScaledaRunConfiguration(
     val c = if (e != null) e else new Element(STORAGE_ID)
     c.setAttribute("taskName", taskName)
     c.setAttribute("targetName", targetName)
-    c.setAttribute("profileName", profileName)
-    c.setAttribute("profileHost", profileHost)
+    if (profileName != null) c.setAttribute("profileName", profileName)
+    else c.setAttribute("profileName", "")
+    if (profileHost != null) c.setAttribute("profileHost", profileHost)
+    else c.setAttribute("profileHost", "")
     c
   }
 
