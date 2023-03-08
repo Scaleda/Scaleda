@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.runner.configuration
 
-import idea.runner.ScaledaRunProcessHandler
+import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
 import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
@@ -25,8 +25,10 @@ import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 
 import java.io.File
+import java.time.Instant
 import scala.collection.mutable
 import scala.language.existentials
+import scala.util.Random
 
 /** A configuration representing a specific Scaleda task as well as corresponding toolchain
   * @param project
@@ -138,12 +140,13 @@ class ScaledaRunConfiguration(
 
               val console = myConsoleBuilder.getConsole
 
-              val sourceId = s"${ScaledaMessageTab.MESSAGE_ID}-${target.toolchain}-${target.name}-${task.name}"
+              val runtimeId =
+                s"${target.toolchain}-${target.name}-${task.name}-${Instant.now()}-${Random.nextInt(65535)}"
 
               def afterExecution(task: TaskConfig, executor: SExecutor): Unit = {
                 // remove message listeners
-                ScaledaMessageTab.instance.detachFromLogger(sourceId)
-                ScaledaMessageParser.removeParser(sourceId)
+                ScaledaMessageTab.instance.detachFromLogger(runtimeId)
+                ScaledaMessageParser.removeParser(runtimeId)
                 task.taskType match {
                   // Only call rvcd when simulate
                   case TaskType.Simulation =>
@@ -157,7 +160,7 @@ class ScaledaRunConfiguration(
 
               val handler =
                 new ScaledaRunProcessHandler(
-                  new ConsoleLogger(console, logSourceId = Some(sourceId)),
+                  new ConsoleLogger(console, logSourceId = Some(runtimeId)),
                   task,
                   afterExecution
                 )
@@ -178,11 +181,21 @@ class ScaledaRunConfiguration(
                     task
                   )
 
+                  val runtime = ScaledaRuntimeInfo(
+                    runtimeId,
+                    target = target,
+                    task = task,
+                    // TODO: use profile in configuration
+                    profile = Toolchain.profiles().find(_.toolchainType == target.toolchain).get
+                  )
+
                   // attach message parser listener
-                  ScaledaMessageTab.instance.attachToLogger(sourceId)
+                  ScaledaMessageTab.instance.attach(runtime)
                   Toolchain.toolchainMessageParser
                     .get(target.toolchain)
-                    .foreach(parserProvider => ScaledaMessageParser.registerParser(sourceId, parserProvider.parser))
+                    .foreach(parserProvider =>
+                      ScaledaMessageParser.registerParser(runtimeId, parserProvider.messageParser)
+                    )
 
                   // run process in the background
                   thread.start()

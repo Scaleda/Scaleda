@@ -4,14 +4,16 @@ package idea.windows.tool.message
 import idea.windows.tool.logging.ScaledaLogReceiver
 import kernel.utils.LogLevel
 
+import org.jetbrains.annotations.Nls
+
 import scala.collection.mutable
 
 trait ScaledaMessageToolchainParser {
-  def parse(source: String, text: String, level: LogLevel.Value): Option[ScaledaMessage]
+  def parse(source: String, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage]
 }
 
 trait ScaledaMessageToolchainParserProvider {
-  def parser: ScaledaMessageToolchainParser
+  def messageParser: ScaledaMessageToolchainParser
 }
 
 object ScaledaMessageParser {

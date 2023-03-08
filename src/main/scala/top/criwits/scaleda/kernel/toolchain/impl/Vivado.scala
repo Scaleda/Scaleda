@@ -1,13 +1,17 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageToolchainParser, ScaledaMessageToolchainParserProvider}
+import idea.windows.tool.message.{
+  ScaledaMessage,
+  ScaledaMessageRenderer,
+  ScaledaMessageToolchainParser,
+  ScaledaMessageToolchainParserProvider
+}
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
-import kernel.toolchain.impl.Vivado.{getVivadoExec, internalID, userFriendlyName}
 import kernel.toolchain.{Toolchain, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
@@ -22,6 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * @param executor An [[Executor]] used to hold information like configurations.
   */
 class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfileDetector {
+  import Vivado._
   override def getInternalID: String = internalID
 
   override def getName: String = userFriendlyName
@@ -128,7 +133,7 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
       ipList: Seq[String] = Seq(),
       xdcList: Seq[String] = Seq(),
       timingReport: Boolean = false,
-      vcdFile: String,
+      vcdFile: String
   )
 
   class TemplateRenderer(
@@ -236,5 +241,9 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
   }
   ToolchainProfileDetector.registerDetector(this)
 
-  override def parser: ScaledaMessageToolchainParser = MessageParser
+  override def messageParser: ScaledaMessageToolchainParser = MessageParser
+
+  private object MessageRenderer extends ScaledaMessageRenderer {}
+
+  ScaledaMessageRenderer.addRenderer(internalID, MessageRenderer)
 }

@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tool.message
 
 import idea.ScaledaBundle
+import idea.runner.ScaledaRuntimeInfo
 import idea.utils.MainLogger
 import idea.windows.tool.logging.ScaledaLoggingService
 
@@ -15,20 +16,26 @@ import com.intellij.ui.components.{JBList, JBScrollPane}
 import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.event.ListSelectionEvent
 import javax.swing.{BoxLayout, DefaultListModel, JPanel}
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, true) with Disposable {
-  private val msgSourceId = ScaledaMessageTab.MESSAGE_ID
-  private var sortByLevel = false
-  private val dataModel   = new DefaultListModel[ScaledaMessage]()
+  private val msgSourceId   = ScaledaMessageTab.MESSAGE_ID
+  private var sortByLevel   = false
+  private val dataModel     = new DefaultListModel[ScaledaMessage]()
   private val listComponent = new JBList[ScaledaMessage](dataModel)
 
-  private val messageQueue = new LinkedBlockingQueue[ScaledaMessage]()
+  private val data = new mutable.HashMap[String, ArrayBuffer[ScaledaMessage]]()
+  // Now viewing runtime, id inside
+  private var view: Option[String] = None
+
+  private val messageQueue = new LinkedBlockingQueue[(ScaledaRuntimeInfo, ScaledaMessage)]()
 
   private val messageHandleThread = new Thread(() => {
     var running = true
     while (running) {
       try {
-        val message = messageQueue.take()
+        val (rt, message) = messageQueue.take()
         dataModel.synchronized {
           dataModel.addElement(message)
         }
@@ -40,14 +47,15 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   })
   messageHandleThread.start()
 
-  private val messageParser = new ScaledaMessageParser(message => {
-    messageQueue.put(message)
-    MainLogger.info("message insert:", message)
-  })
-
-  def attachToLogger(sourceId: String): Unit = {
+  def attach(runtime: ScaledaRuntimeInfo): Unit = {
     val service = project.getService(classOf[ScaledaLoggingService])
-    service.addListener(sourceId, messageParser)
+    service.addListener(
+      runtime.id,
+      new ScaledaMessageParser(message => {
+        messageQueue.put((runtime, message))
+        MainLogger.info(s"[ RUNTIME: ${runtime.id} ] message insert:", message)
+      })
+    )
   }
 
   def detachFromLogger(sourceId: String): Unit = {

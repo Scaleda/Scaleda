@@ -12,5 +12,6 @@ case class ScaledaMessage(
     level: LogLevel.Value = LogLevel.Debug,
     @Nls text: String = "",
     file: Option[VerilogPSIFileRoot] = None,
-    line: Option[Int] = None
+    line: Option[Int] = None,
+    toolchain: String = ""
 )
