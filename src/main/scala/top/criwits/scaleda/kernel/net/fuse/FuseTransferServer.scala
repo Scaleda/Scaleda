@@ -6,6 +6,7 @@ import kernel.net.fuse.FuseTransferClient.requestMessageInto
 import kernel.net.fuse.FuseTransferServer._
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc.RemoteFuseTransfer
 import kernel.net.fuse.fs._
+import kernel.net.user.JwtAuthorizationInterceptor
 import kernel.utils.KernelLogger
 import kernel.utils.serialise.BinarySerializeHelper
 
@@ -38,9 +39,10 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     KernelLogger.info("server onNext: ", msg.toProtoString)
     msg.function match {
       case "login" =>
-      // KernelLogger.info("server: login info with token ", msg.token)
-      // observers.put(msg.token, this)
-      // identifier = Some(msg.token)
+        val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
+        KernelLogger.info("visit from user: ", user)
+        identifier = Some(user.getUsername)
+        observers.put(user.getUsername, this)
       case "error" =>
         val e: Throwable = BinarySerializeHelper.fromGrpcBytes(msg.message)
         KernelLogger.warn("server recv error from client:", e)
@@ -157,7 +159,7 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
 
 class FuseTransferServer extends RemoteFuseTransfer {
   override def visit(responseObserver: StreamObserver[FuseTransferMessage]): StreamObserver[FuseTransferMessage] = {
-    KernelLogger.info("server: login established")
+    KernelLogger.info("server: visit established")
     new FuseTransferServerObserver(responseObserver)
   }
 }
@@ -211,7 +213,7 @@ object FuseTransferServer {
 object FuseTransferClient {
   private final val DEFAULT_PORT = 4555
   def apply(host: String = "127.0.0.1", port: Int = DEFAULT_PORT) =
-    RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port)
+    RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port, enableAuthProvide = true)
   def asStream(dataProvider: FuseDataProvider, host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
     val (client, shutdown) = FuseTransferClient(host, port)
     val clientStream       = new FuseTransferClientObserver(dataProvider)
