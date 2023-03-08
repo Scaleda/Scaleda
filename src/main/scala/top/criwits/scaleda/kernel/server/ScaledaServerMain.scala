@@ -37,7 +37,12 @@ object ScaledaServerMainTest extends App {
   db.forceCleanDatabase()
 
   val (client, shutdown) =
-    RpcPatch.getClient(RemoteRegisterLoginGrpc.blockingStub, "127.0.0.1", RemoteServer.DEFAULT_PORT)
+    RpcPatch.getClient(
+      RemoteRegisterLoginGrpc.blockingStub,
+      "127.0.0.1",
+      RemoteServer.DEFAULT_PORT,
+      enableAuthProvide = true
+    )
   val registerReply = client.register(RemoteRegisterRequest.of("test", "test", ""))
   val loginReply    = client.login(RemoteLoginRequest.of("test", "test"))
   val refreshToken  = loginReply.refreshToken

@@ -92,7 +92,8 @@ object RemoteServer {
         RemoteGrpc.bindService(new RemoteImpl, executionContext),
         RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext)
       ),
-      port
+      port,
+      enableAuthProvide = true
     )
     server.awaitTermination()
   }
