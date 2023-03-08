@@ -144,30 +144,16 @@ class ScaledaDatabase {
       username: String,
       provider: Map[String, String] => Option[String] = claims => JwtManager.createToken(claims = claims)
   ): Token = {
-    // val token     = provider(Map("username" -> username)).get
-    // val exp       = JwtManager.decode(token).get.getExpiresAt
-    val token     = "test-token"
-    val exp       = new Date(new util.Date().getTime + Duration.ofSeconds(2).toMillis)
+    val token     = provider(Map("username" -> username)).get
+    val exp       = JwtManager.decode(token).get.getExpiresAt
     val preparing = getConnection.prepareStatement("INSERT INTO t_token (token, username, exp) VALUES (?, ?, ?)")
     preparing.setString(1, token)
     preparing.setString(2, username)
-    // convert writing timezone to utc
-    // preparing.setDate(
-    //   3,
-    //   new Date(
-    //     ZonedDateTime
-    //       .ofInstant(
-    //         new util.Date(exp.getTime).toInstant,
-    //         ZoneId.of("UTC")
-    //         // ZoneId.systemDefault()
-    //       )
-    //       .toInstant
-    //       .toEpochMilli
-    //   )
-    // )
-    preparing.setTimestamp(3, Timestamp.from(new util.Date(exp.getTime).toInstant))
+    preparing.setTimestamp(3, Timestamp.from(exp.toInstant))
     preparing.executeUpdate()
     preparing.close()
+    // manually do clean...
+    manuallyCleanToken()
     new Token(token, username, exp)
   }
 
@@ -182,15 +168,6 @@ class ScaledaDatabase {
       val t = new Token()
       t.setToken(resultSet.getString("token"))
       t.setUsername(resultSet.getString("username"))
-      // convert time from utc to timezone
-      // t.setExp(
-      //   new util.Date(
-      //     ZonedDateTime
-      //       .ofInstant(new util.Date(resultSet.getDate("exp").getTime).toInstant, ZoneId.systemDefault())
-      //       .toInstant
-      //       .toEpochMilli
-      //   )
-      // )
       t.setExp(resultSet.getTimestamp("exp"))
       result.addOne(t)
     }
@@ -203,30 +180,10 @@ class ScaledaDatabase {
     findToken(token).flatMap(t => findUser(t.getUsername))
 
   def manuallyCleanToken(): Unit = {
-    // val st = getConnection.createStatement()
-    // st.executeUpdate("DELETE FROM t_token WHERE exp < CURRENT_TIMESTAMP")
-    // st.close()
-    {
-      val preparing = getConnection.prepareStatement("SELECT token, username, exp FROM t_token WHERE exp < ?")
-      preparing.setTimestamp(1, Timestamp.from(Instant.now()))
-      val resultSet = preparing.executeQuery()
-      val result    = ArrayBuffer[Token]()
-      while (resultSet.next()) {
-        result.addOne(
-          new Token(resultSet.getString("token"), resultSet.getString("username"), resultSet.getTimestamp("exp"))
-        )
-      }
-      preparing.close()
-      for (token <- result) {
-        KernelLogger.warn("will delete:", token, "now", Timestamp.from(Instant.now()))
-      }
-    }
-    {
-      val preparing = getConnection.prepareStatement("DELETE FROM t_token WHERE exp < ?")
-      preparing.setTimestamp(1, Timestamp.from(Instant.now()))
-      preparing.executeUpdate()
-      preparing.close()
-    }
+    val preparing = getConnection.prepareStatement("DELETE FROM t_token WHERE exp < ?")
+    preparing.setTimestamp(1, Timestamp.from(Instant.now()))
+    preparing.executeUpdate()
+    preparing.close()
   }
 
 }
