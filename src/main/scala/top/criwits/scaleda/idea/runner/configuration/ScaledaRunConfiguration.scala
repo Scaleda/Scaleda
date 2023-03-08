@@ -28,7 +28,6 @@ import java.io.File
 import java.time.Instant
 import scala.collection.mutable
 import scala.language.existentials
-import scala.util.Random
 
 /** A configuration representing a specific Scaleda task as well as corresponding toolchain
   * @param project
@@ -141,7 +140,7 @@ class ScaledaRunConfiguration(
               val console = myConsoleBuilder.getConsole
 
               val runtimeId =
-                s"${target.toolchain}-${target.name}-${task.name}-${Instant.now()}-${Random.nextInt(65535)}"
+                s"${target.toolchain}-${target.name}-${task.name}-${Instant.now()}"
 
               def afterExecution(task: TaskConfig, executor: SExecutor): Unit = {
                 // remove message listeners
