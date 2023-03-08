@@ -9,13 +9,20 @@ import com.auth0.jwt.exceptions.JWTVerificationException
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER
 import io.grpc._
 
-class JwtAuthorizationInterceptor extends ServerInterceptor {
+import scala.collection.immutable.HashSet
+
+class JwtAuthorizationInterceptor(passServices: HashSet[String] = HashSet[String]("RemoteRegisterLogin"))
+    extends ServerInterceptor {
   override def interceptCall[ReqT, RespT](
       serverCall: ServerCall[ReqT, RespT],
       metadata: Metadata,
       next: ServerCallHandler[ReqT, RespT]
   ): ServerCall.Listener[ReqT] = {
-    KernelLogger.info("metadata keys", metadata.keys())
+    KernelLogger.debug("metadata keys", metadata.keys())
+    val m           = serverCall.getMethodDescriptor
+    val serviceName = m.getServiceName.split('.').last
+    KernelLogger.debug("serviceName", serviceName)
+    if (passServices.contains(serviceName)) return Contexts.interceptCall(Context.current(), serverCall, metadata, next)
     val value = metadata.get(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY)
 
     var status = Status.OK

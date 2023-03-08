@@ -1,10 +1,9 @@
 package top.criwits.scaleda
 package kernel.net.user
 
-import kernel.database.ScaledaDatabase
+import kernel.utils.KernelLogger
 
-import io.grpc.{CallCredentials, Metadata, Status}
-import top.criwits.scaleda.kernel.utils.KernelLogger
+import io.grpc.{CallCredentials, Metadata}
 
 import java.util.concurrent.Executor
 
@@ -15,9 +14,9 @@ class AuthorizationProvideCredentials extends CallCredentials {
       applier: CallCredentials.MetadataApplier
   ): Unit = {
     KernelLogger.info("applyRequestMetadata")
-    // requestInfo.getAuthority
-    val header = new Metadata()
-    header.put(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY, "test")
+    val header    = new Metadata()
+    val tokenPair = ScaledaAuthorizationProvider.loadTokenPair
+    header.put(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY, tokenPair.token)
     applier.apply(header)
   }
 
