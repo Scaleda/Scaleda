@@ -24,7 +24,8 @@ object RemoteServer {
   final val DEFAULT_PORT = 20051
 
   final val AVAILABLE_REMOTE_HOSTS = Seq(
-    "127.0.0.1", "pc.chiro.work"
+    "127.0.0.1",
+    "pc.chiro.work"
   )
 
   private class RemoteImpl extends RemoteGrpc.Remote {
@@ -70,17 +71,7 @@ object RemoteServer {
     }
 
     override def getProfiles(request: Empty): Future[ProfilesReply] = async {
-      ProfilesReply(
-        Toolchain
-          .profiles()
-          .toSeq
-          .map(p =>
-            RemoteProfile(
-              name = p.profileName,
-              toolchainType = p.toolchainType
-            )
-          )
-      )
+      ProfilesReply(Toolchain.profiles().toSeq.map(_.asRemoteProfile))
     }
 
     override def getRemoteInfo(request: Empty): Future[RemoteInfo] = async {

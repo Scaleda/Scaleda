@@ -68,8 +68,12 @@ message RunReply {
 }
 
 message RemoteProfile {
-  string name = 1;
-  string toolchain_type = 2;
+  string profileName = 1;
+  string toolchainType = 2;
+  string path = 3;
+  string iverilogPath = 4;
+  string vvpPath = 5;
+  string iverilogVPIPath = 6;
 }
 message ProfilesReply {
   repeated RemoteProfile profiles = 1;

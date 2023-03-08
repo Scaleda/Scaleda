@@ -230,7 +230,7 @@ object ScaledaShellMain {
                           .flatMap(name => {
                             // if remote host specified, use remote name
                             stub
-                              .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.name))
+                              .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.profileName))
                               .getOrElse(
                                 Toolchain.profiles().map(_.profileName).toSeq
                               )

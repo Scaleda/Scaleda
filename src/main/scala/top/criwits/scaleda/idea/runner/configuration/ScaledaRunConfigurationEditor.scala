@@ -61,7 +61,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
           }
           profileName.synchronized {
             profileName.removeAllItems()
-            profiles.foreach(p => profileName.addItem(ProfilePair(host, p.name)))
+            profiles.foreach(p => profileName.addItem(ProfilePair(host, p.profileName)))
           }
           shutdown()
         } catch {

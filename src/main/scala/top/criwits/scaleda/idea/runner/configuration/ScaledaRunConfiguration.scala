@@ -6,11 +6,11 @@ import idea.rvcd.RvcdService
 import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.net.RemoteClient
-import kernel.net.remote.{Empty, RemoteProfile}
+import kernel.net.remote.Empty
 import kernel.project.config.{ProjectConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRun
-import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.{SimulationExecutor, Executor => SExecutor}
+import kernel.toolchain.{Toolchain, ToolchainProfile}
 
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
@@ -111,23 +111,26 @@ class ScaledaRunConfiguration(
       .flatMap(c => {
         c.taskByName(taskName, targetName)
           .map(f => {
-            val (target, task)                             = f
-            var remoteProfiles: Option[Seq[RemoteProfile]] = None
-            val profileHostUse                             = task.host.getOrElse(profileHost)
-            val profile =
+            val (target, task)                                = f
+            var remoteProfiles: Option[Seq[ToolchainProfile]] = None
+            val profileHostUse                                = task.host.getOrElse(profileHost)
+            MainLogger.warn(s"profileHostUse: $profileHostUse")
+            var profile =
               if (profileHostUse.isEmpty) {
                 // Run locally if no host argument provided
                 Toolchain
                   .profiles()
                   .find(p =>
-                    p.toolchainType == target.toolchain && (p.profileName == profileHostUse || profileName.isEmpty)
+                    p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty)
                   )
               } else {
                 val (client, shutdown) = RemoteClient(profileHostUse)
-                remoteProfiles = Some(client.getProfiles(Empty()).profiles)
+                remoteProfiles = Some(client.getProfiles(Empty()).profiles.map(ToolchainProfile(_)))
                 shutdown()
                 remoteProfiles.get
-                  .find(p => p.toolchainType == target.toolchain && (p.name == profileName || profileName.isEmpty))
+                  .find(p =>
+                    p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty)
+                  )
               }
             if (profile.isEmpty) {
               Notification(project).error(
@@ -191,8 +194,7 @@ class ScaledaRunConfiguration(
                     runtimeId,
                     target = target,
                     task = task,
-                    // TODO: use profile in configuration
-                    profile = Toolchain.profiles().find(_.toolchainType == target.toolchain).get
+                    profile = profile.get
                   )
 
                   // attach message parser listener
