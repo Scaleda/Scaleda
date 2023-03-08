@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package verilog
 
 import com.intellij.lang.Language
+import com.intellij.notification.NotificationGroupManager
 import org.antlr.intellij.adaptor.lexer.{PSIElementTypeFactory, RuleIElementType, TokenIElementType}
 
 object VerilogLanguage extends Language("Verilog") {

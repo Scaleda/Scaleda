@@ -11,7 +11,8 @@
     <depends>com.intellij.properties</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.java</depends> <!-- see https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ -->
+    <depends>com.intellij.java
+    </depends> <!-- see https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ -->
 
     <resource-bundle>bundles.ScaledaBundle</resource-bundle>
 
@@ -28,8 +29,8 @@
                 description="Manually install Scaleda assets"/>
         <action id="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
                 class="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
-                text="Waveform" >
-                <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
+                text="Waveform">
+            <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
         </action>
     </actions>
 
@@ -69,32 +70,36 @@
         <lang.syntaxHighlighterFactory language="Verilog"
                                        implementationClass="top.criwits.scaleda.verilog.highlight.VerilogSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="Verilog"
-                                      implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory" />
+                                      implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory"/>
         <lang.braceMatcher language="Verilog"
-                           implementationClass="top.criwits.scaleda.verilog.editor.brace.VerilogBraceMatcherProvider" />
+                           implementationClass="top.criwits.scaleda.verilog.editor.brace.VerilogBraceMatcherProvider"/>
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.verilog.completion.signal.SignalNameCompletionContributor" />
+                                implementationClass="top.criwits.scaleda.verilog.completion.signal.SignalNameCompletionContributor"/>
         <completion.contributor language="Verilog"
                                 implementationClass="top.criwits.scaleda.verilog.completion.keywords.VerilogKeywordCompletionContributor"/>
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.verilog.completion.module.ModuleItemOuterReferenceCompletionContributor" />
+                                implementationClass="top.criwits.scaleda.verilog.completion.module.ModuleItemOuterReferenceCompletionContributor"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.ModuleInstantiationAnnotator" />
+                   implementationClass="top.criwits.scaleda.verilog.annotation.ModuleInstantiationAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.ModulePortConnectionAnnotator" />
+                   implementationClass="top.criwits.scaleda.verilog.annotation.ModulePortConnectionAnnotator"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
-        
+
         <!-- editor -->
-        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler" />
-        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler" />
-        <lang.foldingBuilder language="Verilog" implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder" />
-        <lang.findUsagesProvider language="Verilog" implementationClass="top.criwits.scaleda.verilog.references.VerilogFindUsagesProvider" />
-<!--        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.formatter.VerilogFormattingBuilderModel" />-->
-        <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider" />
-<!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
+        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler"/>
+        <enterHandlerDelegate
+                implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler"/>
+        <lang.foldingBuilder language="Verilog"
+                             implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder"/>
+        <lang.findUsagesProvider language="Verilog"
+                                 implementationClass="top.criwits.scaleda.verilog.references.VerilogFindUsagesProvider"/>
+        <!--        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.formatter.VerilogFormattingBuilderModel" />-->
+        <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
+        <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
+        <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter" />
 
     </extensions>
 
@@ -107,9 +112,9 @@
                 extensions="tcl"/>
         <lang.parserDefinition language="Tcl"
                                implementationClass="top.criwits.scaleda.tcl.TclParserDefinition"/>
-<!--        <lang.ast.factory language="Tcl" implementationClass="top.criwits.scaleda.tcl.TclASTFactory"/>-->
-<!--        <lang.syntaxHighlighterFactory language="Tcl"-->
-<!--                                       implementationClass="top.criwits.scaleda.tcl.TclSyntaxHighlighterFactory"/>-->
+        <!--        <lang.ast.factory language="Tcl" implementationClass="top.criwits.scaleda.tcl.TclASTFactory"/>-->
+        <!--        <lang.syntaxHighlighterFactory language="Tcl"-->
+        <!--                                       implementationClass="top.criwits.scaleda.tcl.TclSyntaxHighlighterFactory"/>-->
         <lang.commenter language="Tcl"
                         implementationClass="top.criwits.scaleda.tcl.commenter.TclCommenter"/>
     </extensions>
@@ -121,17 +126,17 @@
                                  key="settings.toolchains"
                                  id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
                                  instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
-        <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage" />
+        <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage"/>
 
     </extensions>
 
     <!-- Module, Project and SDK -->
     <extensions defaultExtensionNs="com.intellij">
-<!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
-        <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType" />
+        <!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
+        <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType"/>
         <newProjectWizard.language implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
-<!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
+        <!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
     </extensions>
 
 
@@ -142,9 +147,11 @@
                 implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationProducer"/>
     </extensions>
 
+    <!-- Notification group -->
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="BALLOON"
-                           id="top.criwits.scaleda.idea.notification"/>
+                           id="Scaleda"
+                           bundle="bundles.ScaledaBundle" key="notification.scaleda"/>
     </extensions>
 
 </idea-plugin>

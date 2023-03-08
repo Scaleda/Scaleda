@@ -25,9 +25,7 @@ class ProfileDetectAction(project: Project) extends AnAction {
         case 1 => ScaledaBundle.message("detector.notification.found.one", detected.head.profileName)
         case _ => ScaledaBundle.message("detector.notification.found.many", detected.size)
       }
-      val notification = NotificationGroupManager
-        .getInstance()
-        .getNotificationGroup(ScaledaBundle.message("notification.id"))
+      val notification = Notification.NOTIFICATION_GROUP
         .createNotification(content, NotificationType.INFORMATION)
       notification.setTitle(ScaledaBundle.message("detector.notification.found.title"))
       // save detected profiles to disk
