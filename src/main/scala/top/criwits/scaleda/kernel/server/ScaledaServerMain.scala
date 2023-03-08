@@ -29,6 +29,10 @@ object ScaledaServerMain {
   }
 }
 
+object ScaledaServerMainRunTest extends App {
+  ScaledaServerMain.run(ShellArgs())
+}
+
 object ScaledaServerMainTest extends App {
   val thread = new Thread(() => ScaledaServerMain.run(ShellArgs()))
   thread.start()

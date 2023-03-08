@@ -18,10 +18,9 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.sys.process._
 
-/**
- * Map path to another path through Fuse
- * @param sourcePath source data path
- */
+/** Map path to another path through Fuse
+  * @param sourcePath source data path
+  */
 class LocalFuse(sourcePath: String) extends FuseStubFS {
   private val logger = LoggerFactory.getLogger(getClass)
   require(!OS.isWindows)
@@ -35,7 +34,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     if (Files.isSymbolicLink(file.toPath)) {
       mode = (mode & 0xfff) | (0xa << 12)
     }
-    val p = file.toPath
+    val p     = file.toPath
     val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
     // stat.st_nlink.set(1)
     val size = attrs.size()
@@ -55,7 +54,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     val file = getFile(path)
     if (!Files.isSymbolicLink(file.toPath)) return -ErrorCodes.ENOENT
     // val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
-    val run = s"readlink ${file.getAbsolutePath}"
+    val run   = s"readlink ${file.getAbsolutePath}"
     val array = mutable.ArrayBuffer[String]()
     val r = run ! ProcessLogger(
       stdout => array.addOne(stdout),
@@ -269,7 +268,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     var offsetNow = offset
     def applyFilter(filename: String): Int = {
       val nameBuffer = ByteBuffer.allocate(filename.length + 1)
-      nameBuffer.put(0, filename.getBytes, 0, filename.length)
+      nameBuffer.put(filename.getBytes)
       offsetNow += 1
       filter.apply(buf, nameBuffer, null, offsetNow)
       0
@@ -354,7 +353,7 @@ object LocalFuse {
   // !! YOUR JVM WILL CRASH AND CANNOT RESTART !!
   def main(args: Array[String]): Unit = {
     val source = "/tmp/mnt-source"
-    val dest = "/tmp/mnt"
+    val dest   = "/tmp/mnt"
     s"mkdir -p $source".!
     val content = "file content"
     printTextToFile(content, new File(source, "file.txt"))
