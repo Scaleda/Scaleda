@@ -23,6 +23,7 @@ import scala.language.postfixOps
 
 case class FuseTransferMessageCase(
     id: Long,
+    // TODO: task + target + username => identifier; now is username
     identifier: String,
     function: String,
     data: Any,
@@ -37,20 +38,22 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
   private var identifier: Option[String] = None
   override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.info("server onNext: ", msg.toProtoString)
+    val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
     msg.function match {
       case "login" =>
-        val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
         KernelLogger.info("visit from user: ", user)
         identifier = Some(user.getUsername)
-        observers.put(user.getUsername, this)
+        observers.synchronized {
+          observers.put(user.getUsername, this)
+        }
+      // TODO: create mount
       case "error" =>
         val e: Throwable = BinarySerializeHelper.fromGrpcBytes(msg.message)
         KernelLogger.warn("server recv error from client:", e)
         val converted =
           FuseTransferMessageCase(
             msg.id,
-            // TODO
-            "username",
+            user.getUsername,
             msg.function,
             (),
             error = Some(BinarySerializeHelper.fromGrpcBytes(msg.message))
@@ -95,7 +98,9 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
 
   override def onCompleted() = {
     KernelLogger.info("server onComplete")
-    identifier.foreach(observers.remove)
+    observers.synchronized {
+      identifier.foreach(observers.remove)
+    }
   }
 }
 
@@ -194,9 +199,11 @@ object FuseTransferServer {
     while (!done) {
       try {
         val msg = sendQueue.take()
-        observers.get(msg.identifier) match {
-          case Some(observer) => observer.tx.onNext(msg.toMessage)
-          case None           => KernelLogger.error("Cannot send message ", msg, ", no observer!")
+        observers.synchronized {
+          observers.get(msg.identifier) match {
+            case Some(observer) => observer.tx.onNext(msg.toMessage)
+            case None           => KernelLogger.error("Cannot send message ", msg, ", no observer!")
+          }
         }
       } catch {
         case _: InterruptedException =>
