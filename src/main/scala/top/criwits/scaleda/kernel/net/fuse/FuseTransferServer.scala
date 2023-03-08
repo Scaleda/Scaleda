@@ -7,12 +7,13 @@ import kernel.net.fuse.FuseTransferServer._
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc.RemoteFuseTransfer
 import kernel.net.fuse.fs._
 import kernel.net.user.JwtAuthorizationInterceptor
-import kernel.utils.KernelLogger
 import kernel.utils.serialise.BinarySerializeHelper
+import kernel.utils.{KernelLogger, Paths}
 
 import com.google.protobuf.ByteString
 import io.grpc.stub.StreamObserver
 
+import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
 import scala.async.Async.async
 import scala.collection.mutable
@@ -42,9 +43,16 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     msg.function match {
       case "login" =>
         KernelLogger.info("visit from user: ", user)
-        identifier = Some(user.getUsername)
+        val key = user.getUsername
+        identifier = Some(key)
         observers.synchronized {
-          observers.put(user.getUsername, this)
+          observers.put(key, this)
+        }
+        fsProxies.synchronized {
+          val fs   = new ServerSideFuse(new FuseDataProxy(key))
+          val dest = new File(Paths.getServerTemporalDir, key).getAbsolutePath
+          FuseUtils.mountFs(fs, dest, blocking = false)
+          fsProxies.put(key, fs)
         }
       // TODO: create mount
       case "error" =>
@@ -101,6 +109,12 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     observers.synchronized {
       identifier.foreach(observers.remove)
     }
+    fsProxies.synchronized {
+      identifier.foreach(i => {
+        fsProxies.get(i).foreach(p => p.umount())
+        fsProxies.remove(i)
+      })
+    }
   }
 }
 
@@ -136,9 +150,8 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
       case "create"   => dataProvider.create(requestMessageInto(req))
       case _ =>
         KernelLogger.error("Unknown function name:", msg.function)
-        // throw new RuntimeException("Unknown function name")
         async {
-          throw new RuntimeException("Unknown function name")
+          throw new RuntimeException(s"Unknown function name: ${msg.function}")
         }
     }
     try {
@@ -173,12 +186,13 @@ object FuseTransferServer {
   val recvData          = new mutable.HashMap[Long, FuseTransferMessageCase]()
   val recvWait          = new mutable.HashMap[Long, Object]()
   val observers         = new mutable.HashMap[String, FuseTransferServerObserver]()
+  val fsProxies         = new mutable.HashMap[String, ServerSideFuse]()
   private val sendQueue = new LinkedBlockingQueue[FuseTransferMessageCase]
   def request(msg: FuseTransferMessageCase): FuseTransferMessageCase = {
     sendQueue.put(msg)
     val awaitable = new Object
     recvWait.synchronized {
-      recvWait.put(msg.id, awaitable).foreach(o => KernelLogger.error("Same id is waiting! ", msg.id))
+      recvWait.put(msg.id, awaitable).foreach(o => KernelLogger.error("Same id is waiting! ", msg.id, o))
     }
     awaitable.synchronized {
       awaitable.wait()
