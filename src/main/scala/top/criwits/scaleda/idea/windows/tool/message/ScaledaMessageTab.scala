@@ -10,14 +10,17 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent, DefaultActionGroup}
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.ui.{ComboBox, SimpleToolWindowPanel}
 import com.intellij.ui.components.{JBList, JBScrollPane}
 
+import java.awt.BorderLayout
+import java.awt.event.ItemEvent
 import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.event.ListSelectionEvent
 import javax.swing.{BoxLayout, DefaultListModel, JPanel}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.jdk.javaapi.CollectionConverters
 
 class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, true) with Disposable {
   private val msgSourceId   = ScaledaMessageTab.MESSAGE_ID
@@ -25,9 +28,31 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val dataModel     = new DefaultListModel[ScaledaMessage]()
   private val listComponent = new JBList[ScaledaMessage](dataModel)
 
-  private val data = new mutable.HashMap[String, ArrayBuffer[ScaledaMessage]]()
-  // Now viewing runtime, id inside
-  private var view: Option[String] = None
+  private val data         = new mutable.HashMap[String, (ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])]()
+  private val viewComboBox = new ComboBox[String]()
+
+  private def selectToViewById(selectedId: String) = {
+    data
+      .get(selectedId)
+      .foreach(d => {
+        val (rt, messages) = d
+        // find renderer, if no, fallback to default
+        val renderer =
+          ScaledaMessageRenderer.getRendererMap.getOrElse(rt.profile.toolchainType, ScaledaMessageRendererImpl)
+        listComponent.setCellRenderer(renderer)
+        dataModel.synchronized {
+          dataModel.clear()
+          dataModel.addAll(CollectionConverters.asJava(messages))
+        }
+      })
+  }
+
+  viewComboBox.addItemListener(e => {
+    if (e.getStateChange == ItemEvent.SELECTED) {
+      val selectedId = e.getItem.asInstanceOf[String]
+      selectToViewById(selectedId)
+    }
+  })
 
   private val messageQueue = new LinkedBlockingQueue[(ScaledaRuntimeInfo, ScaledaMessage)]()
 
@@ -36,8 +61,13 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     while (running) {
       try {
         val (rt, message) = messageQueue.take()
-        dataModel.synchronized {
-          dataModel.addElement(message)
+        if (viewComboBox.getItem == rt.id)
+          dataModel.synchronized {
+            dataModel.addElement(message)
+          }
+        data.synchronized {
+          if (data.contains(rt.id)) data(rt.id)._2.addOne(message)
+          else data.put(rt.id, (rt, ArrayBuffer(message)))
         }
         Thread.sleep(50)
       } catch {
@@ -56,6 +86,11 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
         MainLogger.info(s"[ RUNTIME: ${runtime.id} ] message insert:", message)
       })
     )
+    dataModel.synchronized {
+      dataModel.clear()
+    }
+    viewComboBox.addItem(runtime.id)
+    viewComboBox.setSelectedItem(runtime.id)
   }
 
   def detachFromLogger(sourceId: String): Unit = {
@@ -66,17 +101,36 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val scrollbar = new JBScrollPane()
   // listComponent.setAutoscrolls(true)
   listComponent.setAutoscrolls(false)
-  private val renderer = new ScaledaMessageRenderer
-  listComponent.setCellRenderer(renderer)
+  listComponent.setCellRenderer(ScaledaMessageRendererImpl)
 
-  private val clearMessageAction = new AnAction(
-    ScaledaBundle.message("windows.message.action.clear"),
-    ScaledaBundle.message("windows.message.action.clear"),
+  private val removeMessageAction = new AnAction(
+    // TODO: i18n
+    "Remove",
+    "Remove",
     AllIcons.Diff.Remove
   ) {
     override def actionPerformed(e: AnActionEvent) = {
       dataModel.synchronized {
         dataModel.clear()
+      }
+      data.synchronized {
+        data.clear()
+      }
+      viewComboBox.removeAllItems()
+    }
+  }
+
+  private val clearMessageAction = new AnAction(
+    ScaledaBundle.message("windows.message.action.clear"),
+    ScaledaBundle.message("windows.message.action.clear"),
+    AllIcons.Actions.DeleteTag
+  ) {
+    override def actionPerformed(e: AnActionEvent) = {
+      dataModel.synchronized {
+        dataModel.clear()
+      }
+      data.synchronized {
+        data.remove(viewComboBox.getItem)
       }
     }
   }
@@ -100,6 +154,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 
   val group = new DefaultActionGroup()
   group.add(clearMessageAction)
+  group.add(removeMessageAction)
   group.add(toggleSortAction)
 
   val toolbar = ActionManager
@@ -107,11 +162,15 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     .createActionToolbar("Scaleda Message Toolbar", group, false)
   setToolbar(toolbar.getComponent)
   toolbar.setTargetComponent(this)
-  val panel = new JPanel()
+  private val panel = new JPanel()
   panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS))
   scrollbar.setViewportView(listComponent)
   panel.add(scrollbar)
-  setContent(panel)
+  private val outerPanel = new JPanel()
+  outerPanel.setLayout(new BorderLayout(0, 0))
+  outerPanel.add(viewComboBox, BorderLayout.NORTH)
+  outerPanel.add(panel, BorderLayout.CENTER)
+  setContent(outerPanel)
 
   ScaledaMessageTab.INSTANCE = this
 
