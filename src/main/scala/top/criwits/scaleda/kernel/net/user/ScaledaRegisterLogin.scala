@@ -18,6 +18,11 @@ class ScaledaRegisterLogin(host: String, port: Int = RemoteServer.DEFAULT_PORT) 
     val (client, shutdown) = getClient
     val reply              = client.login(RemoteLoginRequest.of(username, password))
     shutdown()
+    if (reply.ok) {
+      ScaledaAuthorizationProvider.saveTokenPair(
+        TokenPair(token = reply.token, refreshToken = reply.refreshToken)
+      )
+    }
     reply
   }
   def refreshAndStore(): Boolean = {
@@ -26,8 +31,7 @@ class ScaledaRegisterLogin(host: String, port: Int = RemoteServer.DEFAULT_PORT) 
     val reply              = client.refresh(RemoteRefreshRequest.of(tokenPair.refreshToken))
     shutdown()
     if (reply.ok) {
-      val newPair = tokenPair.copy(token = reply.token)
-      ScaledaAuthorizationProvider.saveTokenPair(newPair)
+      ScaledaAuthorizationProvider.updateToken(reply.token)
     }
     reply.ok
   }

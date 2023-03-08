@@ -19,7 +19,7 @@ import scala.language.existentials
 /** Main gRPC server, will receiver commands from client and execute them
   */
 object RemoteServer {
-  final val DEFAULT_PORT = 50051
+  final val DEFAULT_PORT = 20051
 
   private class RemoteImpl extends RemoteGrpc.Remote {
     override def run(

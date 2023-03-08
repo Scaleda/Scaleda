@@ -18,6 +18,18 @@ object ScaledaAuthorizationProvider {
     val file = Paths.getUserAuthorization
     YAMLHelper(tokenPair, file)
   }
+
+  def updateToken(token: String): Unit = {
+    val tokenPair    = loadTokenPair
+    val newTokenPair = tokenPair.copy(token = token)
+    saveTokenPair(newTokenPair)
+  }
+
+  def updateRefreshToken(refreshToken: String): Unit = {
+    val tokenPair    = loadTokenPair
+    val newTokenPair = tokenPair.copy(refreshToken = refreshToken)
+    saveTokenPair(newTokenPair)
+  }
 }
 
 case class TokenPair(token: String = "", refreshToken: String = "")

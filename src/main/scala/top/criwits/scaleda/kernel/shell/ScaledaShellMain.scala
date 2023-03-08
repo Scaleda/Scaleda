@@ -30,7 +30,7 @@ case class ShellArgs(
     serverHost: String = "",
     serverPort: Int = RemoteServer.DEFAULT_PORT,
     profileName: Option[String] = None,
-    user: User = new User()
+    user: User = new User("", "", "")
 )
 
 object ScaledaShellMain {
@@ -272,11 +272,17 @@ object ScaledaShellMain {
           case ShellRunMode.Serve =>
             ScaledaServerMain.run(shellConfig)
           case ShellRunMode.Login =>
-            new ScaledaRegisterLogin(shellConfig.serverHost)
+            val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
               .login(shellConfig.user.getUsername, shellConfig.user.getPassword)
+            if (!reply.ok) {
+              KernelLogger.error("Login failed:", reply.reason)
+            }
           case ShellRunMode.Register =>
-            new ScaledaRegisterLogin(shellConfig.serverHost)
+            val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
               .register(shellConfig.user)
+            if (!reply.ok) {
+              KernelLogger.error("Register failed:", reply.reason)
+            }
           case _ =>
             KernelLogger.error("not implemented.")
         }
