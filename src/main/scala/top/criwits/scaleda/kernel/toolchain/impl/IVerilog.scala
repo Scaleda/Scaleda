@@ -1,19 +1,11 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import idea.windows.tool.message.{
-  ScaledaMessage,
-  ScaledaMessageRenderer,
-  ScaledaMessageToolchainParser,
-  ScaledaMessageToolchainParserProvider
-}
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
-import kernel.utils.{KernelFileUtils, LogLevel}
-
-import org.jetbrains.annotations.Nls
+import kernel.utils.KernelFileUtils
 
 import java.io.File
 
@@ -81,7 +73,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
   }
 }
 
-object IVerilog extends ScaledaMessageToolchainParserProvider {
+object IVerilog {
   val userFriendlyName: String = "Icarus Verilog"
   val internalID: String       = "iverilog"
 
@@ -130,22 +122,4 @@ object IVerilog extends ScaledaMessageToolchainParserProvider {
 
     }
   }
-
-  private object MessageParser extends ScaledaMessageToolchainParser {
-    override def parse(source: String, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
-      // TODO: implement iverilog parser here
-      if (text.nonEmpty) {
-        return Some(ScaledaMessage(text = text, level = LogLevel.Info))
-      }
-      None
-    }
-  }
-
-  // FIXME: Renderer is idea-related, but inorder to aggregate similar function code, IDEA-related things still include
-
-  private object MessageRenderer extends ScaledaMessageRenderer {}
-
-  ScaledaMessageRenderer.addRenderer(internalID, MessageRenderer)
-
-  override def messageParser: ScaledaMessageToolchainParser = MessageParser
 }

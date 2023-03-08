@@ -8,6 +8,7 @@ import kernel.toolchain.impl._
 import kernel.utils.serialise.YAMLHelper
 import kernel.utils.{KernelLogger, Paths}
 
+import top.criwits.scaleda.idea.toolchain.{IVerilogIdea, VivadoIdea}
 import top.criwits.scaleda.idea.windows.tool.message.ScaledaMessageToolchainParserProvider
 
 import java.io.{File, FilenameFilter}
@@ -57,8 +58,8 @@ object Toolchain {
   def toolchainNames = toolchains.map(_._2._1).toArray
 
   def toolchainMessageParser: Map[String, ScaledaMessageToolchainParserProvider] = Map(
-    Vivado.internalID -> Vivado,
-    IVerilog.internalID -> IVerilog,
+    Vivado.internalID -> VivadoIdea,
+    IVerilog.internalID -> IVerilogIdea,
   )
 
   /**
