@@ -1,33 +1,23 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
+import kernel.net.fuse.fs.RemoteFuseGrpc.RemoteFuseBlockingClient
 import kernel.net.fuse.fs._
 
 import com.google.protobuf.ByteString
-import io.grpc.ManagedChannelBuilder
 import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
-import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Timespec}
+import ru.serce.jnrfuse.{FuseFillDir, FuseStubFS}
 
 import java.nio.ByteBuffer
 import scala.language.existentials
 
-/**
- * Fuse running on remote server,
- * all operations will call scaleda client through gRPC
- * @param host gRPC host to scaleda
- * @param port gRPC port
- */
-class ServerSideFuse(
-    host: String = "localhost",
-    port: Int = FuseRpcServer.port
-) extends FuseStubFS {
+/** Fuse running on remote server,
+  * all operations will call scaleda client through gRPC
+  */
+class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
   val logger = LoggerFactory.getLogger(getClass)
-  val builder = ManagedChannelBuilder.forAddress(host, port)
-  builder.usePlaintext()
-  val channel = builder.build()
-  val stub: RemoteFuseGrpc.RemoteFuseBlockingClient = RemoteFuseGrpc.blockingStub(channel)
 
   override def getattr(path: String, stat: FileStat): Int = {
     val reply = stub.getattr(PathRequest(path))
@@ -115,7 +105,7 @@ class ServerSideFuse(
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    val reply = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
+    val reply     = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
     var offsetNow = offset
     def applyFilter(filename: String): Int = {
       val nameBuffer = ByteBuffer.allocate(filename.length + 1)
