@@ -11,8 +11,11 @@ import io.grpc._
 
 import scala.collection.immutable.HashSet
 
-class JwtAuthorizationInterceptor(passServices: HashSet[String] = HashSet[String]("RemoteRegisterLogin"))
-    extends ServerInterceptor {
+class JwtAuthorizationInterceptor(
+    passServices: HashSet[String] = HashSet[String]("RemoteRegisterLogin"),
+    // TODO: in release, remove this
+    passTokenSet: Map[String, String] = Map("token-test" -> "test")
+) extends ServerInterceptor {
   override def interceptCall[ReqT, RespT](
       serverCall: ServerCall[ReqT, RespT],
       metadata: Metadata,
@@ -22,14 +25,18 @@ class JwtAuthorizationInterceptor(passServices: HashSet[String] = HashSet[String
     val m           = serverCall.getMethodDescriptor
     val serviceName = m.getServiceName.split('.').last
     KernelLogger.debug("serviceName", serviceName)
-    if (passServices.contains(serviceName)) return Contexts.interceptCall(Context.current(), serverCall, metadata, next)
-    val value = metadata.get(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY)
+    val defaultResp = Contexts.interceptCall(Context.current(), serverCall, metadata, next)
+    if (passServices.contains(serviceName)) return defaultResp
+    val token = metadata.get(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY)
+    if (passTokenSet.contains(token)) {
+      val ctx = Context.current.withValue(JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY, passTokenSet(token))
+      return Contexts.interceptCall(ctx, serverCall, metadata, next)
+    }
 
     var status = Status.OK
-    if (value == null) status = Status.UNAUTHENTICATED.withDescription("Authorization token is missing")
+    if (token == null) status = Status.UNAUTHENTICATED.withDescription("Authorization token is missing")
     else {
       var claims: Option[Token] = None
-      val token                 = value
       try {
         val db    = new ScaledaDatabase
         val found = db.findToken(token)

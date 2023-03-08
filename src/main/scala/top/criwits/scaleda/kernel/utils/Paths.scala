@@ -35,6 +35,10 @@ object Paths {
 
   def getUserAuthorization: File = new File(getConfigDir, ".authorization")
 
+  def getServerTemporalDir: File = createDirIfNonExists(
+    new File(if (OS.isWindows) EnvironmentUtils.Backup.env.getOrElse("TEMP", "tmp") else "/tmp", "scaledaTmp")
+  )
+
   def pwd = new File(System.getProperty("user.dir"))
 
   def findExecutableOnPath(name: String): Option[String] = {
