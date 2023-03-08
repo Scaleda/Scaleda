@@ -47,35 +47,45 @@ class ScaledaRunConfiguration(
   private val STORAGE_ID: String = "scaleda"
 
   override def writeExternal(element: Element): Unit = {
-    super.writeExternal(element)
     val child = element.getChild(STORAGE_ID)
-    if (child != null) {
-      child.setAttribute("taskName", taskName)
-      child.setAttribute("targetName", targetName)
-    } else {
-      val c = new Element(STORAGE_ID)
-      c.setAttribute("taskName", taskName)
-      c.setAttribute("targetName", targetName)
-      element.addContent(c)
+    // ignore empty write
+    if (targetName.nonEmpty && taskName.nonEmpty) {
+      MainLogger.debug(s"writeExternal: write $targetName $taskName")
+      if (child != null) {
+        child.setAttribute("taskName", taskName)
+        child.setAttribute("targetName", targetName)
+      } else {
+        val c = new Element(STORAGE_ID)
+        c.setAttribute("taskName", taskName)
+        c.setAttribute("targetName", targetName)
+        element.addContent(c)
+      }
+      super.writeExternal(element)
     }
   }
 
   // FIXME: configuration cannot load from storage
   override def readExternal(element: Element): Unit = {
-    super.readExternal(element)
     val child = element.getChild(STORAGE_ID)
     if (child != null) {
-      ProjectConfig
-        .getConfig()
-        .foreach(c => {
-          val t = child.getAttributeValue("taskName")
-          val r = child.getAttributeValue("targetName")
-          c.taskByName(t, r)
-            .foreach(f => {
-              targetName = f._1.name
-              taskName = f._2.name
-            })
-        })
+      val t = child.getAttributeValue("taskName")
+      val r = child.getAttributeValue("targetName")
+      // FIXME: ignore sync with config yml
+      // ProjectConfig
+      //   .getConfig()
+      //   .foreach(c => {
+      //     MainLogger.warn(s"readExternal: raw $r $t")
+      //     // ignore empty read
+      //     if (t.nonEmpty && r.nonEmpty)
+      //       c.taskByName(t, r)
+      //         .foreach(f => {
+      //           targetName = f._1.name
+      //           taskName = f._2.name
+      //         })
+      //   })
+      targetName = r
+      taskName = t
+      MainLogger.info(s"readExternal: got $targetName $taskName")
     }
   }
 
