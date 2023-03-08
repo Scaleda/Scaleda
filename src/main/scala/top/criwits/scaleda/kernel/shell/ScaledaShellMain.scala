@@ -198,7 +198,8 @@ object ScaledaShellMain {
               KernelLogger.info(s"${JSONHelper(p)}")
             }
             stub.foreach(stub => {
-              val profiles = stub.getProfiles(Empty())
+              val (client, _) = stub
+              val profiles    = client.getProfiles(Empty())
               if (profiles.profiles.nonEmpty) {
                 KernelLogger.info("remote profile list:")
                 for (p <- profiles.profiles)
@@ -229,7 +230,7 @@ object ScaledaShellMain {
                           .flatMap(name => {
                             // if remote host specified, use remote name
                             stub
-                              .map(stub => stub.getProfiles(Empty()).profiles.map(_.name))
+                              .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.name))
                               .getOrElse(
                                 Toolchain.profiles().map(_.profileName).toSeq
                               )
@@ -286,6 +287,9 @@ object ScaledaShellMain {
           case _ =>
             KernelLogger.error("not implemented.")
         }
+
+        // shutdown client
+        stub.foreach(_._2())
       })
   }
 }

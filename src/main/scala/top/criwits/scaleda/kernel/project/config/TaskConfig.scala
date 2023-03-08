@@ -21,6 +21,7 @@ case class TaskConfig(
     topModule: Option[String] = None,
     preset: Boolean = true,
     tcl: Option[String] = None,
+    // force to use remote host
     host: Option[String] = None,
 ) extends ConfigNode() {
 

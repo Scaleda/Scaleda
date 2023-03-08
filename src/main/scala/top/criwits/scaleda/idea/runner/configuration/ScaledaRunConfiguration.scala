@@ -5,8 +5,8 @@ import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
 import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
+import kernel.net.RemoteClient
 import kernel.net.remote.{Empty, RemoteProfile}
-import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.{ProjectConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
@@ -23,6 +23,7 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
+import org.jetbrains.annotations.Nls
 
 import java.io.File
 import java.time.Instant
@@ -42,24 +43,40 @@ class ScaledaRunConfiguration(
 
   var targetName = ""
   var taskName   = ""
+  // set empty to auto select
+  var profileName = ""
+  // set empty to disable remote
+  var profileHost = ""
   // TODO: Add toolchain profile
   val extraEnvs = new mutable.HashMap[String, String]
 
   private val STORAGE_ID: String = "scaleda"
 
+  private def dumpValuesToElement(e: Element): Element = {
+    val c = if (e != null) e else new Element(STORAGE_ID)
+    c.setAttribute("taskName", taskName)
+    c.setAttribute("targetName", targetName)
+    c.setAttribute("profileName", profileName)
+    c.setAttribute("profileHost", profileHost)
+    c
+  }
+
+  private def loadValuesFromElement(@Nls e: Element): Unit = {
+    taskName = e.getAttributeValue("taskName")
+    targetName = e.getAttributeValue("targetName")
+    profileName = e.getAttributeValue("profileName")
+    profileHost = e.getAttributeValue("profileHost")
+  }
+
   override def writeExternal(element: Element): Unit = {
-    val child = element.getChild(STORAGE_ID)
+    val child: Element = element.getChild(STORAGE_ID)
     // ignore empty write
     if (targetName.nonEmpty && taskName.nonEmpty) {
       MainLogger.debug(s"writeExternal: write $targetName $taskName")
       if (child != null) {
-        child.setAttribute("taskName", taskName)
-        child.setAttribute("targetName", targetName)
+        dumpValuesToElement(child)
       } else {
-        val c = new Element(STORAGE_ID)
-        c.setAttribute("taskName", taskName)
-        c.setAttribute("targetName", targetName)
-        element.addContent(c)
+        element.addContent(dumpValuesToElement(null))
       }
       super.writeExternal(element)
     }
@@ -69,23 +86,7 @@ class ScaledaRunConfiguration(
   override def readExternal(element: Element): Unit = {
     val child = element.getChild(STORAGE_ID)
     if (child != null) {
-      val t = child.getAttributeValue("taskName")
-      val r = child.getAttributeValue("targetName")
-      // FIXME: ignore sync with config yml
-      // ProjectConfig
-      //   .getConfig()
-      //   .foreach(c => {
-      //     MainLogger.warn(s"readExternal: raw $r $t")
-      //     // ignore empty read
-      //     if (t.nonEmpty && r.nonEmpty)
-      //       c.taskByName(t, r)
-      //         .foreach(f => {
-      //           targetName = f._1.name
-      //           taskName = f._2.name
-      //         })
-      //   })
-      targetName = r
-      taskName = t
+      loadValuesFromElement(child)
       MainLogger.info(s"readExternal: got $targetName $taskName")
     }
   }
@@ -102,7 +103,7 @@ class ScaledaRunConfiguration(
       executor: Executor,
       environment: ExecutionEnvironment
   ): RunProfileState = {
-    MainLogger.info(s"getState: taskName=$taskName, targetName=$targetName")
+    MainLogger.info(s"getState: taskName=$taskName, targetName=$targetName, profileName=$profileName")
     ProjectConfig
       .getConfig()
       .flatMap(c => {
@@ -110,19 +111,23 @@ class ScaledaRunConfiguration(
           .map(f => {
             val (target, task)                             = f
             var remoteProfiles: Option[Seq[RemoteProfile]] = None
-            val hasProfile =
-              if (task.host.isEmpty) {
+            val profileHostUse                             = task.host.getOrElse(profileHost)
+            val profile =
+              if (profileHostUse.isEmpty) {
                 // Run locally if no host argument provided
                 Toolchain
                   .profiles()
-                  .exists(_.toolchainType == target.toolchain)
+                  .find(p =>
+                    p.toolchainType == target.toolchain && (p.profileName == profileHostUse || profileName.isEmpty)
+                  )
               } else {
-                // TODO: add proxy
-                val stub = RemoteClient(task.host.get, RemoteServer.DEFAULT_PORT)
-                remoteProfiles = Some(stub.getProfiles(Empty()).profiles)
-                remoteProfiles.get.exists(_.toolchainType == target.toolchain)
+                val (client, shutdown) = RemoteClient(profileHostUse)
+                remoteProfiles = Some(client.getProfiles(Empty()).profiles)
+                shutdown()
+                remoteProfiles.get
+                  .find(p => p.toolchainType == target.toolchain && (p.name == profileName || profileName.isEmpty))
               }
-            if (!hasProfile) {
+            if (profile.isEmpty) {
               Notification(project).error(
                 "Toolchain not found",
                 s"Cannot find toolchain ${target.toolchain}, check your profile list"
@@ -215,7 +220,7 @@ class ScaledaRunConfiguration(
           })
       })
       .getOrElse({
-        MainLogger.warn(s"Cannot find task name: $taskName")
+        MainLogger.warn(s"Cannot find task name: $taskName, target name: $targetName")
         null
       })
   }
