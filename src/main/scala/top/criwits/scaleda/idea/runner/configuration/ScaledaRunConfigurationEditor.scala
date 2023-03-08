@@ -24,7 +24,6 @@ class ScaledaRunConfigurationEditor(private val project: Project)
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
   ProjectConfig.getConfig().foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
-  ProjectConfig.getConfig().foreach(c => c.targets.foreach(target => target.tasks.foreach(t => taskName.addItem(t.name))))
 
   targetName.addItemListener(e => {
     if (e.getStateChange == ItemEvent.SELECTED) {
@@ -45,8 +44,12 @@ class ScaledaRunConfigurationEditor(private val project: Project)
     .getPanel
 
   override def resetEditorFrom(s: ScaledaRunConfiguration) = {
-    taskName.setItem(s.taskName)
+    // Warning: because targetName has model data listener, should set targetName first!!
     targetName.setItem(s.targetName)
+    taskName.removeAllItems()
+    ProjectConfig.getConfig().foreach(c => c.targets.find(_.name == s.targetName).foreach(t =>
+      t.tasks.foreach(t => taskName.addItem(t.name))))
+    taskName.setItem(s.taskName)
     environmentVarsComponent.setEnvs(CollectionConverters.asJava(s.extraEnvs))
   }
 

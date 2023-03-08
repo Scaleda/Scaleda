@@ -3,6 +3,7 @@ package idea.runner.configuration
 
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.openapi.project.Project
+import top.criwits.scaleda.idea.utils.MainLogger
 import top.criwits.scaleda.kernel.project.config.{TargetConfig, TaskConfig}
 
 class ScaledaRunConfigurationFactory(
@@ -23,6 +24,7 @@ class ScaledaRunConfigurationFactory(
     val c = new ScaledaRunConfiguration(project, this, target.name + "-" + task.name)
     c.targetName = target.name
     c.taskName = task.name
+    MainLogger.info("createConfigurationFromTargetAndTask", c)
     c
   }
 }
