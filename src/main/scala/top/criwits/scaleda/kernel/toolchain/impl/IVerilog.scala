@@ -134,7 +134,10 @@ object IVerilog extends ScaledaMessageToolchainParserProvider {
   private object MessageParser extends ScaledaMessageToolchainParser {
     override def parse(source: String, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
       // TODO: implement iverilog parser here
-      Some(ScaledaMessage(text = text))
+      if (text.nonEmpty) {
+        return Some(ScaledaMessage(text = text, level = LogLevel.Info))
+      }
+      None
     }
   }
 

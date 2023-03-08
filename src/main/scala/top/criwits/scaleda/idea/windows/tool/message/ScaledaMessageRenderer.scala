@@ -29,44 +29,30 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
       case _     => AllIcons.General.Error
     }
     setIcon(icon)
-    // val ranges          = ArrayBuffer[(Int, Int)]()
-    // val matches         = fileOptionalLineNumberRegex.findAllMatchIn(value.text).toSeq.sortBy(d => d.start - d.end)
-    // val selectedMatches = ArrayBuffer[Regex.Match]()
-    // for (m <- matches) {
-    //   if (
-    //     !ranges.exists(i =>
-    //       (i._1 <= m.start && m.start <= i._2) || (i._1 <= m.end && m.end <= i._2) || (i._1 <= m.start && m.end <= i._2)
-    //     )
-    //   ) {
-    //     // if range not covered, select this match
-    //     ranges.addOne((m.start, m.end))
-    //     selectedMatches.addOne(m)
-    //   }
-    // }
-    val results = ArrayBuffer[(String, Option[SimpleTextAttributes])]()
     val text    = value.text
     val matches = fileOptionalLineNumberRegex.findAllMatchIn(text).toSeq.sortBy(_.start)
-    // val ranges  = matches.map(m => (m.start, m.end)).toSeq
-    // KernelLogger.warn("ranges", ranges)
-    // handle start
-    matches.headOption.foreach(m => {
-      val s = text.slice(0, m.start)
-      if (s.nonEmpty) results.addOne((s, None))
-    })
-    for (i <- matches.indices) {
-      // handle this match and next plain text
-      results.addOne((matches(i).matched, Some(SimpleTextAttributes.LINK_ATTRIBUTES)))
-      if (i < matches.size - 1) {
-        if (matches(i).end < text.length - 1) {
-          results.addOne((text.slice(matches(i).end + 1, matches(i + 1).start), None))
+    if (matches.nonEmpty) {
+      val results = ArrayBuffer[(String, Option[SimpleTextAttributes])]()
+      // handle start
+      matches.headOption.foreach(m => {
+        val s = text.slice(0, m.start)
+        if (s.nonEmpty) results.addOne((s, None))
+      })
+      for (i <- matches.indices) {
+        // handle this match and next plain text
+        results.addOne((matches(i).matched, Some(SimpleTextAttributes.LINK_ATTRIBUTES)))
+        if (i < matches.size - 1) {
+          if (matches(i).end < text.length - 1) {
+            results.addOne((text.slice(matches(i).end + 1, matches(i + 1).start), None))
+          }
+        } else {
+          results.addOne((text.slice(matches(i).end + 1, text.length), None))
         }
-      } else {
-        results.addOne((text.slice(matches(i).end + 1, text.length), None))
       }
+      results.toSeq
+    } else {
+      Seq((text, None))
     }
-
-    // Seq((value.text, None))
-    results.toSeq
   }
 
   override final def customizeCellRenderer(
