@@ -60,6 +60,9 @@ case class ProjectConfig(
 
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"
+
+  // NOTICE: These two variables are global flag to indicated if a project is loaded
+  // they should be always updated simultaneously
   var projectBase: Option[String] = None
   var configFile: Option[String] = None
 

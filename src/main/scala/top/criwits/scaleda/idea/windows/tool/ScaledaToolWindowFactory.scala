@@ -10,7 +10,6 @@ import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory, ToolWindowManager
 import top.criwits.scaleda.idea.ScaledaBundle
 import top.criwits.scaleda.idea.windows.tool.message.ScaledaMessageTab
 
-// FIXME: this tool window will not load after start
 class ScaledaToolWindowFactory extends ToolWindowFactory {
   override def createToolWindowContent(
       project: Project,
@@ -22,14 +21,13 @@ class ScaledaToolWindowFactory extends ToolWindowFactory {
     Disposer.register(service, tabManager)
 
     val messageTab = new ScaledaMessageTab(project)
-    tabManager.addPanel(messageTab, ScaledaBundle.message("windows.tool.log.message.title"))
 
+    tabManager.addPanel(messageTab, ScaledaBundle.message("windows.tool.log.message.title"))
     tabManager.addTab(OutputLogger.LOGGER_ID, ScaledaBundle.message("windows.tool.log.output.title"), switchTo = false)
     tabManager.addTab(MainLogger.LOGGER_ID, ScaledaBundle.message("windows.tool.log.main.title"), switchTo = false)
   }
 }
 
 object ScaledaToolWindowFactory {
-  def toolWindow(project: Project): ToolWindow =
-    ToolWindowManager.getInstance(project).getToolWindow("Scaleda")
+  val WINDOW_ID = "Scaleda Messages"
 }

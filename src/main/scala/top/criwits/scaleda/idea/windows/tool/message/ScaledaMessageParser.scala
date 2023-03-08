@@ -16,6 +16,7 @@ trait ScaledaMessageToolchainParserProvider {
 
 object ScaledaMessageParser {
   private val allParsers = new mutable.HashMap[String, ScaledaMessageToolchainParser]()
+
   def registerParser(key: String, parser: ScaledaMessageToolchainParser): Unit =
     allParsers.put(key, parser)
 
