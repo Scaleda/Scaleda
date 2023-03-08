@@ -20,16 +20,18 @@ object FileUtils {
 
 
   def getAllVerilogFiles(project: Project, test: Boolean = false): List[VerilogPSIFileRoot] = { // FIXME: if source not in src/ will also match
-    val sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.source)
-    val testDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
+    ProjectConfig.projectBase.map(projectBase => {
+      val sourceDir: File = new File(new File(projectBase).getAbsolutePath, ProjectConfig.config.source)
+      val testDir: File = new File(new File(projectBase).getAbsolutePath, ProjectConfig.config.test)
 
-    val vf = LocalFileSystem.getInstance().findFileByIoFile(if (test) testDir else sourceDir)
-    val psiDirectory = PsiManager.getInstance(project).findDirectory(vf)
-    var result: List[VerilogPSIFileRoot] = null
-    inReadAction {
-      result = PsiTreeUtil.findChildrenOfAnyType(psiDirectory, classOf[VerilogPSIFileRoot]).asScala.toList
-    }
-    result
+      val vf = LocalFileSystem.getInstance().findFileByIoFile(if (test) testDir else sourceDir)
+      val psiDirectory = PsiManager.getInstance(project).findDirectory(vf)
+      var result: List[VerilogPSIFileRoot] = null
+      inReadAction {
+        result = PsiTreeUtil.findChildrenOfAnyType(psiDirectory, classOf[VerilogPSIFileRoot]).asScala.toList
+      }
+      result
+    }).getOrElse(List.empty)
   }
 
   def getAllVerilogFilesList(project: Project) =
