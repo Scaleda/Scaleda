@@ -17,3 +17,7 @@ object ScaledaServerMain {
     threads.foreach(_.join())
   }
 }
+
+object ScaledaServerMainTest extends App {
+  ScaledaServerMain.run(ShellArgs())
+}

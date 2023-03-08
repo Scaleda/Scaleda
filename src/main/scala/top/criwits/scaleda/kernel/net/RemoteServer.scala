@@ -3,6 +3,7 @@ package kernel.net
 
 import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
 import kernel.net.remote._
+import kernel.net.user.RemoteRegisterLoginImpl
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
@@ -12,7 +13,7 @@ import io.grpc.stub.StreamObserver
 
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.existentials
 
 /** Main gRPC server, will receiver commands from client and execute them
@@ -85,7 +86,14 @@ object RemoteServer {
   }
 
   def serve(port: Int = DEFAULT_PORT): Unit = {
-    val server = RpcPatch.getStartServer(Seq(), port)
+    val executionContext = ExecutionContext.global
+    val server = RpcPatch.getStartServer(
+      Seq(
+        RemoteGrpc.bindService(new RemoteImpl, executionContext),
+        RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext)
+      ),
+      port
+    )
     server.awaitTermination()
   }
 }
