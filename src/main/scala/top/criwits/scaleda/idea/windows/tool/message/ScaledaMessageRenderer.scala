@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.windows.tool.message
 
-import idea.utils.Icons
+import idea.utils.{Icons, MainLogger}
 
 import com.intellij.icons.AllIcons
 import com.intellij.ui.{ColoredListCellRenderer, SimpleTextAttributes}
@@ -43,10 +43,10 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
         results.addOne((matches(i).matched, Some(SimpleTextAttributes.LINK_ATTRIBUTES)))
         if (i < matches.size - 1) {
           if (matches(i).end < text.length - 1) {
-            results.addOne((text.slice(matches(i).end + 1, matches(i + 1).start), None))
+            results.addOne((text.slice(matches(i).end, matches(i + 1).start), None))
           }
         } else {
-          results.addOne((text.slice(matches(i).end + 1, text.length), None))
+          results.addOne((text.slice(matches(i).end, text.length), None))
         }
       }
       results.toSeq
