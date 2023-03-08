@@ -2,9 +2,12 @@ package top.criwits.scaleda
 package kernel.shell
 
 import kernel.bin.ExtractAssets
+import kernel.database.dao.User
 import kernel.net.remote.Empty
+import kernel.net.user.ScaledaRegisterLogin
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
+import kernel.server.ScaledaServerMain
 import kernel.shell.command.RemoteCommandDeps
 import kernel.template.Template
 import kernel.toolchain.{Toolchain, ToolchainProfile}
@@ -16,7 +19,7 @@ import scopt.OParser
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Install, Run, ListProfiles, ListTasks, Serve = Value
+  val None, Install, Run, ListProfiles, ListTasks, Serve, Login, Register = Value
 }
 
 case class ShellArgs(
@@ -25,8 +28,9 @@ case class ShellArgs(
     workingDir: File = new File("."),
     runMode: ShellRunMode.Value = ShellRunMode.None,
     serverHost: String = "",
-    serverPort: Int = RemoteServer.port,
-    profileName: Option[String] = None
+    serverPort: Int = RemoteServer.DEFAULT_PORT,
+    profileName: Option[String] = None,
+    user: User = new User("", "", "")
 )
 
 object ScaledaShellMain {
@@ -100,6 +104,51 @@ object ScaledaShellMain {
         cmd("serve")
           .text("Run as server")
           .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
+        cmd("login")
+          .text("Login into server")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Login))
+          .children(
+            opt[String]('u', "username")
+              .action((x, c) => {
+                val user = c.user
+                user.setUsername(x)
+                c.copy(user = user)
+              })
+              .text("Specify username"),
+            opt[String]('p', "password")
+              .action((x, c) => {
+                val user = c.user
+                user.setPassword(x)
+                c.copy(user = user)
+              })
+              .text("Specify password")
+          ),
+        cmd("register")
+          .text("Create account in server")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Register))
+          .children(
+            opt[String]('u', "username")
+              .action((x, c) => {
+                val user = c.user
+                user.setUsername(x)
+                c.copy(user = user)
+              })
+              .text("Specify username"),
+            opt[String]('p', "password")
+              .action((x, c) => {
+                val user = c.user
+                user.setPassword(x)
+                c.copy(user = user)
+              })
+              .text("Specify password"),
+            opt[String]('n', "nickname")
+              .action((x, c) => {
+                val user = c.user
+                user.setNickname(x)
+                c.copy(user = user)
+              })
+              .text("Specify nickname")
+          ),
         cmd("profiles")
           .text("Show loaded profiles")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
@@ -166,9 +215,6 @@ object ScaledaShellMain {
                 }
               )
               .getOrElse(KernelLogger.info("no task loaded"))
-          case ShellRunMode.Serve =>
-            // run as server
-            RemoteServer.start()
           case ShellRunMode.Run =>
             config
               .map(c => {
@@ -223,6 +269,20 @@ object ScaledaShellMain {
             KernelLogger.warn("no action specified, do nothing")
           case ShellRunMode.Install =>
             ExtractAssets.run()
+          case ShellRunMode.Serve =>
+            ScaledaServerMain.run(shellConfig)
+          case ShellRunMode.Login =>
+            val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
+              .login(shellConfig.user.getUsername, shellConfig.user.getPassword)
+            if (!reply.ok) {
+              KernelLogger.error("Login failed:", reply.reason)
+            }
+          case ShellRunMode.Register =>
+            val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
+              .register(shellConfig.user)
+            if (!reply.ok) {
+              KernelLogger.error("Register failed:", reply.reason)
+            }
           case _ =>
             KernelLogger.error("not implemented.")
         }

@@ -23,13 +23,17 @@ object Paths {
   def getConfigDir: File = {
     getEnvHome match {
       case Some(path) => createDirIfNonExists(new File(path))
-      case None => createDirIfNonExists(new File(OS.getUserHome, ".scaleda"))
+      case None       => createDirIfNonExists(new File(OS.getUserHome, ".scaleda"))
     }
   }
 
   def getToolchainsDir: File = createDirIfNonExists(new File(getConfigDir, "toolchains"))
 
   def getBinaryDir: File = createDirIfNonExists(new File(getConfigDir, "bin"))
+
+  def getDatabaseDir: File = createDirIfNonExists(new File(getConfigDir, "database"))
+
+  def getUserAuthorization: File = new File(getConfigDir, ".authorization")
 
   def pwd = new File(System.getProperty("user.dir"))
 

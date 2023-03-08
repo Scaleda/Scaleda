@@ -13,7 +13,7 @@ import scala.language.existentials
 
 case class RemoteCommandDeps(
     host: String = "localhost",
-    port: Int = RemoteServer.port
+    port: Int = RemoteServer.DEFAULT_PORT
 )
 
 class RemoteCommandRunner(

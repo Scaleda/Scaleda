@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 import scala.language.existentials
 
 object FuseRpcServer {
-  val port = RemoteServer.port + 1
+  val port = RemoteServer.DEFAULT_PORT + 1
 
   def start(sourcePath: String): Unit = {
     val server = new FuseRpcServer(ExecutionContext.global)

@@ -224,7 +224,7 @@ object FuseTransferClient {
 object FuseTransferTester extends App {
   private final val TEST_PORT = 4551
   val thread = new Thread(() => {
-    val server = RpcPatch.getServer(
+    val server = RpcPatch.getStartServer(
       Seq(
         RemoteFuseTransferGrpc.bindService(new FuseTransferServer, ExecutionContext.global)
       ),

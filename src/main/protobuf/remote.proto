@@ -8,6 +8,40 @@ service Remote {
   rpc GetRemoteInfo(Empty) returns (RemoteInfo) {}
 }
 
+service RemoteRegisterLogin {
+  rpc Register(RemoteRegisterRequest) returns (RemoteRegisterReply) {}
+  rpc Login(RemoteLoginRequest) returns (RemoteLoginReply) {}
+  rpc Refresh(RemoteRefreshRequest) returns (RemoteRefreshReply) {}
+}
+
+message RemoteRegisterRequest {
+  string username = 1;
+  string password = 2;
+  string nickname = 3;
+}
+message RemoteRegisterReply {
+  bool ok = 1;
+  string reason = 2;
+}
+message RemoteLoginRequest {
+  string username = 1;
+  string password = 2;
+}
+message RemoteLoginReply {
+  bool ok = 1;
+  string refreshToken = 2;
+  string token = 3;
+  string reason = 4;
+}
+message RemoteRefreshRequest {
+  string refreshToken = 1;
+}
+message RemoteRefreshReply {
+  bool ok = 1;
+  string token = 2;
+  string reason = 3;
+}
+
 message Empty {}
 
 message StringTriple {

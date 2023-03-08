@@ -119,7 +119,7 @@ class ServerSideFuse(
     var offsetNow = offset
     def applyFilter(filename: String): Int = {
       val nameBuffer = ByteBuffer.allocate(filename.length + 1)
-      nameBuffer.put(0, filename.getBytes, 0, filename.length)
+      nameBuffer.put(filename.getBytes)
       offsetNow += 1
       filter.apply(buf, nameBuffer, null, offsetNow)
     }

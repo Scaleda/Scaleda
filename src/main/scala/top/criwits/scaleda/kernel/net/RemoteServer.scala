@@ -3,13 +3,13 @@ package kernel.net
 
 import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
 import kernel.net.remote._
+import kernel.net.user.RemoteRegisterLoginImpl
+import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
-import kernel.utils.{KernelLogger, OS}
+import kernel.utils.{EnvironmentUtils, KernelLogger, OS}
 
 import io.grpc.stub.StreamObserver
-import io.grpc.{Server, ServerBuilder}
-import top.criwits.scaleda.kernel.shell.ScaledaRunHandler
 
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,75 +19,46 @@ import scala.language.existentials
 /** Main gRPC server, will receiver commands from client and execute them
   */
 object RemoteServer {
-  def start(): Unit = {
-    val server = new RemoteServer(ExecutionContext.global)
-    server.start()
-    server.blockUntilShutdown()
-  }
-
-  val port = 50051
-}
-
-class RemoteServer(executionContext: ExecutionContext) {
-  self =>
-  private[this] var server: Option[Server] = None
-
-  private def start(): Unit = {
-    // FIXME: running in IDEA Service
-    val builder = ServerBuilder.forPort(RemoteServer.port)
-    builder.addService(RemoteGrpc.bindService(new RemoteImpl, executionContext))
-    server = Some(builder.build().start())
-    KernelLogger.logger.info(
-      "Server started, listening on " + RemoteServer.port
-    )
-    sys.addShutdownHook {
-      System.err.println(
-        "*** shutting down gRPC server since JVM is shutting down"
-      )
-      self.stop()
-      System.err.println("*** server shut down")
-    }
-  }
-
-  private def stop(): Unit =
-    server.foreach(_.shutdown())
-
-  private def blockUntilShutdown(): Unit =
-    server.foreach(_.awaitTermination())
+  final val DEFAULT_PORT = 20051
 
   private class RemoteImpl extends RemoteGrpc.Remote {
     override def run(
         request: RunRequest,
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
-      CommandRunner.execute(Seq(CommandDeps(
-        commands = request.commands,
-        path = request.path,
-        envs = request.envs.map(t => (t.a, t.b))
-      )), new ScaledaRunHandler {
-        override def onStdout(data: String) = {
-          KernelLogger.info("[remote executor stdout]", data)
-          responseObserver.onNext(
-            new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = data)
+      CommandRunner.execute(
+        Seq(
+          CommandDeps(
+            commands = request.commands,
+            path = request.path,
+            envs = request.envs.map(t => (t.a, t.b))
           )
-        }
-
-        override def onStderr(data: String) = {
-          KernelLogger.warn("[remote executor stderr]", data)
-          responseObserver.onNext(
-            new RunReply(RUN_REPLY_TYPE_STDERR, strValue = data)
-          )
-        }
-
-        override def onReturn(returnValue: Int, finishedAll: Boolean) = {
-          responseObserver.onNext(
-            new RunReply(
-              RUN_REPLY_TYPE_RETURN,
-              intValue = returnValue
+        ),
+        new ScaledaRunHandler {
+          override def onStdout(data: String) = {
+            KernelLogger.info("[remote executor stdout]", data)
+            responseObserver.onNext(
+              new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = data)
             )
-          )
+          }
+
+          override def onStderr(data: String) = {
+            KernelLogger.warn("[remote executor stderr]", data)
+            responseObserver.onNext(
+              new RunReply(RUN_REPLY_TYPE_STDERR, strValue = data)
+            )
+          }
+
+          override def onReturn(returnValue: Int, finishedAll: Boolean) = {
+            responseObserver.onNext(
+              new RunReply(
+                RUN_REPLY_TYPE_RETURN,
+                intValue = returnValue
+              )
+            )
+          }
         }
-      })
+      )
       responseObserver.onCompleted()
     }
 
@@ -108,9 +79,22 @@ class RemoteServer(executionContext: ExecutionContext) {
     override def getRemoteInfo(request: Empty): Future[RemoteInfo] = async {
       RemoteInfo(os = OS.getOSType match {
         case OS.Windows => RemoteOsType.REMOTE_OS_TYPE_WINDOWS
-        case OS.MacOS => RemoteOsType.REMOTE_OS_TYPE_MACOS
-        case OS.Unix => RemoteOsType.REMOTE_OS_TYPE_LINUX
+        case OS.MacOS   => RemoteOsType.REMOTE_OS_TYPE_MACOS
+        case OS.Unix    => RemoteOsType.REMOTE_OS_TYPE_LINUX
       })
     }
+  }
+
+  def serve(port: Int = DEFAULT_PORT): Unit = {
+    val executionContext = ExecutionContext.global
+    val server = RpcPatch.getStartServer(
+      Seq(
+        RemoteGrpc.bindService(new RemoteImpl, executionContext),
+        RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext)
+      ),
+      port,
+      enableAuthCheck = !EnvironmentUtils.Backup.env.contains("AUTH_DISABLE")
+    )
+    server.awaitTermination()
   }
 }
