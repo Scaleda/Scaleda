@@ -6,6 +6,7 @@ import idea.utils.MainLogger
 import kernel.net.remote.RemoteProfile
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
+import kernel.toolchain.Toolchain
 
 import com.intellij.execution.configuration.EnvironmentVariablesComponent
 import com.intellij.openapi.actionSystem._
@@ -20,9 +21,16 @@ import scala.jdk.javaapi.CollectionConverters
 
 class ScaledaRunConfigurationEditor(private val project: Project) extends SettingsEditor[ScaledaRunConfiguration] {
 
+  case class ProfilePair(host: String, name: String) {
+    override def toString = {
+      if (host.isEmpty) name
+      else s"$host - $name"
+    }
+  }
+
   private val targetName  = new ComboBox[String]
   private val taskName    = new ComboBox[String]
-  private val profileName = new ComboBox[String]
+  private val profileName = new ComboBox[ProfilePair]
   private val profileHost = new TextFieldWithBrowseButton
 
   private val loadedRemoteProfiles   = new mutable.HashMap[String, Seq[RemoteProfile]]
@@ -35,31 +43,39 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
   private def requestRemoteProfiles(): Unit = {
     val host = profileHost.getText
     MainLogger.info(s"requestRemoteProfiles: $host")
-    if (host.isEmpty || loadedRemoteProfiles.contains(host)) return
-    val thread = new Thread(() => {
-      try {
-        val (client, shutdown) = RemoteClient(host)
-        val profiles           = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of()).profiles
-        MainLogger.info("got profiles", profiles)
-        loadedRemoteProfiles.synchronized {
-          loadedRemoteProfiles.put(host, profiles)
-        }
-        profileName.synchronized {
-          profileName.removeAllItems()
-          profiles.foreach(p => profileName.addItem(p.name))
-        }
-        shutdown()
-      } catch {
-        case e: Throwable => MainLogger.info("cannot connect server:", e)
-      } finally {
-        requestProfilesThreads.synchronized {
-          requestProfilesThreads.remove(host)
-        }
+    if (host.isEmpty) {
+      // use local profiles
+      profileName.synchronized {
+        profileName.removeAllItems()
+        Toolchain.profiles().foreach(p => profileName.addItem(ProfilePair("", p.profileName)))
       }
-    })
-    thread.start()
-    requestProfilesThreads.synchronized {
-      requestProfilesThreads.put(host, thread)
+    } else {
+      if (loadedRemoteProfiles.contains(host)) return
+      val thread = new Thread(() => {
+        try {
+          val (client, shutdown) = RemoteClient(host)
+          val profiles           = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of()).profiles
+          MainLogger.info("got profiles", profiles)
+          loadedRemoteProfiles.synchronized {
+            loadedRemoteProfiles.put(host, profiles)
+          }
+          profileName.synchronized {
+            profileName.removeAllItems()
+            profiles.foreach(p => profileName.addItem(ProfilePair(host, p.name)))
+          }
+          shutdown()
+        } catch {
+          case e: Throwable => MainLogger.info("cannot connect server:", e)
+        } finally {
+          requestProfilesThreads.synchronized {
+            requestProfilesThreads.remove(host)
+          }
+        }
+      })
+      thread.start()
+      requestProfilesThreads.synchronized {
+        requestProfilesThreads.put(host, thread)
+      }
     }
   }
 
@@ -120,7 +136,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     taskName.setItem(s.taskName)
     environmentVarsComponent.setEnvs(CollectionConverters.asJava(s.extraEnvs))
     profileHost.setText(s.profileHost)
-    profileName.setItem(s.profileName)
+    profileName.setItem(ProfilePair(s.profileHost, s.profileName))
     requestRemoteProfiles()
   }
 
@@ -128,7 +144,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     s.taskName = taskName.getItem
     s.targetName = targetName.getItem
     s.extraEnvs.addAll(CollectionConverters.asScala(environmentVarsComponent.getEnvs))
-    s.profileName = profileName.getItem
+    s.profileName = profileName.getItem.name
     s.profileHost = profileHost.getText
   }
 
