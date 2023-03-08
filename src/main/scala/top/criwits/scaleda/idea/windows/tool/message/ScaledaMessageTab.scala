@@ -15,39 +15,25 @@ import com.intellij.ui.components.{JBList, JBScrollPane}
 import javax.swing.event.ListSelectionEvent
 import javax.swing.{BoxLayout, DefaultListModel, JPanel}
 
-// FIXME: sometimes messages in this tab can disappear for a moment
 class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, true) with Disposable {
   private val msgSourceId = ScaledaMessageTab.MESSAGE_ID
-  // private val data = ArrayBuffer[ScaledaMessage]()
   private var sortByLevel = false
   private val dataModel   = new DefaultListModel[ScaledaMessage]()
 
-  def flushData(): Unit = {
-    // if (sortByLevel) {
-    //   data.sortInPlaceWith((a, b) => {
-    //     if (a.level < b.level) true
-    //     else if (a.level == b.level) a.time < b.time
-    //     else false
-    //   })
-    // }
-    // // NOTE that if we clear all data in dataModel and refill data, select operation will failed!!
-    // dataModel.clear()
-    // dataModel.addAll(CollectionConverters.asJava(data))
-  }
-
   private val messageParser = new ScaledaMessageParser(message => {
-    // data.addOne(message)
     dataModel.addElement(message)
-    flushData()
   })
+
   def attachToLogger(sourceId: String): Unit = {
     val service = project.getService(classOf[ScaledaLoggingService])
     service.addListener(sourceId, messageParser)
   }
+
   def detachFromLogger(sourceId: String): Unit = {
     val service = project.getService(classOf[ScaledaLoggingService])
     service.removeListener(sourceId)
   }
+
   // add all known toolchain types
   // Toolchain.toolchains.keys.foreach(toolchain => service.addListener(s"$msgSourceId-$toolchain", messageParser))
   private val listComponent = new JBList[ScaledaMessage](dataModel)
@@ -75,7 +61,6 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   ) {
     override def actionPerformed(e: AnActionEvent) = {
       sortByLevel = !sortByLevel
-      flushData()
     }
   }
   // dataModel.addListDataListener(new ListDataListener() {

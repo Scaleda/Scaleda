@@ -146,7 +146,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 }
 
 object ScaledaRunWindowFactory {
-  val WINDOW_ID = "scaleda"
+  val WINDOW_ID = "Scaleda Tasks"
   var model: Option[DefaultTreeModel] = None
   var expandAll: Option[AnAction] = None
 

@@ -44,8 +44,17 @@ class ScaledaReloadTasksAction
           true
         })
     }
+
     if (searchedFile.isEmpty) {
-      MainLogger.warn("No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project")
+      ProjectConfig.configFile = None
+      ProjectConfig.projectBase = None
+      MainLogger.info("No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project")
+
+      // clear the model
+      ScaledaRunWindowFactory.model.foreach(m => {
+        m.setRoot(null) // legal
+        m.reload()
+      })
     } else {
       val f = searchedFile.get
       // refill

@@ -134,14 +134,6 @@
 <!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
     </extensions>
 
-    <!-- Windows / Panels -->
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Scaleda"
-                    canCloseContents="false"
-                    anchor="bottom"
-                    factoryClass="top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory"
-        />
-    </extensions>
 
     <!-- Scaleda run tasks -->
     <extensions defaultExtensionNs="com.intellij">
