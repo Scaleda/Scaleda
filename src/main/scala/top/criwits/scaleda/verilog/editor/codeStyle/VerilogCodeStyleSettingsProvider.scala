@@ -3,7 +3,7 @@ package verilog.editor.codeStyle
 
 import com.intellij.application.options.{CodeStyleAbstractConfigurable, CodeStyleAbstractPanel}
 import com.intellij.lang.Language
-import com.intellij.psi.codeStyle.{CodeStyleConfigurable, CodeStyleSettings, LanguageCodeStyleSettingsProvider}
+import com.intellij.psi.codeStyle.{CodeStyleConfigurable, CodeStyleSettings, CustomCodeStyleSettings, LanguageCodeStyleSettingsProvider}
 import top.criwits.scaleda.verilog.VerilogLanguage
 
 class VerilogCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider {
@@ -16,4 +16,8 @@ class VerilogCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider
   override def getCodeSample(settingsType: LanguageCodeStyleSettingsProvider.SettingsType): String = ""
 
   override def getLanguage: Language = VerilogLanguage
+
+  override def createCustomSettings(settings: CodeStyleSettings): CustomCodeStyleSettings = {
+    new VerilogCodeStyleSettings(settings)
+  }
 }
