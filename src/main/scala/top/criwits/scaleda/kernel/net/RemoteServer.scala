@@ -96,7 +96,7 @@ object RemoteServer {
         RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
       ),
       port,
-      enableAuthCheck = !EnvironmentUtils.Backup.env.contains("AUTH_DISABLE")
+      enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE")
     )
     server.awaitTermination()
   }
