@@ -109,4 +109,6 @@ object ScaledaMessageTab {
   private var INSTANCE: ScaledaMessageTab = _
 
   def instance = INSTANCE
+
+  def apply(project: Project) = if (instance != null) instance else new ScaledaMessageTab(project)
 }

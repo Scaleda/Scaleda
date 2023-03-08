@@ -6,7 +6,9 @@ import idea.rvcd.RvcdService
 import idea.settings.toolchains.ProfileDetectAction
 import idea.utils.{AssetsInstallAction, Icons, MainLogger, RpcService}
 import idea.windows.tasks.ScaledaRunWindowFactory
+import idea.windows.tool.ScaledaToolWindowFactory
 import idea.windows.tool.logging.ScaledaLoggingService
+import idea.windows.tool.message.ScaledaMessageTab
 import kernel.bin.ExtractAssets
 import kernel.toolchain.Toolchain
 
@@ -14,15 +16,13 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
-import top.criwits.scaleda.idea.windows.tool.ScaledaToolWindowFactory
 
-/**
- * This is the startup activity of Scaleda. It will:
- *  - Initialise logger, jinja and other kernel components;
- *  - Initialise windows (tasks and messages);
- *  - Check if latest assets are installed;
- *  - Initialise remote service;
- */
+/** This is the startup activity of Scaleda. It will:
+  *  - Initialise logger, jinja and other kernel components;
+  *  - Initialise windows (tasks and messages);
+  *  - Check if latest assets are installed;
+  *  - Initialise remote service;
+  */
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
@@ -77,5 +77,8 @@ class ScaledaMain extends StartupActivity {
     val rpcService = project.getService(classOf[RpcService])
     rpcService.setProject(project)
     project.getService(classOf[RvcdService]).setProject(project)
+
+    // invoke MessageTab instance
+    val _ = ScaledaMessageTab(project)
   }
 }

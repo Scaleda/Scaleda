@@ -142,8 +142,7 @@ class ScaledaRunConfiguration(
 
               def afterExecution(task: TaskConfig, executor: SExecutor): Unit = {
                 // remove message listeners
-                if (ScaledaMessageTab.instance != null)
-                  ScaledaMessageTab.instance.detachFromLogger(sourceId)
+                ScaledaMessageTab.instance.detachFromLogger(sourceId)
                 ScaledaMessageParser.removeParser(sourceId)
                 task.taskType match {
                   // Only call rvcd when simulate
@@ -180,8 +179,7 @@ class ScaledaRunConfiguration(
                   )
 
                   // attach message parser listener
-                  if (ScaledaMessageTab.instance != null)
-                    ScaledaMessageTab.instance.attachToLogger(sourceId)
+                  ScaledaMessageTab.instance.attachToLogger(sourceId)
                   Toolchain.toolchainMessageParser
                     .get(target.toolchain)
                     .foreach(parserProvider => ScaledaMessageParser.registerParser(sourceId, parserProvider.parser))
