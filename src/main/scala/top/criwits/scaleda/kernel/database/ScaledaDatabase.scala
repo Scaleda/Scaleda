@@ -159,9 +159,10 @@ class ScaledaDatabase {
 
   def findToken(token: String): Option[Token] = {
     val preparing = getConnection.prepareStatement(
-      "SELECT token, username, exp FROM t_token WHERE token=?"
+      "SELECT token, username, exp FROM t_token WHERE token=? AND exp >= ?"
     )
     preparing.setString(1, token)
+    preparing.setTimestamp(2, Timestamp.from(Instant.now()))
     val resultSet = preparing.executeQuery()
     val result    = ArrayBuffer[Token]()
     while (resultSet.next()) {
