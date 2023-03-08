@@ -6,12 +6,14 @@ import kernel.net.fuse.FuseTransferClient.requestMessageInto
 import kernel.net.fuse.FuseTransferServer._
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc.RemoteFuseTransfer
 import kernel.net.fuse.fs._
-import kernel.utils.KernelLogger
+import kernel.net.user.JwtAuthorizationInterceptor
 import kernel.utils.serialise.BinarySerializeHelper
+import kernel.utils.{KernelLogger, Paths}
 
 import com.google.protobuf.ByteString
 import io.grpc.stub.StreamObserver
 
+import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
 import scala.async.Async.async
 import scala.collection.mutable
@@ -20,33 +22,46 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-case class FuseTransferMessage(
+case class FuseTransferMessageCase(
     id: Long,
+    // TODO: task + target + username => identifier; now is username
     identifier: String,
     function: String,
     data: Any,
     error: Option[Throwable] = None
 ) {
-  def toLoginMessage: FuseLoginMessage =
-    FuseLoginMessage.of(id, identifier, function, BinarySerializeHelper.fromAny(data))
+  def toMessage: FuseTransferMessage =
+    FuseTransferMessage.of(id, function, BinarySerializeHelper.fromAny(data))
 }
 
-class FuseTransferServerObserver(val tx: StreamObserver[FuseLoginMessage]) extends StreamObserver[FuseLoginMessage] {
+class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
+    extends StreamObserver[FuseTransferMessage] {
   private var identifier: Option[String] = None
-  override def onNext(msg: FuseLoginMessage) = {
+  override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.info("server onNext: ", msg.toProtoString)
+    val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
     msg.function match {
       case "login" =>
-        KernelLogger.info("server: login info with token ", msg.token)
-        observers.put(msg.token, this)
-        identifier = Some(msg.token)
+        KernelLogger.info("visit from user: ", user)
+        val key = user.getUsername
+        identifier = Some(key)
+        observers.synchronized {
+          observers.put(key, this)
+        }
+        fsProxies.synchronized {
+          val fs   = new ServerSideFuse(new FuseDataProxy(key))
+          val dest = new File(Paths.getServerTemporalDir, key).getAbsolutePath
+          FuseUtils.mountFs(fs, dest, blocking = false)
+          fsProxies.put(key, fs)
+        }
+      // TODO: create mount
       case "error" =>
         val e: Throwable = BinarySerializeHelper.fromGrpcBytes(msg.message)
         KernelLogger.warn("server recv error from client:", e)
         val converted =
-          FuseTransferMessage(
+          FuseTransferMessageCase(
             msg.id,
-            msg.token,
+            user.getUsername,
             msg.function,
             (),
             error = Some(BinarySerializeHelper.fromGrpcBytes(msg.message))
@@ -65,7 +80,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseLoginMessage]) exten
           })
       case _ =>
         val converted =
-          FuseTransferMessage(msg.id, msg.token, msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
+          FuseTransferMessageCase(msg.id, "username", msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
 
         KernelLogger.info("converted:", converted)
         recvData.synchronized {
@@ -91,15 +106,23 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseLoginMessage]) exten
 
   override def onCompleted() = {
     KernelLogger.info("server onComplete")
-    identifier.foreach(observers.remove)
+    observers.synchronized {
+      identifier.foreach(observers.remove)
+    }
+    fsProxies.synchronized {
+      identifier.foreach(i => {
+        fsProxies.get(i).foreach(p => p.umount())
+        fsProxies.remove(i)
+      })
+    }
   }
 }
 
-class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamObserver[FuseLoginMessage] {
-  private var tx: StreamObserver[FuseLoginMessage]          = _
-  def setTx(stream: StreamObserver[FuseLoginMessage]): Unit = tx = stream
+class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamObserver[FuseTransferMessage] {
+  private var tx: StreamObserver[FuseTransferMessage]          = _
+  def setTx(stream: StreamObserver[FuseTransferMessage]): Unit = tx = stream
 
-  override def onNext(msg: FuseLoginMessage) = {
+  override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.info("client: onNext", msg.toProtoString)
     val req = msg.message
 
@@ -127,19 +150,18 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
       case "create"   => dataProvider.create(requestMessageInto(req))
       case _ =>
         KernelLogger.error("Unknown function name:", msg.function)
-        // throw new RuntimeException("Unknown function name")
         async {
-          throw new RuntimeException("Unknown function name")
+          throw new RuntimeException(s"Unknown function name: ${msg.function}")
         }
     }
     try {
       val resp       = handleFutureData(respFuture)
-      val messageNew = FuseLoginMessage.of(msg.id, msg.token, msg.function, resp)
+      val messageNew = FuseTransferMessage.of(msg.id, msg.function, resp)
       KernelLogger.info("client onNext done")
       tx.onNext(messageNew)
     } catch {
       case e: Throwable =>
-        val messageError = FuseLoginMessage.of(msg.id, msg.token, "error", BinarySerializeHelper.fromAny(e))
+        val messageError = FuseTransferMessage.of(msg.id, "error", BinarySerializeHelper.fromAny(e))
         tx.onNext(messageError)
     }
   }
@@ -154,22 +176,23 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
 }
 
 class FuseTransferServer extends RemoteFuseTransfer {
-  override def login(responseObserver: StreamObserver[FuseLoginMessage]): StreamObserver[FuseLoginMessage] = {
-    KernelLogger.info("server: login established")
+  override def visit(responseObserver: StreamObserver[FuseTransferMessage]): StreamObserver[FuseTransferMessage] = {
+    KernelLogger.info("server: visit established")
     new FuseTransferServerObserver(responseObserver)
   }
 }
 
 object FuseTransferServer {
-  val recvData          = new mutable.HashMap[Long, FuseTransferMessage]()
+  val recvData          = new mutable.HashMap[Long, FuseTransferMessageCase]()
   val recvWait          = new mutable.HashMap[Long, Object]()
   val observers         = new mutable.HashMap[String, FuseTransferServerObserver]()
-  private val sendQueue = new LinkedBlockingQueue[FuseTransferMessage]
-  def request(msg: FuseTransferMessage): FuseTransferMessage = {
+  val fsProxies         = new mutable.HashMap[String, ServerSideFuse]()
+  private val sendQueue = new LinkedBlockingQueue[FuseTransferMessageCase]
+  def request(msg: FuseTransferMessageCase): FuseTransferMessageCase = {
     sendQueue.put(msg)
     val awaitable = new Object
     recvWait.synchronized {
-      recvWait.put(msg.id, awaitable).foreach(o => KernelLogger.error("Same id is waiting! ", msg.id))
+      recvWait.put(msg.id, awaitable).foreach(o => KernelLogger.error("Same id is waiting! ", msg.id, o))
     }
     awaitable.synchronized {
       awaitable.wait()
@@ -190,9 +213,11 @@ object FuseTransferServer {
     while (!done) {
       try {
         val msg = sendQueue.take()
-        observers.get(msg.identifier) match {
-          case Some(observer) => observer.tx.onNext(msg.toLoginMessage)
-          case None           => KernelLogger.error("Cannot send message ", msg, ", no observer!")
+        observers.synchronized {
+          observers.get(msg.identifier) match {
+            case Some(observer) => observer.tx.onNext(msg.toMessage)
+            case None           => KernelLogger.error("Cannot send message ", msg, ", no observer!")
+          }
         }
       } catch {
         case _: InterruptedException =>
@@ -209,11 +234,11 @@ object FuseTransferServer {
 object FuseTransferClient {
   private final val DEFAULT_PORT = 4555
   def apply(host: String = "127.0.0.1", port: Int = DEFAULT_PORT) =
-    RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port)
+    RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port, enableAuthProvide = true)
   def asStream(dataProvider: FuseDataProvider, host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
     val (client, shutdown) = FuseTransferClient(host, port)
     val clientStream       = new FuseTransferClientObserver(dataProvider)
-    val stream             = client.login(clientStream)
+    val stream             = client.visit(clientStream)
     clientStream.setTx(stream)
     (stream, shutdown)
   }
@@ -228,17 +253,19 @@ object FuseTransferTester extends App {
       Seq(
         RemoteFuseTransferGrpc.bindService(new FuseTransferServer, ExecutionContext.global)
       ),
-      TEST_PORT
+      TEST_PORT,
+      enableAuthCheck = true
     )
   })
   thread.start()
   Thread.sleep(500)
   val (stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
-  stream.onNext(FuseLoginMessage.of(0, "token", "login", ByteString.EMPTY))
+  stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
   Thread.sleep(100)
   FuseTransferServer.requestThread.start()
   // val resp = FuseTransferServer.request(FuseTransferMessage(1, "token", "init", EmptyReq()))
-  val resp = FuseTransferServer.request(FuseTransferMessage(1, "token", "create", PathModeRequest.of("test", 0x1ed)))
+  val resp =
+    FuseTransferServer.request(FuseTransferMessageCase(1, "token", "create", PathModeRequest.of("test", 0x1ed)))
   KernelLogger.info("resp: ", resp)
   // Thread.sleep(500)
   stream.onCompleted()

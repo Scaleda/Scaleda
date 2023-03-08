@@ -10,6 +10,7 @@ import io.grpc.{Server, ServerBuilder}
 import scala.concurrent.ExecutionContext
 import scala.language.existentials
 
+@Deprecated
 object FuseRpcServer {
   val port = RemoteServer.DEFAULT_PORT + 1
 
@@ -20,6 +21,7 @@ object FuseRpcServer {
   }
 }
 
+@Deprecated
 class FuseRpcServer(executionContext: ExecutionContext) { self =>
   private[this] var server: Option[Server] = None
 

@@ -195,6 +195,11 @@ class ScaledaDatabase {
 
 }
 
+object ScaledaDatabase {
+  // TODO: in release, remove this
+  val passTokenSet: Map[String, User] = Map("token-test" -> new User("test", "test", "test-nick"))
+}
+
 object ScaledaDatabaseTest extends App {
   val db = new ScaledaDatabase
   db.forceCleanDatabase()

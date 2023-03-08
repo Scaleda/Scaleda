@@ -84,12 +84,12 @@ message ReaddirReply {
 }
 
 service RemoteFuseTransfer {
-  rpc login(stream FuseLoginMessage) returns (stream FuseLoginMessage) {}
+  // Token is in metadata
+  rpc visit(stream FuseTransferMessage) returns (stream FuseTransferMessage) {}
 }
 
-message FuseLoginMessage {
+message FuseTransferMessage {
   uint64 id = 1;
-  string token = 2;
-  string function = 3;
-  bytes message = 4;
+  string function = 2;
+  bytes message = 3;
 }

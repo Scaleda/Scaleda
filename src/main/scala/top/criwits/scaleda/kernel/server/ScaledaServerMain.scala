@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.server
 
 import kernel.database.ScaledaDatabase
+import kernel.net.fuse.FuseTransferServer
 import kernel.net.remote.{RemoteLoginRequest, RemoteRefreshRequest, RemoteRegisterLoginGrpc, RemoteRegisterRequest}
 import kernel.net.{RemoteServer, RpcPatch}
 import kernel.shell.ShellArgs
@@ -17,6 +18,9 @@ object ScaledaServerMain {
     })
     threadRpcServer.start()
     threads.addOne(threadRpcServer)
+    val sendFsRpcMessageThread = FuseTransferServer.requestThread
+    sendFsRpcMessageThread.start()
+    threads.addOne(sendFsRpcMessageThread)
     var loop = true
     while (loop) {
       try {

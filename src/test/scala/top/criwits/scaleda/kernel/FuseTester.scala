@@ -1,6 +1,8 @@
 package top.criwits.scaleda
 package kernel
 
+import kernel.net.RpcPatch
+import kernel.net.fuse.fs.RemoteFuseGrpc
 import kernel.net.fuse.{FuseRpcServer, FuseUtils, LocalFuse, ServerSideFuse}
 import kernel.utils.{KernelLogger, OS}
 
@@ -94,7 +96,8 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
     val t = new Thread(() => FuseRpcServer.start(source))
     t.setDaemon(true)
     t.start()
-    val fs = new ServerSideFuse
+    val (client, shutdown) = RpcPatch.getClient(RemoteFuseGrpc.blockingStub, "127.0.0.1", FuseRpcServer.port)
+    val fs = new ServerSideFuse(client)
     FuseUtils.mountFs(fs, dest, blocking = false)
     try {
       val exitFile = new File(source, "exit")
@@ -102,6 +105,7 @@ class FuseTester extends AnyFlatSpec with should.Matchers {
       exitFile.delete()
     } finally {
       fs.umount()
+      shutdown()
     }
   }
 }

@@ -1,6 +1,8 @@
 package top.criwits.scaleda
 package kernel.net
 
+import kernel.net.fuse.FuseTransferServer
+import kernel.net.fuse.fs.RemoteFuseTransferGrpc
 import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
 import kernel.net.remote._
 import kernel.net.user.RemoteRegisterLoginImpl
@@ -90,10 +92,11 @@ object RemoteServer {
     val server = RpcPatch.getStartServer(
       Seq(
         RemoteGrpc.bindService(new RemoteImpl, executionContext),
-        RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext)
+        RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext),
+        RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
       ),
       port,
-      enableAuthCheck = !EnvironmentUtils.Backup.env.contains("AUTH_DISABLE")
+      enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE")
     )
     server.awaitTermination()
   }
