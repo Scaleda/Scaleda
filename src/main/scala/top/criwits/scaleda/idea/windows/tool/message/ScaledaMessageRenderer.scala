@@ -11,10 +11,7 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 
 class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
-  protected val fileRegexString           = "([\\s\\w+:]*?/?(/.+/)?)((\\w+)\\.(\\w+))"
-  protected val fileLineNumberRegexString = fileRegexString + "\\:(\\w+)"
-  protected val fileRegex                 = new Regex(fileRegexString, "prefixPath", "filename")
-  protected val fileLineNumberRegex       = new Regex(fileRegexString, "prefixPath", "filename", "line")
+  import ScaledaMessageRenderer._
 
   protected def renderer(
       list: JList[_ <: ScaledaMessage],
@@ -31,6 +28,8 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
       case _     => AllIcons.General.Error
     }
     setIcon(icon)
+    val fileMatches = fileRegex.findAllMatchIn(value.text).toSeq.sortBy(d => d.start - d.end)
+
     Seq((value.text, None))
   }
 
@@ -50,6 +49,11 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
 object ScaledaMessageRendererImpl extends ScaledaMessageRenderer
 
 object ScaledaMessageRenderer {
+  val fileRegexString = "((\\w+\\:)*?[^\\s'\"/\\\\\\?\\:]*?/?((/[^\\&]+/)|(\\\\[^\\&]+\\\\))?)((\\w+)\\.(\\w+))"
+  val fileLineNumberRegexString = fileRegexString + "\\:(\\w+)"
+  val fileRegex = new Regex(fileRegexString)
+  val fileLineNumberRegex = new Regex(fileRegexString)
+
   private val allRenderers = new mutable.HashMap[String, ScaledaMessageRenderer]()
 
   def addRenderer(key: String, renderer: ScaledaMessageRenderer) = allRenderers.put(key, renderer)
@@ -59,4 +63,13 @@ object ScaledaMessageRenderer {
   def removeRenderer(key: String) = allRenderers.remove(key)
 
   def getRendererMap = allRenderers
+}
+
+object TestFileMatches extends App {
+  import ScaledaMessageRenderer._
+  val text =
+    "INFO: [Common 17-1381] The checkpoint '/home/chiro/programs/scaleda-sample-project/.synth/Vivado-Vivado Synth/waterfall/waterfall.runs/synth_1/waterfall.dcp' has been generated. && Run output will be captured here: /home/chiro/programs/scaleda-sample-project/.synth/Vivado-Vivado Synth/waterfall/waterfall.runs/synth_1/runme.log" +
+      " C:\\Scaleda\\a.txt - caleda.vv"
+  val fileMatches = fileRegex.findAllMatchIn(text).toSeq.sortBy(d => d.start - d.end)
+  fileMatches.foreach(p => println("[" + p + "]"))
 }
