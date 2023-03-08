@@ -4,19 +4,25 @@ package idea.windows.tool.message
 import idea.utils.Icons
 
 import com.intellij.icons.AllIcons
-import com.intellij.ui.ColoredListCellRenderer
+import com.intellij.ui.{ColoredListCellRenderer, SimpleTextAttributes}
 
 import javax.swing.JList
 import scala.collection.mutable
+import scala.util.matching.Regex
 
 class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
-  override def customizeCellRenderer(
+  protected val fileRegexString           = "([\\s\\w+:]*?/?(/.+/)?)((\\w+)\\.(\\w+))"
+  protected val fileLineNumberRegexString = fileRegexString + "\\:(\\w+)"
+  protected val fileRegex                 = new Regex(fileRegexString, "prefixPath", "filename")
+  protected val fileLineNumberRegex       = new Regex(fileRegexString, "prefixPath", "filename", "line")
+
+  protected def renderer(
       list: JList[_ <: ScaledaMessage],
       value: ScaledaMessage,
       index: Int,
       selected: Boolean,
       hasFocus: Boolean
-  ): Unit = {
+  ): Seq[(String, Option[SimpleTextAttributes])] = {
     import top.criwits.scaleda.kernel.utils.LogLevel._
     val icon = value.level match {
       case Debug => Icons.logVerbose
@@ -25,7 +31,19 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
       case _     => AllIcons.General.Error
     }
     setIcon(icon)
-    append(value.text)
+    Seq((value.text, None))
+  }
+
+  override final def customizeCellRenderer(
+      list: JList[_ <: ScaledaMessage],
+      value: ScaledaMessage,
+      index: Int,
+      selected: Boolean,
+      hasFocus: Boolean
+  ): Unit = {
+    renderer(list, value, index, selected, hasFocus).foreach(d =>
+      if (d._2.nonEmpty) append(d._1, d._2.get) else append(d._1)
+    )
   }
 }
 
