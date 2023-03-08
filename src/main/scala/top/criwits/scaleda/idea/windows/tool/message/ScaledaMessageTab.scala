@@ -32,24 +32,50 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val data         = new mutable.HashMap[String, (ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])]()
   private val viewComboBox = new ComboBox[String]()
 
+  private val allLevels = Seq(
+    LogLevel.Debug,
+    LogLevel.Verbose,
+    LogLevel.Info,
+    LogLevel.Warn,
+    LogLevel.Error,
+    LogLevel.Fatal
+  )
   private val enabledLevel = new mutable.HashSet[LogLevel.Value]()
+  // default to ignore debug and verbose
+  enabledLevel.addAll(allLevels.slice(allLevels.indexOf(LogLevel.Info), allLevels.size))
 
   private def findRenderer(toolchainType: String) =
     ScaledaMessageRenderer.getRendererMap.getOrElse(toolchainType, ScaledaMessageRendererImpl)
 
+  // Do sort here, filter is in other part
+  private def sortData(): Unit = {
+    if (sortByLevel) {
+      dataModel.synchronized {
+        val data = dataModel.toArray.map(_.asInstanceOf[ScaledaMessage])
+        data.sortInPlaceWith((a, b) => a.level.id > b.level.id)
+        dataModel.clear()
+        dataModel.addAll(CollectionConverters.asJava(data))
+      }
+    }
+  }
+
   private def selectToViewById(selectedId: String) = {
-    data
-      .get(selectedId)
-      .foreach(d => {
-        val (rt, messages) = d
-        // find renderer, if no, fallback to default
-        val renderer = findRenderer(rt.profile.toolchainType)
-        listComponent.setCellRenderer(renderer)
-        dataModel.synchronized {
-          dataModel.clear()
-          dataModel.addAll(CollectionConverters.asJava(messages))
-        }
-      })
+    if (selectedId != null) {
+      data
+        .get(selectedId)
+        .foreach(d => {
+          val (rt, messages) = d
+          // find renderer, if no, fallback to default
+          val renderer = findRenderer(rt.profile.toolchainType)
+          listComponent.setCellRenderer(renderer)
+          val filterData = messages.filter(m => enabledLevel.contains(m.level))
+          dataModel.synchronized {
+            dataModel.clear()
+            dataModel.addAll(CollectionConverters.asJava(filterData))
+          }
+        })
+      sortData()
+    }
   }
 
   // viewComboBox can be auto select when data changes
@@ -67,10 +93,12 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     while (running) {
       try {
         val (rt, message) = messageQueue.take()
-        if (viewComboBox.getItem == rt.id)
+        if (viewComboBox.getItem == rt.id && enabledLevel.contains(message.level)) {
           dataModel.synchronized {
             dataModel.addElement(message)
           }
+          sortData()
+        }
         data.synchronized {
           if (data.contains(rt.id)) data(rt.id)._2.addOne(message)
           else data.put(rt.id, (rt, ArrayBuffer(message)))
@@ -158,6 +186,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   ) {
     override def actionPerformed(e: AnActionEvent) = {
       sortByLevel = !sortByLevel
+      selectToViewById(viewComboBox.getItem)
     }
 
     override def update(e: AnActionEvent) = {
@@ -173,10 +202,42 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     )
   })
 
+  private val levelIcons = Map(
+    LogLevel.Debug   -> AllIcons.General.Note,
+    LogLevel.Verbose -> AllIcons.Debugger.Db_muted_field_breakpoint,
+    LogLevel.Info    -> AllIcons.General.Information,
+    LogLevel.Warn    -> AllIcons.General.Warning,
+    LogLevel.Error   -> AllIcons.General.Error,
+    LogLevel.Fatal   -> AllIcons.Ide.FatalError
+  )
+  private val levelDisabledIcon = AllIcons.RunConfigurations.TestIgnored
+
+  val levelActions = allLevels.map(level => {
+    val icon = levelIcons(level)
+    new AnAction(level.toString, level.toString, icon) {
+      override def actionPerformed(e: AnActionEvent) = {
+        if (enabledLevel.contains(level)) enabledLevel.remove(level)
+        else enabledLevel.add(level)
+        selectToViewById(viewComboBox.getItem)
+      }
+
+      override def update(e: AnActionEvent) = {
+        if (enabledLevel.contains(level)) {
+          e.getPresentation.setIcon(levelIcons(level))
+          e.getPresentation.setText(s"Enabled $level")
+        } else {
+          e.getPresentation.setIcon(levelDisabledIcon)
+          e.getPresentation.setText(s"Disabled $level")
+        }
+      }
+    }
+  })
+
   val group = new DefaultActionGroup()
   group.add(clearMessageAction)
   group.add(removeMessageAction)
   group.add(toggleSortAction)
+  levelActions.foreach(group.add)
 
   val toolbar = ActionManager
     .getInstance()
