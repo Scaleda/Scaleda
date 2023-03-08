@@ -3,33 +3,34 @@ package idea.runner
 
 import idea.ScaledaBundle
 import idea.utils.MainLogger
+import kernel.project.config.TaskConfig
 import kernel.shell.ScaledaRunHandler
+import kernel.shell.command.CommandDeps
+import kernel.toolchain.executor.Executor
 import kernel.utils.BasicLogger
 
 import com.intellij.execution.process.ProcessHandler
-import top.criwits.scaleda.kernel.project.config.TaskConfig
-import top.criwits.scaleda.kernel.shell.command.CommandDeps
-import top.criwits.scaleda.kernel.toolchain.executor.Executor
 
 import java.io.OutputStream
 
-/**
- * Handle a task process locally or remotely
- * @param logger using logger
- * @param task task
- * @param invokeAfterFinish will emit with [[task]] and [[Executor]] after `finishedAll`
- */
-class ScaledaRunProcessHandler(logger: BasicLogger, task: TaskConfig, invokeAfterFinish: (TaskConfig, Executor) => Unit = (_: TaskConfig, _: Executor) => {})
-    extends ProcessHandler
+/** Handle a task process locally or remotely
+  * @param logger using logger
+  * @param task task
+  * @param invokeAfterFinish will emit with [[task]] and [[Executor]] after `finishedAll`
+  */
+class ScaledaRunProcessHandler(
+    logger: BasicLogger,
+    task: TaskConfig,
+    invokeAfterFinish: (TaskConfig, Executor) => Unit = (_: TaskConfig, _: Executor) => {}
+) extends ProcessHandler
     with ScaledaRunHandler {
   // Set terminating <- `true` to invoke stopping
   var terminating = false
   // terminated will be set `true` after process really terminated
   var terminated = false
 
-  /**
-   * Called when destroy button clicked
-   */
+  /** Called when destroy button clicked
+    */
   override def destroyProcessImpl(): Unit = {
     MainLogger.warn(
       s"destroyProcessImpl, running: ${terminated}, stopping: ${terminating}"
@@ -68,14 +69,16 @@ class ScaledaRunProcessHandler(logger: BasicLogger, task: TaskConfig, invokeAfte
 
   var ret: Int = 0
 
-  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit = {
-    logger.info(ScaledaBundle.message("task.run.return.text", returnValue))
+  override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
+    val msg = ScaledaBundle.message("task.run.return.text", returnValue)
+    if (meetErrors) logger.warn(msg)
+    else logger.info(msg)
     ret = returnValue
-    if (finishedAll) {
+    if (finishedAll || meetErrors) {
       terminating = false
       terminated = true
-      // invoke
-      invokeAfterFinish(task, executor)
+      // invoke only success all
+      if (!meetErrors) invokeAfterFinish(task, executor)
     }
   }
 

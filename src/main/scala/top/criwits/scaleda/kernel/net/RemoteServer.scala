@@ -28,6 +28,7 @@ object RemoteServer {
         request: RunRequest,
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
+      // Note that there's only one command to execute
       CommandRunner.execute(
         Seq(
           CommandDeps(
@@ -51,7 +52,7 @@ object RemoteServer {
             )
           }
 
-          override def onReturn(returnValue: Int, finishedAll: Boolean) = {
+          override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean) = {
             responseObserver.onNext(
               new RunReply(
                 RUN_REPLY_TYPE_RETURN,

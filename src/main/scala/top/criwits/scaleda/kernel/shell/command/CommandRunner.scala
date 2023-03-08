@@ -159,7 +159,7 @@ object CommandRunner {
       flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
       val returnValue = r.returnValue.value.get.get
       if (returnValue != handler.expectedReturnValue) meetErrors = true
-      handler.onReturn(returnValue, commands.last == command || meetErrors)
+      handler.onReturn(returnValue, commands.last == command, meetErrors)
       step += 1
     })
   }
@@ -179,8 +179,8 @@ object CommandRunner {
 
       override def onStderr(data: String): Unit = handler.onStderr(data)
 
-      override def onReturn(returnValue: Int, finishedAll: Boolean): Unit = {
-        handler.onReturn(returnValue, finishedAll)
+      override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
+        handler.onReturn(returnValue, finishedAll, meetErrors)
         returnValues.addOne(returnValue)
       }
 

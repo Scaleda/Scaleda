@@ -120,7 +120,7 @@ trait ScaledaRunHandler {
     * @param returnValue return value
     * @param finishedAll is all commands finished
     */
-  def onReturn(returnValue: Int, finishedAll: Boolean): Unit
+  def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit
 
   /** Return true if handler is stopping this process
     * @return terminating
@@ -149,9 +149,9 @@ trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {
 }
 
 object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
-  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit = {
+  override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     // TODO: i18n
-    KernelLogger.info(s"command done, returns $returnValue, finishedAll: $finishedAll")
+    KernelLogger.info(s"command done, returns $returnValue, finishedAll: $finishedAll, meetErrors: $meetErrors")
   }
 }
 
@@ -160,9 +160,14 @@ object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
 
   override def onStderr(data: String): Unit = KernelLogger.error("[remote]", data)
 
-  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
+  override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     // TODO: i18n
-    KernelLogger.info("[remote]", s"command done, returns $returnValue")
+    if (meetErrors) {
+      KernelLogger.error("[remote]", s"command error, returns $returnValue")
+    } else {
+      KernelLogger.info("[remote]", s"command done, returns $returnValue")
+    }
+  }
 }
 
 /** RunHandler that records return value and outputs to [[returnValues]]
@@ -180,6 +185,6 @@ class ScaledaRunHandlerToArray(
   override def onStderr(data: String): Unit =
     errors.map(_.addOne(data)).getOrElse(onStdout(data))
 
-  override def onReturn(returnValue: Int, finishedAll: Boolean): Unit =
+  override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit =
     returnValues.foreach(_.addOne(returnValue))
 }
