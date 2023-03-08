@@ -103,6 +103,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   listComponent.setAutoscrolls(false)
   listComponent.setCellRenderer(ScaledaMessageRendererImpl)
 
+  // remove all message data
   private val removeMessageAction = new AnAction(
     // TODO: i18n
     "Remove",
@@ -120,6 +121,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     }
   }
 
+  // remove message data in this select
   private val clearMessageAction = new AnAction(
     ScaledaBundle.message("windows.message.action.clear"),
     ScaledaBundle.message("windows.message.action.clear"),
@@ -132,6 +134,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
       data.synchronized {
         data.remove(viewComboBox.getItem)
       }
+      viewComboBox.removeItem(viewComboBox.getItem)
     }
   }
 
