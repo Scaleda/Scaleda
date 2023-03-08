@@ -49,5 +49,6 @@ object ScaledaServerMainTest extends App {
 
   thread.interrupt()
   KernelLogger.info("main done")
+  System.exit(0)
   thread.join()
 }
