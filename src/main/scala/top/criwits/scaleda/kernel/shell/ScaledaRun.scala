@@ -28,6 +28,8 @@ object ScaledaRun {
       profile: Option[ToolchainProfile] = None,
       remoteDeps: Option[RemoteCommandDeps] = None
   ): Unit = {
+    val remoteDepsTmp = remoteDeps.getOrElse(RemoteCommandDeps(host = profile.map(_.host).getOrElse("")))
+    val remoteDepsUse = if (remoteDepsTmp.host.isEmpty) Some(remoteDepsTmp) else None
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
 
     val info = Toolchain.toolchains(target.toolchain)
@@ -93,7 +95,7 @@ object ScaledaRun {
           } else task
         val toolchain = info._2(executor)
         val commands  = toolchain.commands(taskUse)
-        CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+        CommandRunner.executeLocalOrRemote(remoteDepsUse, commands, handler)
       })
       .getOrElse(KernelLogger.error("No profile found!"))
   }
@@ -103,9 +105,10 @@ object ScaledaRun {
       workingDir: File,
       target: TargetConfig,
       task: TaskConfig,
-      daemon: Boolean = true
+      daemon: Boolean = true,
+      profile: Option[ToolchainProfile] = None,
   ): Thread = {
-    val t = new Thread(() => runTask(handler, workingDir, target, task))
+    val t = new Thread(() => runTask(handler, workingDir, target, task, profile = profile))
     t.setDaemon(daemon)
     t
   }

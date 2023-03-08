@@ -70,10 +70,11 @@ message RunReply {
 message RemoteProfile {
   string profileName = 1;
   string toolchainType = 2;
-  string path = 3;
-  string iverilogPath = 4;
-  string vvpPath = 5;
-  string iverilogVPIPath = 6;
+// FIXME: items over 3 make gRPC crash!!
+//  string path = 3;
+//  string iverilogPath = 4;
+//  string vvpPath = 5;
+//  string iverilogVPIPath = 6;
 }
 message ProfilesReply {
   repeated RemoteProfile profiles = 1;

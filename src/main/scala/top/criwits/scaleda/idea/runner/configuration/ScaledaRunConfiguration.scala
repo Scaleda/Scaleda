@@ -125,7 +125,12 @@ class ScaledaRunConfiguration(
                   )
               } else {
                 val (client, shutdown) = RemoteClient(profileHostUse)
-                remoteProfiles = Some(client.getProfiles(Empty()).profiles.map(ToolchainProfile(_)))
+                remoteProfiles = Some(
+                  client
+                    .getProfiles(Empty())
+                    .profiles
+                    .map(p => ToolchainProfile.asRemoteToolchainProfile(p, profileHostUse))
+                )
                 shutdown()
                 remoteProfiles.get
                   .find(p =>
@@ -187,7 +192,8 @@ class ScaledaRunConfiguration(
                     handler,
                     new File(ProjectConfig.projectBase.get),
                     target,
-                    task
+                    task,
+                    profile = profile
                   )
 
                   val runtime = ScaledaRuntimeInfo(

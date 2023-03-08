@@ -30,6 +30,8 @@ class ToolchainProfile(
   var edited: Boolean = false
   @JsonIgnore
   var removed: Boolean = false
+  @JsonIgnore
+  var host: String = ""
 
   def this(profileName: String, toolchainType: String) = {
     this(profileName, toolchainType, "", "", "", "")
@@ -52,7 +54,7 @@ class ToolchainProfile(
   }
 
   @JsonIgnore
-  def asRemoteProfile = RemoteProfile.of(profileName, toolchainType, path, iverilogPath, vvpPath, iverilogVPIPath)
+  def asRemoteProfile = RemoteProfile.of(profileName, toolchainType)
 }
 
 object ToolchainProfile {
@@ -76,8 +78,10 @@ object ToolchainProfile {
     def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String])
   }
 
-  def apply(remote: RemoteProfile): ToolchainProfile = {
+  def asRemoteToolchainProfile(remote: RemoteProfile, host: String): ToolchainProfile = {
     import remote._
-    new ToolchainProfile(profileName, toolchainType, path, iverilogPath, vvpPath, iverilogVPIPath)
+    val v = new ToolchainProfile(profileName, toolchainType, "", "", "", "")
+    v.host = host
+    v
   }
 }
