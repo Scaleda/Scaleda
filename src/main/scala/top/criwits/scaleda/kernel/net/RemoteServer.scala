@@ -7,7 +7,7 @@ import kernel.net.user.RemoteRegisterLoginImpl
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
-import kernel.utils.{KernelLogger, OS}
+import kernel.utils.{EnvironmentUtils, KernelLogger, OS}
 
 import io.grpc.stub.StreamObserver
 
@@ -93,7 +93,7 @@ object RemoteServer {
         RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext)
       ),
       port,
-      enableAuthProvide = true
+      enableAuthCheck = !EnvironmentUtils.Backup.env.contains("AUTH_DISABLE")
     )
     server.awaitTermination()
   }

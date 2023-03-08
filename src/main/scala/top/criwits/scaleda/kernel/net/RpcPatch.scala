@@ -39,7 +39,7 @@ object RpcPatch {
   def getStartServer(
       services: => Seq[ServerServiceDefinition],
       port: Int,
-      enableAuthProvide: Boolean = false
+      enableAuthCheck: Boolean = false
   ): Server = {
     val provider = RpcPatch.getDefaultServerProvider
     val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
@@ -47,7 +47,7 @@ object RpcPatch {
     val builder = method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
     services.foreach(service => builder.addService(service))
     KernelLogger.info("scaleda grpc server serve at port", port)
-    if (enableAuthProvide) {
+    if (enableAuthCheck) {
       builder.intercept(new JwtAuthorizationInterceptor)
     }
     val server = builder.build().start()
