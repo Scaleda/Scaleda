@@ -144,17 +144,23 @@ class ScaledaDatabase {
       username: String,
       provider: Map[String, String] => Option[String] = claims => JwtManager.createToken(claims = claims)
   ): Token = {
-    val token     = provider(Map("username" -> username)).get
-    val exp       = JwtManager.decode(token).get.getExpiresAt
-    val preparing = getConnection.prepareStatement("INSERT INTO t_token (token, username, exp) VALUES (?, ?, ?)")
-    preparing.setString(1, token)
-    preparing.setString(2, username)
-    preparing.setTimestamp(3, Timestamp.from(exp.toInstant))
-    preparing.executeUpdate()
-    preparing.close()
-    // manually do clean...
-    manuallyCleanToken()
-    new Token(token, username, exp)
+    val token      = provider(Map("username" -> username)).get
+    val existToken = findToken(token)
+    if (existToken.isDefined) {
+      // retry
+      createToken(username, provider)
+    } else {
+      val exp       = JwtManager.decode(token).get.getExpiresAt
+      val preparing = getConnection.prepareStatement("INSERT INTO t_token (token, username, exp) VALUES (?, ?, ?)")
+      preparing.setString(1, token)
+      preparing.setString(2, username)
+      preparing.setTimestamp(3, Timestamp.from(exp.toInstant))
+      preparing.executeUpdate()
+      preparing.close()
+      // manually do clean...
+      manuallyCleanToken()
+      new Token(token, username, exp)
+    }
   }
 
   def findToken(token: String): Option[Token] = {
