@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.{JBList, JBScrollPane}
 
+import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.event.ListSelectionEvent
 import javax.swing.{BoxLayout, DefaultListModel, JPanel}
 
@@ -19,9 +20,29 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val msgSourceId = ScaledaMessageTab.MESSAGE_ID
   private var sortByLevel = false
   private val dataModel   = new DefaultListModel[ScaledaMessage]()
+  private val listComponent = new JBList[ScaledaMessage](dataModel)
+
+  private val messageQueue = new LinkedBlockingQueue[ScaledaMessage]()
+
+  private val messageHandleThread = new Thread(() => {
+    var running = true
+    while (running) {
+      try {
+        val message = messageQueue.take()
+        dataModel.synchronized {
+          dataModel.addElement(message)
+        }
+        Thread.sleep(50)
+      } catch {
+        case e: InterruptedException => running = false
+      }
+    }
+  })
+  messageHandleThread.start()
 
   private val messageParser = new ScaledaMessageParser(message => {
-    dataModel.addElement(message)
+    messageQueue.put(message)
+    MainLogger.info("message insert:", message)
   })
 
   def attachToLogger(sourceId: String): Unit = {
@@ -34,10 +55,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     service.removeListener(sourceId)
   }
 
-  // add all known toolchain types
-  // Toolchain.toolchains.keys.foreach(toolchain => service.addListener(s"$msgSourceId-$toolchain", messageParser))
-  private val listComponent = new JBList[ScaledaMessage](dataModel)
-  private val scrollbar     = new JBScrollPane()
+  private val scrollbar = new JBScrollPane()
   // listComponent.setAutoscrolls(true)
   listComponent.setAutoscrolls(false)
   private val renderer = new ScaledaMessageRenderer
@@ -49,8 +67,9 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     AllIcons.Diff.Remove
   ) {
     override def actionPerformed(e: AnActionEvent) = {
-      // data.clear()
-      dataModel.clear()
+      dataModel.synchronized {
+        dataModel.clear()
+      }
     }
   }
 
@@ -63,13 +82,6 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
       sortByLevel = !sortByLevel
     }
   }
-  // dataModel.addListDataListener(new ListDataListener() {
-  //   override def intervalAdded(listDataEvent: ListDataEvent): Unit = ???
-  //
-  //   override def intervalRemoved(listDataEvent: ListDataEvent): Unit = ???
-  //
-  //   override def contentsChanged(listDataEvent: ListDataEvent): Unit = ???
-  // })
   listComponent.addListSelectionListener((listSelectionEvent: ListSelectionEvent) => {
     MainLogger.info(
       listSelectionEvent.toString,
@@ -89,7 +101,6 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   toolbar.setTargetComponent(this)
   val panel = new JPanel()
   panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS))
-  panel.add(listComponent)
   scrollbar.setViewportView(listComponent)
   panel.add(scrollbar)
   setContent(panel)
@@ -98,6 +109,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 
   override def dispose() = {
     ScaledaMessageTab.INSTANCE = null
+    messageHandleThread.interrupt()
     val service = project.getService(classOf[ScaledaLoggingService])
     service.removeListener(msgSourceId)
   }
