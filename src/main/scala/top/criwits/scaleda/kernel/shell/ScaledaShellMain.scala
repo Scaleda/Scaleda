@@ -197,15 +197,17 @@ object ScaledaShellMain {
             for (p <- Toolchain.profiles()) {
               KernelLogger.info(s"${JSONHelper(p)}")
             }
-            stub.foreach(stub => {
-              val (client, _) = stub
-              val profiles    = client.getProfiles(Empty())
-              if (profiles.profiles.nonEmpty) {
-                KernelLogger.info("remote profile list:")
-                for (p <- profiles.profiles)
-                  KernelLogger.info(s"${JSONHelper(p)}")
-              }
-            })
+            {
+              stub.foreach(stub => {
+                val (client, _) = stub
+                val profiles    = client.getProfiles(Empty())
+                if (profiles.profiles.nonEmpty) {
+                  KernelLogger.info("remote profile list:")
+                  for (p <- profiles.profiles)
+                    KernelLogger.info(s"${JSONHelper(p)}")
+                }
+              })
+            }
           case ShellRunMode.ListTasks =>
             KernelLogger.info("task list:")
             ProjectConfig
