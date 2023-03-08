@@ -8,7 +8,7 @@ import kernel.utils.{KernelLogger, Paths}
 import org.apache.commons.io.IOUtils
 
 import java.io.File
-import java.sql.{Connection, Date, DriverManager, SQLException}
+import java.sql._
 import java.time.{Duration, Instant, ZoneId, ZonedDateTime}
 import java.util
 import scala.collection.mutable.ArrayBuffer
@@ -66,6 +66,8 @@ class ScaledaDatabase {
     dropDatabase()
     updateDatabase()
   }
+
+  updateDatabase()
 
   // t_user
 
@@ -145,13 +147,25 @@ class ScaledaDatabase {
     // val token     = provider(Map("username" -> username)).get
     // val exp       = JwtManager.decode(token).get.getExpiresAt
     val token     = "test-token"
-    val exp       = new Date(new util.Date().getTime + Duration.ofMinutes(1).toMillis)
+    val exp       = new Date(new util.Date().getTime + Duration.ofSeconds(2).toMillis)
     val preparing = getConnection.prepareStatement("INSERT INTO t_token (token, username, exp) VALUES (?, ?, ?)")
     preparing.setString(1, token)
     preparing.setString(2, username)
-    // TODO: convert writing timezone to utc
-    // preparing.setDate(3, ZonedDateTime.ofInstant(new Date(exp.getTime).toInstant, ZoneId.of()))
-    preparing.setDate(3, exp)
+    // convert writing timezone to utc
+    // preparing.setDate(
+    //   3,
+    //   new Date(
+    //     ZonedDateTime
+    //       .ofInstant(
+    //         new util.Date(exp.getTime).toInstant,
+    //         ZoneId.of("UTC")
+    //         // ZoneId.systemDefault()
+    //       )
+    //       .toInstant
+    //       .toEpochMilli
+    //   )
+    // )
+    preparing.setTimestamp(3, Timestamp.from(new util.Date(exp.getTime).toInstant))
     preparing.executeUpdate()
     preparing.close()
     new Token(token, username, exp)
@@ -168,8 +182,16 @@ class ScaledaDatabase {
       val t = new Token()
       t.setToken(resultSet.getString("token"))
       t.setUsername(resultSet.getString("username"))
-      // TODO: convert time from utc to timezone
-      t.setExp(new util.Date(resultSet.getDate("exp").getTime))
+      // convert time from utc to timezone
+      // t.setExp(
+      //   new util.Date(
+      //     ZonedDateTime
+      //       .ofInstant(new util.Date(resultSet.getDate("exp").getTime).toInstant, ZoneId.systemDefault())
+      //       .toInstant
+      //       .toEpochMilli
+      //   )
+      // )
+      t.setExp(resultSet.getTimestamp("exp"))
       result.addOne(t)
     }
     resultSet.close()
@@ -181,9 +203,30 @@ class ScaledaDatabase {
     findToken(token).flatMap(t => findUser(t.getUsername))
 
   def manuallyCleanToken(): Unit = {
-    val st = getConnection.createStatement()
-    st.executeUpdate("DELETE FROM t_token WHERE exp < CURRENT_TIMESTAMP")
-    st.close()
+    // val st = getConnection.createStatement()
+    // st.executeUpdate("DELETE FROM t_token WHERE exp < CURRENT_TIMESTAMP")
+    // st.close()
+    {
+      val preparing = getConnection.prepareStatement("SELECT token, username, exp FROM t_token WHERE exp < ?")
+      preparing.setTimestamp(1, Timestamp.from(Instant.now()))
+      val resultSet = preparing.executeQuery()
+      val result    = ArrayBuffer[Token]()
+      while (resultSet.next()) {
+        result.addOne(
+          new Token(resultSet.getString("token"), resultSet.getString("username"), resultSet.getTimestamp("exp"))
+        )
+      }
+      preparing.close()
+      for (token <- result) {
+        KernelLogger.warn("will delete:", token, "now", Timestamp.from(Instant.now()))
+      }
+    }
+    {
+      val preparing = getConnection.prepareStatement("DELETE FROM t_token WHERE exp < ?")
+      preparing.setTimestamp(1, Timestamp.from(Instant.now()))
+      preparing.executeUpdate()
+      preparing.close()
+    }
   }
 
 }

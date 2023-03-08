@@ -9,9 +9,10 @@ CREATE TABLE IF NOT EXISTS t_token
 (
     token    varchar(128) NOT NULL PRIMARY KEY,
     username varchar(32)  NOT NULL,
-    exp      datetime     NOT NULL
+    exp      timestamp    NOT NULL
 );
 
+-- NOT WORK FOR TIMEZONE
 -- CREATE TRIGGER IF NOT EXISTS clean_token
 --     AFTER INSERT
 --     ON t_token
