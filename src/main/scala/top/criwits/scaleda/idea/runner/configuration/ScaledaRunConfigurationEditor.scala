@@ -2,9 +2,11 @@ package top.criwits.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
+import kernel.net.RemoteServer
 import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.configuration.EnvironmentVariablesComponent
+import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, TextFieldWithBrowseButton}
@@ -23,6 +25,19 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
   ProjectConfig.getConfig().foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
+
+  profileHost.addActionListener(e => {
+    val group = new DefaultActionGroup()
+    RemoteServer.AVAILABLE_REMOTE_HOSTS.foreach(host => {
+      group.add(new AnAction(host) {
+        override def actionPerformed(e: AnActionEvent) = {
+          profileHost.setText(host)
+        }
+      })
+    })
+    val popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group)
+    popupMenu.getComponent.show(profileHost, profileHost.getX, profileHost.getY)
+  })
 
   targetName.addItemListener(e => {
     if (e.getStateChange == ItemEvent.SELECTED) {

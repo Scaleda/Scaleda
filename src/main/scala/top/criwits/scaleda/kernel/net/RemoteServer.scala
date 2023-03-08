@@ -23,6 +23,10 @@ import scala.language.existentials
 object RemoteServer {
   final val DEFAULT_PORT = 20051
 
+  final val AVAILABLE_REMOTE_HOSTS = Seq(
+    "127.0.0.1", "pc.chiro.work"
+  )
+
   private class RemoteImpl extends RemoteGrpc.Remote {
     override def run(
         request: RunRequest,
