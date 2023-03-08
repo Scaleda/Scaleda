@@ -52,7 +52,9 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     if (sortByLevel) {
       dataModel.synchronized {
         val data = dataModel.toArray.map(_.asInstanceOf[ScaledaMessage])
-        data.sortInPlaceWith((a, b) => a.level.id > b.level.id)
+        data.sortInPlaceWith((a, b) =>
+          if (a.level.id == b.level.id) a.time.toEpochMilli < b.time.toEpochMilli else a.level.id > b.level.id
+        )
         dataModel.clear()
         dataModel.addAll(CollectionConverters.asJava(data))
       }
