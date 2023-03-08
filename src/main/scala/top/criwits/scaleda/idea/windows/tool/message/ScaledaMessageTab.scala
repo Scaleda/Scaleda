@@ -5,6 +5,7 @@ import idea.ScaledaBundle
 import idea.runner.ScaledaRuntimeInfo
 import idea.utils.MainLogger
 import idea.windows.tool.logging.ScaledaLoggingService
+import kernel.utils.LogLevel
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
@@ -17,7 +18,7 @@ import java.awt.BorderLayout
 import java.awt.event.ItemEvent
 import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.event.ListSelectionEvent
-import javax.swing.{BoxLayout, DefaultListModel, JPanel}
+import javax.swing.{BoxLayout, DefaultListModel, Icon, JPanel}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.javaapi.CollectionConverters
@@ -31,14 +32,18 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val data         = new mutable.HashMap[String, (ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])]()
   private val viewComboBox = new ComboBox[String]()
 
+  private val enabledLevel = new mutable.HashSet[LogLevel.Value]()
+
+  private def findRenderer(toolchainType: String) =
+    ScaledaMessageRenderer.getRendererMap.getOrElse(toolchainType, ScaledaMessageRendererImpl)
+
   private def selectToViewById(selectedId: String) = {
     data
       .get(selectedId)
       .foreach(d => {
         val (rt, messages) = d
         // find renderer, if no, fallback to default
-        val renderer =
-          ScaledaMessageRenderer.getRendererMap.getOrElse(rt.profile.toolchainType, ScaledaMessageRendererImpl)
+        val renderer = findRenderer(rt.profile.toolchainType)
         listComponent.setCellRenderer(renderer)
         dataModel.synchronized {
           dataModel.clear()
@@ -47,6 +52,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
       })
   }
 
+  // viewComboBox can be auto select when data changes
   viewComboBox.addItemListener(e => {
     if (e.getStateChange == ItemEvent.SELECTED) {
       val selectedId = e.getItem.asInstanceOf[String]
@@ -69,6 +75,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
           if (data.contains(rt.id)) data(rt.id)._2.addOne(message)
           else data.put(rt.id, (rt, ArrayBuffer(message)))
         }
+        // A delay is necessary, or items in list will flash
         Thread.sleep(50)
       } catch {
         case e: InterruptedException => running = false
@@ -91,6 +98,8 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     }
     viewComboBox.addItem(runtime.id)
     viewComboBox.setSelectedItem(runtime.id)
+    val renderer = findRenderer(runtime.profile.toolchainType)
+    listComponent.setCellRenderer(renderer)
   }
 
   def detachFromLogger(sourceId: String): Unit = {
@@ -138,13 +147,22 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     }
   }
 
+  private def getToggleSortIcon: Icon =
+    if (sortByLevel)
+      AllIcons.RunConfigurations.Scroll_down
+    else AllIcons.General.AutoscrollToSource
   private val toggleSortAction = new AnAction(
     ScaledaBundle.message("windows.message.action.sort"),
     ScaledaBundle.message("windows.message.action.sort"),
-    AllIcons.General.AutoscrollToSource
+    getToggleSortIcon
   ) {
     override def actionPerformed(e: AnActionEvent) = {
       sortByLevel = !sortByLevel
+    }
+
+    override def update(e: AnActionEvent) = {
+      // update icon
+      e.getPresentation.setIcon(getToggleSortIcon)
     }
   }
   listComponent.addListSelectionListener((listSelectionEvent: ListSelectionEvent) => {

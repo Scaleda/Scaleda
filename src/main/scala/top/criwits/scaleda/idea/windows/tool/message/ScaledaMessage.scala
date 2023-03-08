@@ -6,9 +6,11 @@ import verilog.VerilogPSIFileRoot
 
 import org.jetbrains.annotations.Nls
 
+import java.time.Instant
+
 case class ScaledaMessage(
     code: Int = 0,
-    time: Long = 0,
+    time: Instant = Instant.now(),
     level: LogLevel.Value = LogLevel.Debug,
     @Nls text: String = "",
     file: Option[VerilogPSIFileRoot] = None,

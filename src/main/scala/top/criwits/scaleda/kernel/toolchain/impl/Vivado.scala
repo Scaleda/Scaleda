@@ -195,8 +195,7 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
           Some(
             ScaledaMessage(
               text = s"[$tag] $message",
-              level = textedLevel,
-              time = System.currentTimeMillis()
+              level = textedLevel
             )
           )
         } else {
