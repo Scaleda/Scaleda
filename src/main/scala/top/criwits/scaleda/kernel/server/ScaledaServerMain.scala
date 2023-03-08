@@ -4,7 +4,7 @@ package kernel.server
 import kernel.database.ScaledaDatabase
 import kernel.net.fuse.FuseTransferServer
 import kernel.net.remote.{RemoteLoginRequest, RemoteRefreshRequest, RemoteRegisterLoginGrpc, RemoteRegisterRequest}
-import kernel.net.{RemoteServer, RpcPatch}
+import kernel.net.{RemoteClient, RemoteServer, RpcPatch}
 import kernel.shell.ShellArgs
 import kernel.utils.KernelLogger
 
@@ -44,21 +44,28 @@ object ScaledaServerMainTest extends App {
   val db = new ScaledaDatabase
   db.forceCleanDatabase()
 
-  val (client, shutdown) =
-    RpcPatch.getClient(
-      RemoteRegisterLoginGrpc.blockingStub,
-      "127.0.0.1",
-      RemoteServer.DEFAULT_PORT,
-      enableAuthProvide = true
-    )
-  val registerReply = client.register(RemoteRegisterRequest.of("test", "test", ""))
-  val loginReply    = client.login(RemoteLoginRequest.of("test", "test"))
-  val refreshToken  = loginReply.refreshToken
-  val token         = loginReply.token
-  val refreshReply  = client.refresh(RemoteRefreshRequest.of(refreshToken))
-  val tokenNew      = refreshReply.token
-
-  KernelLogger.info("refresh token", refreshToken, "token", token, "new token", tokenNew)
+  {
+    val (client, shutdown) =
+      RpcPatch.getClient(
+        RemoteRegisterLoginGrpc.blockingStub,
+        "127.0.0.1",
+        RemoteServer.DEFAULT_PORT,
+        enableAuthProvide = true
+      )
+    val registerReply = client.register(RemoteRegisterRequest.of("test", "test", ""))
+    val loginReply    = client.login(RemoteLoginRequest.of("test", "test"))
+    val refreshToken  = loginReply.refreshToken
+    val token         = loginReply.token
+    val refreshReply  = client.refresh(RemoteRefreshRequest.of(refreshToken))
+    val tokenNew      = refreshReply.token
+    KernelLogger.info("refresh token", refreshToken, "token", token, "new token", tokenNew)
+  }
+  {
+    val (client, shutdown) = RemoteClient("127.0.0.1")
+    val reply              = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of())
+    KernelLogger.info("remote profiles", reply.profiles)
+    shutdown()
+  }
 
   thread.interrupt()
   KernelLogger.info("main done")

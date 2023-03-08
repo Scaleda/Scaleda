@@ -71,7 +71,9 @@ object RemoteServer {
     }
 
     override def getProfiles(request: Empty): Future[ProfilesReply] = async {
-      ProfilesReply(Toolchain.profiles().toSeq.map(_.asRemoteProfile))
+      val profiles = Toolchain.profiles().toSeq.map(_.asRemoteProfile)
+      KernelLogger.info("remote profiles:", profiles)
+      ProfilesReply(profiles)
     }
 
     override def getRemoteInfo(request: Empty): Future[RemoteInfo] = async {

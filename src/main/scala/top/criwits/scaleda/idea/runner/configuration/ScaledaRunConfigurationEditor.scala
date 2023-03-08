@@ -50,7 +50,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
         Toolchain.profiles().foreach(p => profileName.addItem(ProfilePair("", p.profileName)))
       }
     } else {
-      if (loadedRemoteProfiles.contains(host)) return
+      if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty) return
       val thread = new Thread(() => {
         try {
           val (client, shutdown) = RemoteClient(host)
@@ -144,7 +144,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     s.taskName = taskName.getItem
     s.targetName = targetName.getItem
     s.extraEnvs.addAll(CollectionConverters.asScala(environmentVarsComponent.getEnvs))
-    s.profileName = profileName.getItem.name
+    s.profileName = if (profileName.getItem != null) profileName.getItem.name else ""
     s.profileHost = profileHost.getText
   }
 
