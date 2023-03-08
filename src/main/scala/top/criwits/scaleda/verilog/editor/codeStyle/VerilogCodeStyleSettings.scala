@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package verilog.editor.codeStyle
 
 import com.intellij.psi.codeStyle.{CodeStyleSettings, CustomCodeStyleSettings}
-import top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettings.{INFER}
+import top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettings.INFER
 
 class VerilogCodeStyleSettings(container: CodeStyleSettings) extends CustomCodeStyleSettings("Verilog", container) {
   var LINE_BREAK_PENALTY: Int = 2

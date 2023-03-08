@@ -20,7 +20,7 @@ class ScaledaToolWindowFactory extends ToolWindowFactory {
       new ConsoleTabManager(project, toolWindow.getContentManager)
     Disposer.register(service, tabManager)
 
-    val messageTab = new ScaledaMessageTab(project)
+    val messageTab = ScaledaMessageTab(project)
 
     tabManager.addPanel(messageTab, ScaledaBundle.message("windows.tool.log.message.title"))
     tabManager.addTab(OutputLogger.LOGGER_ID, ScaledaBundle.message("windows.tool.log.output.title"), switchTo = false)
