@@ -32,7 +32,7 @@ object RemoteServer {
       CommandRunner.execute(
         Seq(
           CommandDeps(
-            commands = request.commands,
+            args = request.commands,
             path = request.path,
             envs = request.envs.map(t => (t.a, t.b))
           )

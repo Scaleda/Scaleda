@@ -42,7 +42,7 @@ class RvcdService extends Disposable {
       CommandRunner.execute(
         Seq(
           CommandDeps(
-            commands = cmdLine,
+            args = cmdLine,
             description = "Start RVCD Instance"
           )
         ),

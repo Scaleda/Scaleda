@@ -61,7 +61,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
     Seq(
       CommandDeps(
-        commands = Seq(
+        args = Seq(
           executor.profile.iverilogPath,
           "-s",
           testbench,
@@ -73,7 +73,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
         description = "Compiling designs"
       ),
       CommandDeps(
-        commands = Seq(executor.profile.vvpPath, simExecutorName),
+        args = Seq(executor.profile.vvpPath, simExecutorName),
         path = workingDir.getAbsolutePath,
         description = "Running simulation"
       )
@@ -106,7 +106,7 @@ object IVerilog extends ScaledaMessageToolchainParserProvider {
         return None
       }
 
-      Some(iverilogFiles.map(f => CommandDeps(commands = Seq(f.getAbsolutePath, "-V"))))
+      Some(iverilogFiles.map(f => CommandDeps(args = Seq(f.getAbsolutePath, "-V"))))
     }
 
     /** Parse toolchain version information from output of command lines of [[verifyCommandLine]]

@@ -27,7 +27,7 @@ class CommandRunnerTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "ping 127.0.0.1" in {
-    val ping = CommandDeps(commands = Seq("ping", if (OS.isWindows) "-n" else "-c", "4", "127.0.0.1"))
+    val ping = CommandDeps(args = Seq("ping", if (OS.isWindows) "-n" else "-c", "4", "127.0.0.1"))
     CommandRunner.execute(Seq(ping), ScaledaRunKernelHandler)
   }
 }

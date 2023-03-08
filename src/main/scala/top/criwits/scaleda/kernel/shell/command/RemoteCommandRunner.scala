@@ -27,7 +27,7 @@ class RemoteCommandRunner(
   )
   builder.usePlaintext()
   val request = new RunRequest(
-    commands = deps.commands,
+    commands = deps.args,
     path = deps.path,
     envs = deps.envs.map(t => new StringTriple(t._1, t._2))
   )

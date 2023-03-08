@@ -40,7 +40,7 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
 
   private def commandDepsForSingleTcl(tclUse: String) = Seq(
     CommandDeps(
-      commands = Seq(
+      args = Seq(
         getVivadoExec(executor.profile.path),
         "-mode",
         "batch",
@@ -97,7 +97,7 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
       if (!vivadoFile.exists()) {
         return None
       }
-      Some(Seq(CommandDeps(commands = Seq(vivadoFile.getAbsolutePath, "-version"))))
+      Some(Seq(CommandDeps(args = Seq(vivadoFile.getAbsolutePath, "-version"))))
     }
 
     override def parseVersionInfo(
@@ -213,7 +213,7 @@ object Vivado extends ToolchainProfileDetector with ScaledaMessageToolchainParse
       case Some(vivadoPath) =>
         val vivadoFile = new File(vivadoPath)
         val commands = Seq(
-          CommandDeps(commands = Seq(vivadoFile.getAbsolutePath, "-version"))
+          CommandDeps(args = Seq(vivadoFile.getAbsolutePath, "-version"))
         )
         val outputStrings = ArrayBuffer[String]()
         val returnValues = await(

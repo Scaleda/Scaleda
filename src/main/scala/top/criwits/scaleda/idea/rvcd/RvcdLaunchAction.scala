@@ -14,7 +14,7 @@ class RvcdLaunchAction extends AnAction {
       CommandRunner.execute(
         Seq(
           CommandDeps(
-            commands = Seq(RvcdService.rvcdFile.getAbsolutePath),
+            args = Seq(RvcdService.rvcdFile.getAbsolutePath),
             description = "Start RVCD Instance"
           )
         ),

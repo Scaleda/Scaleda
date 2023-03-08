@@ -20,7 +20,7 @@ case class CommandOutputStream(
 )
 
 case class CommandDeps(
-    commands: Seq[String] = Seq(),
+    args: Seq[String] = Seq(),
     path: String = "",
     envs: Seq[(String, String)] = Seq(),
     description: String = ""
@@ -29,13 +29,13 @@ case class CommandDeps(
 class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val path: String =
     if (deps.path.isEmpty) System.getProperty("user.dir") else deps.path
-  val commands                    = deps.commands
+  val args                        = deps.args
   val envs: Seq[(String, String)] = deps.envs
   val workingDir                  = new File(path)
   if (!workingDir.exists()) workingDir.mkdirs()
   KernelLogger.warn("exec deps:", deps)
   private val procBuilder = new ProcessBuilder()
-  procBuilder.command(CollectionConverters.asJava(commands))
+  procBuilder.command(CollectionConverters.asJava(args))
   procBuilder.directory(workingDir)
   deps.envs.foreach(d => procBuilder.environment().put(d._1, d._2))
   private var process: Option[Process] = None
@@ -132,7 +132,7 @@ object CommandRunner {
     val steps      = commands.length
     commands.foreach(command => {
       if (!ignoreErrors && meetErrors) return
-      KernelLogger.info(s"running command: ${command.commands.mkString(" ")}")
+      KernelLogger.info(s"running command: ${command.args.mkString(" ")}")
       val stepHint = (s"-- Step ($step/$steps)") + (
         if (command.description != "") ": " + command.description
         else ""
