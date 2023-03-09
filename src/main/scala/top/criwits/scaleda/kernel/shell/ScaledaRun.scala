@@ -14,6 +14,7 @@ import io.grpc.StatusRuntimeException
 
 import java.io.File
 import java.time.Instant
+import java.util.Date
 import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
@@ -143,7 +144,7 @@ object ScaledaRun {
           None
         } else {
           val runtimeId =
-            s"${target.toolchain}-${target.name}-${task.name}-${Instant.now()}"
+            s"${target.toolchain}-${target.name}-${task.name}-${new Date()}"
 
           val workingDir = new File(ProjectConfig.projectBase.get)
           val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
