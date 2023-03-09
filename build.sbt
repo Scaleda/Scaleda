@@ -62,7 +62,7 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
   libraryDependencies += "com.google.guava" % "guava" % "31.1-jre",
   // https://mvnrepository.com/artifact/commons-io/commons-io
   libraryDependencies += "commons-io" % "commons-io" % "2.11.0",
-    // https://mvnrepository.com/artifact/log4j/log4j
+  // https://mvnrepository.com/artifact/log4j/log4j
   libraryDependencies += "log4j" % "log4j" % "1.2.17",
   libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "1.0.1",
   libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % Provided,

@@ -1,6 +1,8 @@
 package top.criwits.scaleda
 package kernel.utils
 
+import kernel.bin.ExtractAssets
+
 object ScaledaClean {
   def run(): Unit = {
     // remove ~/.scaleda
@@ -18,5 +20,6 @@ object ScaledaClean {
 }
 
 object ScaledaCleanTest extends App {
+  ExtractAssets.run()
   ScaledaClean.run()
 }
