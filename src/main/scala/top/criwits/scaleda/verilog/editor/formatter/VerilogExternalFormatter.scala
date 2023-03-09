@@ -1,26 +1,28 @@
 package top.criwits.scaleda
 package verilog.editor.formatter
 
+import idea.ScaledaBundle
+import idea.utils.Notification
+import verilog.editor.codeStyle.VerilogCodeStyleSettings
+import verilog.{VerilogFileType, VerilogLanguage, VerilogPSIFileRoot}
+
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.{CapturingProcessAdapter, OSProcessHandler, ProcessEvent}
 import com.intellij.formatting.service.AsyncDocumentFormattingService.FormattingTask
 import com.intellij.formatting.service.{AsyncDocumentFormattingService, AsyncFormattingRequest, FormattingService}
 import com.intellij.psi.PsiFile
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.idea.utils.{MainLogger, Notification}
-import top.criwits.scaleda.verilog.{VerilogFileType, VerilogLanguage, VerilogPSIFileRoot}
-import top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettings
 
 import java.nio.charset.StandardCharsets
 import java.util
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionException
 import scala.jdk.CollectionConverters._
 
 class VerilogExternalFormatter extends AsyncDocumentFormattingService {
-  override def createFormattingTask(formattingRequest: AsyncFormattingRequest): AsyncDocumentFormattingService.FormattingTask = {
+  override def createFormattingTask(
+      formattingRequest: AsyncFormattingRequest
+  ): AsyncDocumentFormattingService.FormattingTask = {
     val formattingContext = formattingRequest.getContext
-    val project = formattingContext.getProject
+    val project           = formattingContext.getProject
 
     // Check if Verible is installed
     if (!VeribleFormatterHelper.veribleFormatter.exists()) {
@@ -28,8 +30,8 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
     }
 
     val codeStyleSettings = formattingContext.getCodeStyleSettings
-    val verilogStyle = codeStyleSettings.getCustomSettings(classOf[VerilogCodeStyleSettings])
-    val file = formattingRequest.getIOFile
+    val verilogStyle      = codeStyleSettings.getCustomSettings(classOf[VerilogCodeStyleSettings])
+    val file              = formattingRequest.getIOFile
     if (file == null) return null
 
     val params = Seq(
@@ -38,7 +40,6 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
       "--line_break_penalty=" + verilogStyle.LINE_BREAK_PENALTY,
       "--over_column_limit_penalty=" + verilogStyle.OVER_COLUMN_LIMIT_PENALTY,
       "--wrap_spaces=" + verilogStyle.WRAP_SPACES,
-
       "--assignment_statement_alignment=" + verilogStyle.ASSIGNMENT_STATEMENT_ALIGNMENT,
       "--case_items_alignment=" + verilogStyle.CASE_ITEMS_ALIGNMENT,
       "--class_member_variable_alignment=" + verilogStyle.CLASS_MEMBER_VARIABLE_ALIGNMENT,
@@ -73,13 +74,17 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
 
       return new FormattingTask() {
         override def run(): Unit = {
+//          println(cmdLine.getCommandLineString)
           handler.addProcessListener(new CapturingProcessAdapter() {
             override def processTerminated(event: ProcessEvent): Unit = {
               val exitCode = event.getExitCode;
               if (exitCode == 0) {
                 formattingRequest.onTextReady(getOutput.getStdout)
               } else {
-                formattingRequest.onError(ScaledaBundle.message("notification.formatting.failed"), getOutput.getStderr)
+                formattingRequest.onError(
+                  ScaledaBundle.message("notification.formatting.failed"),
+                  getOutput.getStderr
+                ) //TODO: hard to read for end user
               }
             }
           })
