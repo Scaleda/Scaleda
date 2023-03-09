@@ -15,9 +15,10 @@ import org.jetbrains.annotations.Nls
 object IVerilogIdea extends ScaledaMessageToolchainParserProvider {
   private object MessageParser extends ScaledaMessageToolchainParser {
     override def parse(source: String, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
-      // TODO: implement iverilog parser here
-      if (text.nonEmpty) {
-        return Some(ScaledaMessage(text = text, level = LogLevel.Info))
+      if (text.nonEmpty && level.id >= LogLevel.Info.id) {
+        var messageLevel = LogLevel.Info
+        if (text.toLowerCase.contains("error")) messageLevel = LogLevel.Error
+        return Some(ScaledaMessage(text = text, level = messageLevel))
       }
       None
     }
