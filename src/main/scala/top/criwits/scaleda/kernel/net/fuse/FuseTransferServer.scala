@@ -167,6 +167,7 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
 
   override def onError(t: Throwable) = {
     KernelLogger.warn("client onError:", t)
+    // if (tx != null) tx.onCompleted()
   }
 
   override def onCompleted() = {
@@ -239,7 +240,7 @@ object FuseTransferClient {
     val clientStream       = new FuseTransferClientObserver(dataProvider)
     val stream             = client.visit(clientStream)
     clientStream.setTx(stream)
-    (stream, shutdown)
+    (client, stream, shutdown)
   }
   def requestMessageInto[T](msg: ByteString): T =
     BinarySerializeHelper.fromGrpcBytes(msg).asInstanceOf[T]
@@ -258,7 +259,7 @@ object FuseTransferTester extends App {
   })
   thread.start()
   Thread.sleep(500)
-  val (stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
+  val (client, stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
   stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
   Thread.sleep(100)
   FuseTransferServer.requestThread.start()
@@ -289,7 +290,8 @@ object FuseTransferClientTester extends App {
       "-h",
       "localhost",
       "-c",
-      "Unnamed"
+      "vvvv"
+      // "Unnamed"
     )
   )
 }

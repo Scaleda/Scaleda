@@ -41,27 +41,38 @@ class RemoteCommandRunner(
       }
       shutdown()
     })
+    shellThread.start()
     val fsThread = new Thread(() => {
-      var fsRunning = true
+      var fsRunning                 = true
+      var shutdown: Option[() => _] = None
       while (fsRunning) {
         try {
-          val (stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider(deps.path))
+          val (_client, stream, _shutdown) = FuseTransferClient.asStream(new FuseDataProvider(deps.path))
+          shutdown = Some(_shutdown)
           try {
             stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
+            while (true) {
+              Thread.sleep(100)
+            }
           } catch {
             case e: InterruptedException =>
               stream.onCompleted()
               throw e
-          } finally {
-            shutdown()
           }
         } catch {
           case _e: InterruptedException =>
             KernelLogger.info("fs data provider exits")
             fsRunning = false
+          case e: Throwable =>
+            KernelLogger.warn("fs data provider restart", e)
+            Thread.sleep(100)
+        } finally {
+          shutdown.foreach(f => f())
+          shutdown = None
         }
       }
     })
+    fsThread.start()
     shellThread.join()
     fsThread.interrupt()
   })
