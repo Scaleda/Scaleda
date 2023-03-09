@@ -34,7 +34,7 @@ class FuseRpcServer(executionContext: ExecutionContext) { self =>
       )
     )
     server = Some(builder.build().start())
-    KernelLogger.logger.info(
+    KernelLogger.info(
       "Server started, listening on " + FuseRpcServer.port
     )
     sys.addShutdownHook {

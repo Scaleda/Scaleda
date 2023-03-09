@@ -24,16 +24,18 @@ import scala.sys.process._
   */
 class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   val logger = LoggerFactory.getLogger(getClass)
+  // val logger = KernelLogger
+  // logger.setLevel(LogLevel.Debug)
 
   private def getFile(p: String): File = new File(sourcePath, p)
 
   override def init(request: EmptyReq): Future[EmptyReq] = async {
-    logger.debug("init")
+    logger.info("init")
     EmptyReq()
   }
 
   override def destroy(request: EmptyReq): Future[EmptyReq] = async {
-    logger.debug("destroy")
+    logger.info("destroy")
     EmptyReq()
   }
 
@@ -133,7 +135,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       val file = getFile(path)
       val run =
         s"chmod ${Integer.toOctalString(mode.toInt & 0xfff)} ${file.getAbsolutePath}"
-      logger.debug(
+      logger.info(
         s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
       )
       val r = run.!
@@ -147,7 +149,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     if (!file.exists()) ReadReply(-ErrorCodes.ENOENT)
     else if (file.isDirectory) ReadReply(-ErrorCodes.EISDIR)
     else {
-      logger.debug(s"read(path=$path, size=$size, offset=$offset)")
+      logger.info(s"read(path=$path, size=$size, offset=$offset)")
       val rf = new RandomAccessFile(file, "r")
       rf.seek(offset)
       val data = new Array[Byte](size)
@@ -159,7 +161,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
 
   override def write(request: WriteRequest): Future[IntReply] = async {
     import request._
-    logger.debug(s"write(path=$path, size=$size, offset=$offset)")
+    logger.info(s"write(path=$path, size=$size, offset=$offset)")
     val file = getFile(path)
     IntReply({
       if (!file.exists()) -ErrorCodes.ENOENT
@@ -177,18 +179,22 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   override def readdir(request: ReaddirRequest): Future[ReaddirReply] = async {
     import request._
     val file = getFile(path)
-    if (!file.exists() || !file.isDirectory) ReaddirReply(-ErrorCodes.ENOENT)
-    else {
+    if (!file.exists() || !file.isDirectory) {
+      logger.warn(s"file exists? ${file.exists()}, file is dir? ${file.isDirectory}")
+      ReaddirReply(-ErrorCodes.ENOENT)
+    } else {
       val results = ArrayBuffer[String]()
 
-      def applyFilter(filename: String): Unit =
+      def applyFilter(filename: String): Unit = {
         results.addOne(filename)
+        logger.warn(s"add $filename to results")
+      }
 
-      logger.debug(
+      logger.info(
         s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}"
       )
       val list = file.listFiles()
-      logger.debug(s"listed files: ${list.mkString(", ")}")
+      logger.info(s"listed files: ${list.mkString(", ")}")
       if (offset == 0) applyFilter(".")
       if (offset == 1 || offset == 0) applyFilter("..")
       if (list.length + 2 == offset) ReaddirReply()
@@ -198,7 +204,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
           .slice(offset - 2, list.length)
           .headOption
           .map(f => {
-            logger.debug(
+            logger.info(
               s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}"
             )
             applyFilter(f.getName)
