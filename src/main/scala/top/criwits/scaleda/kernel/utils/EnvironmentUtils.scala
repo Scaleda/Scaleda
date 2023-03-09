@@ -6,6 +6,7 @@ import scala.collection.mutable
 import scala.io.Source
 
 object EnvironmentUtils {
+  // In JVM, we cannot modify global environment variables, so we should copy one for modification
   object Backup {
     val env = new mutable.HashMap[String, String]()
     env.addAll(sys.env)

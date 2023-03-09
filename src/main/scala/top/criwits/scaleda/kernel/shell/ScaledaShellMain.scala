@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.shell
 
 import kernel.bin.ExtractAssets
+import kernel.configuration.ScaledaKernelConfiguration
 import kernel.database.dao.User
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
@@ -11,14 +12,14 @@ import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
 import kernel.utils.serialise.JSONHelper
-import kernel.utils.{KernelLogger, Paths, ScaledaClean}
+import kernel.utils.{EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
 
 import scopt.OParser
 
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Install, Run, ListProfiles, ListTasks, Serve, Clean, Login, Register = Value
+  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register = Value
 }
 
 case class ShellArgs(
@@ -29,7 +30,7 @@ case class ShellArgs(
     serverHost: String = "",
     profileName: String = "",
     user: User = new User("", "", ""),
-    configureName: String = "",
+    configureName: String = ""
 )
 
 object ScaledaShellMain {
@@ -64,6 +65,8 @@ object ScaledaShellMain {
   def main(args: Array[String]): Unit = {
     KernelLogger.info(s"This is Scaleda shell! Args: ${args.mkString(" ")}")
     Template.initJinja()
+    // invoke Env backup
+    val _ = EnvironmentUtils.Backup
 
     // install binaries
     if (!ExtractAssets.isInstalled) {
@@ -138,6 +141,9 @@ object ScaledaShellMain {
         cmd("tasks")
           .text("Show loaded tasks")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
+        cmd("configurations")
+          .text("Show all configurations to run")
+          .action((_, c) => c.copy(runMode = ShellRunMode.ListConfigurations)),
         cmd("run")
           .text("Run task")
           .action((_, c) => c.copy(runMode = ShellRunMode.Run))
@@ -192,6 +198,9 @@ object ScaledaShellMain {
                 }
               )
               .getOrElse(KernelLogger.info("no task loaded"))
+          case ShellRunMode.ListConfigurations =>
+            KernelLogger.info("configurations:")
+            KernelLogger.info(ScaledaKernelConfiguration.configurations)
           case ShellRunMode.Run =>
             ProjectConfig
               .getConfig()

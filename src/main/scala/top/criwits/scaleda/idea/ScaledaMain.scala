@@ -12,12 +12,12 @@ import idea.windows.tool.message.ScaledaMessageTab
 import kernel.bin.ExtractAssets
 import kernel.toolchain.Toolchain
 import kernel.toolchain.impl._
+import kernel.utils.{EnvironmentUtils, KernelLogger}
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
-import top.criwits.scaleda.kernel.utils.KernelLogger
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -28,6 +28,9 @@ import top.criwits.scaleda.kernel.utils.KernelLogger
 class ScaledaMain extends StartupActivity {
   override def runActivity(project: Project): Unit = {
     MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
+
+    // invoke Env backup
+    val _ = EnvironmentUtils.Backup
 
     // Logging service, handling IDEA log output
     project.getService(classOf[ScaledaLoggingService])
