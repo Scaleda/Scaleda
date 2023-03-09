@@ -20,20 +20,20 @@ object Paths {
     }
   }
 
-  def getConfigDir: File = {
+  def getGlobalConfigDir: File = {
     getEnvHome match {
       case Some(path) => createDirIfNonExists(new File(path))
       case None       => createDirIfNonExists(new File(OS.getUserHome, ".scaleda"))
     }
   }
 
-  def getToolchainsDir: File = createDirIfNonExists(new File(getConfigDir, "toolchains"))
+  def getToolchainsDir: File = createDirIfNonExists(new File(getGlobalConfigDir, "toolchains"))
 
-  def getBinaryDir: File = createDirIfNonExists(new File(getConfigDir, "bin"))
+  def getBinaryDir: File = createDirIfNonExists(new File(getGlobalConfigDir, "bin"))
 
-  def getDatabaseDir: File = createDirIfNonExists(new File(getConfigDir, "database"))
+  def getDatabaseDir: File = createDirIfNonExists(new File(getGlobalConfigDir, "database"))
 
-  def getUserAuthorization: File = new File(getConfigDir, ".authorization")
+  def getUserAuthorization: File = new File(getGlobalConfigDir, ".authorization")
 
   def getServerTemporalDir: File = createDirIfNonExists(
     new File(if (OS.isWindows) EnvironmentUtils.Backup.env.getOrElse("TEMP", "tmp") else "/tmp", "scaledaTmp")

@@ -3,22 +3,22 @@ package kernel.shell
 
 import kernel.bin.ExtractAssets
 import kernel.database.dao.User
+import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.net.user.ScaledaRegisterLogin
-import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
 import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
 import kernel.utils.serialise.JSONHelper
-import kernel.utils.{KernelLogger, Paths}
+import kernel.utils.{KernelLogger, Paths, ScaledaClean}
 
 import scopt.OParser
 
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Install, Run, ListProfiles, ListTasks, Serve, Login, Register = Value
+  val None, Install, Run, ListProfiles, ListTasks, Serve, Clean, Login, Register = Value
 }
 
 case class ShellArgs(
@@ -113,6 +113,9 @@ object ScaledaShellMain {
         cmd("serve")
           .text("Run as server")
           .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
+        cmd("clean")
+          .text("Clean all data on device")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Clean)),
         cmd("login")
           .text("Login into server")
           .action((_, c) => c.copy(runMode = ShellRunMode.Login)),
@@ -254,6 +257,8 @@ object ScaledaShellMain {
             if (!reply.ok) {
               KernelLogger.error("Register failed:", reply.reason)
             }
+          case ShellRunMode.Clean =>
+            ScaledaClean.run()
           case _ =>
             KernelLogger.error("not implemented.")
         }

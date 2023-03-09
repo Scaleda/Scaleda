@@ -5,10 +5,12 @@ import kernel.project.config.ProjectConfig
 import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseVisitor}
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
+import org.apache.commons.io.file.DeletingPathVisitor
 
 import java.io._
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import java.security.{MessageDigest, NoSuchAlgorithmException}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -214,4 +216,7 @@ object KernelFileUtils {
     }
     s
   }
+
+  def deleteDirectory(path: Path): Unit =
+    Files.walkFileTree(path, DeletingPathVisitor.withLongCounters())
 }
