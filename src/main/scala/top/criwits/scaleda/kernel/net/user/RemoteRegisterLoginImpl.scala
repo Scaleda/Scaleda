@@ -6,8 +6,6 @@ import kernel.database.dao.User
 import kernel.database.{ScaledaDatabase, UserException}
 import kernel.net.remote._
 
-import top.criwits.scaleda.idea.ScaledaBundle
-
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -30,7 +28,11 @@ class RemoteRegisterLoginImpl extends RemoteRegisterLoginGrpc.RemoteRegisterLogi
       if (user.nonEmpty) {
         val token        = db.createToken(request.username, claims => JwtManager.createToken(claims = claims))
         val refreshToken = db.createToken(request.username, claims => JwtManager.createRefreshToken(claims = claims))
-        RemoteLoginReply.of(ok = true, token.getToken, refreshToken.getToken, "ok")
+        if (token.isEmpty || refreshToken.isEmpty) {
+          RemoteLoginReply.of(ok = false, "", "", "Cannot generate token")
+        } else {
+          RemoteLoginReply.of(ok = true, token.get.getToken, refreshToken.get.getToken, "ok")
+        }
       } else {
         RemoteLoginReply.of(ok = false, "", "", "Username or password error")
       }
@@ -46,7 +48,9 @@ class RemoteRegisterLoginImpl extends RemoteRegisterLoginGrpc.RemoteRegisterLogi
       RemoteRefreshReply.of(ok = false, "", "Token invalid")
     } else {
       val tokenNew = db.createToken(token.get.getUsername, claims => JwtManager.createToken(claims = claims))
-      RemoteRefreshReply.of(ok = true, tokenNew.getToken, "ok")
+      tokenNew
+        .map(t => RemoteRefreshReply.of(ok = true, t.getToken, "ok"))
+        .getOrElse(RemoteRefreshReply.of(ok = false, "", "Cannot generate Token"))
     }
   }
 }

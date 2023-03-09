@@ -7,7 +7,6 @@ import kernel.net.user.TokenPair
 import kernel.utils.{EnvironmentUtils, KernelLogger, Paths}
 
 import org.apache.commons.io.IOUtils
-import top.criwits.scaleda.idea.ScaledaBundle
 
 import java.io.File
 import java.sql._
@@ -144,8 +143,10 @@ class ScaledaDatabase {
   def createToken(
       username: String,
       provider: Map[String, String] => Option[String] = claims => JwtManager.createToken(claims = claims)
-  ): Token = {
-    val token      = provider(Map("username" -> username)).get
+  ): Option[Token] = {
+    val tokenOptional = provider(Map("username" -> username))
+    if (tokenOptional.isEmpty) return None
+    val token      = tokenOptional.get
     val existToken = findToken(token)
     if (existToken.isDefined) {
       // retry
@@ -160,7 +161,7 @@ class ScaledaDatabase {
       preparing.close()
       // manually do clean...
       manuallyCleanToken()
-      new Token(token, username, exp)
+      Some(new Token(token, username, exp))
     }
   }
 
@@ -229,7 +230,7 @@ object ScaledaDatabaseUserTest extends App {
 object ScaledaDatabaseTokenTest extends App {
   val db = new ScaledaDatabase
   db.forceCleanDatabase()
-  val token = db.createToken("test")
+  val token = db.createToken("test").get
   val load  = db.findToken(token.getToken).get
   KernelLogger.info("now", new util.Date().getTime, "token", token.getExp.getTime, "load", load.getExp.getTime)
   KernelLogger.info(

@@ -15,23 +15,27 @@ import java.time.Duration
 import java.util.{Base64, Date}
 
 object JwtManager {
-  val publicKey  = EnvironmentUtils.Backup.env("JWT_RSA_PUBLIC_KEY")
-  val privateKey = EnvironmentUtils.Backup.env("JWT_RSA_PRIVATE_KEY")
+  val publicKey  = EnvironmentUtils.Backup.env.get("JWT_RSA_PUBLIC_KEY")
+  val privateKey = EnvironmentUtils.Backup.env.get("JWT_RSA_PRIVATE_KEY")
   val rsaPublicKey =
+    publicKey.map(key =>
+      KeyFactory
+        .getInstance("RSA")
+        .generatePublic(new X509EncodedKeySpec(Base64.getDecoder.decode(key)))
+        .asInstanceOf[RSAPublicKey]
+    )
+  val rsaPrivateKey = privateKey.map(key =>
     KeyFactory
       .getInstance("RSA")
-      .generatePublic(new X509EncodedKeySpec(Base64.getDecoder.decode(publicKey)))
-      .asInstanceOf[RSAPublicKey]
-  val rsaPrivateKey =
-    KeyFactory
-      .getInstance("RSA")
-      .generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder.decode(privateKey)))
+      .generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder.decode(key)))
       .asInstanceOf[RSAPrivateKey]
+  )
 
   def create(validTime: Duration, claims: Map[String, String] = Map()): Option[String] = {
+    if (rsaPrivateKey.isEmpty || rsaPublicKey.isEmpty) return None
     val now = new Date()
     try {
-      val algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey)
+      val algorithm = Algorithm.RSA256(rsaPublicKey.get, rsaPrivateKey.get)
       var builder = JWT.create
         .withIssuer("auth0")
         .withExpiresAt(new Date(now.getTime + validTime.toMillis).toInstant)
@@ -54,8 +58,9 @@ object JwtManager {
     create(validTime, claims)
 
   def decode(token: String): Option[DecodedJWT] = {
+    if (rsaPrivateKey.isEmpty || rsaPublicKey.isEmpty) return None
     try {
-      val algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey)
+      val algorithm = Algorithm.RSA256(rsaPublicKey.get, rsaPrivateKey.get)
       val verifier  = JWT.require(algorithm).withIssuer("auth0").build
       Some(verifier.verify(token))
     } catch {
