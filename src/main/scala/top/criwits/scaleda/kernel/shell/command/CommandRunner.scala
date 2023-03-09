@@ -132,7 +132,7 @@ object CommandRunner {
     val steps      = commands.length
     commands.foreach(command => {
       if (!ignoreErrors && meetErrors) return
-      KernelLogger.info(s"running command: ${command.args.mkString(" ")}")
+      KernelLogger.info(s"running command: ${command.args.map(s => s"\"$s\" ").mkString("")}")
       val stepHint = (s"-- Step ($step/$steps)") + (
         if (command.description != "") ": " + command.description
         else ""

@@ -36,6 +36,7 @@ case class ShellArgs(
 
 object ScaledaShellMain {
   private def loadConfig(projectRootPath: String): Unit = {
+    KernelLogger.info(s"loadConfig($projectRootPath)")
     val rootDir = new File(projectRootPath)
     if (rootDir.exists() && rootDir.isDirectory) {
       ProjectConfig.projectBase = Some(rootDir.getAbsolutePath)
@@ -76,7 +77,7 @@ object ScaledaShellMain {
     }
 
     // preparse workdir
-    preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(_))
+    preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(a))
     // preparse server host
     // val host = preParseArgs(args, Seq("-h", "--host"))
     if (ProjectConfig.configFile.isEmpty) {

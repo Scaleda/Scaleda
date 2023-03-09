@@ -268,7 +268,8 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
     var offsetNow = offset
     def applyFilter(filename: String): Int = {
       val nameBuffer = ByteBuffer.allocate(filename.length + 1)
-      nameBuffer.put(filename.getBytes)
+      // nameBuffer.put(filename.getBytes)
+      nameBuffer.put(0, filename.getBytes, 0, filename.length)
       offsetNow += 1
       filter.apply(buf, nameBuffer, null, offsetNow)
       0

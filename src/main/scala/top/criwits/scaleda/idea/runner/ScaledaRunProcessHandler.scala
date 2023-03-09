@@ -70,7 +70,7 @@ class ScaledaRunProcessHandler(
 
   override def onStderr(data: String): Unit = {
     logger.warn(data)
-    outputLogger.error(data)
+    outputLogger.warn(data)
   }
 
   var ret: Int = 0
@@ -79,7 +79,7 @@ class ScaledaRunProcessHandler(
     val msg = ScaledaBundle.message("task.run.return.text", returnValue)
     if (meetErrors) {
       logger.warn(msg)
-      outputLogger.error(msg)
+      outputLogger.warn(msg)
     }
     else {
       logger.debug(msg)

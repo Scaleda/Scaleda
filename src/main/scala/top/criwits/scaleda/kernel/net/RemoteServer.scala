@@ -5,14 +5,15 @@ import kernel.net.fuse.FuseTransferServer
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc
 import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
 import kernel.net.remote._
-import kernel.net.user.RemoteRegisterLoginImpl
+import kernel.net.user.{JwtAuthorizationInterceptor, RemoteRegisterLoginImpl}
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
-import kernel.utils.{EnvironmentUtils, KernelLogger, OS}
+import kernel.utils.{EnvironmentUtils, KernelLogger, OS, Paths}
 
 import io.grpc.stub.StreamObserver
 
+import java.io.File
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,15 +34,29 @@ object RemoteServer {
         request: RunRequest,
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
+      val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
+      val commandDeps = if (user != null) {
+        // do text replacement
+        val username                       = user.getUsername
+        val targetPath                     = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
+        val sourcePath                     = request.path
+        def doReplace(src: String): String = src.replaceAll(sourcePath, targetPath)
+        CommandDeps(
+          args = request.commands.map(doReplace),
+          path = targetPath,
+          envs = request.envs.map(t => (doReplace(t.a), doReplace(t.b)))
+        )
+      } else {
+        KernelLogger.warn("Remote run: user info not found! Replacement fallbacks")
+        CommandDeps(
+          args = request.commands,
+          path = request.path,
+          envs = request.envs.map(t => (t.a, t.b))
+        )
+      }
       // Note that there's only one command to execute
       CommandRunner.execute(
-        Seq(
-          CommandDeps(
-            args = request.commands,
-            path = request.path,
-            envs = request.envs.map(t => (t.a, t.b))
-          )
-        ),
+        Seq(commandDeps),
         new ScaledaRunHandler {
           override def onStdout(data: String) = {
             KernelLogger.info("[remote executor stdout]", data)
@@ -61,7 +76,9 @@ object RemoteServer {
             responseObserver.onNext(
               new RunReply(
                 RUN_REPLY_TYPE_RETURN,
-                intValue = returnValue
+                intValue = returnValue,
+                finishedAll = finishedAll,
+                meetErrors = meetErrors
               )
             )
           }
@@ -94,7 +111,8 @@ object RemoteServer {
         RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
       ),
       port,
-      enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE"))
+      enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE")
+    )
     server.awaitTermination()
   }
 }

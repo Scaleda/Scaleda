@@ -21,7 +21,7 @@ class ScaledaRegisterLogin(host: String, port: Int = RemoteServer.DEFAULT_PORT) 
     shutdown()
     if (reply.ok) {
       ScaledaAuthorizationProvider.saveTokenPair(
-        TokenPair(token = reply.token, refreshToken = reply.refreshToken)
+        UserTokenBean(username = username, token = reply.token, refreshToken = reply.refreshToken)
       )
     }
     reply

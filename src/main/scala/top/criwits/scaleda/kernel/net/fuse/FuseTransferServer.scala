@@ -1,14 +1,15 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
-import kernel.net.RpcPatch
 import kernel.net.fuse.FuseTransferClient.requestMessageInto
 import kernel.net.fuse.FuseTransferServer._
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc.RemoteFuseTransfer
 import kernel.net.fuse.fs._
 import kernel.net.user.JwtAuthorizationInterceptor
+import kernel.net.{RemoteServer, RpcPatch}
+import kernel.shell.ScaledaShellMain
 import kernel.utils.serialise.BinarySerializeHelper
-import kernel.utils.{KernelLogger, Paths}
+import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.google.protobuf.ByteString
 import io.grpc.stub.StreamObserver
@@ -33,34 +34,48 @@ case class FuseTransferMessageCase(
     FuseTransferMessage.of(id, function, BinarySerializeHelper.fromAny(data))
 }
 
+object FuseTransferMessageCase {
+  private var lastMsgId: Long = 2
+
+  def newMsgId: Long = {
+    synchronized {
+      val v = lastMsgId
+      lastMsgId = lastMsgId + 1
+      return v
+    }
+  }
+}
+
 class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     extends StreamObserver[FuseTransferMessage] {
   private var identifier: Option[String] = None
   override def onNext(msg: FuseTransferMessage) = {
-    KernelLogger.info("server onNext: ", msg.toProtoString)
+    KernelLogger.debug("server onNext: ", msg.toProtoString)
     val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
+    if (user == null) KernelLogger.warn("Fuse Transfer Server recv null user")
+    val key = if (user == null || (user != null && user.getUsername == null)) "test" else user.getUsername
     msg.function match {
       case "login" =>
-        KernelLogger.info("visit from user: ", user)
-        val key = user.getUsername
+        KernelLogger.info("visit from user:", user, "key", key)
         identifier = Some(key)
         observers.synchronized {
           observers.put(key, this)
         }
         fsProxies.synchronized {
           val fs   = new ServerSideFuse(new FuseDataProxy(key))
-          val dest = new File(Paths.getServerTemporalDir, key).getAbsolutePath
-          FuseUtils.mountFs(fs, dest, blocking = false)
+          val dest = new File(Paths.getServerTemporalDir(), key)
+          // must create an empty directory
+          KernelFileUtils.deleteDirectory(dest.toPath)
+          FuseUtils.mountFs(fs, dest.getAbsolutePath, blocking = false)
           fsProxies.put(key, fs)
         }
-      // TODO: create mount
       case "error" =>
         val e: Throwable = BinarySerializeHelper.fromGrpcBytes(msg.message)
         KernelLogger.warn("server recv error from client:", e)
         val converted =
           FuseTransferMessageCase(
             msg.id,
-            user.getUsername,
+            key,
             msg.function,
             (),
             error = Some(BinarySerializeHelper.fromGrpcBytes(msg.message))
@@ -79,7 +94,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
           })
       case _ =>
         val converted =
-          FuseTransferMessageCase(msg.id, "username", msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
+          FuseTransferMessageCase(msg.id, key, msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
 
         KernelLogger.info("converted:", converted)
         recvData.synchronized {
@@ -91,7 +106,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
         recvWait
           .get(msg.id)
           .foreach(obj => {
-            KernelLogger.info("notifying", msg.id)
+            KernelLogger.debug("notifying message id", msg.id)
             obj.synchronized {
               obj.notify()
             }
@@ -126,7 +141,6 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
     val req = msg.message
 
     def handleFutureData[T](future: Future[T]): ByteString = {
-      KernelLogger.info("future:", future)
       val result = Await.result(future, 3 seconds)
       KernelLogger.info("result:", result)
       BinarySerializeHelper.fromAny(result)
@@ -167,6 +181,7 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
 
   override def onError(t: Throwable) = {
     KernelLogger.warn("client onError:", t)
+    // if (tx != null) tx.onCompleted()
   }
 
   override def onCompleted() = {
@@ -231,7 +246,7 @@ object FuseTransferServer {
 }
 
 object FuseTransferClient {
-  private final val DEFAULT_PORT = 4555
+  private final val DEFAULT_PORT = RemoteServer.DEFAULT_PORT
   def apply(host: String = "127.0.0.1", port: Int = DEFAULT_PORT) =
     RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port, enableAuthProvide = true)
   def asStream(dataProvider: FuseDataProvider, host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
@@ -239,7 +254,7 @@ object FuseTransferClient {
     val clientStream       = new FuseTransferClientObserver(dataProvider)
     val stream             = client.visit(clientStream)
     clientStream.setTx(stream)
-    (stream, shutdown)
+    (client, stream, shutdown)
   }
   def requestMessageInto[T](msg: ByteString): T =
     BinarySerializeHelper.fromGrpcBytes(msg).asInstanceOf[T]
@@ -258,7 +273,7 @@ object FuseTransferTester extends App {
   })
   thread.start()
   Thread.sleep(500)
-  val (stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
+  val (client, stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
   stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
   Thread.sleep(100)
   FuseTransferServer.requestThread.start()
@@ -271,4 +286,26 @@ object FuseTransferTester extends App {
   // Thread.sleep(500)
   FuseTransferServer.requestThread.interrupt()
   shutdown()
+}
+
+object FuseTransferClientTester extends App {
+  ScaledaShellMain.main(
+    Array(
+      "configurations",
+      "-C",
+      "../scaleda-sample-project"
+    )
+  )
+  ScaledaShellMain.main(
+    Array(
+      "run",
+      "-C",
+      "../scaleda-sample-project",
+      "-h",
+      "localhost",
+      "-c",
+      "vvvv"
+      // "Unnamed"
+    )
+  )
 }

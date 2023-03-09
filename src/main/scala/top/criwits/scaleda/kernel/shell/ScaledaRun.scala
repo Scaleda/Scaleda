@@ -33,11 +33,18 @@ object ScaledaRun {
     val info = Toolchain.toolchains(rt.target.toolchain)
     val rtProcessed =
       if (rt.task.preset) {
-        Toolchain.toolchainPresetHandler.get(rt.target.toolchain).map(_.handlePreset(rt)).getOrElse(rt)
-      } else rt
+        Toolchain.toolchainPresetHandler.get(rt.target.toolchain).flatMap(_.handlePreset(rt))
+      } else Some(rt)
     val toolchain = info._2(rt.executor)
-    val commands  = toolchain.commands(rtProcessed.task)
-    CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+    if (rtProcessed.isEmpty) {
+      KernelLogger.warn(
+        s"Cannot apply preset for ${rt.target.toolchain}! Preset supports: ${Toolchain.toolchainPresetHandler.keys}"
+      )
+    }
+    rtProcessed.foreach(p => {
+      val commands = toolchain.commands(p.task)
+      CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+    })
   }
 
   def runTaskBackground(

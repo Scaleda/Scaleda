@@ -10,7 +10,7 @@ import org.apache.commons.io.file.DeletingPathVisitor
 import java.io._
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
-import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
+import java.nio.file.{Files, Path}
 import java.security.{MessageDigest, NoSuchAlgorithmException}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -218,5 +218,5 @@ object KernelFileUtils {
   }
 
   def deleteDirectory(path: Path): Unit =
-    Files.walkFileTree(path, DeletingPathVisitor.withLongCounters())
+    if (path.toFile.exists()) Files.walkFileTree(path, DeletingPathVisitor.withLongCounters())
 }

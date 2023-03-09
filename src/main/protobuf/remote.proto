@@ -65,6 +65,8 @@ message RunReply {
   RunReplyType reply_type = 1;
   string str_value = 2;
   int32 int_value = 3;
+  bool finishedAll = 4;
+  bool meetErrors = 5;
 }
 
 // Note that these value cannot be null!!!

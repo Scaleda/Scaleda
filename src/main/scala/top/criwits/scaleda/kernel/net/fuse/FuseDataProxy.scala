@@ -8,7 +8,9 @@ import sourcecode.Name
 
 class FuseDataProxy(identifier: String) extends RemoteFuseBlockingClient {
   private def makeRequest[TReq, TResp](data: TReq)(implicit function: Name): TResp = {
-    val resp = FuseTransferServer.request(FuseTransferMessageCase(1, identifier, function.value, data))
+    val resp = FuseTransferServer.request(
+      FuseTransferMessageCase(FuseTransferMessageCase.newMsgId, identifier, function.value, data)
+    )
     if (resp.error.isDefined) {
       throw resp.error.get
     }
