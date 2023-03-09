@@ -109,7 +109,7 @@ object ScaledaRun {
         val (target, task)                                = f
         var remoteProfiles: Option[Seq[ToolchainProfile]] = None
         val profileHostUse                                = task.host.getOrElse(profileHost)
-        KernelLogger.warn(s"profileHostUse: $profileHostUse")
+        KernelLogger.info(s"profileHostUse: $profileHostUse")
         val profile =
           if (profileHostUse.isEmpty) {
             // Run locally if no host argument provided

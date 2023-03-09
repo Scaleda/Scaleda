@@ -15,11 +15,13 @@ import kernel.utils.serialise.JSONHelper
 import kernel.utils.{EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
 
 import scopt.OParser
+import top.criwits.scaleda.idea.ScaledaBundle
 
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register = Value
+  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register, RefreshToken =
+    Value
 }
 
 case class ShellArgs(
@@ -282,6 +284,10 @@ object ScaledaShellMain {
             }
           case ShellRunMode.Clean =>
             ScaledaClean.run()
+          case ShellRunMode.RefreshToken =>
+            if (new ScaledaRegisterLogin(shellConfig.serverHost).refreshAndStore())
+              KernelLogger.info(ScaledaBundle.message("kernel.token.refresh.ok"))
+            else KernelLogger.error(ScaledaBundle.message("kernel.token.refresh.failed"))
           case _ =>
             KernelLogger.error("not implemented.")
         }

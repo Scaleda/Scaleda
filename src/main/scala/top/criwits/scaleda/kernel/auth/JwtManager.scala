@@ -48,7 +48,7 @@ object JwtManager {
     }
   }
 
-  def createToken(validTime: Duration = Duration.ofHours(2), claims: Map[String, String] = Map()) =
+  def createToken(validTime: Duration = Duration.ofDays(3), claims: Map[String, String] = Map()) =
     create(validTime, claims)
   def createRefreshToken(validTime: Duration = Duration.ofDays(30), claims: Map[String, String] = Map()) =
     create(validTime, claims)

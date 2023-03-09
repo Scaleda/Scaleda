@@ -140,7 +140,7 @@ object CommandRunner {
       handler.onStepDescription(stepHint)
       handler.onShellCommand(command)
       val isRemote = remoteDeps.nonEmpty
-      if (isRemote) KernelLogger.warn("will execute remotely:", remoteDeps.get)
+      if (isRemote) KernelLogger.info("will execute remotely:", remoteDeps.get)
       val runner = remoteDeps
         .map(r => new RemoteCommandRunner(command, r))
         .getOrElse(new CommandRunner(command))
