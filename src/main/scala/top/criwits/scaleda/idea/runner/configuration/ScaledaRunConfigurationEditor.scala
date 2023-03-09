@@ -59,7 +59,20 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
         profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.local"))
       })
     } else {
-      if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty) return
+      if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty && host == profileHost.getText) {
+        profileName.synchronized {
+          profileName.removeAllItems()
+          loadedRemoteProfiles(host).foreach(p => profileName.addItem(ProfilePair(host, p.profileName)))
+        }
+        SwingUtilities.invokeLater(() => {
+          profileStateComp.clear()
+          profileStateComp.setIcon(AllIcons.General.InspectionsOK)
+          profileStateComp.append(
+            ScaledaBundle.message("tasks.configuration.profile.state.cached", loadedRemoteProfiles(host).length, host)
+          )
+        })
+        return
+      }
       val thread = new Thread(() => {
         var profiles: Seq[RemoteProfile] = Seq()
         try {
@@ -99,6 +112,9 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
           SwingUtilities.invokeLater(() => {
             profileStateComp.clear()
             profileStateComp.setIcon(AllIcons.General.InspectionsOK)
+            profileStateComp.append(
+              ScaledaBundle.message("tasks.configuration.profile.state.ok", profiles.length, host)
+            )
           })
         }
       })
