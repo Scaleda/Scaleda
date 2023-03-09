@@ -1,12 +1,13 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
+import idea.runner.ScaledaRuntimeInfo
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
-import kernel.toolchain.{Toolchain, ToolchainProfile, ToolchainProfileDetector}
+import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
 import java.io.File
@@ -68,7 +69,7 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
   override def detectProfiles = Vivado.detectProfiles
 }
 
-object Vivado extends ToolchainProfileDetector {
+object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String       = "vivado"
 
@@ -203,4 +204,20 @@ object Vivado extends ToolchainProfileDetector {
     }
   }
   ToolchainProfileDetector.registerDetector(this)
+
+  override def handlePreset(rt: ScaledaRuntimeInfo): ScaledaRuntimeInfo = {
+    val templateRenderer = new Vivado.TemplateRenderer(
+      executor = rt.executor,
+      targetConfig = rt.target,
+      taskConfig = rt.task
+    )
+    templateRenderer.render()
+    val rtNew = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
+      case TaskType.Simulation  => "run_sim.tcl"
+      case TaskType.Synthesis   => "run_synth.tcl"
+      case TaskType.Implement   => "run_impl.tcl"
+      case TaskType.Programming => "run_program.tcl"
+    })))
+    rtNew
+  }
 }

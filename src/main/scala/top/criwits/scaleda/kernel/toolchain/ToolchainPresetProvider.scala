@@ -1,8 +1,8 @@
 package top.criwits.scaleda
 package kernel.toolchain
 
-import kernel.project.config.TaskConfig
+import idea.runner.ScaledaRuntimeInfo
 
 trait ToolchainPresetProvider {
-  def handlePreset(task: TaskConfig): TaskConfig
+  def handlePreset(rt: ScaledaRuntimeInfo): ScaledaRuntimeInfo
 }

@@ -4,8 +4,10 @@ package kernel.toolchain.impl
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
-import kernel.toolchain.{Toolchain, ToolchainProfile}
+import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile}
 import kernel.utils.KernelFileUtils
+
+import top.criwits.scaleda.idea.runner.ScaledaRuntimeInfo
 
 import java.io.File
 
@@ -73,7 +75,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
   }
 }
 
-object IVerilog {
+object IVerilog extends ToolchainPresetProvider {
   val userFriendlyName: String = "Icarus Verilog"
   val internalID: String       = "iverilog"
 
@@ -122,4 +124,6 @@ object IVerilog {
 
     }
   }
+
+  override def handlePreset(rt: ScaledaRuntimeInfo): ScaledaRuntimeInfo = rt
 }

@@ -127,13 +127,16 @@ class ScaledaRunConfiguration(
               } else {
                 try {
                   val (client, shutdown) = RemoteClient(profileHostUse)
-                  remoteProfiles = Some(
-                    client
-                      .getProfiles(Empty())
-                      .profiles
-                      .map(p => ToolchainProfile.asRemoteToolchainProfile(p, profileHostUse))
-                  )
-                  shutdown()
+                  try {
+                    remoteProfiles = Some(
+                      client
+                        .getProfiles(Empty())
+                        .profiles
+                        .map(p => ToolchainProfile.asRemoteToolchainProfile(p, profileHostUse))
+                    )
+                  } finally {
+                    shutdown()
+                  }
                 } catch {
                   case e: StatusRuntimeException =>
                     // TODO: i18n
@@ -168,12 +171,12 @@ class ScaledaRunConfiguration(
               val workingDir = new File(ProjectConfig.projectBase.get)
               val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
               val runtime = ScaledaRuntimeInfo(
-                runtimeId,
+                id = runtimeId,
                 target = target,
                 task = task,
                 profile = profile.get,
-                executor,
-                workingDir
+                executor = executor,
+                workingDir = workingDir
               )
 
               def afterExecution(): Unit = {

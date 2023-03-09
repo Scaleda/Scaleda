@@ -62,6 +62,11 @@ object Toolchain {
     IVerilog.internalID -> IVerilogIdea,
   )
 
+  def toolchainPresetHandler: Map[String, ToolchainPresetProvider] = Map(
+    Vivado.internalID -> Vivado,
+    IVerilog.internalID -> IVerilog,
+  )
+
   /**
    * Profiles for different toolchains, loaded by [[ToolchainProfileLoader]]
    */

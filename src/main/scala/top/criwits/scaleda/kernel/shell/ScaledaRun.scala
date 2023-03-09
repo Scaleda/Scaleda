@@ -5,7 +5,6 @@ import idea.runner.ScaledaRuntimeInfo
 import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
-import kernel.toolchain.impl.{IVerilog, Vivado}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
@@ -21,53 +20,24 @@ object ScaledaRun {
     * @param task A [[TaskConfig]]
     * @param profile An optional [[ToolchainProfile]]
     */
-  def runTask(
+  private def runTask(
       handler: ScaledaRunHandler,
       rt: ScaledaRuntimeInfo,
       remoteDeps: Option[RemoteCommandDeps] = None
   ): Unit = {
+    require(rt.profile.profileName.nonEmpty, "must provide profile before runTask")
     val remoteDepsTmp = remoteDeps.getOrElse(RemoteCommandDeps(host = rt.profile.host))
     val remoteDepsUse = if (remoteDepsTmp.host.nonEmpty) Some(remoteDepsTmp) else None
     KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
 
     val info = Toolchain.toolchains(rt.target.toolchain)
-    // find profile
-    var profileUse = if (rt.profile.profileName.isEmpty) None else Some(rt.profile)
-    if (profileUse.isEmpty) {
-      profileUse = Toolchain
-        .profiles()
-        .find(p => p.toolchainType == rt.target.toolchain)
-    }
-    profileUse
-      .map(profile => {
-        val taskUse =
-          if (rt.task.preset) {
-            rt.target.toolchain match {
-              case Vivado.internalID =>
-                val r = new Vivado.TemplateRenderer(
-                  executor = rt.executor,
-                  targetConfig = rt.target,
-                  taskConfig = rt.task
-                )
-                r.render()
-                rt.task.copy(tcl = Some(rt.task.taskType match {
-                  case TaskType.Simulation  => "run_sim.tcl"
-                  case TaskType.Synthesis   => "run_synth.tcl"
-                  case TaskType.Implement   => "run_impl.tcl"
-                  case TaskType.Programming => "run_program.tcl"
-                }))
-              case IVerilog.internalID =>
-                rt.task
-              case _ =>
-                KernelLogger.error(s"not supported preset: ${rt.target.toolchain}")
-                rt.task
-            }
-          } else rt.task
-        val toolchain = info._2(rt.executor)
-        val commands  = toolchain.commands(taskUse)
-        CommandRunner.executeLocalOrRemote(remoteDepsUse, commands, handler)
-      })
-      .getOrElse(KernelLogger.error("No profile found!"))
+    val rtProcessed =
+      if (rt.task.preset) {
+        Toolchain.toolchainPresetHandler.get(rt.target.toolchain).map(_.handlePreset(rt)).getOrElse(rt)
+      } else rt
+    val toolchain = info._2(rt.executor)
+    val commands  = toolchain.commands(rtProcessed.task)
+    CommandRunner.executeLocalOrRemote(remoteDepsUse, commands, handler)
   }
 
   def runTaskBackground(
