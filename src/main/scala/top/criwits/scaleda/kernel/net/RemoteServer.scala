@@ -1,8 +1,11 @@
 package top.criwits.scaleda
 package kernel.net
 
+import kernel.net.fuse.FuseTransferServer
+import kernel.net.fuse.fs.RemoteFuseTransferGrpc
 import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
 import kernel.net.remote._
+import kernel.net.user.RemoteRegisterLoginImpl
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
@@ -86,7 +89,7 @@ object RemoteServer {
     val executionContext = ExecutionContext.global
     val server = RpcPatch.getStartServer(
       Seq(
-        RemoteGrpc.bindService(new RemoteImpl, executionContext)
+        RemoteGrpc.bindService(new RemoteImpl, executionContext),
         RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext),
         RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
       ),

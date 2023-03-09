@@ -88,9 +88,18 @@ object ToolchainProfile {
     def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String])
   }
 
+  private def stringSetNullIfEmpty(s: String): String = if (s != null && s.isEmpty) null else s
+
   def asRemoteToolchainProfile(remote: RemoteProfile, host: String): ToolchainProfile = {
     import remote._
-    val v = new ToolchainProfile(profileName, toolchainType, path, iverilogPath, vvpPath, iverilogVPIPath)
+    val v = new ToolchainProfile(
+      stringSetNullIfEmpty(profileName),
+      stringSetNullIfEmpty(toolchainType),
+      stringSetNullIfEmpty(path),
+      stringSetNullIfEmpty(iverilogPath),
+      stringSetNullIfEmpty(vvpPath),
+      stringSetNullIfEmpty(iverilogVPIPath)
+    )
     v.host = host
     v
   }
