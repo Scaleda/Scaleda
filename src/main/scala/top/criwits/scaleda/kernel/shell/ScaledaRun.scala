@@ -1,7 +1,6 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import idea.ScaledaBundle
 import idea.runner.ScaledaRuntimeInfo
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
@@ -132,7 +131,7 @@ object ScaledaRun {
               }
             } catch {
               case e: StatusRuntimeException =>
-                KernelLogger.warn(ScaledaBundle.message("kernel.remote.profiles.failed", profileHostUse), e)
+                KernelLogger.warn("Cannot load profiles from host", profileHostUse, e)
                 return None
             }
             remoteProfiles.get
@@ -200,8 +199,8 @@ trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {
 object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     if (meetErrors)
-      KernelLogger.warn(ScaledaBundle.message("kernel.run.handler.return", returnValue, finishedAll, meetErrors))
-    else KernelLogger.info(ScaledaBundle.message("kernel.run.handler.return", returnValue, finishedAll, meetErrors))
+      KernelLogger.warn(s"Command failed, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors")
+    else KernelLogger.info(s"Command done, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors")
   }
 }
 
@@ -212,9 +211,13 @@ object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
 
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     if (meetErrors)
-      KernelLogger.warn(ScaledaBundle.message("kernel.run.remote.handler.return", returnValue, finishedAll, meetErrors))
+      KernelLogger.warn(
+        s"Remote command failed, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors"
+      )
     else
-      KernelLogger.info(ScaledaBundle.message("kernel.run.remote.handler.return", returnValue, finishedAll, meetErrors))
+      KernelLogger.info(
+        s"Remote command done, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors"
+      )
   }
 }
 

@@ -6,6 +6,7 @@ import kernel.net.remote._
 import kernel.net.{RemoteServer, RpcPatch}
 
 class ScaledaRegisterLogin(host: String, port: Int = RemoteServer.DEFAULT_PORT) {
+  // TODO: timeout option if server dies
   private def getClient = RpcPatch.getClient(RemoteRegisterLoginGrpc.blockingStub, host, port)
 
   def register(user: User): RemoteRegisterReply = {

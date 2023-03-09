@@ -15,7 +15,6 @@ import kernel.utils.serialise.JSONHelper
 import kernel.utils.{EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
 
 import scopt.OParser
-import top.criwits.scaleda.idea.ScaledaBundle
 
 import java.io.File
 
@@ -137,6 +136,9 @@ object ScaledaShellMain {
               })
               .text("Specify nickname")
           ),
+        cmd("refresh")
+          .text("Refresh token")
+          .action((_, c) => c.copy(runMode = ShellRunMode.RefreshToken)),
         cmd("profiles")
           .text("Show loaded profiles")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
@@ -286,8 +288,8 @@ object ScaledaShellMain {
             ScaledaClean.run()
           case ShellRunMode.RefreshToken =>
             if (new ScaledaRegisterLogin(shellConfig.serverHost).refreshAndStore())
-              KernelLogger.info(ScaledaBundle.message("kernel.token.refresh.ok"))
-            else KernelLogger.error(ScaledaBundle.message("kernel.token.refresh.failed"))
+              KernelLogger.info("Refresh token done")
+            else KernelLogger.error("Refresh token failed")
           case _ =>
             KernelLogger.error("not implemented.")
         }
