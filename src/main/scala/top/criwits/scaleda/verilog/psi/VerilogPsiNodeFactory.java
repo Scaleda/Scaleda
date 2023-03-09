@@ -20,6 +20,7 @@ import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPs
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.NameOfInstancePsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.NamedPortConnectionPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.OrderedPortConnectionPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.module.*;
 import top.criwits.scaleda.verilog.psi.nodes.signal.*;
 
@@ -211,10 +212,17 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_statement),
         StatementPsiNode.class
     );
+
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_named_port_connection),
         NamedPortConnectionPsiNode.class
     );
+
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_ordered_parameter_assignment),
+        OrderedPortConnectionPsiNode.class
+    );
+
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_directive),
         DirectivePsiNode.class

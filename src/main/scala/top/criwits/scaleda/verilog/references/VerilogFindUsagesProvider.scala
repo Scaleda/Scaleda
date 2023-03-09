@@ -19,21 +19,12 @@ class VerilogFindUsagesProvider extends FindUsagesProvider {
 
   override def getWordsScanner: WordsScanner = new DefaultWordsScanner(
     new ANTLRLexerAdaptor(VerilogLanguage, new VerilogLexer(null)),
-    TokenSet.create(VerilogLanguage.getTokenType(VerilogLexer.Simple_identifier)),
-    TokenSet.create(VerilogLanguage.getTokenType(VerilogLexer.Block_comment), VerilogLanguage.getTokenType(VerilogLexer.One_line_comment)),
-    TokenSet.create(
-      VerilogLanguage.getTokenType(VerilogLexer.Real_number),
-      VerilogLanguage.getTokenType(VerilogLexer.Decimal_number),
-      VerilogLanguage.getTokenType(VerilogLexer.Binary_number),
-      VerilogLanguage.getTokenType(VerilogLexer.Octal_number),
-      VerilogLanguage.getTokenType(VerilogLexer.Hex_number),
-      VerilogLanguage.getTokenType(VerilogLexer.String)
-    )
+    VerilogLanguage.identifierTokenSet, VerilogLanguage.commentTokenSet, VerilogLanguage.literalTokenSet
   )
 
   override def getHelpId(psiElement: PsiElement): String = null
 
-  override def getType(element: PsiElement): String = "一眼丁真" // FIXME
+  override def getType(element: PsiElement): String = "" // FIXME
 
   override def getDescriptiveName(element: PsiElement): String = element.getText
 

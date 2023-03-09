@@ -89,6 +89,7 @@
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
 
         <!-- editor -->
+        <spellchecker.support language="Verilog" implementationClass="top.criwits.scaleda.verilog.spell.VerilogSpellcheckStrategy" />
         <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler"/>
         <enterHandlerDelegate
                 implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler"/>

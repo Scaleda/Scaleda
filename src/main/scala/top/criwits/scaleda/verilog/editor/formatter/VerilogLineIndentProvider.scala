@@ -13,6 +13,7 @@ import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.util.text.CharArrayUtil
 import VerilogLineIndentProvider.getIndentString
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.module.ModuleHeadPsiNode
@@ -106,6 +107,8 @@ object VerilogLineIndentProvider {
    * @return
    */
   def getIndentString(editor: Editor, offset: Int, policy: Int): String = {
+    val indentLength = CodeStyle.getSettings(editor).getIndentOptions.INDENT_SIZE
+
     val docChars = editor.getDocument.getCharsSequence
     val settings = CodeStyle.getSettings(editor)
     val indentOptions = settings.getIndentOptions(VerilogFileType.instance)
@@ -118,13 +121,13 @@ object VerilogLineIndentProvider {
         val diff = indentEnd - indentStart
         if (diff > 0) {
           if (policy >= 0) baseIndent = docChars.subSequence(indentStart, indentEnd).toString
-          else if (diff >= 4) baseIndent = docChars.subSequence(indentStart, indentEnd - 4).toString
+          else if (diff >= indentLength) baseIndent = docChars.subSequence(indentStart, indentEnd - indentLength).toString
         }
       }
     }
 
     if (policy == 1) {
-      baseIndent += new IndentInfo(0, 4, 0).generateNewWhiteSpace(indentOptions)
+      baseIndent += new IndentInfo(0, indentLength, 0).generateNewWhiteSpace(indentOptions)
     }
     baseIndent
   }
