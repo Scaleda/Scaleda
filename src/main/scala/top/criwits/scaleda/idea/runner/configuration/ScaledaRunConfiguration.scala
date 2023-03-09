@@ -7,9 +7,9 @@ import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
-import kernel.project.config.{ProjectConfig, TaskConfig, TaskType}
+import kernel.project.config.{ProjectConfig, TaskType}
 import kernel.shell.ScaledaRun
-import kernel.toolchain.executor.{SimulationExecutor, Executor => SExecutor}
+import kernel.toolchain.executor.SimulationExecutor
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
+import io.grpc.StatusRuntimeException
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
 
@@ -97,12 +98,12 @@ class ScaledaRunConfiguration(
     new ScaledaRunConfigurationEditor(project)
 
   /** Returns a [[RunProfileState]], which is actually used to run
-    * @param executor
+    * @param ideaExecutor
     * @param environment
     * @return
     */
   override def getState(
-      executor: Executor,
+      ideaExecutor: Executor,
       environment: ExecutionEnvironment
   ): RunProfileState = {
     MainLogger.info(s"getState: taskName=$taskName, targetName=$targetName, profileName=$profileName")
@@ -115,7 +116,7 @@ class ScaledaRunConfiguration(
             var remoteProfiles: Option[Seq[ToolchainProfile]] = None
             val profileHostUse                                = task.host.getOrElse(profileHost)
             MainLogger.warn(s"profileHostUse: $profileHostUse")
-            var profile =
+            val profile =
               if (profileHostUse.isEmpty) {
                 // Run locally if no host argument provided
                 Toolchain
@@ -124,14 +125,21 @@ class ScaledaRunConfiguration(
                     p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty)
                   )
               } else {
-                val (client, shutdown) = RemoteClient(profileHostUse)
-                remoteProfiles = Some(
-                  client
-                    .getProfiles(Empty())
-                    .profiles
-                    .map(p => ToolchainProfile.asRemoteToolchainProfile(p, profileHostUse))
-                )
-                shutdown()
+                try {
+                  val (client, shutdown) = RemoteClient(profileHostUse)
+                  remoteProfiles = Some(
+                    client
+                      .getProfiles(Empty())
+                      .profiles
+                      .map(p => ToolchainProfile.asRemoteToolchainProfile(p, profileHostUse))
+                  )
+                  shutdown()
+                } catch {
+                  case e: StatusRuntimeException =>
+                    // TODO: i18n
+                    MainLogger.warn("Cannot load profiles form host", profileHostUse, e)
+                    return null
+                }
                 remoteProfiles.get
                   .find(p =>
                     p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty)
@@ -157,16 +165,27 @@ class ScaledaRunConfiguration(
               val runtimeId =
                 s"${target.toolchain}-${target.name}-${task.name}-${Instant.now()}"
 
-              def afterExecution(task: TaskConfig, executor: SExecutor): Unit = {
+              val workingDir = new File(ProjectConfig.projectBase.get)
+              val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
+              val runtime = ScaledaRuntimeInfo(
+                runtimeId,
+                target = target,
+                task = task,
+                profile = profile.get,
+                executor,
+                workingDir
+              )
+
+              def afterExecution(): Unit = {
                 // remove message listeners
-                ScaledaMessageTab.instance.detachFromLogger(runtimeId)
-                ScaledaMessageParser.removeParser(runtimeId)
-                task.taskType match {
+                ScaledaMessageTab.instance.detachFromLogger(runtime.id)
+                ScaledaMessageParser.removeParser(runtime.id)
+                runtime.task.taskType match {
                   // Only call rvcd when simulate
                   case TaskType.Simulation =>
                     project
                       .getService(classOf[RvcdService])
-                      .launchWithWaveformAndSource(executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
+                      .launchWithWaveformAndSource(runtime.executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
                   // TODO / FIXME: Source is not given
                   case _ =>
                 }
@@ -181,27 +200,14 @@ class ScaledaRunConfiguration(
 
               val state = new RunProfileState {
                 override def execute(
-                    executor: Executor,
+                    ideaExecutor: Executor,
                     runner: ProgramRunner[_]
                 ): ExecutionResult = {
                   // attach listener to control the green dot
                   ProcessTerminatedListener.attach(handler)
 
                   // prepare process
-                  val thread = ScaledaRun.runTaskBackground(
-                    handler,
-                    new File(ProjectConfig.projectBase.get),
-                    target,
-                    task,
-                    profile = profile
-                  )
-
-                  val runtime = ScaledaRuntimeInfo(
-                    runtimeId,
-                    target = target,
-                    task = task,
-                    profile = profile.get
-                  )
+                  val thread = ScaledaRun.runTaskBackground(handler, runtime)
 
                   // attach message parser listener
                   ScaledaMessageTab.instance.attach(runtime)

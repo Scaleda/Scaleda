@@ -21,7 +21,7 @@ import java.io.OutputStream
 class ScaledaRunProcessHandler(
     logger: BasicLogger,
     task: TaskConfig,
-    invokeAfterFinish: (TaskConfig, Executor) => Unit = (_: TaskConfig, _: Executor) => {}
+    invokeAfterFinish: () => Unit = () => {}
 ) extends ProcessHandler
     with ScaledaRunHandler {
   // Set terminating <- `true` to invoke stopping
@@ -78,7 +78,7 @@ class ScaledaRunProcessHandler(
       terminating = false
       terminated = true
       // invoke only success all
-      if (!meetErrors) invokeAfterFinish(task, executor)
+      if (!meetErrors) invokeAfterFinish()
     }
   }
 

@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell
 
+import idea.runner.ScaledaRuntimeInfo
 import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
@@ -22,78 +23,47 @@ object ScaledaRun {
     */
   def runTask(
       handler: ScaledaRunHandler,
-      workingDir: File,
-      target: TargetConfig,
-      task: TaskConfig,
-      profile: Option[ToolchainProfile] = None,
+      rt: ScaledaRuntimeInfo,
       remoteDeps: Option[RemoteCommandDeps] = None
   ): Unit = {
-    val remoteDepsTmp = remoteDeps.getOrElse(RemoteCommandDeps(host = profile.map(_.host).getOrElse("")))
+    val remoteDepsTmp = remoteDeps.getOrElse(RemoteCommandDeps(host = rt.profile.host))
     val remoteDepsUse = if (remoteDepsTmp.host.nonEmpty) Some(remoteDepsTmp) else None
-    KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
+    KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
 
-    val info = Toolchain.toolchains(target.toolchain)
+    val info = Toolchain.toolchains(rt.target.toolchain)
     // find profile
-    var profileUse = profile
+    var profileUse = if (rt.profile.profileName.isEmpty) None else Some(rt.profile)
     if (profileUse.isEmpty) {
       profileUse = Toolchain
         .profiles()
-        .find(p => p.toolchainType == target.toolchain)
+        .find(p => p.toolchainType == rt.target.toolchain)
     }
     profileUse
       .map(profile => {
-        // generate executor
-        val workingDirName = target.name + "-" + task.name
-        val executor = task.taskType match {
-          case TaskType.Simulation =>
-            // FIXME: GENERATE TESTBENCH?
-            val testbench    = task.findTopModule.get // FIXME: should not get if None, but...
-            val workingPlace = new File(new File(workingDir, ".sim"), workingDirName)
-            SimulationExecutor(
-              workingDir = workingPlace,
-              topModule = testbench,
-              vcdFile = new File(workingPlace, testbench + "_waveform.vcd"),
-              profile = profile
-            )
-          case TaskType.Synthesis =>
-            SynthesisExecutor(
-              workingDir = new File(new File(workingDir, ".synth"), workingDirName),
-              topModule = task.findTopModule.get,
-              profile = profile
-            )
-          case TaskType.Implement =>
-            ImplementExecutor(
-              workingDir = new File(new File(workingDir, ".impl"), workingDirName),
-              topModule = task.findTopModule.get,
-              profile = profile
-            )
-        }
-        // FIXME: Tricky?
-        handler.executor = executor
         val taskUse =
-          if (task.preset) {
-            target.toolchain match {
+          if (rt.task.preset) {
+            rt.target.toolchain match {
               case Vivado.internalID =>
                 val r = new Vivado.TemplateRenderer(
-                  executor = executor,
-                  targetConfig = target,
-                  taskConfig = task
+                  executor = rt.executor,
+                  targetConfig = rt.target,
+                  taskConfig = rt.task
                 )
                 r.render()
-                task.copy(tcl = Some(task.taskType match {
-                  case TaskType.Simulation => "run_sim.tcl"
-                  case TaskType.Synthesis => "run_synth.tcl"
-                  case TaskType.Implement => "run_impl.tcl"
+                rt.task.copy(tcl = Some(rt.task.taskType match {
+                  case TaskType.Simulation  => "run_sim.tcl"
+                  case TaskType.Synthesis   => "run_synth.tcl"
+                  case TaskType.Implement   => "run_impl.tcl"
                   case TaskType.Programming => "run_program.tcl"
                 }))
               case IVerilog.internalID =>
-                task
+                rt.task
               case _ =>
-                KernelLogger.error(s"not supported preset: ${target.toolchain}")
-                task
+                KernelLogger.error(s"not supported preset: ${rt.target.toolchain}")
+                rt.task
             }
-          } else task
-        val toolchain = info._2(executor)
+          } else rt.task
+        val toolchain = info._2(rt.executor)
         val commands  = toolchain.commands(taskUse)
         CommandRunner.executeLocalOrRemote(remoteDepsUse, commands, handler)
       })
@@ -102,15 +72,45 @@ object ScaledaRun {
 
   def runTaskBackground(
       handler: ScaledaRunHandler,
-      workingDir: File,
-      target: TargetConfig,
-      task: TaskConfig,
-      daemon: Boolean = true,
-      profile: Option[ToolchainProfile] = None,
+      runtime: ScaledaRuntimeInfo,
+      daemon: Boolean = true
   ): Thread = {
-    val t = new Thread(() => runTask(handler, workingDir, target, task, profile = profile))
+    val t = new Thread(() => runTask(handler, runtime))
     t.setDaemon(daemon)
     t
+  }
+
+  def generateExecutor(
+      target: TargetConfig,
+      task: TaskConfig,
+      profile: ToolchainProfile,
+      workingDir: File
+  ): Executor = {
+    val workingDirName = target.name + "-" + task.name
+    task.taskType match {
+      case TaskType.Simulation =>
+        // FIXME: GENERATE TESTBENCH?
+        val testbench    = task.findTopModule.get // FIXME: should not get if None, but...
+        val workingPlace = new File(new File(workingDir, ".sim"), workingDirName)
+        SimulationExecutor(
+          workingDir = workingPlace,
+          topModule = testbench,
+          vcdFile = new File(workingPlace, testbench + "_waveform.vcd"),
+          profile = profile
+        )
+      case TaskType.Synthesis =>
+        SynthesisExecutor(
+          workingDir = new File(new File(workingDir, ".synth"), workingDirName),
+          topModule = task.findTopModule.get,
+          profile = profile
+        )
+      case TaskType.Implement =>
+        ImplementExecutor(
+          workingDir = new File(new File(workingDir, ".impl"), workingDirName),
+          topModule = task.findTopModule.get,
+          profile = profile
+        )
+    }
   }
 }
 
@@ -138,9 +138,6 @@ trait ScaledaRunHandler {
   def onStepDescription(data: String): Unit = {}
 
   def expectedReturnValue: Int = 0
-
-  // FIXME: What's for
-  var executor: Executor = _
 }
 
 /** RunHandler that logging outputs to [[KernelLogger]]

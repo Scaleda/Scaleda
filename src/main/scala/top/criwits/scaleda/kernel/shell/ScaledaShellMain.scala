@@ -219,55 +219,56 @@ object ScaledaShellMain {
               )
               .getOrElse(KernelLogger.info("no task loaded"))
           case ShellRunMode.Run =>
-            config
-              .map(c => {
-                ProjectConfig
-                  .getConfig()
-                  .foreach(
-                    _.taskByName(shellConfig.task, shellConfig.target)
-                      .map(f => {
-                        val (target, task) = f
-                        // TODO: specify toolchain in shell
-                        val profile = shellConfig.profileName
-                          .flatMap(name => {
-                            // if remote host specified, use remote name
-                            stub
-                              .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.profileName))
-                              .getOrElse(
-                                Toolchain.profiles().map(_.profileName).toSeq
-                              )
-                              .find(_ == name)
-                          })
-                          .map(name =>
-                            // FIXME
-                            new ToolchainProfile(
-                              name,
-                              "vivado",
-                              "/opt/Xilinx/Vivado/2019.2"
-                            )
-                          )
-                        ScaledaRun.runTask(
-                          if (stub.nonEmpty) ScaledaRunKernelRemoteHandler
-                          else ScaledaRunKernelHandler,
-                          workingDir,
-                          target,
-                          task,
-                          profile = profile,
-                          remoteDeps =
-                            if (stub.nonEmpty)
-                              Some(
-                                RemoteCommandDeps(
-                                  host = shellConfig.serverHost,
-                                  port = shellConfig.serverPort
-                                )
-                              )
-                            else None
-                        )
-                      })
-                      .getOrElse(KernelLogger.error("no specific task!"))
-                  )
-              })
-              .getOrElse(KernelLogger.error("no config loaded!"))
+            // config
+            //   .map(c => {
+            //     ProjectConfig
+            //       .getConfig()
+            //       .foreach(
+            //         _.taskByName(shellConfig.task, shellConfig.target)
+            //           .map(f => {
+            //             val (target, task) = f
+            //             // TODO: specify toolchain in shell
+            //             val profile = shellConfig.profileName
+            //               .flatMap(name => {
+            //                 // if remote host specified, use remote name
+            //                 stub
+            //                   .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.profileName))
+            //                   .getOrElse(
+            //                     Toolchain.profiles().map(_.profileName).toSeq
+            //                   )
+            //                   .find(_ == name)
+            //               })
+            //               .map(name =>
+            //                 // FIXME
+            //                 new ToolchainProfile(
+            //                   name,
+            //                   "vivado",
+            //                   "/opt/Xilinx/Vivado/2019.2"
+            //                 )
+            //               )
+            //             ScaledaRun.runTask(
+            //               if (stub.nonEmpty) ScaledaRunKernelRemoteHandler
+            //               else ScaledaRunKernelHandler,
+            //               workingDir,
+            //               target,
+            //               task,
+            //               profile = profile,
+            //               remoteDeps =
+            //                 if (stub.nonEmpty)
+            //                   Some(
+            //                     RemoteCommandDeps(
+            //                       host = shellConfig.serverHost,
+            //                       port = shellConfig.serverPort
+            //                     )
+            //                   )
+            //                 else None
+            //             )
+            //           })
+            //           .getOrElse(KernelLogger.error("no specific task!"))
+            //       )
+            //   })
+            //   .getOrElse(KernelLogger.error("no config loaded!"))
+            // TODO: fix shell run
           case ShellRunMode.None =>
             KernelLogger.warn("no action specified, do nothing")
           case ShellRunMode.Install =>
