@@ -1,11 +1,10 @@
 package top.criwits.scaleda
 package kernel.template
 
-import kernel.utils.KernelLogger
+import kernel.utils.{ImplicitPathReplace, KernelLogger, NoPathReplace}
 
 import com.hubspot.jinjava.Jinjava
 import org.apache.commons.io.{FileUtils, IOUtils}
-import top.criwits.scaleda.kernel.utils.serialise.JSONHelper
 
 import java.io.{File, PrintWriter}
 import scala.jdk.javaapi.CollectionConverters
@@ -28,7 +27,7 @@ object Template {
   def getJin = jin
 
   def render(template: String, context: Map[String, Any]): String = {
-    val c = CollectionConverters.asJava(context)
+    val c              = CollectionConverters.asJava(context)
     val curClassLoader = Thread.currentThread.getContextClassLoader
     try {
       Thread.currentThread.setContextClassLoader(this.getClass.getClassLoader)
@@ -43,18 +42,20 @@ object Template {
 
   def renderResource(resourcePath: String, context: Map[String, Any]): String = {
     val stream = getClass.getClassLoader.getResourceAsStream(s"templates/${resourcePath}")
-    val s = IOUtils.toString(stream, "UTF-8")
+    val s      = IOUtils.toString(stream, "UTF-8")
     render(s, context)
   }
 
-  def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String): Unit = {
+  def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String)(implicit
+      replace: ImplicitPathReplace = NoPathReplace
+  ): Unit = {
     KernelLogger.debug(s"render resource ${resourcePath} to ${targetPath}")
     val f = new File(targetPath)
     // if (f.exists()) return
     FileUtils.touch(f)
     val printer = new PrintWriter(f)
-    val result = renderResource(resourcePath, context)
-    printer.write(result)
+    val result  = renderResource(resourcePath, context)
+    printer.write(replace.doReplace(result))
     printer.close()
   }
 }
@@ -63,12 +64,14 @@ trait TemplateRenderer {
   def render(): Unit
 }
 
-abstract class ResourceTemplateRender
-(resourceBase: String, targetBase: String, resources: Map[String, String]) extends TemplateRenderer {
+abstract class ResourceTemplateRender(resourceBase: String, targetBase: String, resources: Map[String, String])(implicit
+    replace: ImplicitPathReplace = NoPathReplace
+) extends TemplateRenderer {
   def context: Map[String, Any]
 
   override def render(): Unit =
-    resources.map(f => (s"${resourceBase}/${f._1}", s"${targetBase}/${f._2}"))
-      .foreach(f => Template.renderResourceTo(f._1, context, f._2))
+    resources
+      .map(f => (s"${resourceBase}/${f._1}", s"${targetBase}/${f._2}"))
+      .foreach(f => Template.renderResourceTo(f._1, context, f._2)(replace))
 
 }

@@ -38,7 +38,7 @@ object RemoteServer {
       val commandDeps = if (user != null) {
         // do text replacement
         val username                       = user.getUsername
-        val targetPath                     = new File(Paths.getServerTemporalDir, username).getAbsolutePath
+        val targetPath                     = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
         val sourcePath                     = request.path
         def doReplace(src: String): String = src.replaceAll(sourcePath, targetPath)
         CommandDeps(

@@ -4,5 +4,5 @@ package kernel.toolchain
 import idea.runner.ScaledaRuntimeInfo
 
 trait ToolchainPresetProvider {
-  def handlePreset(rt: ScaledaRuntimeInfo): ScaledaRuntimeInfo
+  def handlePreset(rt: ScaledaRuntimeInfo): Option[ScaledaRuntimeInfo]
 }

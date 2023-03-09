@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.toolchain.impl
 
 import idea.runner.ScaledaRuntimeInfo
+import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
@@ -134,7 +135,8 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       executor: Executor,
       targetConfig: TargetConfig,
       taskConfig: TaskConfig
-  ) extends ResourceTemplateRender(
+  )(implicit replace: ImplicitPathReplace = NoPathReplace)
+      extends ResourceTemplateRender(
         "tcl/vivado",
         executor.workingDir.getAbsolutePath,
         Map(
@@ -145,7 +147,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
           "run_impl.tcl.j2"       -> "run_impl.tcl",
           "run_program.tcl.j2"    -> "run_program.tcl"
         )
-      ) {
+      )(replace) {
     val config = ProjectConfig.getConfig()
 
     override def context: Map[String, Any] = config
@@ -205,12 +207,31 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   }
   ToolchainProfileDetector.registerDetector(this)
 
-  override def handlePreset(rt: ScaledaRuntimeInfo): ScaledaRuntimeInfo = {
+  override def handlePreset(rt: ScaledaRuntimeInfo): Option[ScaledaRuntimeInfo] = {
+    val userTokenBean = ScaledaAuthorizationProvider.loadTokenPair
+    // A local username is required...
+    // TODO: Move preset process to server side?
+    if (rt.profile.isRemoteProfile && userTokenBean.username.isEmpty) {
+      KernelLogger.warn("Cannot apply Vivado preset! Check your user token info, re-login or register")
+      return None
+    }
+    // TODO: request for remote mnt base
+    val replace =
+      if (rt.profile.isRemoteProfile) {
+        // this path may not exist on local
+        val remoteTargetPath = new File(Paths.getServerTemporalDir(false), userTokenBean.username).getAbsolutePath
+        new ImplicitPathReplace(rt.workingDir.getAbsolutePath, remoteTargetPath) {
+          override def doReplace(src: String) = {
+            KernelLogger.info("Vivado preset replace works")
+            super.doReplace(src)
+          }
+        }
+      } else NoPathReplace
     val templateRenderer = new Vivado.TemplateRenderer(
       executor = rt.executor,
       targetConfig = rt.target,
       taskConfig = rt.task
-    )
+    )(replace)
     templateRenderer.render()
     val rtNew = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"
@@ -218,6 +239,6 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       case TaskType.Implement   => "run_impl.tcl"
       case TaskType.Programming => "run_program.tcl"
     })))
-    rtNew
+    Some(rtNew)
   }
 }

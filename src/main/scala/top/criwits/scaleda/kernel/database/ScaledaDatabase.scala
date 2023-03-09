@@ -3,7 +3,7 @@ package kernel.database
 
 import kernel.auth.JwtManager
 import kernel.database.dao.{Token, User}
-import kernel.net.user.TokenPair
+import kernel.net.user.UserTokenBean
 import kernel.utils.{EnvironmentUtils, KernelLogger, Paths}
 
 import org.apache.commons.io.IOUtils
@@ -202,7 +202,7 @@ object ScaledaDatabase {
   // in release, remove `AUTH_DEV_MODE`
   val passTokenSet: Map[String, User] = {
     if (EnvironmentUtils.Backup.env.contains("AUTH_DEV_MODE"))
-      Map(TokenPair.TEST_MODE_PAIR.refreshToken -> new User("test", "test", "test-nick"))
+      Map(UserTokenBean.TEST_MODE_PAIR.refreshToken -> new User("test", "test", "test-nick"))
     else Map()
   }
 }

@@ -1,13 +1,12 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
+import idea.runner.ScaledaRuntimeInfo
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile}
 import kernel.utils.KernelFileUtils
-
-import top.criwits.scaleda.idea.runner.ScaledaRuntimeInfo
 
 import java.io.File
 
@@ -125,5 +124,5 @@ object IVerilog extends ToolchainPresetProvider {
     }
   }
 
-  override def handlePreset(rt: ScaledaRuntimeInfo): ScaledaRuntimeInfo = rt
+  override def handlePreset(rt: ScaledaRuntimeInfo) = Some(rt)
 }

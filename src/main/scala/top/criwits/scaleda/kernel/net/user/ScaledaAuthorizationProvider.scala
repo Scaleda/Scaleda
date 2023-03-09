@@ -1,24 +1,24 @@
 package top.criwits.scaleda
 package kernel.net.user
 
-import kernel.utils.{EnvironmentUtils, Paths}
 import kernel.utils.serialise.YAMLHelper
+import kernel.utils.{EnvironmentUtils, Paths}
 
 object ScaledaAuthorizationProvider {
-  def loadTokenPair: TokenPair = {
+  def loadTokenPair: UserTokenBean = {
     if (EnvironmentUtils.Backup.env.contains("AUTH_DEV_MODE")) {
-      TokenPair.TEST_MODE_PAIR
+      UserTokenBean.TEST_MODE_PAIR
     } else {
       val file = Paths.getUserAuthorization
       try {
-        YAMLHelper(file, classOf[TokenPair])
+        YAMLHelper(file, classOf[UserTokenBean])
       } catch {
-        case e: Throwable => TokenPair()
+        case e: Throwable => UserTokenBean()
       }
     }
   }
 
-  def saveTokenPair(tokenPair: TokenPair): Unit = {
+  def saveTokenPair(tokenPair: UserTokenBean): Unit = {
     val file = Paths.getUserAuthorization
     YAMLHelper(tokenPair, file)
   }
@@ -34,10 +34,4 @@ object ScaledaAuthorizationProvider {
     val newTokenPair = tokenPair.copy(refreshToken = refreshToken)
     saveTokenPair(newTokenPair)
   }
-}
-
-case class TokenPair(token: String = "", refreshToken: String = "")
-
-object TokenPair {
-  final val TEST_MODE_PAIR = TokenPair("token-test", "token-test")
 }

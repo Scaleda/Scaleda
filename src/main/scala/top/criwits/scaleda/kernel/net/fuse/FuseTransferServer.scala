@@ -50,7 +50,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
         }
         fsProxies.synchronized {
           val fs   = new ServerSideFuse(new FuseDataProxy(key))
-          val dest = new File(Paths.getServerTemporalDir, key).getAbsolutePath
+          val dest = new File(Paths.getServerTemporalDir(), key).getAbsolutePath
           FuseUtils.mountFs(fs, dest, blocking = false)
           fsProxies.put(key, fs)
         }
