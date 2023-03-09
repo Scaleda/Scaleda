@@ -59,13 +59,13 @@ object RpcPatch {
       useReflection: Boolean = true
   ): Server = {
     val builder: ServerBuilder[_] = if (useReflection) {
-      KernelLogger.info("use reflection")
+      KernelLogger.info("server using reflection")
       val provider = RpcPatch.getDefaultServerProvider
       val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
       method.setAccessible(true)
       method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
     } else {
-      KernelLogger.info("not use reflection")
+      KernelLogger.info("disable server reflection")
       ServerBuilder.forPort(port)
     }
     services.foreach(service => builder.addService(service))

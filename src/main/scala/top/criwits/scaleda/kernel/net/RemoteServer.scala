@@ -1,11 +1,8 @@
 package top.criwits.scaleda
 package kernel.net
 
-import kernel.net.fuse.FuseTransferServer
-import kernel.net.fuse.fs.RemoteFuseTransferGrpc
 import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
 import kernel.net.remote._
-import kernel.net.user.RemoteRegisterLoginImpl
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
@@ -83,19 +80,49 @@ object RemoteServer {
         case OS.Unix    => RemoteOsType.REMOTE_OS_TYPE_LINUX
       })
     }
+
+    override def getProfileDetails(request: ProfileDetailsRequest): Future[ProfileDetailsReply] = async {
+      val r =
+        Toolchain
+          .profiles()
+          .find(_.profileName == request.profileName)
+          .map(p => {
+            import p._
+            ProfileDetailsReply.of(
+              Map(
+                // "profileName"     -> profileName,
+                // "toolchainType"   -> toolchainType,
+                // "path"            -> path,
+                // "iverilogPath"    -> iverilogPath,
+                // "vvpPath"         -> vvpPath,
+                // "iverilogVPIPath" -> iverilogVPIPath
+                "name0" -> profileName,
+                "name1" -> toolchainType,
+                "name2" -> path,
+                // "name3" -> iverilogPath
+                "name4" -> vvpPath,
+                // "name5" -> iverilogVPIPath
+              )
+            )
+          })
+          .getOrElse(ProfileDetailsReply.defaultInstance)
+
+      KernelLogger.info(s"getProfileDetails(${request.profileName}) => $r")
+      r
+    }
   }
 
   def serve(port: Int = DEFAULT_PORT): Unit = {
     val executionContext = ExecutionContext.global
     val server = RpcPatch.getStartServer(
       Seq(
-        RemoteGrpc.bindService(new RemoteImpl, executionContext),
-        RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext),
-        RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
+        RemoteGrpc.bindService(new RemoteImpl, executionContext)
+        // RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext),
+        // RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
       ),
       port,
-      enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE")
-      // useReflection = false
+      enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE"),
+      useReflection = false
     )
     server.awaitTermination()
   }
