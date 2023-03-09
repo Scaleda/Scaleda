@@ -133,7 +133,12 @@ class ScaledaRunConfiguration(
     }
 
     val handler =
-      new ScaledaRunProcessHandler(new ConsoleLogger(console, logSourceId = Some(runtime.id)), runtime, afterExecution)
+      new ScaledaRunProcessHandler(
+        project,
+        new ConsoleLogger(console, logSourceId = Some(runtime.id)),
+        runtime,
+        afterExecution
+      )
 
     (_: Executor, _: ProgramRunner[_]) => {
       // attach listener to control the green dot
