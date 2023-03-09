@@ -24,7 +24,6 @@ import scala.language.postfixOps
 
 case class FuseTransferMessageCase(
     id: Long,
-    // TODO: task + target + username => identifier; now is username
     identifier: String,
     function: String,
     data: Any,

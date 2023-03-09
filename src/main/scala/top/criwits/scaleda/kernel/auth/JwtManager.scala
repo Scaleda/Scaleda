@@ -38,7 +38,7 @@ object JwtManager {
       for ((k, v) <- claims) builder = builder.withClaim(k, v)
       builder = builder.withClaim("random", Integer.valueOf(new SecureRandom().nextInt()))
       val token = builder.sign(algorithm)
-      KernelLogger.info("create token (hash):", token.hashCode)
+      KernelLogger.debug("create token (hash):", token.hashCode)
       Some(token)
     } catch {
       case e: JWTCreationException =>
@@ -48,7 +48,7 @@ object JwtManager {
     }
   }
 
-  def createToken(validTime: Duration = Duration.ofHours(2), claims: Map[String, String] = Map()) =
+  def createToken(validTime: Duration = Duration.ofDays(3), claims: Map[String, String] = Map()) =
     create(validTime, claims)
   def createRefreshToken(validTime: Duration = Duration.ofDays(30), claims: Map[String, String] = Map()) =
     create(validTime, claims)

@@ -13,7 +13,6 @@ import kernel.utils.KernelLogger
 import io.grpc.StatusRuntimeException
 
 import java.io.File
-import java.time.Instant
 import java.util.Date
 import scala.collection.mutable.ArrayBuffer
 
@@ -109,7 +108,7 @@ object ScaledaRun {
         val (target, task)                                = f
         var remoteProfiles: Option[Seq[ToolchainProfile]] = None
         val profileHostUse                                = task.host.getOrElse(profileHost)
-        KernelLogger.warn(s"profileHostUse: $profileHostUse")
+        KernelLogger.info(s"profileHostUse: $profileHostUse")
         val profile =
           if (profileHostUse.isEmpty) {
             // Run locally if no host argument provided
@@ -132,8 +131,7 @@ object ScaledaRun {
               }
             } catch {
               case e: StatusRuntimeException =>
-                // TODO: i18n
-                KernelLogger.warn("Cannot load profiles form host", profileHostUse, e)
+                KernelLogger.warn("Cannot load profiles from host", profileHostUse, e)
                 return None
             }
             remoteProfiles.get
@@ -200,8 +198,9 @@ trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {
 
 object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
-    // TODO: i18n
-    KernelLogger.info(s"command done, returns $returnValue, finishedAll: $finishedAll, meetErrors: $meetErrors")
+    if (meetErrors)
+      KernelLogger.warn(s"Command failed, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors")
+    else KernelLogger.info(s"Command done, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors")
   }
 }
 
@@ -211,12 +210,14 @@ object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onStderr(data: String): Unit = KernelLogger.error("[remote]", data)
 
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
-    // TODO: i18n
-    if (meetErrors) {
-      KernelLogger.error("[remote]", s"command error, returns $returnValue")
-    } else {
-      KernelLogger.info("[remote]", s"command done, returns $returnValue")
-    }
+    if (meetErrors)
+      KernelLogger.warn(
+        s"Remote command failed, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors"
+      )
+    else
+      KernelLogger.info(
+        s"Remote command done, returns $returnValue; finishedAll: $finishedAll, meetErrors: $meetErrors"
+      )
   }
 }
 

@@ -19,7 +19,8 @@ import scopt.OParser
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register = Value
+  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register, RefreshToken =
+    Value
 }
 
 case class ShellArgs(
@@ -135,6 +136,9 @@ object ScaledaShellMain {
               })
               .text("Specify nickname")
           ),
+        cmd("refresh")
+          .text("Refresh token")
+          .action((_, c) => c.copy(runMode = ShellRunMode.RefreshToken)),
         cmd("profiles")
           .text("Show loaded profiles")
           .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
@@ -282,6 +286,10 @@ object ScaledaShellMain {
             }
           case ShellRunMode.Clean =>
             ScaledaClean.run()
+          case ShellRunMode.RefreshToken =>
+            if (new ScaledaRegisterLogin(shellConfig.serverHost).refreshAndStore())
+              KernelLogger.info("Refresh token done")
+            else KernelLogger.error("Refresh token failed")
           case _ =>
             KernelLogger.error("not implemented.")
         }

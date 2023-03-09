@@ -1,8 +1,6 @@
 package top.criwits.scaleda
 package kernel.utils
 
-// import com.typesafe.scalalogging.Logger
-
 import org.slf4j.LoggerFactory
 import sourcecode.{File, Line, Name}
 

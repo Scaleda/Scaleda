@@ -142,28 +142,9 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   listComponent.setAutoscrolls(false)
   listComponent.setCellRenderer(ScaledaMessageRendererImpl)
 
-  // remove all message data
-  private val removeMessageAction = new AnAction(
-    // TODO: i18n
-    "Remove",
-    "Remove",
-    AllIcons.Diff.Remove
-  ) {
-    override def actionPerformed(e: AnActionEvent) = {
-      dataModel.synchronized {
-        dataModel.clear()
-      }
-      data.synchronized {
-        data.clear()
-      }
-      viewComboBox.removeAllItems()
-    }
-  }
-
-  // remove message data in this select
-  private val clearMessageAction = new AnAction(
-    ScaledaBundle.message("windows.message.action.clear"),
-    ScaledaBundle.message("windows.message.action.clear"),
+  private val cleanThisRunMessageAction = new AnAction(
+    ScaledaBundle.message("windows.message.action.clean.short"),
+    ScaledaBundle.message("windows.message.action.clean"),
     AllIcons.Actions.DeleteTag
   ) {
     override def actionPerformed(e: AnActionEvent) = {
@@ -177,12 +158,29 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     }
   }
 
+  // remove message data in this select
+  private val clearAllMessageAction = new AnAction(
+    ScaledaBundle.message("windows.message.action.clear.short"),
+    ScaledaBundle.message("windows.message.action.clear"),
+    AllIcons.Diff.Remove
+  ) {
+    override def actionPerformed(e: AnActionEvent) = {
+      dataModel.synchronized {
+        dataModel.clear()
+      }
+      data.synchronized {
+        data.clear()
+      }
+      viewComboBox.removeAllItems()
+    }
+  }
+
   private def getToggleSortIcon: Icon =
     if (sortByLevel)
       AllIcons.RunConfigurations.Scroll_down
     else AllIcons.General.AutoscrollToSource
   private val toggleSortAction = new AnAction(
-    ScaledaBundle.message("windows.message.action.sort"),
+    ScaledaBundle.message("windows.message.action.sort.short"),
     ScaledaBundle.message("windows.message.action.sort"),
     getToggleSortIcon
   ) {
@@ -236,8 +234,8 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   })
 
   val group = new DefaultActionGroup()
-  group.add(clearMessageAction)
-  group.add(removeMessageAction)
+  group.add(clearAllMessageAction)
+  group.add(cleanThisRunMessageAction)
   group.add(toggleSortAction)
   levelActions.foreach(group.add)
 

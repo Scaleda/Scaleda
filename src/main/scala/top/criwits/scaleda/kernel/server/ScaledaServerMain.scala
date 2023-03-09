@@ -36,6 +36,7 @@ object ScaledaServerMain {
 }
 
 object ScaledaServerMainRunTest extends App {
+  new ScaledaDatabase().forceCleanDatabase()
   ScaledaServerMain.run(ShellArgs())
 }
 

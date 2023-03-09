@@ -19,7 +19,7 @@ class JwtAuthorizationInterceptor(
       metadata: Metadata,
       next: ServerCallHandler[ReqT, RespT]
   ): ServerCall.Listener[ReqT] = {
-    KernelLogger.info("metadata keys", metadata.keys())
+    KernelLogger.debug("metadata keys", metadata.keys())
     val m           = serverCall.getMethodDescriptor
     val serviceName = m.getServiceName.split('.').last
     KernelLogger.debug("serviceName", serviceName)

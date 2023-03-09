@@ -2,22 +2,23 @@ package top.criwits.scaleda
 package idea.runner
 
 import idea.ScaledaBundle
-import idea.utils.MainLogger
+import idea.utils.{MainLogger, OutputLogger}
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.CommandDeps
-import kernel.toolchain.executor.Executor
 import kernel.utils.BasicLogger
 
 import com.intellij.execution.process.ProcessHandler
+import com.intellij.openapi.project.Project
 
 import java.io.OutputStream
 
 /** Handle a task process locally or remotely
   * @param logger using logger
-  * @param task task
-  * @param invokeAfterFinish will emit with [[task]] and [[Executor]] after `finishedAll`
+  * @param rt Runtime of this run
+  * @param invokeAfterFinish will emit with [[ScaledaRuntimeInfo]] after `finishedAll`
   */
 class ScaledaRunProcessHandler(
+    project: Project,
     logger: BasicLogger,
     rt: ScaledaRuntimeInfo,
     invokeAfterFinish: ScaledaRuntimeInfo => Unit = rt => {}
@@ -58,18 +59,32 @@ class ScaledaRunProcessHandler(
   override def onShellCommand(command: CommandDeps) =
     logger.debug("cd", s"\"${command.path}\"", "&&", command.args.map(s => s"\"$s\"").mkString(" "))
 
+  private val outputLogger = OutputLogger(project)
+
   override def onStepDescription(data: String): Unit = logger.debug(data)
 
-  override def onStdout(data: String): Unit = logger.info(data)
+  override def onStdout(data: String): Unit = {
+    logger.info(data)
+    outputLogger.info(data)
+  }
 
-  override def onStderr(data: String): Unit = logger.warn(data)
+  override def onStderr(data: String): Unit = {
+    logger.warn(data)
+    outputLogger.error(data)
+  }
 
   var ret: Int = 0
 
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     val msg = ScaledaBundle.message("task.run.return.text", returnValue)
-    if (meetErrors) logger.warn(msg)
-    else logger.debug(msg)
+    if (meetErrors) {
+      logger.warn(msg)
+      outputLogger.error(msg)
+    }
+    else {
+      logger.debug(msg)
+      outputLogger.debug(msg)
+    }
     ret = returnValue
     if (finishedAll || meetErrors) {
       terminating = false

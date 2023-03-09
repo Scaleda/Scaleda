@@ -26,7 +26,6 @@ class FuseRpcServer(executionContext: ExecutionContext) { self =>
   private[this] var server: Option[Server] = None
 
   private def start(sourcePath: String): Unit = {
-    // FIXME: fix running this in IDEA
     val builder = ServerBuilder.forPort(FuseRpcServer.port)
     builder.addService(
       RemoteFuseGrpc.bindService(

@@ -56,11 +56,23 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
       SwingUtilities.invokeLater(() => {
         profileStateComp.clear()
         profileStateComp.setIcon(AllIcons.General.InspectionsOK)
-        // TODO: i18n
-        profileStateComp.append("Using local profiles")
+        profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.local"))
       })
     } else {
-      if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty) return
+      if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty && host == profileHost.getText) {
+        profileName.synchronized {
+          profileName.removeAllItems()
+          loadedRemoteProfiles(host).foreach(p => profileName.addItem(ProfilePair(host, p.profileName)))
+        }
+        SwingUtilities.invokeLater(() => {
+          profileStateComp.clear()
+          profileStateComp.setIcon(AllIcons.General.InspectionsOK)
+          profileStateComp.append(
+            ScaledaBundle.message("tasks.configuration.profile.state.cached", loadedRemoteProfiles(host).length, host)
+          )
+        })
+        return
+      }
       val thread = new Thread(() => {
         var profiles: Seq[RemoteProfile] = Seq()
         try {
@@ -80,7 +92,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
               SwingUtilities.invokeLater(() => {
                 profileStateComp.clear()
                 profileStateComp.setIcon(AllIcons.General.BalloonError)
-                profileStateComp.append(s"Cannot connect to server $host: $e")
+                profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.failed", host, e))
               })
             }
         } finally {
@@ -100,6 +112,9 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
           SwingUtilities.invokeLater(() => {
             profileStateComp.clear()
             profileStateComp.setIcon(AllIcons.General.InspectionsOK)
+            profileStateComp.append(
+              ScaledaBundle.message("tasks.configuration.profile.state.ok", profiles.length, host)
+            )
           })
         }
       })
@@ -151,9 +166,8 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     .setVerticalGap(UIUtil.DEFAULT_VGAP)
     .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.target.name"), targetName)
     .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.task.name"), taskName)
-    // TODO: i18n
-    .addLabeledComponent("Profile name", profileName)
-    .addLabeledComponent("Profile host", profileHost)
+    .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.profile.name"), profileName)
+    .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.profile.host"), profileHost)
     .addComponentToRightColumn(profileStateComp)
     .addComponent(environmentVarsComponent)
     .getPanel
