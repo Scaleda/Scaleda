@@ -9,7 +9,7 @@ import top.criwits.scaleda.verilog.psi.VerilogPsiLeafNodeFactory
 
 class VerilogASTFactory extends DefaultASTFactoryImpl {
   override def createLeaf(tpe: IElementType, text: CharSequence) = {
-    Log.info(s"createLeaf(${tpe}, ${text})")
+    Log.debug(s"createLeaf(${tpe}, ${text})")
     VerilogPsiLeafNodeFactory.create(tpe, text)
   }
 }
