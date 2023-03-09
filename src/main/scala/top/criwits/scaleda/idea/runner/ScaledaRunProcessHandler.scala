@@ -55,10 +55,8 @@ class ScaledaRunProcessHandler(
   }
   override def getProcessInput: OutputStream = outputStream
 
-  override def onShellCommand(command: CommandDeps) = {
-    // FIXME: cd {workdir} && {command} may not available when using `commands`. Delete this or fix it
-    // logger.debug("cd", s"\"${command.path}\"", "&&", command.commands.mkString(" "))
-  }
+  override def onShellCommand(command: CommandDeps) =
+    logger.debug("cd", s"\"${command.path}\"", "&&", command.args.map(s => s"\"$s\"").mkString(" "))
 
   override def onStepDescription(data: String): Unit = logger.debug(data)
 
