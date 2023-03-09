@@ -27,7 +27,6 @@ case class ShellArgs(
     workingDir: File = new File("."),
     runMode: ShellRunMode.Value = ShellRunMode.None,
     serverHost: String = "",
-    serverPort: Int = RemoteServer.DEFAULT_PORT,
     profileName: String = "",
     user: User = new User("", "", "")
 )
@@ -74,7 +73,7 @@ object ScaledaShellMain {
     // preparse workdir
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(_))
     // preparse server host
-    val host = preParseArgs(args, Seq("--host"))
+    // val host = preParseArgs(args, Seq("-h", "--host"))
     if (ProjectConfig.configFile.isEmpty) {
       // try loading config in pwd
       loadConfig(Paths.pwd.getAbsolutePath)
@@ -94,10 +93,6 @@ object ScaledaShellMain {
         opt[String]('h', "host")
           .action((x, c) => c.copy(serverHost = x))
           .text("Set server host for RPC"),
-        opt[Int]("port")
-          .action((x, c) => c.copy(serverPort = x))
-          .text("Set server port for RPC")
-          .hidden(),
         opt[String]('u', "username")
           .action((x, c) => {
             val user = c.user
@@ -161,7 +156,7 @@ object ScaledaShellMain {
       .foreach(shellConfig => {
         val stub =
           if (shellConfig.serverHost.nonEmpty)
-            Some(RemoteClient(shellConfig.serverHost, shellConfig.serverPort))
+            Some(RemoteClient(shellConfig.serverHost))
           else None
         val workingDir = shellConfig.workingDir
         val config     = ProjectConfig.getConfig()
@@ -246,12 +241,14 @@ object ScaledaShellMain {
           case ShellRunMode.Serve =>
             ScaledaServerMain.run(shellConfig)
           case ShellRunMode.Login =>
+            require(shellConfig.serverHost.nonEmpty, "server host must provide")
             val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
               .login(shellConfig.user.getUsername, shellConfig.user.getPassword)
             if (!reply.ok) {
               KernelLogger.error("Login failed:", reply.reason)
             }
           case ShellRunMode.Register =>
+            require(shellConfig.serverHost.nonEmpty, "server host must provide")
             val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
               .register(shellConfig.user)
             if (!reply.ok) {
