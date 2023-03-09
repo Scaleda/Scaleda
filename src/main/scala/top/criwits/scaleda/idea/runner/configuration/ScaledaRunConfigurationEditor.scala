@@ -56,8 +56,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
       SwingUtilities.invokeLater(() => {
         profileStateComp.clear()
         profileStateComp.setIcon(AllIcons.General.InspectionsOK)
-        // TODO: i18n
-        profileStateComp.append("Using local profiles")
+        profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.local"))
       })
     } else {
       if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty) return
@@ -80,7 +79,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
               SwingUtilities.invokeLater(() => {
                 profileStateComp.clear()
                 profileStateComp.setIcon(AllIcons.General.BalloonError)
-                profileStateComp.append(s"Cannot connect to server $host: $e")
+                profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.failed", host, e))
               })
             }
         } finally {
