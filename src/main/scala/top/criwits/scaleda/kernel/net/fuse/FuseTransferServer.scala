@@ -1,12 +1,13 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
-import kernel.net.RpcPatch
 import kernel.net.fuse.FuseTransferClient.requestMessageInto
 import kernel.net.fuse.FuseTransferServer._
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc.RemoteFuseTransfer
 import kernel.net.fuse.fs._
 import kernel.net.user.JwtAuthorizationInterceptor
+import kernel.net.{RemoteServer, RpcPatch}
+import kernel.shell.ScaledaShellMain
 import kernel.utils.serialise.BinarySerializeHelper
 import kernel.utils.{KernelLogger, Paths}
 
@@ -53,7 +54,6 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
           FuseUtils.mountFs(fs, dest, blocking = false)
           fsProxies.put(key, fs)
         }
-      // TODO: create mount
       case "error" =>
         val e: Throwable = BinarySerializeHelper.fromGrpcBytes(msg.message)
         KernelLogger.warn("server recv error from client:", e)
@@ -231,7 +231,7 @@ object FuseTransferServer {
 }
 
 object FuseTransferClient {
-  private final val DEFAULT_PORT = 4555
+  private final val DEFAULT_PORT = RemoteServer.DEFAULT_PORT
   def apply(host: String = "127.0.0.1", port: Int = DEFAULT_PORT) =
     RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port, enableAuthProvide = true)
   def asStream(dataProvider: FuseDataProvider, host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
@@ -271,4 +271,25 @@ object FuseTransferTester extends App {
   // Thread.sleep(500)
   FuseTransferServer.requestThread.interrupt()
   shutdown()
+}
+
+object FuseTransferClientTester extends App {
+  ScaledaShellMain.main(
+    Array(
+      "configurations",
+      "-C",
+      "../scaleda-sample-project"
+    )
+  )
+  ScaledaShellMain.main(
+    Array(
+      "run",
+      "-C",
+      "../scaleda-sample-project",
+      "-h",
+      "localhost",
+      "-c",
+      "Unnamed"
+    )
+  )
 }
