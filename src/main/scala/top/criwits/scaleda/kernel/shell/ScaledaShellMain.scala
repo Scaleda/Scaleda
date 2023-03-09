@@ -148,6 +148,9 @@ object ScaledaShellMain {
           .text("Run task")
           .action((_, c) => c.copy(runMode = ShellRunMode.Run))
           .children(
+            opt[String]('c', "config")
+              .action((x, c) => c.copy(configureName = x))
+              .text("Specify configure"),
             opt[String]('t', "task")
               .action((x, c) => c.copy(taskName = x))
               .text("Specify the task"),
@@ -205,30 +208,40 @@ object ScaledaShellMain {
             ProjectConfig
               .getConfig()
               .foreach(c => {
-                val profileHost = shellConfig.serverHost
+                var profileHost = shellConfig.serverHost
                 var taskName    = shellConfig.taskName
                 var targetName  = shellConfig.targetName
                 // auto in ScaledaRun
-                val profileName = shellConfig.profileName
-                if (taskName.isEmpty) {
-                  if (c.taskNames.length > 1) KernelLogger.warn("Multiple tasks available")
-                  // select first task
-                  c.headTargetTask
-                    .map(f => {
-                      val (target, task) = f
-                      targetName = target.name
-                      taskName = task.name
-                    })
-                    .getOrElse(KernelLogger.error("No task available"))
-                }
-                if (targetName.isEmpty) {
-                  // auto fill in target name
-                  c.taskByName(taskName)
-                    .map(f => {
-                      val (target, _) = f
-                      targetName = target.name
-                    })
-                    .getOrElse(KernelLogger.error("Task name error"))
+                var profileName    = shellConfig.profileName
+                val configureName  = shellConfig.configureName
+                val configurations = ScaledaKernelConfiguration.configurations
+                if (configurations.contains(configureName)) {
+                  val configuration = configurations(configureName)
+                  taskName = configuration.configuration.scaleda.taskName
+                  targetName = configuration.configuration.scaleda.targetName
+                  profileHost = configuration.configuration.scaleda.profileHost
+                  profileName = configuration.configuration.scaleda.profileName
+                } else {
+                  if (taskName.isEmpty) {
+                    if (c.taskNames.length > 1) KernelLogger.warn("Multiple tasks available")
+                    // select first task
+                    c.headTargetTask
+                      .map(f => {
+                        val (target, task) = f
+                        targetName = target.name
+                        taskName = task.name
+                      })
+                      .getOrElse(KernelLogger.error("No task available"))
+                  }
+                  if (targetName.isEmpty) {
+                    // auto fill in target name
+                    c.taskByName(taskName)
+                      .map(f => {
+                        val (target, _) = f
+                        targetName = target.name
+                      })
+                      .getOrElse(KernelLogger.error("Task name error"))
+                  }
                 }
                 // last check
                 if (c.taskByTaskTargetName(taskName, targetName).isEmpty) {
