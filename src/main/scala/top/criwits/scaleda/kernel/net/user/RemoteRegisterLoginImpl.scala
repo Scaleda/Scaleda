@@ -6,6 +6,8 @@ import kernel.database.dao.User
 import kernel.database.{ScaledaDatabase, UserException}
 import kernel.net.remote._
 
+import top.criwits.scaleda.idea.ScaledaBundle
+
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -30,8 +32,7 @@ class RemoteRegisterLoginImpl extends RemoteRegisterLoginGrpc.RemoteRegisterLogi
         val refreshToken = db.createToken(request.username, claims => JwtManager.createRefreshToken(claims = claims))
         RemoteLoginReply.of(ok = true, token.getToken, refreshToken.getToken, "ok")
       } else {
-        // TODO: i18n
-        RemoteLoginReply.of(ok = false, "", "", "username or password error")
+        RemoteLoginReply.of(ok = false, "", "", ScaledaBundle.message("exception.user.auth.failed"))
       }
     } catch {
       case e: UserException => RemoteLoginReply.of(ok = false, "", "", e.getMessage)
@@ -42,8 +43,7 @@ class RemoteRegisterLoginImpl extends RemoteRegisterLoginGrpc.RemoteRegisterLogi
     val db    = new ScaledaDatabase
     val token = db.findToken(request.refreshToken)
     if (token.isEmpty) {
-      // TODO: i18n
-      RemoteRefreshReply.of(ok = false, "", "Token invalid")
+      RemoteRefreshReply.of(ok = false, "", ScaledaBundle.message("exception.token.invalid"))
     } else {
       val tokenNew = db.createToken(token.get.getUsername, claims => JwtManager.createToken(claims = claims))
       RemoteRefreshReply.of(ok = true, tokenNew.getToken, "ok")

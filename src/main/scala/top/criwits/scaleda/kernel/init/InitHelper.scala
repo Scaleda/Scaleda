@@ -1,11 +1,13 @@
 package top.criwits.scaleda
 package kernel.init
 
-import top.criwits.scaleda.kernel.utils.KernelLogger
+import idea.ScaledaBundle
+import kernel.utils.KernelLogger
 
 import java.io.{File, FileOutputStream}
 
 object InitHelper {
+
   /** Create project with initalising it's basic structure and file
     * @param root Project root
     * @param projectName Project name
@@ -26,12 +28,10 @@ object InitHelper {
           |""".stripMargin
       val stream = new FileOutputStream(configFile, false)
       stream.write(configContent.getBytes)
-      KernelLogger.info(
-      s"Generated new Scaleda project structure, project name: $projectName, project root: ${root.getAbsolutePath}"
-      )
+      KernelLogger.info(ScaledaBundle.message("kernel.generate.ok", projectName, root.getAbsolutePath))
       true
     } else {
-      KernelLogger.error(s"Cannot generate new Scaleda project $projectName")
+      KernelLogger.error(ScaledaBundle.message("kernel.generate.failed", projectName))
       false
     }
   }

@@ -7,6 +7,7 @@ import kernel.net.user.TokenPair
 import kernel.utils.{EnvironmentUtils, KernelLogger, Paths}
 
 import org.apache.commons.io.IOUtils
+import top.criwits.scaleda.idea.ScaledaBundle
 
 import java.io.File
 import java.sql._
@@ -100,7 +101,7 @@ class ScaledaDatabase {
 
   def insertUser(user: User): Unit = {
     val userNow = findUser(user.getUsername)
-    if (userNow.isDefined) throw new UserException("user exists")
+    if (userNow.isDefined) throw new UserException(ScaledaBundle.message("exception.user.exists"))
     val preparing = getConnection.prepareStatement("INSERT INTO t_user (username, password, nickname) VALUES (?, ?, ?)")
     Seq(user.getUsername, user.getPassword, user.getNickname).zipWithIndex.foreach(t =>
       preparing.setString(t._2 + 1, t._1)
@@ -118,9 +119,8 @@ class ScaledaDatabase {
 
   def checkAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Unit = {
     val userNow = findUser(username, password = Some(oldPassword))
-    // TODO: i18n
     if (userNow.isEmpty)
-      throw new UserException("username or password error")
+      throw new UserException(ScaledaBundle.message("exception.user.auth.failed"))
     val preparing = getConnection.prepareStatement("UPDATE t_user SET password=? WHERE username=?")
     preparing.setString(1, newPassword)
     preparing.setString(2, username)

@@ -20,7 +20,7 @@ class ProcessRunTest extends AnyFlatSpec with should.Matchers {
     procBuilder.command(
       CollectionConverters.asJava(
         if (OS.isWindows) Seq("cmd", "/c", s"echo %$envName%")
-          // FIXME: not work, but set env may works
+          // not work, but set env may works..? // MAY NOT
         else Seq("sh", "-c", "echo $%s".format(envName)))
     )
     val process    = procBuilder.start()

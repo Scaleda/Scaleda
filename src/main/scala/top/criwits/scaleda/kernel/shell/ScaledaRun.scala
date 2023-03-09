@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell
 
+import idea.ScaledaBundle
 import idea.runner.ScaledaRuntimeInfo
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
@@ -13,7 +14,6 @@ import kernel.utils.KernelLogger
 import io.grpc.StatusRuntimeException
 
 import java.io.File
-import java.time.Instant
 import java.util.Date
 import scala.collection.mutable.ArrayBuffer
 
@@ -132,8 +132,7 @@ object ScaledaRun {
               }
             } catch {
               case e: StatusRuntimeException =>
-                // TODO: i18n
-                KernelLogger.warn("Cannot load profiles form host", profileHostUse, e)
+                KernelLogger.warn(ScaledaBundle.message("kernel.remote.profiles.failed", profileHostUse), e)
                 return None
             }
             remoteProfiles.get
@@ -200,8 +199,9 @@ trait ScaledaRunKernelHandlerWithReturn extends ScaledaRunHandler {
 
 object ScaledaRunKernelHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
-    // TODO: i18n
-    KernelLogger.info(s"command done, returns $returnValue, finishedAll: $finishedAll, meetErrors: $meetErrors")
+    if (meetErrors)
+      KernelLogger.warn(ScaledaBundle.message("kernel.run.handler.return", returnValue, finishedAll, meetErrors))
+    else KernelLogger.info(ScaledaBundle.message("kernel.run.handler.return", returnValue, finishedAll, meetErrors))
   }
 }
 
@@ -211,12 +211,10 @@ object ScaledaRunKernelRemoteHandler extends ScaledaRunKernelHandlerWithReturn {
   override def onStderr(data: String): Unit = KernelLogger.error("[remote]", data)
 
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
-    // TODO: i18n
-    if (meetErrors) {
-      KernelLogger.error("[remote]", s"command error, returns $returnValue")
-    } else {
-      KernelLogger.info("[remote]", s"command done, returns $returnValue")
-    }
+    if (meetErrors)
+      KernelLogger.warn(ScaledaBundle.message("kernel.run.remote.handler.return", returnValue, finishedAll, meetErrors))
+    else
+      KernelLogger.info(ScaledaBundle.message("kernel.run.remote.handler.return", returnValue, finishedAll, meetErrors))
   }
 }
 
