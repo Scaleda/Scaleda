@@ -9,7 +9,7 @@ import kernel.net.user.JwtAuthorizationInterceptor
 import kernel.net.{RemoteServer, RpcPatch}
 import kernel.shell.ScaledaShellMain
 import kernel.utils.serialise.BinarySerializeHelper
-import kernel.utils.{KernelLogger, Paths}
+import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.google.protobuf.ByteString
 import io.grpc.stub.StreamObserver
@@ -40,18 +40,21 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
   override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.info("server onNext: ", msg.toProtoString)
     val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
+    if (user == null) KernelLogger.warn("Fuse Transfer Server recv null user")
+    val key = if (user == null || (user != null && user.getUsername == null)) "test" else user.getUsername
     msg.function match {
       case "login" =>
-        KernelLogger.info("visit from user: ", user)
-        val key = user.getUsername
+        KernelLogger.info("visit from user:", user, "key", key)
         identifier = Some(key)
         observers.synchronized {
           observers.put(key, this)
         }
         fsProxies.synchronized {
           val fs   = new ServerSideFuse(new FuseDataProxy(key))
-          val dest = new File(Paths.getServerTemporalDir(), key).getAbsolutePath
-          FuseUtils.mountFs(fs, dest, blocking = false)
+          val dest = new File(Paths.getServerTemporalDir(), key)
+          // must create an empty directory
+          KernelFileUtils.deleteDirectory(dest.toPath)
+          FuseUtils.mountFs(fs, dest.getAbsolutePath, blocking = false)
           fsProxies.put(key, fs)
         }
       case "error" =>
@@ -60,7 +63,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
         val converted =
           FuseTransferMessageCase(
             msg.id,
-            user.getUsername,
+            key,
             msg.function,
             (),
             error = Some(BinarySerializeHelper.fromGrpcBytes(msg.message))

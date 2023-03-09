@@ -29,7 +29,13 @@ class RemoteCommandRunner(
     envs = deps.envs.map(t => new StringTriple(t._1, t._2))
   )
   override val thread = new Thread(() => {
+    val fuseStarted = new Object
     val shellThread = new Thread(() => {
+      // wait until fuse started
+      fuseStarted.synchronized {
+        fuseStarted.wait()
+      }
+      KernelLogger.info("shell thread started")
       val (client, shutdown) = RemoteClient(remoteCommandDeps.host, port = remoteCommandDeps.port)
       for (r <- client.run(request)) {
         r.replyType match {
@@ -51,6 +57,12 @@ class RemoteCommandRunner(
           shutdown = Some(_shutdown)
           try {
             stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
+            KernelLogger.info("shell thread started, wait server side fuse mount...")
+            Thread.sleep(2000)
+            KernelLogger.info("fs thread notifies shell thread")
+            fuseStarted.synchronized {
+              fuseStarted.notify()
+            }
             while (true) {
               Thread.sleep(100)
             }

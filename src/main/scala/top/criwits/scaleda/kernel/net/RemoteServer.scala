@@ -47,6 +47,7 @@ object RemoteServer {
           envs = request.envs.map(t => (doReplace(t.a), doReplace(t.b)))
         )
       } else {
+        KernelLogger.warn("Remote run: user info not found! Replacement fallbacks")
         CommandDeps(
           args = request.commands,
           path = request.path,

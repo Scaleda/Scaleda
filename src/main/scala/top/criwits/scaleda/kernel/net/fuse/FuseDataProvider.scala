@@ -84,7 +84,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     if (file.exists() || (file.exists() && file.isFile))
       IntReply(-ErrorCodes.ENOENT)
     else {
-      s"mkdir ${file.getAbsolutePath}".!
+      s"""mkdir "${file.getAbsolutePath}\"""".!
       await(chmod(request))
     }
   }
@@ -134,7 +134,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     IntReply({
       val file = getFile(path)
       val run =
-        s"chmod ${Integer.toOctalString(mode.toInt & 0xfff)} ${file.getAbsolutePath}"
+        s"""chmod ${Integer.toOctalString(mode.toInt & 0xfff)} \"${file.getAbsolutePath}\""""
       logger.info(
         s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
       )

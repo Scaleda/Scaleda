@@ -222,7 +222,13 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         val remoteTargetPath = new File(Paths.getServerTemporalDir(false), userTokenBean.username).getAbsolutePath
         new ImplicitPathReplace(rt.workingDir.getAbsolutePath, remoteTargetPath) {
           override def doReplace(src: String) = {
-            KernelLogger.info("Vivado preset replace works")
+            KernelLogger.info(
+              "Vivado preset replace works",
+              "from",
+              rt.workingDir.getAbsolutePath,
+              "to",
+              remoteTargetPath
+            )
             super.doReplace(src)
           }
         }
