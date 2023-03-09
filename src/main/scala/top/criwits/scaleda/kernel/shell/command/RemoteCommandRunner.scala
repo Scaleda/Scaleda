@@ -1,13 +1,11 @@
 package top.criwits.scaleda
 package kernel.shell.command
 
-import kernel.net.RemoteServer
 import kernel.net.remote.RunReplyType._
-import kernel.net.remote.{RemoteGrpc, RunRequest, StringTriple}
+import kernel.net.remote.{RunRequest, StringTriple}
+import kernel.net.{RemoteClient, RemoteServer}
 import kernel.shell.ScaledaRunHandler
 import kernel.utils.KernelLogger
-
-import io.grpc.ManagedChannelBuilder
 
 import scala.language.existentials
 
@@ -21,21 +19,14 @@ class RemoteCommandRunner(
     remoteCommandDeps: RemoteCommandDeps
 ) extends CommandRunner(deps)
     with AbstractCommandRunner {
-  // TODO: update this to run in IDEA
-  val builder = ManagedChannelBuilder.forAddress(
-    remoteCommandDeps.host,
-    remoteCommandDeps.port
-  )
-  builder.usePlaintext()
   val request = new RunRequest(
     commands = deps.args,
     path = deps.path,
     envs = deps.envs.map(t => new StringTriple(t._1, t._2))
   )
   override val thread = new Thread(() => {
-    val channel = builder.build()
-    val stub = RemoteGrpc.blockingStub(channel)
-    for (r <- stub.run(request)) {
+    val (client, shutdown) = RemoteClient(remoteCommandDeps.host, port = remoteCommandDeps.port)
+    for (r <- client.run(request)) {
       r.replyType match {
         case RUN_REPLY_TYPE_STDOUT => stdOut.put(r.strValue)
         case RUN_REPLY_TYPE_STDERR => stdErr.put(r.strValue)
@@ -43,6 +34,7 @@ class RemoteCommandRunner(
         case e                     => KernelLogger.error(s"invalid message: ${r}")
       }
     }
+    shutdown()
   })
 
   override def run: CommandOutputStream = {

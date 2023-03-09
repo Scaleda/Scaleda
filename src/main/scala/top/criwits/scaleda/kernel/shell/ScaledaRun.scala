@@ -29,7 +29,7 @@ object ScaledaRun {
       remoteDeps: Option[RemoteCommandDeps] = None
   ): Unit = {
     val remoteDepsTmp = remoteDeps.getOrElse(RemoteCommandDeps(host = profile.map(_.host).getOrElse("")))
-    val remoteDepsUse = if (remoteDepsTmp.host.isEmpty) Some(remoteDepsTmp) else None
+    val remoteDepsUse = if (remoteDepsTmp.host.nonEmpty) Some(remoteDepsTmp) else None
     KernelLogger.info(s"runTask workingDir=${workingDir.getAbsoluteFile}")
 
     val info = Toolchain.toolchains(target.toolchain)
