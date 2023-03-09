@@ -60,7 +60,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
               .map(c => {
                 if (PSI_ELEMENT.is(dataId) && selectedNodes.nonEmpty) {
                   val selected = selectedNodes.head
-                  c.taskByName(selected.name, selected.parent.get.name).map(t => t._2).orNull
+                  c.taskByTaskTargetName(selected.name, selected.parent.get.name).map(t => t._2).orNull
                 } else null
               })
               .orNull

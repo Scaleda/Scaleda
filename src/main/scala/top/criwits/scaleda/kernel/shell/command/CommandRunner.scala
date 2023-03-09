@@ -122,7 +122,7 @@ object CommandRunner {
   }
 
   def executeLocalOrRemote(
-      remoteCommandDeps: Option[RemoteCommandDeps],
+      remoteDeps: Option[RemoteCommandDeps],
       commands: Seq[CommandDeps],
       handler: ScaledaRunHandler,
       ignoreErrors: Boolean = false
@@ -139,9 +139,9 @@ object CommandRunner {
       )
       handler.onStepDescription(stepHint)
       handler.onShellCommand(command)
-      val isRemote = remoteCommandDeps.nonEmpty
-      if (isRemote) KernelLogger.warn("will execute remotely:", remoteCommandDeps.get)
-      val runner = remoteCommandDeps
+      val isRemote = remoteDeps.nonEmpty
+      if (isRemote) KernelLogger.warn("will execute remotely:", remoteDeps.get)
+      val runner = remoteDeps
         .map(r => new RemoteCommandRunner(command, r))
         .getOrElse(new CommandRunner(command))
       val r = runner.run

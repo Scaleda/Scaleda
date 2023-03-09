@@ -18,21 +18,16 @@ import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
 
-  /** Run a task
+  /** Run a task.
     * @param handler A [[ScaledaRunHandler]] used to redirect output and error
-    * @param workingDir Working directory
-    * @param target A [[TargetConfig]]
-    * @param task A [[TaskConfig]]
-    * @param profile An optional [[ToolchainProfile]]
+    * @param rt: Whether to run remotely: `rt.profile.host`
     */
-  private def runTask(
+  def runTask(
       handler: ScaledaRunHandler,
-      rt: ScaledaRuntimeInfo,
-      remoteDeps: Option[RemoteCommandDeps] = None
+      rt: ScaledaRuntimeInfo
   ): Unit = {
     require(rt.profile.profileName.nonEmpty, "must provide profile before runTask")
-    val remoteDepsTmp = remoteDeps.getOrElse(RemoteCommandDeps(host = rt.profile.host))
-    val remoteDepsUse = if (remoteDepsTmp.host.nonEmpty) Some(remoteDepsTmp) else None
+    val remoteDeps = if (rt.profile.isRemoteProfile) Some(RemoteCommandDeps(host = rt.profile.host)) else None
     KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
 
     val info = Toolchain.toolchains(rt.target.toolchain)
@@ -42,7 +37,7 @@ object ScaledaRun {
       } else rt
     val toolchain = info._2(rt.executor)
     val commands  = toolchain.commands(rtProcessed.task)
-    CommandRunner.executeLocalOrRemote(remoteDepsUse, commands, handler)
+    CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
   }
 
   def runTaskBackground(
@@ -88,6 +83,14 @@ object ScaledaRun {
     }
   }
 
+  /** Generate a runtime from names.<br/>
+    * May reach remote profiles.
+    * @param targetName name of target in config
+    * @param taskName name of task in config
+    * @param profileName name of profile, local / remote
+    * @param profileHost empty if local
+    * @return
+    */
   def generateRuntimeFromName(
       targetName: String,
       taskName: String,
@@ -100,7 +103,7 @@ object ScaledaRun {
       return None
     }
     val c = configOptional.get
-    c.taskByName(taskName, targetName)
+    c.taskByTaskTargetName(taskName, targetName)
       .flatMap(f => {
         val (target, task)                                = f
         var remoteProfiles: Option[Seq[ToolchainProfile]] = None
@@ -113,6 +116,7 @@ object ScaledaRun {
               .profiles()
               .find(p => p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty))
           } else {
+            // TODO: remote profiles request util
             try {
               val (client, shutdown) = RemoteClient(profileHostUse)
               try {

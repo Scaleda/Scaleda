@@ -30,8 +30,14 @@ class ToolchainProfile(
   var edited: Boolean = false
   @JsonIgnore
   var removed: Boolean = false
+
+  /**
+   * When need to run remotely, this field will be set to remote host
+   */
   @JsonIgnore
   var host: String = ""
+  @JsonIgnore
+  def isRemoteProfile: Boolean = host.nonEmpty
 
   def this(profileName: String, toolchainType: String) = {
     this(profileName, toolchainType, "", "", "", "")

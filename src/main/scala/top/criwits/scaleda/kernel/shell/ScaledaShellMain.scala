@@ -22,13 +22,13 @@ object ShellRunMode extends Enumeration {
 }
 
 case class ShellArgs(
-    task: String = "",
-    target: String = "",
+    taskName: String = "",
+    targetName: String = "",
     workingDir: File = new File("."),
     runMode: ShellRunMode.Value = ShellRunMode.None,
     serverHost: String = "",
     serverPort: Int = RemoteServer.DEFAULT_PORT,
-    profileName: Option[String] = None,
+    profileName: String = "",
     user: User = new User("", "", "")
 )
 
@@ -91,7 +91,7 @@ object ScaledaShellMain {
         opt[File]('C', "workdir")
           .action((x, c) => c.copy(workingDir = x))
           .text("Working directory"),
-        opt[String]("host")
+        opt[String]('h', "host")
           .action((x, c) => c.copy(serverHost = x))
           .text("Set server host for RPC"),
         opt[Int]("port")
@@ -143,15 +143,15 @@ object ScaledaShellMain {
           .text("Run task")
           .action((_, c) => c.copy(runMode = ShellRunMode.Run))
           .children(
-            opt[String]('r', "target")
-              .action((x, c) => c.copy(target = x))
-              .text("Specify the target"),
             opt[String]('t', "task")
-              .action((x, c) => c.copy(task = x))
+              .action((x, c) => c.copy(taskName = x))
               .text("Specify the task"),
+            opt[String]('r', "target")
+              .action((x, c) => c.copy(targetName = x))
+              .text("Specify the target, otherwise will auto fill"),
             opt[String]('p', "profile")
-              .action((x, c) => c.copy(profileName = Some(x)))
-              .text("Specify profile name")
+              .action((x, c) => c.copy(profileName = x))
+              .text("Specify profile name, otherwise will auto fill")
           ),
         help("help").text("Prints this usage text")
       )
@@ -194,62 +194,51 @@ object ScaledaShellMain {
               )
               .getOrElse(KernelLogger.info("no task loaded"))
           case ShellRunMode.Run =>
-            if (config.isEmpty) {
-              KernelLogger.error("no configure found!")
-            } else {
-              val c = config.get
-
-            }
-          // config
-          //   .map(c => {
-          //     ProjectConfig
-          //       .getConfig()
-          //       .foreach(
-          //         _.taskByName(shellConfig.task, shellConfig.target)
-          //           .map(f => {
-          //             val (target, task) = f
-          //             // TODO: specify toolchain in shell
-          //             val profile = shellConfig.profileName
-          //               .flatMap(name => {
-          //                 // if remote host specified, use remote name
-          //                 stub
-          //                   .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.profileName))
-          //                   .getOrElse(
-          //                     Toolchain.profiles().map(_.profileName).toSeq
-          //                   )
-          //                   .find(_ == name)
-          //               })
-          //               .map(name =>
-          //                 // FIXME
-          //                 new ToolchainProfile(
-          //                   name,
-          //                   "vivado",
-          //                   "/opt/Xilinx/Vivado/2019.2"
-          //                 )
-          //               )
-          //             ScaledaRun.runTask(
-          //               if (stub.nonEmpty) ScaledaRunKernelRemoteHandler
-          //               else ScaledaRunKernelHandler,
-          //               workingDir,
-          //               target,
-          //               task,
-          //               profile = profile,
-          //               remoteDeps =
-          //                 if (stub.nonEmpty)
-          //                   Some(
-          //                     RemoteCommandDeps(
-          //                       host = shellConfig.serverHost,
-          //                       port = shellConfig.serverPort
-          //                     )
-          //                   )
-          //                 else None
-          //             )
-          //           })
-          //           .getOrElse(KernelLogger.error("no specific task!"))
-          //       )
-          //   })
-          //   .getOrElse(KernelLogger.error("no config loaded!"))
-          // TODO: fix shell run
+            ProjectConfig
+              .getConfig()
+              .foreach(c => {
+                val profileHost = shellConfig.serverHost
+                var taskName    = shellConfig.taskName
+                var targetName  = shellConfig.targetName
+                // auto in ScaledaRun
+                val profileName = shellConfig.profileName
+                if (taskName.isEmpty) {
+                  if (c.taskNames.length > 1) KernelLogger.warn("Multiple tasks available")
+                  // select first task
+                  c.headTargetTask
+                    .map(f => {
+                      val (target, task) = f
+                      targetName = target.name
+                      taskName = task.name
+                    })
+                    .getOrElse(KernelLogger.error("No task available"))
+                }
+                if (targetName.isEmpty) {
+                  // auto fill in target name
+                  c.taskByName(taskName)
+                    .map(f => {
+                      val (target, _) = f
+                      targetName = target.name
+                    })
+                    .getOrElse(KernelLogger.error("Task name error"))
+                }
+                // last check
+                if (c.taskByTaskTargetName(taskName, targetName).isEmpty) {
+                  KernelLogger.error(s"Cannot find target-task: $targetName-$taskName")
+                } else {
+                  KernelLogger.info(s"Run target-task-profile-host: $targetName-$taskName-$profileName-$profileHost")
+                  ScaledaRun
+                    .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+                    .map(rt => {
+                      ScaledaRun
+                        .runTask(
+                          if (rt.profile.isRemoteProfile) ScaledaRunKernelRemoteHandler else ScaledaRunKernelHandler,
+                          rt
+                        )
+                    })
+                    .getOrElse(KernelLogger.error("Cannot generate runtime!"))
+                }
+              })
           case ShellRunMode.None =>
             KernelLogger.warn("no action specified, do nothing")
           case ShellRunMode.Install =>

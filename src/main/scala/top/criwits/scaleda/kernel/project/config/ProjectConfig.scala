@@ -40,22 +40,38 @@ case class ProjectConfig(
 
   def taskNames = targets.flatMap(_.tasks).map(_.name)
 
-  def taskByName(taskName: String, targetName: String): Option[(TargetConfig, TaskConfig)] = {
+  def taskByTaskTargetName(taskName: String, targetName: String): Option[(TargetConfig, TaskConfig)] = {
     val r = targets.filter(_.name == targetName)
     if (r.isEmpty) return None
 
     assert(r.length == 1)
     val target = r.head
-    val tasks = target.tasks.filter(_.name == taskName)
+    val tasks  = target.tasks.filter(_.name == taskName)
     if (tasks.isEmpty) return None
 
     assert(tasks.length == 1)
     Some(target, tasks.head)
   }
 
+  /** Auto find target and task
+    * @param taskName name of task
+    * @return
+    */
+  def taskByName(taskName: String): Option[(TargetConfig, TaskConfig)] =
+    targets
+      .map(target => (target, target.tasks.find(_.name == taskName)))
+      .filter(t => t._2.nonEmpty)
+      .map(t => (t._1, t._2.get))
+      .headOption
+
   def headTarget = targets.headOption
 
   def headTask = targets.headOption.flatMap(t => t.tasks.headOption)
+
+  def headTargetTask =
+    targets.headOption.map(target => (target, target.tasks.headOption))
+      .filter(_._2.nonEmpty)
+      .map(f => (f._1, f._2.get))
 }
 
 object ProjectConfig {
@@ -64,7 +80,7 @@ object ProjectConfig {
   // NOTICE: These two variables are global flag to indicated if a project is loaded
   // they should be always updated simultaneously
   var projectBase: Option[String] = None
-  var configFile: Option[String] = None
+  var configFile: Option[String]  = None
 
   def getConfig(path: Option[String] = configFile): Option[ProjectConfig] = {
     path match {
@@ -124,13 +140,9 @@ object ProjectConfig {
           val target = projectConfig.targets.find(_.name == targetName).get
           val r = if (target.tasks.exists(_.name == oldTaskName)) {
             // replace exist task in target and replace target in config
-            val newTasks = target.tasks.filter(_.name != oldTaskName) :+ task
+            val newTasks  = target.tasks.filter(_.name != oldTaskName) :+ task
             val newTarget = target.copy(tasks = newTasks)
-            projectConfig.copy(targets =
-              projectConfig.targets.map(t =>
-                if (t.name == newTarget.name) newTarget else t
-              )
-            )
+            projectConfig.copy(targets = projectConfig.targets.map(t => if (t.name == newTarget.name) newTarget else t))
           } else {
             // append task to target, and replace target in config
             val targets = projectConfig.targets.map(t =>
