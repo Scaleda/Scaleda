@@ -101,7 +101,7 @@ class ScaledaDatabase {
 
   def insertUser(user: User): Unit = {
     val userNow = findUser(user.getUsername)
-    if (userNow.isDefined) throw new UserException(ScaledaBundle.message("exception.user.exists"))
+    if (userNow.isDefined) throw new UserException("Username exists")
     val preparing = getConnection.prepareStatement("INSERT INTO t_user (username, password, nickname) VALUES (?, ?, ?)")
     Seq(user.getUsername, user.getPassword, user.getNickname).zipWithIndex.foreach(t =>
       preparing.setString(t._2 + 1, t._1)
@@ -120,7 +120,7 @@ class ScaledaDatabase {
   def checkAndUpdatePassword(username: String, oldPassword: String, newPassword: String): Unit = {
     val userNow = findUser(username, password = Some(oldPassword))
     if (userNow.isEmpty)
-      throw new UserException(ScaledaBundle.message("exception.user.auth.failed"))
+      throw new UserException("Username or password error")
     val preparing = getConnection.prepareStatement("UPDATE t_user SET password=? WHERE username=?")
     preparing.setString(1, newPassword)
     preparing.setString(2, username)

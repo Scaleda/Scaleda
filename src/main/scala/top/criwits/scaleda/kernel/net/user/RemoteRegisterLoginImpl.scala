@@ -32,7 +32,7 @@ class RemoteRegisterLoginImpl extends RemoteRegisterLoginGrpc.RemoteRegisterLogi
         val refreshToken = db.createToken(request.username, claims => JwtManager.createRefreshToken(claims = claims))
         RemoteLoginReply.of(ok = true, token.getToken, refreshToken.getToken, "ok")
       } else {
-        RemoteLoginReply.of(ok = false, "", "", ScaledaBundle.message("exception.user.auth.failed"))
+        RemoteLoginReply.of(ok = false, "", "", "Username or password error")
       }
     } catch {
       case e: UserException => RemoteLoginReply.of(ok = false, "", "", e.getMessage)
@@ -43,7 +43,7 @@ class RemoteRegisterLoginImpl extends RemoteRegisterLoginGrpc.RemoteRegisterLogi
     val db    = new ScaledaDatabase
     val token = db.findToken(request.refreshToken)
     if (token.isEmpty) {
-      RemoteRefreshReply.of(ok = false, "", ScaledaBundle.message("exception.token.invalid"))
+      RemoteRefreshReply.of(ok = false, "", "Token invalid")
     } else {
       val tokenNew = db.createToken(token.get.getUsername, claims => JwtManager.createToken(claims = claims))
       RemoteRefreshReply.of(ok = true, tokenNew.getToken, "ok")
