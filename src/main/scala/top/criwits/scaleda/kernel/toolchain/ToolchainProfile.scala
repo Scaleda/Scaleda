@@ -54,7 +54,17 @@ class ToolchainProfile(
   }
 
   @JsonIgnore
-  def asRemoteProfile = RemoteProfile.of(profileName, toolchainType)
+  private def stringRemoveNull(s: String): String = if (s != null) s else ""
+
+  @JsonIgnore
+  def asRemoteProfile = RemoteProfile.of(
+    stringRemoveNull(profileName),
+    stringRemoveNull(toolchainType),
+    stringRemoveNull(path),
+    stringRemoveNull(iverilogPath),
+    stringRemoveNull(vvpPath),
+    stringRemoveNull(iverilogVPIPath)
+  )
 }
 
 object ToolchainProfile {
@@ -80,7 +90,7 @@ object ToolchainProfile {
 
   def asRemoteToolchainProfile(remote: RemoteProfile, host: String): ToolchainProfile = {
     import remote._
-    val v = new ToolchainProfile(profileName, toolchainType, "", "", "", "")
+    val v = new ToolchainProfile(profileName, toolchainType, path, iverilogPath, vvpPath, iverilogVPIPath)
     v.host = host
     v
   }

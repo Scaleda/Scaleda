@@ -53,29 +53,29 @@ object ScaledaServerMainTest extends App {
   val db = new ScaledaDatabase
   db.forceCleanDatabase()
 
-  // {
-  //   val (client, shutdown) =
-  //     RpcPatch.getClient(
-  //       RemoteRegisterLoginGrpc.blockingStub,
-  //       "127.0.0.1",
-  //       RemoteServer.DEFAULT_PORT,
-  //       enableAuthProvide = true
-  //     )
-  //   val registerReply = client.register(RemoteRegisterRequest.of("test", "test", ""))
-  //   val loginReply    = client.login(RemoteLoginRequest.of("test", "test"))
-  //   val refreshToken  = loginReply.refreshToken
-  //   val token         = loginReply.token
-  //   val refreshReply  = client.refresh(RemoteRefreshRequest.of(refreshToken))
-  //   val tokenNew      = refreshReply.token
-  //   KernelLogger.info("refresh token", refreshToken, "token", token, "new token", tokenNew)
-  //   shutdown()
-  // }
   {
-    // val username = "user"
-    // val password = "pass"
-    // val req      = new ScaledaRegisterLogin("127.0.0.1")
-    // req.register(new User(username, password, username))
-    // req.login(username, password)
+    val (client, shutdown) =
+      RpcPatch.getClient(
+        RemoteRegisterLoginGrpc.blockingStub,
+        "127.0.0.1",
+        RemoteServer.DEFAULT_PORT,
+        enableAuthProvide = true
+      )
+    val registerReply = client.register(RemoteRegisterRequest.of("test", "test", ""))
+    val loginReply    = client.login(RemoteLoginRequest.of("test", "test"))
+    val refreshToken  = loginReply.refreshToken
+    val token         = loginReply.token
+    val refreshReply  = client.refresh(RemoteRefreshRequest.of(refreshToken))
+    val tokenNew      = refreshReply.token
+    KernelLogger.info("refresh token", refreshToken, "token", token, "new token", tokenNew)
+    shutdown()
+  }
+  {
+    val username = "user"
+    val password = "pass"
+    val req      = new ScaledaRegisterLogin("127.0.0.1")
+    req.register(new User(username, password, username))
+    req.login(username, password)
 
     // val (client, shutdown) = RemoteClient("127.0.0.1")
     // val reply              = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of())
@@ -88,14 +88,10 @@ object ScaledaServerMainTest extends App {
     //   RemoteServer.DEFAULT_PORT,
     //   enableAuthProvide = true
     // )
-    val (client, shutdown) = RemoteClient("127.0.0.1")
-    val reply = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of())
+    val (client, shutdown)           = RemoteClient("127.0.0.1")
+    val reply                        = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of())
     val profiles: Seq[RemoteProfile] = reply.profiles
     KernelLogger.info("remote profiles", profiles)
-    profiles.headOption.foreach(profile => {
-      val detailsReply = client.getProfileDetails(ProfileDetailsRequest.of(profile.profileName))
-      KernelLogger.info("remote profile details", detailsReply)
-    })
     shutdown()
   }
 

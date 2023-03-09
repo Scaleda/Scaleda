@@ -80,36 +80,6 @@ object RemoteServer {
         case OS.Unix    => RemoteOsType.REMOTE_OS_TYPE_LINUX
       })
     }
-
-    override def getProfileDetails(request: ProfileDetailsRequest): Future[ProfileDetailsReply] = async {
-      val r =
-        Toolchain
-          .profiles()
-          .find(_.profileName == request.profileName)
-          .map(p => {
-            import p._
-            ProfileDetailsReply.of(
-              Map(
-                // "profileName"     -> profileName,
-                // "toolchainType"   -> toolchainType,
-                // "path"            -> path,
-                // "iverilogPath"    -> iverilogPath,
-                // "vvpPath"         -> vvpPath,
-                // "iverilogVPIPath" -> iverilogVPIPath
-                "name0" -> profileName,
-                "name1" -> toolchainType,
-                "name2" -> path,
-                // "name3" -> iverilogPath
-                "name4" -> vvpPath,
-                // "name5" -> iverilogVPIPath
-              )
-            )
-          })
-          .getOrElse(ProfileDetailsReply.defaultInstance)
-
-      KernelLogger.info(s"getProfileDetails(${request.profileName}) => $r")
-      r
-    }
   }
 
   def serve(port: Int = DEFAULT_PORT): Unit = {
@@ -117,8 +87,8 @@ object RemoteServer {
     val server = RpcPatch.getStartServer(
       Seq(
         RemoteGrpc.bindService(new RemoteImpl, executionContext)
-        // RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext),
-        // RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
+        RemoteRegisterLoginGrpc.bindService(new RemoteRegisterLoginImpl, executionContext),
+        RemoteFuseTransferGrpc.bindService(new FuseTransferServer, executionContext)
       ),
       port,
       enableAuthCheck = EnvironmentUtils.Backup.env.contains("AUTH_ENABLE"),

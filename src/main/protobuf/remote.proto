@@ -6,7 +6,6 @@ service Remote {
   rpc Run(RunRequest) returns (stream RunReply) {}
   rpc GetProfiles(Empty) returns (ProfilesReply) {}
   rpc GetRemoteInfo(Empty) returns (RemoteInfo) {}
-  rpc GetProfileDetails(ProfileDetailsRequest) returns (ProfileDetailsReply) {}
 }
 
 service RemoteRegisterLogin {
@@ -68,29 +67,17 @@ message RunReply {
   int32 int_value = 3;
 }
 
+// Note that these value cannot be null!!!
 message RemoteProfile {
   string profileName = 1;
   string toolchainType = 2;
-// FIXME: items over 3 make gRPC crash!!
-//  string path = 3;
-//  string iverilogPath = 4;
-//  string vvpPath = 5;
-//  string iverilogVPIPath = 6;
+  string path = 3;
+  string iverilogPath = 4;
+  string vvpPath = 5;
+  string iverilogVPIPath = 6;
 }
 message ProfilesReply {
   repeated RemoteProfile profiles = 1;
-}
-message ProfileDetailsRequest {
-  string profileName = 1;
-}
-message ProfileDetailsReply {
-//  string profileName = 1;
-//  string toolchainType = 2;
-//  string path = 3;
-//  string iverilogPath = 4;
-//  string vvpPath = 5;
-//  string iverilogVPIPath = 6;
-  map<string, string> content = 1;
 }
 
 enum RemoteOsType {
