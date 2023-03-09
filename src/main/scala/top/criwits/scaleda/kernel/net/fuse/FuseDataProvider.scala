@@ -40,6 +40,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   }
 
   override def getattr(request: PathRequest): Future[GetAttrReply] = async {
+    logger.info(s"getattr(${request.path})")
     val file = getFile(request.path)
     if (!file.exists()) GetAttrReply(-ErrorCodes.ENOENT)
     else {

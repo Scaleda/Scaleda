@@ -34,11 +34,23 @@ case class FuseTransferMessageCase(
     FuseTransferMessage.of(id, function, BinarySerializeHelper.fromAny(data))
 }
 
+object FuseTransferMessageCase {
+  private var lastMsgId: Long = 2
+
+  def newMsgId: Long = {
+    synchronized {
+      val v = lastMsgId
+      lastMsgId = lastMsgId + 1
+      return v
+    }
+  }
+}
+
 class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     extends StreamObserver[FuseTransferMessage] {
   private var identifier: Option[String] = None
   override def onNext(msg: FuseTransferMessage) = {
-    KernelLogger.info("server onNext: ", msg.toProtoString)
+    KernelLogger.debug("server onNext: ", msg.toProtoString)
     val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
     if (user == null) KernelLogger.warn("Fuse Transfer Server recv null user")
     val key = if (user == null || (user != null && user.getUsername == null)) "test" else user.getUsername
@@ -94,7 +106,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
         recvWait
           .get(msg.id)
           .foreach(obj => {
-            KernelLogger.info("notifying", msg.id)
+            KernelLogger.debug("notifying message id", msg.id)
             obj.synchronized {
               obj.notify()
             }
@@ -129,7 +141,6 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
     val req = msg.message
 
     def handleFutureData[T](future: Future[T]): ByteString = {
-      KernelLogger.info("future:", future)
       val result = Await.result(future, 3 seconds)
       KernelLogger.info("result:", result)
       BinarySerializeHelper.fromAny(result)
