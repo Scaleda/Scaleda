@@ -181,6 +181,7 @@ class ScaledaDatabase {
     }
     resultSet.close()
     preparing.close()
+    manuallyCleanToken()
     result.headOption
   }
 
