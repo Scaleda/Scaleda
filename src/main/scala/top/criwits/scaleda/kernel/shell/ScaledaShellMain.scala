@@ -28,7 +28,8 @@ case class ShellArgs(
     runMode: ShellRunMode.Value = ShellRunMode.None,
     serverHost: String = "",
     profileName: String = "",
-    user: User = new User("", "", "")
+    user: User = new User("", "", ""),
+    configureName: String = "",
 )
 
 object ScaledaShellMain {

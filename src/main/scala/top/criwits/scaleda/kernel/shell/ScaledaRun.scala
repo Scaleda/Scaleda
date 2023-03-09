@@ -139,6 +139,7 @@ object ScaledaRun {
               .find(p => p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty))
           }
         if (profile.isEmpty) {
+          KernelLogger.warn("Cannot specify profile! profiles:", Toolchain.profiles())
           None
         } else {
           val runtimeId =
@@ -166,9 +167,10 @@ trait ScaledaRunHandler {
 
   def onStderr(data: String): Unit
 
-  /** Invoked when one return value captured, and [[finishedAll]] == true after all commands done
+  /** Invoked when one return value captured, and `finishedAll` == true after all commands done
     * @param returnValue return value
     * @param finishedAll is all commands finished
+    * @param meetErrors has errors when executing
     */
   def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit
 
