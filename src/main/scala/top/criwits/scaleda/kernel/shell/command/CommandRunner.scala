@@ -33,7 +33,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   val envs: Seq[(String, String)] = deps.envs
   val workingDir                  = new File(path)
   if (!workingDir.exists()) workingDir.mkdirs()
-  KernelLogger.warn("exec deps:", deps)
+  KernelLogger.info("exec deps:", deps)
   private val procBuilder = new ProcessBuilder()
   procBuilder.command(CollectionConverters.asJava(args))
   procBuilder.directory(workingDir)

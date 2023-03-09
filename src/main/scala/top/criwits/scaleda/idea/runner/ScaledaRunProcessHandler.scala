@@ -71,7 +71,7 @@ class ScaledaRunProcessHandler(
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     val msg = ScaledaBundle.message("task.run.return.text", returnValue)
     if (meetErrors) logger.warn(msg)
-    else logger.info(msg)
+    else logger.debug(msg)
     ret = returnValue
     if (finishedAll || meetErrors) {
       terminating = false
