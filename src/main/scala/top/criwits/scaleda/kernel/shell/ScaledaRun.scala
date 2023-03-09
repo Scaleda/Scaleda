@@ -2,13 +2,18 @@ package top.criwits.scaleda
 package kernel.shell
 
 import idea.runner.ScaledaRuntimeInfo
-import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
+import kernel.net.RemoteClient
+import kernel.net.remote.Empty
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
+import io.grpc.StatusRuntimeException
+
 import java.io.File
+import java.time.Instant
 import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
@@ -81,6 +86,74 @@ object ScaledaRun {
           profile = profile
         )
     }
+  }
+
+  def generateRuntimeFromName(
+      targetName: String,
+      taskName: String,
+      profileName: String,
+      profileHost: String
+  ): Option[ScaledaRuntimeInfo] = {
+    val configOptional = ProjectConfig.getConfig()
+    if (configOptional.isEmpty) {
+      KernelLogger.warn("no configure found")
+      return None
+    }
+    val c = configOptional.get
+    c.taskByName(taskName, targetName)
+      .flatMap(f => {
+        val (target, task)                                = f
+        var remoteProfiles: Option[Seq[ToolchainProfile]] = None
+        val profileHostUse                                = task.host.getOrElse(profileHost)
+        KernelLogger.warn(s"profileHostUse: $profileHostUse")
+        val profile =
+          if (profileHostUse.isEmpty) {
+            // Run locally if no host argument provided
+            Toolchain
+              .profiles()
+              .find(p => p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty))
+          } else {
+            try {
+              val (client, shutdown) = RemoteClient(profileHostUse)
+              try {
+                remoteProfiles = Some(
+                  client
+                    .getProfiles(Empty())
+                    .profiles
+                    .map(p => ToolchainProfile.asRemoteToolchainProfile(p, profileHostUse))
+                )
+              } finally {
+                shutdown()
+              }
+            } catch {
+              case e: StatusRuntimeException =>
+                // TODO: i18n
+                KernelLogger.warn("Cannot load profiles form host", profileHostUse, e)
+                return None
+            }
+            remoteProfiles.get
+              .find(p => p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty))
+          }
+        if (profile.isEmpty) {
+          None
+        } else {
+          val runtimeId =
+            s"${target.toolchain}-${target.name}-${task.name}-${Instant.now()}"
+
+          val workingDir = new File(ProjectConfig.projectBase.get)
+          val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
+          val runtime = ScaledaRuntimeInfo(
+            id = runtimeId,
+            target = target,
+            task = task,
+            profile = profile.get,
+            executor = executor,
+            workingDir = workingDir
+          )
+
+          Some(runtime)
+        }
+      })
   }
 }
 

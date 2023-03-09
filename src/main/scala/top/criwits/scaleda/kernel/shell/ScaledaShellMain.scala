@@ -8,9 +8,8 @@ import kernel.net.user.ScaledaRegisterLogin
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
 import kernel.server.ScaledaServerMain
-import kernel.shell.command.RemoteCommandDeps
 import kernel.template.Template
-import kernel.toolchain.{Toolchain, ToolchainProfile}
+import kernel.toolchain.Toolchain
 import kernel.utils.serialise.JSONHelper
 import kernel.utils.{KernelLogger, Paths}
 
@@ -82,6 +81,7 @@ object ScaledaShellMain {
     }
     if (ProjectConfig.configFile.isEmpty)
       KernelLogger.info("No project config detected!")
+
     val shellParser = {
       val builder = OParser.builder[ShellArgs]
       import builder._
@@ -98,6 +98,20 @@ object ScaledaShellMain {
           .action((x, c) => c.copy(serverPort = x))
           .text("Set server port for RPC")
           .hidden(),
+        opt[String]('u', "username")
+          .action((x, c) => {
+            val user = c.user
+            user.setUsername(x)
+            c.copy(user = user)
+          })
+          .text("Specify username"),
+        opt[String]('p', "password")
+          .action((x, c) => {
+            val user = c.user
+            user.setPassword(x)
+            c.copy(user = user)
+          })
+          .text("Specify password"),
         cmd("install")
           .text("Install necessary binaries force")
           .action((_, c) => c.copy(runMode = ShellRunMode.Install)),
@@ -106,41 +120,11 @@ object ScaledaShellMain {
           .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
         cmd("login")
           .text("Login into server")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Login))
-          .children(
-            opt[String]('u', "username")
-              .action((x, c) => {
-                val user = c.user
-                user.setUsername(x)
-                c.copy(user = user)
-              })
-              .text("Specify username"),
-            opt[String]('p', "password")
-              .action((x, c) => {
-                val user = c.user
-                user.setPassword(x)
-                c.copy(user = user)
-              })
-              .text("Specify password")
-          ),
+          .action((_, c) => c.copy(runMode = ShellRunMode.Login)),
         cmd("register")
           .text("Create account in server")
           .action((_, c) => c.copy(runMode = ShellRunMode.Register))
           .children(
-            opt[String]('u', "username")
-              .action((x, c) => {
-                val user = c.user
-                user.setUsername(x)
-                c.copy(user = user)
-              })
-              .text("Specify username"),
-            opt[String]('p', "password")
-              .action((x, c) => {
-                val user = c.user
-                user.setPassword(x)
-                c.copy(user = user)
-              })
-              .text("Specify password"),
             opt[String]('n', "nickname")
               .action((x, c) => {
                 val user = c.user
@@ -165,15 +149,6 @@ object ScaledaShellMain {
             opt[String]('t', "task")
               .action((x, c) => c.copy(task = x))
               .text("Specify the task"),
-//              .validate(name =>
-//                if (
-//                  ProjectConfig
-//                    .getConfig()
-//                    .exists(c => c.taskNames.contains(name))
-//                )
-//                  success
-//                else failure(s"no task ${name} found!")
-//              ),
             opt[String]('p', "profile")
               .action((x, c) => c.copy(profileName = Some(x)))
               .text("Specify profile name")
@@ -219,56 +194,62 @@ object ScaledaShellMain {
               )
               .getOrElse(KernelLogger.info("no task loaded"))
           case ShellRunMode.Run =>
-            // config
-            //   .map(c => {
-            //     ProjectConfig
-            //       .getConfig()
-            //       .foreach(
-            //         _.taskByName(shellConfig.task, shellConfig.target)
-            //           .map(f => {
-            //             val (target, task) = f
-            //             // TODO: specify toolchain in shell
-            //             val profile = shellConfig.profileName
-            //               .flatMap(name => {
-            //                 // if remote host specified, use remote name
-            //                 stub
-            //                   .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.profileName))
-            //                   .getOrElse(
-            //                     Toolchain.profiles().map(_.profileName).toSeq
-            //                   )
-            //                   .find(_ == name)
-            //               })
-            //               .map(name =>
-            //                 // FIXME
-            //                 new ToolchainProfile(
-            //                   name,
-            //                   "vivado",
-            //                   "/opt/Xilinx/Vivado/2019.2"
-            //                 )
-            //               )
-            //             ScaledaRun.runTask(
-            //               if (stub.nonEmpty) ScaledaRunKernelRemoteHandler
-            //               else ScaledaRunKernelHandler,
-            //               workingDir,
-            //               target,
-            //               task,
-            //               profile = profile,
-            //               remoteDeps =
-            //                 if (stub.nonEmpty)
-            //                   Some(
-            //                     RemoteCommandDeps(
-            //                       host = shellConfig.serverHost,
-            //                       port = shellConfig.serverPort
-            //                     )
-            //                   )
-            //                 else None
-            //             )
-            //           })
-            //           .getOrElse(KernelLogger.error("no specific task!"))
-            //       )
-            //   })
-            //   .getOrElse(KernelLogger.error("no config loaded!"))
-            // TODO: fix shell run
+            if (config.isEmpty) {
+              KernelLogger.error("no configure found!")
+            } else {
+              val c = config.get
+
+            }
+          // config
+          //   .map(c => {
+          //     ProjectConfig
+          //       .getConfig()
+          //       .foreach(
+          //         _.taskByName(shellConfig.task, shellConfig.target)
+          //           .map(f => {
+          //             val (target, task) = f
+          //             // TODO: specify toolchain in shell
+          //             val profile = shellConfig.profileName
+          //               .flatMap(name => {
+          //                 // if remote host specified, use remote name
+          //                 stub
+          //                   .map(stub => stub._1.getProfiles(Empty()).profiles.map(_.profileName))
+          //                   .getOrElse(
+          //                     Toolchain.profiles().map(_.profileName).toSeq
+          //                   )
+          //                   .find(_ == name)
+          //               })
+          //               .map(name =>
+          //                 // FIXME
+          //                 new ToolchainProfile(
+          //                   name,
+          //                   "vivado",
+          //                   "/opt/Xilinx/Vivado/2019.2"
+          //                 )
+          //               )
+          //             ScaledaRun.runTask(
+          //               if (stub.nonEmpty) ScaledaRunKernelRemoteHandler
+          //               else ScaledaRunKernelHandler,
+          //               workingDir,
+          //               target,
+          //               task,
+          //               profile = profile,
+          //               remoteDeps =
+          //                 if (stub.nonEmpty)
+          //                   Some(
+          //                     RemoteCommandDeps(
+          //                       host = shellConfig.serverHost,
+          //                       port = shellConfig.serverPort
+          //                     )
+          //                   )
+          //                 else None
+          //             )
+          //           })
+          //           .getOrElse(KernelLogger.error("no specific task!"))
+          //       )
+          //   })
+          //   .getOrElse(KernelLogger.error("no config loaded!"))
+          // TODO: fix shell run
           case ShellRunMode.None =>
             KernelLogger.warn("no action specified, do nothing")
           case ShellRunMode.Install =>

@@ -3,7 +3,6 @@ package idea.runner
 
 import idea.ScaledaBundle
 import idea.utils.MainLogger
-import kernel.project.config.TaskConfig
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.Executor
@@ -20,8 +19,8 @@ import java.io.OutputStream
   */
 class ScaledaRunProcessHandler(
     logger: BasicLogger,
-    task: TaskConfig,
-    invokeAfterFinish: () => Unit = () => {}
+    rt: ScaledaRuntimeInfo,
+    invokeAfterFinish: ScaledaRuntimeInfo => Unit = rt => {}
 ) extends ProcessHandler
     with ScaledaRunHandler {
   // Set terminating <- `true` to invoke stopping
@@ -78,7 +77,7 @@ class ScaledaRunProcessHandler(
       terminating = false
       terminated = true
       // invoke only success all
-      if (!meetErrors) invokeAfterFinish()
+      if (!meetErrors) invokeAfterFinish(rt)
     }
   }
 

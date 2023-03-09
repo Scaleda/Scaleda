@@ -3,14 +3,12 @@ package idea.runner.configuration
 
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
-import idea.utils.{ConsoleLogger, MainLogger, Notification}
+import idea.utils.{ConsoleLogger, MainLogger}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
-import kernel.net.RemoteClient
-import kernel.net.remote.Empty
-import kernel.project.config.{ProjectConfig, TaskType}
+import kernel.project.config.TaskType
 import kernel.shell.ScaledaRun
+import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.SimulationExecutor
-import kernel.toolchain.{Toolchain, ToolchainProfile}
 
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
@@ -22,12 +20,9 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
-import io.grpc.StatusRuntimeException
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
 
-import java.io.File
-import java.time.Instant
 import scala.collection.mutable
 import scala.language.existentials
 
@@ -107,140 +102,63 @@ class ScaledaRunConfiguration(
       environment: ExecutionEnvironment
   ): RunProfileState = {
     MainLogger.info(s"getState: taskName=$taskName, targetName=$targetName, profileName=$profileName")
-    ProjectConfig
-      .getConfig()
-      .flatMap(c => {
-        c.taskByName(taskName, targetName)
-          .map(f => {
-            val (target, task)                                = f
-            var remoteProfiles: Option[Seq[ToolchainProfile]] = None
-            val profileHostUse                                = task.host.getOrElse(profileHost)
-            MainLogger.warn(s"profileHostUse: $profileHostUse")
-            val profile =
-              if (profileHostUse.isEmpty) {
-                // Run locally if no host argument provided
-                Toolchain
-                  .profiles()
-                  .find(p =>
-                    p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty)
-                  )
-              } else {
-                try {
-                  val (client, shutdown) = RemoteClient(profileHostUse)
-                  try {
-                    remoteProfiles = Some(
-                      client
-                        .getProfiles(Empty())
-                        .profiles
-                        .map(p => ToolchainProfile.asRemoteToolchainProfile(p, profileHostUse))
-                    )
-                  } finally {
-                    shutdown()
-                  }
-                } catch {
-                  case e: StatusRuntimeException =>
-                    // TODO: i18n
-                    MainLogger.warn("Cannot load profiles form host", profileHostUse, e)
-                    return null
-                }
-                remoteProfiles.get
-                  .find(p =>
-                    p.toolchainType == target.toolchain && (p.profileName == profileName || profileName.isEmpty)
-                  )
-              }
-            if (profile.isEmpty) {
-              Notification(project).error(
-                "Toolchain not found",
-                s"Cannot find toolchain ${target.toolchain}, check your profile list"
-              )
-              null
-            } else {
-              val searchScope =
-                ExecutionSearchScopes
-                  .executionScope(project, environment.getRunProfile)
+    val runtimeOptional = ScaledaRun.generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+    if (runtimeOptional.isEmpty) {
+      MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
+      return null
+    }
+    val runtime = runtimeOptional.get
+    val searchScope =
+      ExecutionSearchScopes
+        .executionScope(project, environment.getRunProfile)
 
-              val myConsoleBuilder =
-                TextConsoleBuilderFactory.getInstance
-                  .createBuilder(project, searchScope)
+    val myConsoleBuilder =
+      TextConsoleBuilderFactory.getInstance
+        .createBuilder(project, searchScope)
 
-              val console = myConsoleBuilder.getConsole
+    val console = myConsoleBuilder.getConsole
+    def afterExecution(rt: ScaledaRuntimeInfo): Unit = {
+      // remove message listeners
+      ScaledaMessageTab.instance.detachFromLogger(rt.id)
+      ScaledaMessageParser.removeParser(rt.id)
+      rt.task.taskType match {
+        // Only call rvcd when simulate
+        case TaskType.Simulation =>
+          project
+            .getService(classOf[RvcdService])
+            .launchWithWaveformAndSource(rt.executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
+        // TODO / FIXME: Source is not given
+        case _ =>
+      }
+    }
 
-              val runtimeId =
-                s"${target.toolchain}-${target.name}-${task.name}-${Instant.now()}"
+    val handler =
+      new ScaledaRunProcessHandler(new ConsoleLogger(console, logSourceId = Some(runtime.id)), runtime, afterExecution)
 
-              val workingDir = new File(ProjectConfig.projectBase.get)
-              val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
-              val runtime = ScaledaRuntimeInfo(
-                id = runtimeId,
-                target = target,
-                task = task,
-                profile = profile.get,
-                executor = executor,
-                workingDir = workingDir
-              )
+    (_: Executor, _: ProgramRunner[_]) => {
+      // attach listener to control the green dot
+      ProcessTerminatedListener.attach(handler)
 
-              def afterExecution(): Unit = {
-                // remove message listeners
-                ScaledaMessageTab.instance.detachFromLogger(runtime.id)
-                ScaledaMessageParser.removeParser(runtime.id)
-                runtime.task.taskType match {
-                  // Only call rvcd when simulate
-                  case TaskType.Simulation =>
-                    project
-                      .getService(classOf[RvcdService])
-                      .launchWithWaveformAndSource(runtime.executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
-                  // TODO / FIXME: Source is not given
-                  case _ =>
-                }
-              }
+      // prepare process
+      val thread = ScaledaRun.runTaskBackground(handler, runtime)
 
-              val handler =
-                new ScaledaRunProcessHandler(
-                  new ConsoleLogger(console, logSourceId = Some(runtimeId)),
-                  task,
-                  afterExecution
-                )
+      // attach message parser listener
+      ScaledaMessageTab.instance.attach(runtime)
+      Toolchain.toolchainMessageParser
+        .get(runtime.target.toolchain)
+        .foreach(parserProvider => ScaledaMessageParser.registerParser(runtime.id, parserProvider.messageParser))
 
-              val state = new RunProfileState {
-                override def execute(
-                    ideaExecutor: Executor,
-                    runner: ProgramRunner[_]
-                ): ExecutionResult = {
-                  // attach listener to control the green dot
-                  ProcessTerminatedListener.attach(handler)
+      // run process in the background
+      thread.start()
 
-                  // prepare process
-                  val thread = ScaledaRun.runTaskBackground(handler, runtime)
+      // return result
+      new ExecutionResult {
+        override def getExecutionConsole: ExecutionConsole = console
 
-                  // attach message parser listener
-                  ScaledaMessageTab.instance.attach(runtime)
-                  Toolchain.toolchainMessageParser
-                    .get(target.toolchain)
-                    .foreach(parserProvider =>
-                      ScaledaMessageParser.registerParser(runtimeId, parserProvider.messageParser)
-                    )
+        override def getActions: Array[AnAction] = Array()
 
-                  // run process in the background
-                  thread.start()
-
-                  // return result
-                  new ExecutionResult {
-                    override def getExecutionConsole: ExecutionConsole = console
-
-                    override def getActions: Array[AnAction] = Array()
-
-                    override def getProcessHandler: ProcessHandler = handler
-                  }
-                }
-              }
-
-              state
-            }
-          })
-      })
-      .getOrElse({
-        MainLogger.warn(s"Cannot find task name: $taskName, target name: $targetName")
-        null
-      })
+        override def getProcessHandler: ProcessHandler = handler
+      }
+    }
   }
 }
