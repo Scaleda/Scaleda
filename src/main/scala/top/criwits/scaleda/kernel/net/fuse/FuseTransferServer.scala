@@ -94,7 +94,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
           })
       case _ =>
         val converted =
-          FuseTransferMessageCase(msg.id, "username", msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
+          FuseTransferMessageCase(msg.id, key, msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
 
         KernelLogger.info("converted:", converted)
         recvData.synchronized {
