@@ -151,9 +151,8 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     .setVerticalGap(UIUtil.DEFAULT_VGAP)
     .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.target.name"), targetName)
     .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.task.name"), taskName)
-    // TODO: i18n
-    .addLabeledComponent("Profile name", profileName)
-    .addLabeledComponent("Profile host", profileHost)
+    .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.profile.name"), profileName)
+    .addLabeledComponent(ScaledaBundle.message("tasks.configuration.label.profile.host"), profileHost)
     .addComponentToRightColumn(profileStateComp)
     .addComponent(environmentVarsComponent)
     .getPanel
