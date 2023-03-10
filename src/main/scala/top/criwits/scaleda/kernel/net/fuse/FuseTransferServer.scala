@@ -1,19 +1,16 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
-import kernel.net.RpcPatch
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc.RemoteFuseTransfer
 import kernel.net.fuse.fs._
-import kernel.server.ScaledaServerMainRunTest
-import kernel.shell.ScaledaShellMain
-import kernel.utils.{KernelLogger, Paths}
+import kernel.utils.KernelLogger
+import kernel.utils.serialise.BinarySerializeHelper
 
-import com.google.protobuf.ByteString
 import io.grpc.stub.StreamObserver
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
-import scala.concurrent.{ExecutionContext, TimeoutException}
+import scala.concurrent.TimeoutException
 import scala.language.postfixOps
 
 class FuseTransferServer extends RemoteFuseTransfer {
@@ -63,7 +60,9 @@ object FuseTransferServer {
         observers.synchronized {
           observers.get(msg.identifier) match {
             case Some(observer) => observer.tx.onNext(msg.toMessage)
-            case None           => KernelLogger.error("Cannot send message ", msg, ", no observer!")
+            case None =>
+              KernelLogger.error("Cannot send message ", msg, ", no observer!")
+              recvWait.synchronized { recvWait.get(msg.id) }.foreach(o => o.synchronized { o.notify() })
           }
         }
       } catch {
@@ -77,10 +76,25 @@ object FuseTransferServer {
     }
   }
 
-  // def localRequest(
-  //     localObserver: StreamObserver[FuseTransferMessage],
-  //     msg: FuseTransferMessageCase
-  // ): FuseTransferMessageCase = {
-  //   localObserver.onNext(msg.toMessage)
-  // }
+  def localRequest(
+      localObserver: FuseTransferClientObserver,
+      msg: FuseTransferMessageCase
+  ): FuseTransferMessageCase = {
+    var recvData: Option[FuseTransferMessage] = None
+    localObserver.setTx(new StreamObserver[FuseTransferMessage] {
+      override def onNext(value: FuseTransferMessage) = {
+        recvData = Some(value)
+      }
+      override def onError(t: Throwable) = throw t
+      override def onCompleted() = {}
+    })
+    try {
+      val _ = localObserver.onNext(msg.toMessage)
+    } catch {
+      case e: Throwable =>
+        return msg.copy(error = Some(e))
+    }
+    if (recvData.isEmpty) msg.copy(error = Some(new RuntimeException("No data recv?")))
+    msg.copy(data = BinarySerializeHelper.fromGrpcBytes(recvData.get.message))
+  }
 }

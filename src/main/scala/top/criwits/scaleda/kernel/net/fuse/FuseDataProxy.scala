@@ -7,7 +7,7 @@ import kernel.net.fuse.fs._
 import sourcecode.Name
 
 class FuseDataProxy(identifier: String) extends RemoteFuseBlockingClient {
-  private def makeRequest[TReq, TResp](data: TReq)(implicit function: Name): TResp = {
+  protected def makeRequest[TReq, TResp](data: TReq)(implicit function: Name): TResp = {
     val resp = FuseTransferServer.request(
       FuseTransferMessageCase(FuseTransferMessageCase.newMsgId, identifier, function.value, data)
     )

@@ -2,17 +2,17 @@ package top.criwits.scaleda
 package kernel
 
 import kernel.net.RpcPatch
+import kernel.net.fuse._
 import kernel.net.fuse.fs.{FuseTransferMessage, PathModeRequest, RemoteFuseTransferGrpc}
-import kernel.net.fuse.{FuseDataProvider, FuseTransferClient, FuseTransferMessageCase, FuseTransferServer}
 import kernel.server.ScaledaServerMainRunTest
 import kernel.shell.ScaledaShellMain
-import kernel.utils.KernelLogger
+import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.google.protobuf.ByteString
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import ru.serce.jnrfuse.FuseStubFS
 
+import java.io.File
 import scala.concurrent.ExecutionContext
 
 class FuseTransferTester extends AnyFlatSpec with should.Matchers {
@@ -68,5 +68,15 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
     FuseTransferClientTester.run()
     // serverThread.join()
     serverThread.interrupt()
+  }
+
+  it should "test local transfer" in {
+    val dataProvider   = new FuseDataProvider(Paths.pwd.getAbsolutePath)
+    val observer       = new FuseTransferClientObserver(dataProvider)
+    val fs             = new ServerSideFuse(new FuseLocalProxy(observer))
+    val mountPoint     = "/tmp/scaledaTest"
+    val mountPointFile = new File(mountPoint)
+    if (mountPointFile.exists()) KernelFileUtils.deleteDirectory(mountPointFile.toPath)
+    FuseUtils.mountFs(fs, mountPoint, blocking = true)
   }
 }

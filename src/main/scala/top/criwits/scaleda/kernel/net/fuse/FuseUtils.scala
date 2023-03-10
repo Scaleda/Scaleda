@@ -50,9 +50,13 @@ object FuseUtils {
       } catch {
         case e: FuseException =>
           KernelLogger.warn("retrying mount:", e)
-          // if (!OS.isWindows) s"""umount \'$mountPoint\"""".!
-          // else
-          fs.umount()
+          if (!OS.isWindows) {
+            try {
+              s"""umount \"$mountPoint\"""".!
+            } catch {
+              case e: Throwable => KernelLogger.warn("cannot umount:", e)
+            }
+          } else fs.umount()
           doMount()
       }
     } catch {
