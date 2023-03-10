@@ -289,6 +289,7 @@ object FuseTransferTester extends App {
 }
 
 object FuseTransferClientTester extends App {
+  ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro", "-p", "1234"))
   ScaledaShellMain.main(
     Array(
       "configurations",
@@ -303,9 +304,11 @@ object FuseTransferClientTester extends App {
       "../scaleda-sample-project",
       "-h",
       "localhost",
-      "-c",
-      "vvvv"
-      // "Unnamed"
+      // "-c",
+      // "vvvv"
+      // // "Unnamed"
+      "-t",
+      "Vivado Simulation"
     )
   )
 }

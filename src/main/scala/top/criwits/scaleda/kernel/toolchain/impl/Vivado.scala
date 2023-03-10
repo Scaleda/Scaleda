@@ -11,6 +11,8 @@ import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
+import top.criwits.scaleda.kernel.net.remote.RemoteInfo
+
 import java.io.File
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
@@ -154,10 +156,11 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       .map(config => {
         val top =
           taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
-        val sim     = taskConfig.`type` == "simulation"
-        val topFile = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
+        val sim             = taskConfig.`type` == "simulation"
+        val topFile         = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
         val testbenchSource = topFile.getAbsolutePath.replace('\\', '/')
-        val vcdFile = if (sim) executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath.replace('\\', '/') else ""
+        val vcdFile =
+          if (sim) executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath.replace('\\', '/') else ""
         val context = Vivado.TemplateContext(
           top = top,
           workDir = executor.workingDir.getAbsolutePath,
@@ -210,7 +213,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   }
   ToolchainProfileDetector.registerDetector(this)
 
-  override def handlePreset(rt: ScaledaRuntimeInfo): Option[ScaledaRuntimeInfo] = {
+  override def handlePreset(rt: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntimeInfo] = {
     val userTokenBean = ScaledaAuthorizationProvider.loadTokenPair
     // A local username is required...
     // TODO: Move preset process to server side?
@@ -222,7 +225,8 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
     val replace =
       if (rt.profile.isRemoteProfile) {
         // this path may not exist on local
-        val remoteTargetPath = new File(Paths.getServerTemporalDir(false), userTokenBean.username).getAbsolutePath
+        // val remoteTargetPath = new File(Paths.getServerTemporalDir(false), userTokenBean.username).getAbsolutePath
+        val remoteTargetPath = remoteInfo.get.tempPrefix + "/" + userTokenBean.username
         new ImplicitPathReplace(rt.workingDir.getAbsolutePath, remoteTargetPath) {
           override def doReplace(src: String) = {
             KernelLogger.info(

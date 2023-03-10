@@ -94,11 +94,14 @@ object RemoteServer {
     }
 
     override def getRemoteInfo(request: Empty): Future[RemoteInfo] = async {
-      RemoteInfo(os = OS.getOSType match {
-        case OS.Windows => RemoteOsType.REMOTE_OS_TYPE_WINDOWS
-        case OS.MacOS   => RemoteOsType.REMOTE_OS_TYPE_MACOS
-        case OS.Unix    => RemoteOsType.REMOTE_OS_TYPE_LINUX
-      })
+      RemoteInfo(
+        os = OS.getOSType match {
+          case OS.Windows => RemoteOsType.REMOTE_OS_TYPE_WINDOWS
+          case OS.MacOS   => RemoteOsType.REMOTE_OS_TYPE_MACOS
+          case OS.Unix    => RemoteOsType.REMOTE_OS_TYPE_LINUX
+        },
+        tempPrefix = Paths.getServerTemporalDir().getAbsolutePath
+      )
     }
   }
 

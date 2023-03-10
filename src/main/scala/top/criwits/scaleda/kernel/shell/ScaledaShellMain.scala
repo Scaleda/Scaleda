@@ -87,6 +87,16 @@ object ScaledaShellMain {
     if (ProjectConfig.configFile.isEmpty)
       KernelLogger.info("No project config detected!")
 
+    def requireHost(shellConfig: ShellArgs): Unit = {
+      require(shellConfig.serverHost.nonEmpty, "server host must provide")
+    }
+
+    def requireHostUserPassword(shellConfig: ShellArgs): Unit = {
+      requireHost(shellConfig)
+      require(shellConfig.user.getUsername.nonEmpty, "Username required")
+      require(shellConfig.user.getPassword.nonEmpty, "Password required")
+    }
+
     val shellParser = {
       val builder = OParser.builder[ShellArgs]
       import builder._
@@ -272,22 +282,29 @@ object ScaledaShellMain {
           case ShellRunMode.Serve =>
             ScaledaServerMain.run(shellConfig)
           case ShellRunMode.Login =>
-            require(shellConfig.serverHost.nonEmpty, "server host must provide")
+            requireHostUserPassword(shellConfig)
             val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
               .login(shellConfig.user.getUsername, shellConfig.user.getPassword)
             if (!reply.ok) {
               KernelLogger.error("Login failed:", reply.reason)
             }
           case ShellRunMode.Register =>
-            require(shellConfig.serverHost.nonEmpty, "server host must provide")
-            val reply = new ScaledaRegisterLogin(shellConfig.serverHost)
-              .register(shellConfig.user)
+            requireHostUserPassword(shellConfig)
+            val request = new ScaledaRegisterLogin(shellConfig.serverHost)
+            val reply   = request.register(shellConfig.user)
             if (!reply.ok) {
               KernelLogger.error("Register failed:", reply.reason)
+            } else {
+              KernelLogger.info("Register done for user", shellConfig.user.getUsername)
+              val loginReply = request.login(shellConfig.user.getUsername, shellConfig.user.getPassword)
+              if (loginReply.ok) {
+                KernelLogger
+              }
             }
           case ShellRunMode.Clean =>
             ScaledaClean.run()
           case ShellRunMode.RefreshToken =>
+            requireHost(shellConfig)
             if (new ScaledaRegisterLogin(shellConfig.serverHost).refreshAndStore())
               KernelLogger.info("Refresh token done")
             else KernelLogger.error("Refresh token failed")
