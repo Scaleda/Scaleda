@@ -11,6 +11,7 @@ import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{FuseFillDir, FuseStubFS}
 import top.criwits.scaleda.kernel.utils.{KernelLogger, OS}
 
+import java.io.File
 import java.nio.ByteBuffer
 import scala.language.existentials
 
@@ -19,6 +20,13 @@ import scala.language.existentials
   */
 class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
   val logger = LoggerFactory.getLogger(getClass)
+
+  private def appendPath(path: String, appendStr: String) = {
+    val trimPath      = path.trim
+    var pathSeparator = File.separator
+    if (trimPath.endsWith("/") || trimPath.endsWith("\\")) pathSeparator = ""
+    path + pathSeparator + appendStr
+  }
 
   override def getattr(path: String, stat: FileStat): Int = {
     val reply =
@@ -143,12 +151,17 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       // filter.apply(buf, nameBuffer, null, offsetNow)
       val fileStat = FileStat.of(buf)
       if (filename.equals(".") || filename.equals("..")) filter.apply(buf, filename, null, 0)
-      else if (getattr(path + "/" + filename, fileStat) == 0) {
+      else if (getattr(appendPath(path, filename), fileStat) == 0) {
+        KernelLogger.debug("applying filename", filename)
         filter.apply(buf, filename, fileStat, 0)
+      } else {
+        KernelLogger.warn(s"getattr failed for file $filename")
       }
     }
     if (reply.r == 0)
       reply.name.foreach(name => applyFilter(name))
+
+    KernelLogger.debug("readdir done")
     reply.r
   }
 

@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
-class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamObserver[FuseTransferMessage] {
+class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extends StreamObserver[FuseTransferMessage] {
   private var tx: StreamObserver[FuseTransferMessage] = _
   def setTx(stream: StreamObserver[FuseTransferMessage]): Unit =
     tx = stream
