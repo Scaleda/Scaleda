@@ -13,6 +13,7 @@ import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.google.protobuf.ByteString
 import io.grpc.stub.StreamObserver
+import top.criwits.scaleda.kernel.server.ScaledaServerMainRunTest
 
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
@@ -62,6 +63,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
           observers.put(key, this)
         }
         fsProxies.synchronized {
+          FuseUtils.loadLibraries()
           val fs   = new ServerSideFuse(new FuseDataProxy(key))
           val dest = new File(Paths.getServerTemporalDir(), key)
           // must create an empty directory
@@ -289,7 +291,7 @@ object FuseTransferTester extends App {
 }
 
 object FuseTransferClientTester extends App {
-  ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro", "-p", "1234"))
+  ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro2", "-p", "1234"))
   ScaledaShellMain.main(
     Array(
       "configurations",
@@ -311,4 +313,11 @@ object FuseTransferClientTester extends App {
       "Vivado Simulation"
     )
   )
+}
+
+object FuseTransferServerClientTester extends App {
+  val serverThread = new Thread(() => ScaledaServerMainRunTest.main(Array()))
+  serverThread.start()
+  FuseTransferClientTester.main(Array())
+  serverThread.join()
 }

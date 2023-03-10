@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
-import kernel.utils.KernelLogger
+import kernel.utils.{KernelLogger, OS}
 
 import ru.serce.jnrfuse.{FuseException, FuseStubFS}
 
@@ -13,12 +13,11 @@ import scala.sys.process._
 object FuseUtils {
   val debug = false
 
-  /**
-   * Mount a filesystem, will retry if failed
-   * @param fs filesystem
-   * @param mountPoint mount point
-   * @param blocking will block current thread until umount
-   */
+  /** Mount a filesystem, will retry if failed
+    * @param fs filesystem
+    * @param mountPoint mount point
+    * @param blocking will block current thread until umount
+    */
   def mountFs(
       fs: FuseStubFS,
       mountPoint: String,
@@ -29,24 +28,19 @@ object FuseUtils {
       val path = Paths.get(mountPoint)
       val file = new File(mountPoint)
       if (!file.exists())
-        KernelLogger.warn("creating dirs with returns:", file.mkdirs())
-      def doMount(): Unit = fs.mount(
-        path,
-        blocking,
-        debug,
-        Array(
-          "-o",
-          "allow_other",
-          "-o",
-          "fsname=scaleda-fs"
-        )
-      )
+        KernelLogger.info("creating dirs with returns:", file.mkdirs())
+      def doMount(): Unit = {
+        val options = Array("-o", "allow_other", "-o", "fsname=scaleda-fs")
+        KernelLogger.info(s"doMount(path=$path, blocking=$blocking, debug=$debug)")
+        fs.mount(path, blocking, debug, options)
+      }
       try {
-        // fs.mount(path, blocking)
         doMount()
       } catch {
-        case _: FuseException => {
-          s"umount $mountPoint".!
+        case e: FuseException => {
+          KernelLogger.warn("retrying mount:", e)
+          if (!OS.isWindows) s"""umount \'$mountPoint\"""".!
+          else fs.umount()
           doMount()
         }
       }
@@ -60,14 +54,14 @@ object FuseUtils {
   }
 
   def fileAttrsUnixString(file: File): String = {
-    val path = file.toPath
+    val path  = file.toPath
     val attrs = Files.readAttributes(path, classOf[PosixFileAttributes])
     val perms = attrs.permissions()
     PosixFilePermissions.toString(perms)
   }
 
   def fileAttrsUnixToInt(file: File): Int = {
-    val str = fileAttrsUnixString(file)
+    val str                    = fileAttrsUnixString(file)
     def bitToInt(c: Char): Int = if (c == '-') 0 else 1
     def groupToInt(group: String): Int =
       (0 until 3).map(i => bitToInt(group.charAt(i)) << (2 - i)).sum
@@ -86,5 +80,11 @@ object FuseUtils {
     val printer = new PrintWriter(file)
     printer.print(content)
     printer.close()
+  }
+
+  def loadLibraries(): Unit = {
+    if (OS.isWindows) {
+      // System.setProperty("jnrfuse.winfsp.path", "D:\\Programs\\scaleda\\src\\main\\resources\\bin\\winfsp_x64.dll")
+    }
   }
 }

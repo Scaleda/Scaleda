@@ -9,7 +9,7 @@ import kernel.net.user.{JwtAuthorizationInterceptor, RemoteRegisterLoginImpl}
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
-import kernel.utils.{EnvironmentUtils, KernelLogger, OS, Paths}
+import kernel.utils.{EnvironmentUtils, ImplicitPathReplace, KernelLogger, OS, Paths}
 
 import io.grpc.stub.StreamObserver
 
@@ -37,14 +37,15 @@ object RemoteServer {
       val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
       val commandDeps = if (user != null) {
         // do text replacement
-        val username                       = user.getUsername
-        val targetPath                     = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
-        val sourcePath                     = request.path
-        def doReplace(src: String): String = src.replaceAll(sourcePath, targetPath)
+        val username   = user.getUsername
+        val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
+        val sourcePath = request.path
+        val replacer   = new ImplicitPathReplace(sourcePath, targetPath)
+        // def doReplace(src: String): String = src.replaceAll(sourcePath, targetPath)
         CommandDeps(
-          args = request.commands.map(doReplace),
+          args = request.commands.map(replacer.doReplace),
           path = targetPath,
-          envs = request.envs.map(t => (doReplace(t.a), doReplace(t.b)))
+          envs = request.envs.map(t => (replacer.doReplace(t.a), replacer.doReplace(t.b)))
         )
       } else {
         KernelLogger.warn("Remote run: user info not found! Replacement fallbacks")

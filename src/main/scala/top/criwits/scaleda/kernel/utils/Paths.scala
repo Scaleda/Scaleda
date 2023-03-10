@@ -36,7 +36,11 @@ object Paths {
   def getUserAuthorization: File = new File(getGlobalConfigDir, ".authorization")
 
   def getServerTemporalDir(isWindows: Boolean = OS.isWindows): File = createDirIfNonExists(
-    new File(if (isWindows) EnvironmentUtils.Backup.env.getOrElse("TEMP", "tmp") else "/home/chiro/tmp", "scaledaTmp")
+    new File(
+      if (isWindows) EnvironmentUtils.Backup.env.getOrElse("SCALEDA_TEMP", new File(pwd, ".tmp").getAbsolutePath)
+      else "/home/chiro/tmp",
+      "scaledaTmp"
+    )
   )
 
   def pwd = new File(System.getProperty("user.dir"))
