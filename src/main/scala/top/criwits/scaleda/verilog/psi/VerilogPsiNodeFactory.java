@@ -221,7 +221,7 @@ public class VerilogPsiNodeFactory {
     );
 
     ruleIElementTypeClassMap.put(
-        getRuleIElementType(VerilogParser.RULE_ordered_parameter_assignment),
+        getRuleIElementType(VerilogParser.RULE_ordered_port_connection),
         OrderedPortConnectionPsiNode.class
     );
 

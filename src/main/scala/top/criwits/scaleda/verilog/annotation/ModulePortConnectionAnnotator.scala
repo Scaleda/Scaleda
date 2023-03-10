@@ -50,14 +50,48 @@ class ModulePortConnectionAnnotator extends Annotator {
                 SB.message(
                   "annotation.not.connected.port",
                   module.getName,
-                  mp.filter(_._2.nonEmpty).map(_._1.getIdentifier.getName).mkString(", ")
+                  mp.filter(_._2.isEmpty).map(_._1.getIdentifier.getName).mkString(", ")
                 )
               )
               .withFix(new ModulePortConnectionIntent(instance, Seq.empty))
               .range(annotateRange)
               .create()
           }
-        case _ =>
+        case ModuleInstantiationPsiNode.NONE =>
+          if (module.getPorts.length != 0) {
+          holder
+              .newAnnotation(
+                HighlightSeverity.ERROR,
+                SB.message(
+                  "annotation.not.connected.ordered.port",
+                  module.getName,
+                  module.getPorts.map(_.getIdentifier.getName).mkString(", ")
+                )
+              )
+              .withFix(new ModulePortConnectionIntent(instance, Seq.empty))
+              .range(annotateRange)
+              .create()
+          }
+        case ModuleInstantiationPsiNode.ORDERED =>
+          val connectMap = instance.getConnectMap
+          if (
+            !connectMap
+              .map(_._2.nonEmpty)
+              .reduce(_ && _)
+          ) {
+            holder
+              .newAnnotation(
+                HighlightSeverity.ERROR,
+                SB.message(
+                  "annotation.not.connected.ordered.port",
+                  module.getName,
+                  connectMap.filter(_._2.isEmpty).map(_._1.getIdentifier.getName).mkString(", ")
+                )
+              )
+              .withFix(new ModulePortConnectionIntent(instance, Seq.empty))
+              .range(annotateRange)
+              .create()
+          }
       }
     }
 
