@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
-import kernel.utils.{KernelLogger, OS}
+import kernel.utils.{KernelFileUtils, KernelLogger, OS}
 
 import ru.serce.jnrfuse.{FuseException, FuseStubFS}
 
@@ -11,7 +11,7 @@ import java.nio.file.{Files, Paths}
 import scala.sys.process._
 
 object FuseUtils {
-  val debug = false
+  val debug = true
 
   /** Mount a filesystem, will retry if failed
     * @param fs filesystem
@@ -29,9 +29,17 @@ object FuseUtils {
       val file = new File(mountPoint)
       if (!file.exists())
         KernelLogger.info("creating dirs with returns:", file.mkdirs())
+      if (OS.isWindows) {
+        if (file.exists()) {
+          if (file.isFile) file.delete()
+          else KernelFileUtils.deleteDirectory(file.toPath)
+        }
+      }
       def doMount(): Unit = {
         val options = Array("-o", "allow_other", "-o", "fsname=scaleda-fs")
-        KernelLogger.info(s"doMount(path=$path, blocking=$blocking, debug=$debug)")
+        KernelLogger.info(
+          s"doMount(path=$path, blocking=$blocking, debug=$debug), target path exists: ${path.toFile.exists()}"
+        )
         fs.mount(path, blocking, debug, options)
       }
       try {

@@ -35,13 +35,20 @@ object Paths {
 
   def getUserAuthorization: File = new File(getGlobalConfigDir, ".authorization")
 
-  def getServerTemporalDir(isWindows: Boolean = OS.isWindows): File = createDirIfNonExists(
-    new File(
-      if (isWindows) EnvironmentUtils.Backup.env.getOrElse("SCALEDA_TEMP", new File(pwd, ".tmp").getAbsolutePath)
-      else "/home/chiro/tmp",
-      "scaledaTmp"
-    )
-  )
+  def getServerTemporalDir(isWindows: Boolean = OS.isWindows): File = {
+    if (OS.isWindows) {
+      val f =
+        new File(EnvironmentUtils.Backup.env.getOrElse("TEMP", new File(pwd, ".tmp").getAbsolutePath), "scaledaTmp")
+      if (f.exists()) {
+        if (f.isFile) f.delete()
+        else KernelFileUtils.deleteDirectory(f.toPath)
+      }
+      require(!f.exists(), "Windows delete target path failed")
+      f
+    } else {
+      new File("/home/chiro/tmp", "scaledaTmp")
+    }
+  }
 
   def pwd = new File(System.getProperty("user.dir"))
 
