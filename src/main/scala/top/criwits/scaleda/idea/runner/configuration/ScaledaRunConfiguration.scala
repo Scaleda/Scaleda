@@ -43,7 +43,6 @@ class ScaledaRunConfiguration(
   var profileName = ""
   // set empty to disable remote
   var profileHost = ""
-  // TODO: Add toolchain profile
   val extraEnvs = new mutable.HashMap[String, String]
 
   private val STORAGE_ID: String = "scaleda"
@@ -80,7 +79,6 @@ class ScaledaRunConfiguration(
     }
   }
 
-  // FIXME: configuration cannot load from storage
   override def readExternal(element: Element): Unit = {
     val child = element.getChild(STORAGE_ID)
     if (child != null) {
