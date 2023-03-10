@@ -17,10 +17,7 @@ import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.SeqBlockPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.expression.ExpressionPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.NameOfInstancePsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.NamedPortConnectionPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.OrderedPortConnectionPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.*;
 import top.criwits.scaleda.verilog.psi.nodes.module.*;
 import top.criwits.scaleda.verilog.psi.nodes.signal.*;
 
@@ -211,6 +208,11 @@ public class VerilogPsiNodeFactory {
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_statement),
         StatementPsiNode.class
+    );
+
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_list_of_port_connections),
+        ListOfPortConnectionsPsiNode.class
     );
 
     ruleIElementTypeClassMap.put(
