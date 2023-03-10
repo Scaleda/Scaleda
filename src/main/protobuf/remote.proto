@@ -89,4 +89,5 @@ enum RemoteOsType {
 }
 message RemoteInfo {
   RemoteOsType os = 1;
+  string tempPrefix = 2;
 }

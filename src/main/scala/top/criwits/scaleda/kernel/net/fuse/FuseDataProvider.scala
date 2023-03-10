@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.net.fuse
 
 import kernel.net.fuse.fs._
+import kernel.utils.OS
 
 import com.google.protobuf.ByteString
 import org.slf4j.LoggerFactory
@@ -9,7 +10,7 @@ import ru.serce.jnrfuse.ErrorCodes
 
 import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
-import java.nio.file.attribute.PosixFileAttributes
+import java.nio.file.attribute.{DosFileAttributes, PosixFileAttributes}
 import java.util.concurrent.TimeUnit
 import scala.async.Async.{async, await}
 import scala.collection.mutable
@@ -40,16 +41,31 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   }
 
   override def getattr(request: PathRequest): Future[GetAttrReply] = async {
-    logger.info(s"getattr(${request.path})")
     val file = getFile(request.path)
+    logger.info(s"getattr(${request.path}) <-> $file")
     if (!file.exists()) GetAttrReply(-ErrorCodes.ENOENT)
     else {
-      var mode = FuseUtils.fileAttrsUnixToInt(file)
+      val p = file.toPath
+      val attrs =
+        if (OS.isWindows)
+          Files.readAttributes(p, classOf[DosFileAttributes])
+        else
+          Files.readAttributes(p, classOf[PosixFileAttributes])
+      if (attrs.isRegularFile) {
+        logger.info(s"file ${request.path} attrs: size=${attrs.size()}")
+      }
+      // 0777 | ...
+      // val modeBad = FuseUtils.fileAttrsToInt(file)
+      // var mode = FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+      // var mode = FuseUtils.fileAttrsUnixToInt(file)
+      var mode =
+        if (OS.isWindows)
+          FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+        else
+          FuseUtils.fileAttrsUnixToInt(file)
       if (Files.isSymbolicLink(file.toPath)) {
         mode = (mode & 0xfff) | (0xa << 12)
       }
-      val p     = file.toPath
-      val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
       GetAttrReply(
         mode = mode,
         size = attrs.size(),
@@ -132,21 +148,26 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
 
   override def chmod(request: PathModeRequest): Future[IntReply] = async {
     import request._
-    IntReply({
-      val file = getFile(path)
-      val run =
-        s"""chmod ${Integer.toOctalString(mode.toInt & 0xfff)} \"${file.getAbsolutePath}\""""
-      logger.info(
-        s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
-      )
-      val r = run.!
-      if (r == 0) 0 else -ErrorCodes.ENOENT
-    })
+    val file = getFile(path)
+    if (OS.isWindows) {
+      IntReply(if (file.exists()) 0 else -ErrorCodes.ENOENT)
+    } else {
+      IntReply({
+        val run =
+          s"""chmod ${Integer.toOctalString(mode.toInt & 0xfff)} \"${file.getAbsolutePath}\""""
+        logger.info(
+          s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
+        )
+        val r = run.!
+        if (r == 0) 0 else -ErrorCodes.ENOENT
+      })
+    }
   }
 
   override def read(request: ReadRequest): Future[ReadReply] = async {
     import request._
     val file = getFile(path)
+    logger.info(s"reading $path <-> $file")
     if (!file.exists()) ReadReply(-ErrorCodes.ENOENT)
     else if (file.isDirectory) ReadReply(-ErrorCodes.EISDIR)
     else {
@@ -188,7 +209,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
 
       def applyFilter(filename: String): Unit = {
         results.addOne(filename)
-        logger.warn(s"add $filename to results")
+        logger.info(s"add $filename to results")
       }
 
       logger.info(
@@ -200,18 +221,10 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       if (offset == 1 || offset == 0) applyFilter("..")
       if (list.length + 2 == offset) ReaddirReply()
       else if (list.length + 2 < offset) ReaddirReply(-ErrorCodes.ENOENT)
-      else
-        list
-          .slice(offset - 2, list.length)
-          .headOption
-          .map(f => {
-            logger.info(
-              s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}"
-            )
-            applyFilter(f.getName)
-            ReaddirReply(name = results.toSeq)
-          })
-          .getOrElse(ReaddirReply(-ErrorCodes.ENOENT))
+      else {
+        list.slice(offset - 2, list.length).map(_.getName).foreach(applyFilter)
+        ReaddirReply(name = results.toSeq)
+      }
     }
   }
 

@@ -13,6 +13,7 @@ import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.google.protobuf.ByteString
 import io.grpc.stub.StreamObserver
+import top.criwits.scaleda.kernel.server.ScaledaServerMainRunTest
 
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
@@ -20,7 +21,7 @@ import scala.async.Async.async
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
 import scala.language.postfixOps
 
 case class FuseTransferMessageCase(
@@ -62,10 +63,9 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
           observers.put(key, this)
         }
         fsProxies.synchronized {
+          FuseUtils.loadLibraries()
           val fs   = new ServerSideFuse(new FuseDataProxy(key))
           val dest = new File(Paths.getServerTemporalDir(), key)
-          // must create an empty directory
-          KernelFileUtils.deleteDirectory(dest.toPath)
           FuseUtils.mountFs(fs, dest.getAbsolutePath, blocking = false)
           fsProxies.put(key, fs)
         }
@@ -133,11 +133,13 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
 }
 
 class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamObserver[FuseTransferMessage] {
-  private var tx: StreamObserver[FuseTransferMessage]          = _
-  def setTx(stream: StreamObserver[FuseTransferMessage]): Unit = tx = stream
+  private var tx: StreamObserver[FuseTransferMessage] = _
+  def setTx(stream: StreamObserver[FuseTransferMessage]): Unit =
+    tx = stream
+  val initFlag = new Object
 
   override def onNext(msg: FuseTransferMessage) = {
-    KernelLogger.info("client: onNext", msg.toProtoString)
+    KernelLogger.debug("client: onNext", msg.toProtoString)
     val req = msg.message
 
     def handleFutureData[T](future: Future[T]): ByteString = {
@@ -147,7 +149,12 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
     }
 
     val respFuture: Future[_] = msg.function match {
-      case "init"     => dataProvider.init(requestMessageInto(req))
+      case "init" => {
+        initFlag.synchronized {
+          initFlag.notify()
+        }
+        dataProvider.init(requestMessageInto(req))
+      }
       case "destroy"  => dataProvider.destroy(requestMessageInto(req))
       case "getattr"  => dataProvider.getattr(requestMessageInto(req))
       case "readlink" => dataProvider.readlink(requestMessageInto(req))
@@ -209,15 +216,20 @@ object FuseTransferServer {
       recvWait.put(msg.id, awaitable).foreach(o => KernelLogger.error("Same id is waiting! ", msg.id, o))
     }
     awaitable.synchronized {
-      awaitable.wait()
+      // awaitable.wait()
+      awaitable.wait(5000)
     }
     recvWait.synchronized {
       recvWait.remove(msg.id)
     }
     val resp =
       recvData.synchronized { recvData.get(msg.id) }
-    if (resp.isEmpty) KernelLogger.error("Did not recv data!")
-    resp.get
+    if (resp.isEmpty) {
+      KernelLogger.error(s"Did not recv data! Timeout for message req $msg")
+      msg.copy(error = Some(new TimeoutException()))
+    } else {
+      resp.get
+    }
   }
 
   val requestThread = new Thread(() => doRequestThread())
@@ -251,10 +263,10 @@ object FuseTransferClient {
     RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port, enableAuthProvide = true)
   def asStream(dataProvider: FuseDataProvider, host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
     val (client, shutdown) = FuseTransferClient(host, port)
-    val clientStream       = new FuseTransferClientObserver(dataProvider)
-    val stream             = client.visit(clientStream)
-    clientStream.setTx(stream)
-    (client, stream, shutdown)
+    val observer           = new FuseTransferClientObserver(dataProvider)
+    val stream             = client.visit(observer)
+    observer.setTx(stream)
+    (client, stream, observer, shutdown)
   }
   def requestMessageInto[T](msg: ByteString): T =
     BinarySerializeHelper.fromGrpcBytes(msg).asInstanceOf[T]
@@ -273,7 +285,7 @@ object FuseTransferTester extends App {
   })
   thread.start()
   Thread.sleep(500)
-  val (client, stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
+  val (client, stream, observer, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
   stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
   Thread.sleep(100)
   FuseTransferServer.requestThread.start()
@@ -289,23 +301,18 @@ object FuseTransferTester extends App {
 }
 
 object FuseTransferClientTester extends App {
+  ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro2", "-p", "1234"))
+  // ScaledaShellMain.main(Array("configurations", "-C", "../scaleda-sample-project"))
   ScaledaShellMain.main(
-    Array(
-      "configurations",
-      "-C",
-      "../scaleda-sample-project"
-    )
+    Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost")
   )
-  ScaledaShellMain.main(
-    Array(
-      "run",
-      "-C",
-      "../scaleda-sample-project",
-      "-h",
-      "localhost",
-      "-c",
-      "vvvv"
-      // "Unnamed"
-    )
-  )
+  // ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation"))
+}
+
+object FuseTransferServerClientTester extends App {
+  val serverThread = new Thread(() => ScaledaServerMainRunTest.main(Array()))
+  serverThread.start()
+  FuseTransferClientTester.main(Array())
+  // serverThread.join()
+  serverThread.interrupt()
 }

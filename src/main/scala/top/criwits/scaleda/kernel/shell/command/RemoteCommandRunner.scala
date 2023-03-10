@@ -53,12 +53,18 @@ class RemoteCommandRunner(
       var shutdown: Option[() => _] = None
       while (fsRunning) {
         try {
-          val (_client, stream, _shutdown) = FuseTransferClient.asStream(new FuseDataProvider(deps.path))
+          val (_client, stream, observer, _shutdown) = FuseTransferClient.asStream(new FuseDataProvider(deps.path))
           shutdown = Some(_shutdown)
           try {
             stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
             KernelLogger.info("shell thread started, wait server side fuse mount...")
-            Thread.sleep(2000)
+            observer.initFlag.synchronized {
+              observer.initFlag.wait()
+            }
+            KernelLogger.info("recv init signal")
+            // Thread.sleep(2000)
+            Thread.sleep(5000)
+            // Thread.sleep(500000)
             KernelLogger.info("fs thread notifies shell thread")
             fuseStarted.synchronized {
               fuseStarted.notify()
@@ -84,8 +90,10 @@ class RemoteCommandRunner(
         }
       }
     })
+    fsThread.setDaemon(false)
     fsThread.start()
     shellThread.join()
+    // fsThread.join()
     fsThread.interrupt()
   })
 

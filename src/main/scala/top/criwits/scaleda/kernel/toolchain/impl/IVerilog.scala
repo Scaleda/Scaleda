@@ -8,6 +8,8 @@ import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile}
 import kernel.utils.KernelFileUtils
 
+import top.criwits.scaleda.kernel.net.remote.RemoteInfo
+
 import java.io.File
 
 class IVerilog(executor: Executor) extends Toolchain(executor) {
@@ -36,6 +38,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     // vcd file
     val vcdFile = simExecutor.vcdFile
 
+    // TODO: move file operations to preset handler?
     KernelFileUtils.insertAfterModuleHead(
       testbenchFile,
       newTestbenchFile,
@@ -124,5 +127,5 @@ object IVerilog extends ToolchainPresetProvider {
     }
   }
 
-  override def handlePreset(rt: ScaledaRuntimeInfo) = Some(rt)
+  override def handlePreset(rt: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]) = Some(rt)
 }

@@ -59,6 +59,9 @@ message WriteRequest {
 message IntReply {
   uint32 r = 1;
 }
+message LongReply {
+  uint64 r = 1;
+}
 message IntTupleReply {
   uint32 r1 = 1;
   uint32 r2 = 2;

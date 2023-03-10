@@ -33,7 +33,15 @@ object ScaledaRun {
     val info = Toolchain.toolchains(rt.target.toolchain)
     val rtProcessed =
       if (rt.task.preset) {
-        Toolchain.toolchainPresetHandler.get(rt.target.toolchain).flatMap(_.handlePreset(rt))
+        // fetch remote system info
+        val remoteInfo =
+          if (rt.profile.isRemoteProfile) {
+            val (client, shutdown) = RemoteClient(rt.profile.host)
+            val remoteInfoReply    = client.getRemoteInfo(Empty.of())
+            shutdown()
+            Some(remoteInfoReply)
+          } else None
+        Toolchain.toolchainPresetHandler.get(rt.target.toolchain).flatMap(_.handlePreset(rt, remoteInfo))
       } else Some(rt)
     val toolchain = info._2(rt.executor)
     if (rtProcessed.isEmpty) {
@@ -117,7 +125,7 @@ object ScaledaRun {
         val profileHostUse                                = task.host.getOrElse(profileHost)
         KernelLogger.info(s"profileHostUse: $profileHostUse")
         val profile =
-          if (profileHostUse.isEmpty) {
+          if (profileHostUse == null || profileHostUse.isEmpty) {
             // Run locally if no host argument provided
             Toolchain
               .profiles()
