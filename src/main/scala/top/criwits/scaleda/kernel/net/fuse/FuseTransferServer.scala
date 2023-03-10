@@ -21,7 +21,7 @@ import scala.async.Async.async
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
 import scala.language.postfixOps
 
 case class FuseTransferMessageCase(
@@ -133,9 +133,10 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
 }
 
 class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamObserver[FuseTransferMessage] {
-  private var tx: StreamObserver[FuseTransferMessage]          = _
-  def setTx(stream: StreamObserver[FuseTransferMessage]): Unit = tx = stream
-  val initFlag                                                 = new Object
+  private var tx: StreamObserver[FuseTransferMessage] = _
+  def setTx(stream: StreamObserver[FuseTransferMessage]): Unit =
+    tx = stream
+  val initFlag = new Object
 
   override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.debug("client: onNext", msg.toProtoString)
@@ -215,15 +216,20 @@ object FuseTransferServer {
       recvWait.put(msg.id, awaitable).foreach(o => KernelLogger.error("Same id is waiting! ", msg.id, o))
     }
     awaitable.synchronized {
-      awaitable.wait()
+      // awaitable.wait()
+      awaitable.wait(5000)
     }
     recvWait.synchronized {
       recvWait.remove(msg.id)
     }
     val resp =
       recvData.synchronized { recvData.get(msg.id) }
-    if (resp.isEmpty) KernelLogger.error("Did not recv data!")
-    resp.get
+    if (resp.isEmpty) {
+      KernelLogger.error("Did not recv data!")
+      msg.copy(error = Some(new TimeoutException()))
+    } else {
+      resp.get
+    }
   }
 
   val requestThread = new Thread(() => doRequestThread())
@@ -297,7 +303,9 @@ object FuseTransferTester extends App {
 object FuseTransferClientTester extends App {
   ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro2", "-p", "1234"))
   // ScaledaShellMain.main(Array("configurations", "-C", "../scaleda-sample-project"))
-  ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost"))
+  ScaledaShellMain.main(
+    Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost")
+  )
   // ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation"))
 }
 

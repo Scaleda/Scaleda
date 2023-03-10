@@ -11,7 +11,7 @@ import top.criwits.scaleda.kernel.utils.OS
 
 import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
-import java.nio.file.attribute.{DosFileAttributes, PosixFileAttributes}
+import java.nio.file.attribute.{BasicFileAttributes, DosFileAttributes, PosixFileAttributes}
 import java.util.concurrent.TimeUnit
 import scala.async.Async.{async, await}
 import scala.collection.mutable
@@ -42,35 +42,28 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   }
 
   override def getattr(request: PathRequest): Future[GetAttrReply] = async {
-    logger.info(s"getattr(${request.path})")
     val file = getFile(request.path)
+    logger.info(s"getattr(${request.path}) <-> $file")
     if (!file.exists()) GetAttrReply(-ErrorCodes.ENOENT)
     else {
-      if (OS.isWindows) {
-        val p     = file.toPath
+      val p = file.toPath
+      val attrs = if (OS.isWindows) {
         val attrs = Files.readAttributes(p, classOf[DosFileAttributes])
-        val mode =
-          FileStat.ALL_READ | FileStat.ALL_WRITE | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
-        GetAttrReply(
-          mode = mode,
-          size = attrs.size(),
-          aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
-          mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
-        )
-      } else {
-        var mode = FuseUtils.fileAttrsUnixToInt(file)
-        if (Files.isSymbolicLink(file.toPath)) {
-          mode = (mode & 0xfff) | (0xa << 12)
+        if (attrs.isRegularFile) {
+          logger.info(s"file ${request.path} attrs: size=${attrs.size()} readonly=${attrs.isReadOnly}")
         }
-        val p     = file.toPath
-        val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
-        GetAttrReply(
-          mode = mode,
-          size = attrs.size(),
-          aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
-          mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
-        )
+        attrs
+      } else {
+        Files.readAttributes(p, classOf[PosixFileAttributes])
       }
+      val mode =
+        FileStat.ALL_READ | FileStat.ALL_WRITE | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
+      GetAttrReply(
+        mode = mode,
+        size = attrs.size(),
+        aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
+        mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
+      )
     }
   }
 
@@ -147,21 +140,26 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
 
   override def chmod(request: PathModeRequest): Future[IntReply] = async {
     import request._
-    IntReply({
-      val file = getFile(path)
-      val run =
-        s"""chmod ${Integer.toOctalString(mode.toInt & 0xfff)} \"${file.getAbsolutePath}\""""
-      logger.info(
-        s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
-      )
-      val r = run.!
-      if (r == 0) 0 else -ErrorCodes.ENOENT
-    })
+    val file = getFile(path)
+    if (OS.isWindows) {
+      IntReply(if (file.exists()) 0 else -ErrorCodes.ENOENT)
+    } else {
+      IntReply({
+        val run =
+          s"""chmod ${Integer.toOctalString(mode.toInt & 0xfff)} \"${file.getAbsolutePath}\""""
+        logger.info(
+          s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
+        )
+        val r = run.!
+        if (r == 0) 0 else -ErrorCodes.ENOENT
+      })
+    }
   }
 
   override def read(request: ReadRequest): Future[ReadReply] = async {
     import request._
     val file = getFile(path)
+    logger.info(s"reading $path <-> $file")
     if (!file.exists()) ReadReply(-ErrorCodes.ENOENT)
     else if (file.isDirectory) ReadReply(-ErrorCodes.EISDIR)
     else {

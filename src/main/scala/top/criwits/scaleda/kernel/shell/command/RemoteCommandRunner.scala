@@ -62,7 +62,8 @@ class RemoteCommandRunner(
               observer.initFlag.wait()
             }
             KernelLogger.info("recv init signal")
-            Thread.sleep(2000)
+            // Thread.sleep(2000)
+            Thread.sleep(5000)
             // Thread.sleep(500000)
             KernelLogger.info("fs thread notifies shell thread")
             fuseStarted.synchronized {
@@ -89,6 +90,7 @@ class RemoteCommandRunner(
         }
       }
     })
+    fsThread.setDaemon(false)
     fsThread.start()
     shellThread.join()
     fsThread.interrupt()
