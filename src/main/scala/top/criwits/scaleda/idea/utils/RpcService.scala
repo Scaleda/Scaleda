@@ -81,10 +81,10 @@ class RpcService extends Disposable {
               // IDEA interaction
               ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), executionContext),
               // Fuse as data provider
-              RemoteFuseGrpc.bindService(
-                new FuseDataProvider(sourcePath),
-                executionContext
-              )
+              // RemoteFuseGrpc.bindService(
+              //   new FuseDataProvider(sourcePath),
+              //   executionContext
+              // )
             ),
             DEFAULT_PORT
           )

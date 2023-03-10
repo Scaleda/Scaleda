@@ -16,4 +16,10 @@ class SimpleTester extends AnyFlatSpec with should.Matchers {
     println(m.group())
     (0 to m.groupCount).map(i => println(s"$i: ${m.group(i)}"))
   }
+
+  it should "test path replace on windows" in {
+    val path = "D:\\Programs\\scaleda-sample-project\\test\\waterfall_tb.v"
+    val replaced = path.replace('\\', '/')
+    println(s"replaced: $replaced")
+  }
 }
