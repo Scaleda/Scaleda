@@ -7,8 +7,9 @@ import kernel.net.fuse.fs._
 import com.google.protobuf.ByteString
 import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
-import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Timespec}
+import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{FuseFillDir, FuseStubFS}
+import top.criwits.scaleda.kernel.utils.OS
 
 import java.nio.ByteBuffer
 import scala.language.existentials
@@ -32,7 +33,9 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       stat.st_atim.tv_sec.set(aTime)
       stat.st_mtim.tv_sec.set(mTime)
       stat.st_ctim.tv_sec.set(mTime)
-      // stat.st_nlink.set(1)
+      stat.st_nlink.set(1)
+      stat.st_uid.set(getContext.uid.get)
+      stat.st_gid.set(getContext.gid.get)
     } else {
       logger.warn(s"getattr failed for $path")
       stat.st_size.set(0)
@@ -161,4 +164,20 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
   // override def listxattr(path: String, list: Pointer, size: Long) = 0
   //
   // override def setxattr(path: String, name: String, value: Pointer, size: Long, flags: Int) = 0
+
+  override def statfs(path: String, stbuf: Statvfs) = {
+    if (OS.isWindows && "/".equals(path)) {
+      // statfs needs to be implemented on Windows in order to allow for copying
+      // data from other devices because winfsp calculates the volume size based
+      // on the statvfs call.
+      // see https://github.com/billziss-gh/winfsp/blob/14e6b402fe3360fdebcc78868de8df27622b565f/src/dll/fuse/fuse_intf.c#L654
+      // 设定块数量
+      stbuf.f_blocks.set(1024 * 1024); // total data blocks in file system
+      // 设定块大小
+      stbuf.f_frsize.set(1024); // fs block size
+      // 剩余可用块
+      stbuf.f_bfree.set(1024 * 1024); // free blocks in fs
+    }
+    0
+  }
 }

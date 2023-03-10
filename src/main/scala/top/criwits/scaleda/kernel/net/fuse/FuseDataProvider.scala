@@ -231,7 +231,8 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   override def create(request: PathModeRequest): Future[IntReply] = async {
     val file = getFile(request.path)
     // s"touch ${file.getAbsolutePath}".!
-    if (file.exists() && file.isDirectory) IntReply(-ErrorCodes.EISDIR)
+    if (file.exists() && file.isFile) IntReply(-ErrorCodes.EEXIST())
+    else if (file.exists() && file.isDirectory) IntReply(-ErrorCodes.EISDIR)
     else if (!file.createNewFile()) IntReply(-ErrorCodes.EIO)
     else await(chmod(request))
   }
