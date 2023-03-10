@@ -41,7 +41,6 @@ object RemoteServer {
         val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
         val sourcePath = request.path
         val replacer   = new ImplicitPathReplace(sourcePath, targetPath)
-        // def doReplace(src: String): String = src.replaceAll(sourcePath, targetPath)
         CommandDeps(
           args = request.commands.map(replacer.doReplace),
           path = targetPath,

@@ -66,8 +66,6 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
           FuseUtils.loadLibraries()
           val fs   = new ServerSideFuse(new FuseDataProxy(key))
           val dest = new File(Paths.getServerTemporalDir(), key)
-          // must create an empty directory
-          KernelFileUtils.deleteDirectory(dest.toPath)
           FuseUtils.mountFs(fs, dest.getAbsolutePath, blocking = false)
           fsProxies.put(key, fs)
         }
@@ -137,9 +135,10 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
 class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamObserver[FuseTransferMessage] {
   private var tx: StreamObserver[FuseTransferMessage]          = _
   def setTx(stream: StreamObserver[FuseTransferMessage]): Unit = tx = stream
+  val initFlag                                                 = new Object
 
   override def onNext(msg: FuseTransferMessage) = {
-    KernelLogger.info("client: onNext", msg.toProtoString)
+    KernelLogger.debug("client: onNext", msg.toProtoString)
     val req = msg.message
 
     def handleFutureData[T](future: Future[T]): ByteString = {
@@ -149,7 +148,12 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
     }
 
     val respFuture: Future[_] = msg.function match {
-      case "init"     => dataProvider.init(requestMessageInto(req))
+      case "init" => {
+        initFlag.synchronized {
+          initFlag.notify()
+        }
+        dataProvider.init(requestMessageInto(req))
+      }
       case "destroy"  => dataProvider.destroy(requestMessageInto(req))
       case "getattr"  => dataProvider.getattr(requestMessageInto(req))
       case "readlink" => dataProvider.readlink(requestMessageInto(req))
@@ -253,10 +257,10 @@ object FuseTransferClient {
     RpcPatch.getClient(RemoteFuseTransferGrpc.stub, host, port, enableAuthProvide = true)
   def asStream(dataProvider: FuseDataProvider, host: String = "127.0.0.1", port: Int = DEFAULT_PORT) = {
     val (client, shutdown) = FuseTransferClient(host, port)
-    val clientStream       = new FuseTransferClientObserver(dataProvider)
-    val stream             = client.visit(clientStream)
-    clientStream.setTx(stream)
-    (client, stream, shutdown)
+    val observer           = new FuseTransferClientObserver(dataProvider)
+    val stream             = client.visit(observer)
+    observer.setTx(stream)
+    (client, stream, observer, shutdown)
   }
   def requestMessageInto[T](msg: ByteString): T =
     BinarySerializeHelper.fromGrpcBytes(msg).asInstanceOf[T]
@@ -275,7 +279,7 @@ object FuseTransferTester extends App {
   })
   thread.start()
   Thread.sleep(500)
-  val (client, stream, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
+  val (client, stream, observer, shutdown) = FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
   stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
   Thread.sleep(100)
   FuseTransferServer.requestThread.start()
@@ -292,32 +296,15 @@ object FuseTransferTester extends App {
 
 object FuseTransferClientTester extends App {
   ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro2", "-p", "1234"))
-  ScaledaShellMain.main(
-    Array(
-      "configurations",
-      "-C",
-      "../scaleda-sample-project"
-    )
-  )
-  ScaledaShellMain.main(
-    Array(
-      "run",
-      "-C",
-      "../scaleda-sample-project",
-      "-h",
-      "localhost",
-      // "-c",
-      // "vvvv"
-      // // "Unnamed"
-      "-t",
-      "Vivado Simulation"
-    )
-  )
+  // ScaledaShellMain.main(Array("configurations", "-C", "../scaleda-sample-project"))
+  ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost"))
+  // ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation"))
 }
 
 object FuseTransferServerClientTester extends App {
   val serverThread = new Thread(() => ScaledaServerMainRunTest.main(Array()))
   serverThread.start()
   FuseTransferClientTester.main(Array())
-  serverThread.join()
+  // serverThread.join()
+  serverThread.interrupt()
 }

@@ -33,6 +33,9 @@ object FuseUtils {
         if (file.exists()) {
           if (file.isFile) file.delete()
           else KernelFileUtils.deleteDirectory(file.toPath)
+        } else {
+          file.mkdirs()
+          KernelFileUtils.deleteDirectory(file.toPath)
         }
       }
       def doMount(): Unit = {
@@ -45,12 +48,11 @@ object FuseUtils {
       try {
         doMount()
       } catch {
-        case e: FuseException => {
+        case e: FuseException =>
           KernelLogger.warn("retrying mount:", e)
           if (!OS.isWindows) s"""umount \'$mountPoint\"""".!
           else fs.umount()
           doMount()
-        }
       }
     } catch {
       case e: InterruptedException =>

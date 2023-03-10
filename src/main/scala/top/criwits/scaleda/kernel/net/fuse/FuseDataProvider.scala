@@ -6,10 +6,12 @@ import kernel.net.fuse.fs._
 import com.google.protobuf.ByteString
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
+import ru.serce.jnrfuse.struct.FileStat
+import top.criwits.scaleda.kernel.utils.OS
 
 import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
-import java.nio.file.attribute.PosixFileAttributes
+import java.nio.file.attribute.{DosFileAttributes, PosixFileAttributes}
 import java.util.concurrent.TimeUnit
 import scala.async.Async.{async, await}
 import scala.collection.mutable
@@ -44,18 +46,31 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     val file = getFile(request.path)
     if (!file.exists()) GetAttrReply(-ErrorCodes.ENOENT)
     else {
-      var mode = FuseUtils.fileAttrsUnixToInt(file)
-      if (Files.isSymbolicLink(file.toPath)) {
-        mode = (mode & 0xfff) | (0xa << 12)
+      if (OS.isWindows) {
+        val p     = file.toPath
+        val attrs = Files.readAttributes(p, classOf[DosFileAttributes])
+        val mode =
+          FileStat.ALL_READ | FileStat.ALL_WRITE | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
+        GetAttrReply(
+          mode = mode,
+          size = attrs.size(),
+          aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
+          mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
+        )
+      } else {
+        var mode = FuseUtils.fileAttrsUnixToInt(file)
+        if (Files.isSymbolicLink(file.toPath)) {
+          mode = (mode & 0xfff) | (0xa << 12)
+        }
+        val p     = file.toPath
+        val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
+        GetAttrReply(
+          mode = mode,
+          size = attrs.size(),
+          aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
+          mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
+        )
       }
-      val p     = file.toPath
-      val attrs = Files.readAttributes(p, classOf[PosixFileAttributes])
-      GetAttrReply(
-        mode = mode,
-        size = attrs.size(),
-        aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
-        mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
-      )
     }
   }
 
