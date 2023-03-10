@@ -38,6 +38,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     // vcd file
     val vcdFile = simExecutor.vcdFile
 
+    // TODO: move file operations to preset handler?
     KernelFileUtils.insertAfterModuleHead(
       testbenchFile,
       newTestbenchFile,
@@ -56,22 +57,26 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
     Seq(
       CommandDeps(
-        args = Seq(
-          executor.profile.iverilogPath,
-          "-s",
-          testbench,
-          "-o",
-          simExecutorName,
-          newTestbenchFile.getAbsolutePath
-        ) ++ sources.map(_.getAbsolutePath),
-        path = workingDir.getAbsolutePath,
-        description = "Compiling designs"
-      ),
-      CommandDeps(
-        args = Seq(executor.profile.vvpPath, simExecutorName),
-        path = workingDir.getAbsolutePath,
-        description = "Running simulation"
+        args = Seq("list.bat"),
+        path = workingDir.getAbsolutePath
       )
+      // CommandDeps(
+      //   args = Seq(
+      //     executor.profile.iverilogPath,
+      //     "-s",
+      //     testbench,
+      //     "-o",
+      //     simExecutorName,
+      //     newTestbenchFile.getAbsolutePath
+      //   ) ++ sources.map(_.getAbsolutePath),
+      //   path = workingDir.getAbsolutePath,
+      //   description = "Compiling designs"
+      // ),
+      // CommandDeps(
+      //   args = Seq(executor.profile.vvpPath, simExecutorName),
+      //   path = workingDir.getAbsolutePath,
+      //   description = "Running simulation"
+      // )
     )
   }
 }

@@ -47,17 +47,16 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     if (!file.exists()) GetAttrReply(-ErrorCodes.ENOENT)
     else {
       val p = file.toPath
-      val attrs = if (OS.isWindows) {
-        val attrs = Files.readAttributes(p, classOf[DosFileAttributes])
-        if (attrs.isRegularFile) {
-          logger.info(s"file ${request.path} attrs: size=${attrs.size()} readonly=${attrs.isReadOnly}")
-        }
-        attrs
-      } else {
-        Files.readAttributes(p, classOf[PosixFileAttributes])
+      val attrs =
+        if (OS.isWindows)
+          Files.readAttributes(p, classOf[DosFileAttributes])
+        else
+          Files.readAttributes(p, classOf[PosixFileAttributes])
+      if (attrs.isRegularFile) {
+        logger.info(s"file ${request.path} attrs: size=${attrs.size()}")
       }
-      val mode =
-        FileStat.ALL_READ | FileStat.ALL_WRITE | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
+      // 0777 | ...
+      val mode = 0x1ff | (if (attrs.isDirectory) FileStat.S_IFDIR else 0)
       GetAttrReply(
         mode = mode,
         size = attrs.size(),
@@ -213,18 +212,10 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       if (offset == 1 || offset == 0) applyFilter("..")
       if (list.length + 2 == offset) ReaddirReply()
       else if (list.length + 2 < offset) ReaddirReply(-ErrorCodes.ENOENT)
-      else
-        list
-          .slice(offset - 2, list.length)
-          .headOption
-          .map(f => {
-            logger.info(
-              s"readdir: putting file ${f.getAbsolutePath}, name: ${f.getName}"
-            )
-            applyFilter(f.getName)
-            ReaddirReply(name = results.toSeq)
-          })
-          .getOrElse(ReaddirReply(-ErrorCodes.ENOENT))
+      else {
+        list.slice(offset - 2, list.length).map(_.getName).foreach(applyFilter)
+        ReaddirReply(name = results.toSeq)
+      }
     }
   }
 

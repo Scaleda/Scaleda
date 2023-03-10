@@ -225,7 +225,7 @@ object FuseTransferServer {
     val resp =
       recvData.synchronized { recvData.get(msg.id) }
     if (resp.isEmpty) {
-      KernelLogger.error("Did not recv data!")
+      KernelLogger.error(s"Did not recv data! Timeout for message req $msg")
       msg.copy(error = Some(new TimeoutException()))
     } else {
       resp.get

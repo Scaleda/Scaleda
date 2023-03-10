@@ -104,6 +104,7 @@ object KernelFileUtils {
   }
 
   def insertAfterModuleHead(original: File, output: File, moduleName: String, insert: String): Unit = {
+    KernelLogger.info(s"insertAfterModuleHead $original -> $output")
     val stream     = new FileInputStream(original)
     val charStream = CharStreams.fromStream(stream)
     stream.close()
