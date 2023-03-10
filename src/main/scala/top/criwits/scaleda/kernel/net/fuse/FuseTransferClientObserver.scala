@@ -26,7 +26,7 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
     val req = msg.message
 
     def handleFutureData[T](future: Future[T]): ByteString = {
-      val result = Await.result(future, 3 seconds)
+      val result = Await.result(future, 3000000 seconds)
       KernelLogger.info("result:", result)
       BinarySerializeHelper.fromAny(result)
     }
@@ -63,6 +63,8 @@ class FuseTransferClientObserver(dataProvider: FuseDataProvider) extends StreamO
       tx.onNext(messageNew)
     } catch {
       case e: Throwable =>
+        KernelLogger.warn("exception during client observer", e)
+        e.printStackTrace()
         val messageError = FuseTransferMessage.of(msg.id, "error", BinarySerializeHelper.fromAny(e))
         tx.onNext(messageError)
     }

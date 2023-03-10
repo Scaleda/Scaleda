@@ -9,7 +9,7 @@ import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{FuseFillDir, FuseStubFS}
-import top.criwits.scaleda.kernel.utils.OS
+import top.criwits.scaleda.kernel.utils.{KernelLogger, OS}
 
 import java.nio.ByteBuffer
 import scala.language.existentials
@@ -21,7 +21,15 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
   val logger = LoggerFactory.getLogger(getClass)
 
   override def getattr(path: String, stat: FileStat): Int = {
-    val reply = stub.getattr(PathRequest(path))
+    val reply =
+      try {
+        stub.getattr(PathRequest(path))
+      } catch {
+        case e: Throwable =>
+          KernelLogger.error("error when getattr:", e)
+          e.printStackTrace()
+          throw e
+      }
     import reply._
     if (r == 0) {
       stat.st_size.set(size)
@@ -45,6 +53,8 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       stat.st_ctim.tv_sec.set(0)
       stat.st_nlink.set(0)
     }
+    logger.warn(s"getattr($path): mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
+      .longValue()} uid=${stat.st_uid.get} gid=${stat.st_gid.get}")
     r
   }
 
@@ -122,15 +132,20 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    val reply     = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
-    var offsetNow = offset
-    def applyFilter(filename: String): Int = {
-      val nameBuffer = ByteBuffer.allocate(filename.length + 1)
+    val reply = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
+    // var offsetNow = offset
+    def applyFilter(filename: String): Unit = {
+      // val nameBuffer = ByteBuffer.allocate(filename.length + 1)
       // nameBuffer.put(filename.getBytes)
-      nameBuffer.put(filename.getBytes, 0, filename.getBytes.length)
+      // nameBuffer.put(filename.getBytes, 0, filename.getBytes.length)
       // nameBuffer.put(0, filename.getBytes, 0, filename.length)
-      offsetNow += 1
-      filter.apply(buf, nameBuffer, null, offsetNow)
+      // offsetNow += 1
+      // filter.apply(buf, nameBuffer, null, offsetNow)
+      val fileStat = FileStat.of(buf)
+      if (filename.equals(".") || filename.equals("..")) filter.apply(buf, filename, null, 0)
+      else if (getattr(path + "/" + filename, fileStat) == 0) {
+        filter.apply(buf, filename, fileStat, 0)
+      }
     }
     if (reply.r == 0)
       reply.name.foreach(name => applyFilter(name))
@@ -180,4 +195,6 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     }
     0
   }
+
+  override def open(path: String, fi: FuseFileInfo) = 0
 }

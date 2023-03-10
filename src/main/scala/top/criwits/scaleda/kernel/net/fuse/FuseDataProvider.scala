@@ -60,7 +60,8 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       // var mode = FuseUtils.fileAttrsUnixToInt(file)
       var mode =
         if (OS.isWindows)
-          FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+          // FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+          0x1ff | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
         else
           FuseUtils.fileAttrsUnixToInt(file)
       if (Files.isSymbolicLink(file.toPath)) {
@@ -68,7 +69,8 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       }
       GetAttrReply(
         mode = mode,
-        size = attrs.size(),
+        // size = attrs.size(),
+        size = if (attrs.isDirectory) 0 else file.length(),
         aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
         mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
       )
@@ -98,10 +100,12 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   override def mkdir(request: PathModeRequest): Future[IntReply] = async {
     val path = request.path
     val file = getFile(path)
-    if (file.exists() || (file.exists() && file.isFile))
+    if (file.exists()) IntReply(-ErrorCodes.EEXIST)
+    else if (file.exists() || (file.exists() && file.isFile))
       IntReply(-ErrorCodes.ENOENT)
     else {
-      s"""mkdir "${file.getAbsolutePath}\"""".!
+      // s"""mkdir "${file.getAbsolutePath}\"""".!
+      file.mkdirs()
       await(chmod(request))
     }
   }
@@ -231,7 +235,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   override def create(request: PathModeRequest): Future[IntReply] = async {
     val file = getFile(request.path)
     // s"touch ${file.getAbsolutePath}".!
-    if (file.exists() && file.isFile) IntReply(-ErrorCodes.EEXIST())
+    if (file.exists()) IntReply(-ErrorCodes.EEXIST)
     else if (file.exists() && file.isDirectory) IntReply(-ErrorCodes.EISDIR)
     else if (!file.createNewFile()) IntReply(-ErrorCodes.EIO)
     else await(chmod(request))

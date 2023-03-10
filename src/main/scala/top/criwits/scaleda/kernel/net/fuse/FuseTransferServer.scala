@@ -96,6 +96,7 @@ object FuseTransferServer {
         return msg.copy(error = Some(e))
     }
     if (recvData.isEmpty) msg.copy(error = Some(new RuntimeException("No data recv?")))
-    msg.copy(data = BinarySerializeHelper.fromGrpcBytes(recvData.get.message))
+    val data: Any = BinarySerializeHelper.fromGrpcBytes(recvData.get.message)
+    msg.copy(data = data)
   }
 }

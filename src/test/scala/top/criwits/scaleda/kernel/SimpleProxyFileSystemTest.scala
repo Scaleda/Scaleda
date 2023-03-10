@@ -31,12 +31,12 @@ object SimpleFileSystem {
 }
 
 class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
-  final private val log           = LoggerFactory.getLogger(this.getClass.getSimpleName + "@" + this.hashCode)
+  final private val logger        = LoggerFactory.getLogger(this.getClass.getSimpleName + "@" + this.hashCode)
   final private val openMap       = new util.HashMap[File, FileChannel]
   final private val channelStatus = new util.HashMap[FileChannel, OpenOption]
 
   override def create(path: String, @mode_t mode: Long, fi: FuseFileInfo): Int = {
-    log.info("正在创建文件, filePath: {}, mode: {}", path, mode)
+    logger.info("正在创建文件, filePath: {}, mode: {}", path, mode)
     if (getPath(path).exists) {
       // 文件存在的情况下返回 EEXIST(文件已存在) 错误码
       return -ErrorCodes.EEXIST
@@ -51,7 +51,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
       else -ErrorCodes.EIO
       catch {
         case e: IOException =>
-          log.error("创建文件失败", e)
+          logger.error("创建文件失败", e)
           // 当读写发生错误时的万能代码（如果能在 ErrorCodes 里找到对应代码就最好不过，没找到可使用 EIO 代替）
           return -ErrorCodes.EIO
       }
@@ -60,7 +60,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def getattr(path: String, stat: FileStat): Int = {
-    log.info("正在获取属性, path: {}", path)
+    logger.info("正在获取属性, path: {}", path)
     val p = getPath(path)
     if (p.exists) {
       if (p.isDirectory) {
@@ -74,6 +74,8 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
       // 不是很明白用来做什么，但必须设置
       stat.st_uid.set(getContext.uid.get)
       stat.st_gid.set(getContext.gid.get)
+      logger.warn(s"getattr($path): mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
+        .longValue()} uid=${stat.st_uid.get} gid=${stat.st_gid.get}")
       return 0
     }
     -ErrorCodes.ENOENT
@@ -84,7 +86,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   private def getPath(path: String) = new File(rootDirectory, path)
 
   override def mkdir(path: String, @mode_t mode: Long): Int = {
-    log.info("正在创建目录, path: {}, mode: {}", path, mode)
+    logger.info("正在创建目录, path: {}, mode: {}", path, mode)
     if (getPath(path).exists) {
       // 如果已存在
       return -ErrorCodes.EEXIST
@@ -99,7 +101,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def read(path: String, buf: Pointer, @size_t size: Long, @off_t offset: Long, fi: FuseFileInfo): Int = {
-    log.info("正在读取文件, path: {}, size: {}, offset: {}", path, size, offset)
+    logger.info("正在读取文件, path: {}, size: {}, offset: {}", path, size, offset)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     if (p.isDirectory) return -ErrorCodes.EISDIR
@@ -131,7 +133,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def readdir(path: String, buf: Pointer, filter: FuseFillDir, @off_t offset: Long, fi: FuseFileInfo): Int = {
-    log.info("正在读取目录列表, path: {}, offset: {}", path, offset)
+    logger.info("正在读取目录列表, path: {}, offset: {}", path, offset)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     if (!p.isDirectory) return -ErrorCodes.ENOTDIR
@@ -155,7 +157,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def statfs(path: String, stbuf: Statvfs) = {
-    log.info("正在获取文件系统属性, path: {}", path)
+    logger.info("正在获取文件系统属性, path: {}", path)
     // 仅限 Windows
     if (Platform.getNativePlatform.getOS eq WINDOWS) {
       // 官方注释：
@@ -180,7 +182,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def rename(path: String, newName: String): Int = {
-    log.info("正在更改文件名, path: {}, newName: {}", path, newName)
+    logger.info("正在更改文件名, path: {}, newName: {}", path, newName)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     val newParent = getParentPath(newName)
@@ -191,7 +193,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def rmdir(path: String): Int = {
-    log.info("正在删除目录, path: {}", path)
+    logger.info("正在删除目录, path: {}", path)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     if (!p.isDirectory) return -ErrorCodes.ENOTDIR
@@ -205,7 +207,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def truncate(path: String, offset: Long): Int = {
-    log.info("正在清空文件数据, path: {}, offset: {}", path, offset)
+    logger.info("正在清空文件数据, path: {}, offset: {}", path, offset)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     if (!p.isFile) return -ErrorCodes.EISDIR
@@ -217,14 +219,14 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
       0
     } catch {
       case e: IOException =>
-        log.error("清空文件数据时发生异常", e)
+        logger.error("清空文件数据时发生异常", e)
         -ErrorCodes.EIO
     } finally if (fileInput != null) fileInput.close()
 
   }
 
   override def unlink(path: String): Int = {
-    log.info("正在删除文件, path: {}", path)
+    logger.info("正在删除文件, path: {}", path)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     if (p.delete) 0
@@ -232,7 +234,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def open(path: String, fi: FuseFileInfo): Int = {
-    log.info("正在打开文件, path: {}", path)
+    logger.info("正在打开文件, path: {}", path)
     // 建议该方法仅检查是否存在和是否为文件即可，不适宜打开 FileChannel
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
@@ -241,7 +243,7 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
   }
 
   override def release(path: String, fi: FuseFileInfo): Int = {
-    log.info("正在释放文件, path: {}", path)
+    logger.info("正在释放文件, path: {}", path)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     if (!p.isFile) return -ErrorCodes.EISDIR
@@ -250,14 +252,14 @@ class SimpleFileSystem(private val rootDirectory: File) extends FuseStubFS {
       try openMap.get(p).close()
       catch {
         case e: IOException =>
-          log.error("释放文件时发生异常", e)
+          logger.error("释放文件时发生异常", e)
           return -ErrorCodes.EIO
       } finally openMap.remove(p)
     0
   }
 
   override def write(path: String, buf: Pointer, @size_t size: Long, @off_t offset: Long, fi: FuseFileInfo): Int = {
-    log.info("正在写入文件, path: {}, size: {}, offset: {}", path, size, offset)
+    logger.info("正在写入文件, path: {}, size: {}, offset: {}", path, size, offset)
     val p = getPath(path)
     if (!p.exists) return -ErrorCodes.ENOENT
     if (!p.isFile) return -ErrorCodes.EISDIR
