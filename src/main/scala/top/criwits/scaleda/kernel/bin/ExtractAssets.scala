@@ -22,6 +22,10 @@ object ExtractAssets {
     val copiedList = ArrayBuffer[String]()
     if (!targetDirectory.exists()) targetDirectory.mkdirs()
     val resourceStream = getClass.getClassLoader.getResourceAsStream(resourceFile)
+    if (resourceStream == null) {
+      KernelLogger.warn("Assets not found! Check your", resourceFile)
+      return
+    }
     val zipInputStream = new ZipInputStream(resourceStream)
     var zipEntry       = zipInputStream.getNextEntry
 
