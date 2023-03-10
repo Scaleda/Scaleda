@@ -24,6 +24,10 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     import reply._
     if (r == 0) {
       stat.st_size.set(size)
+      // if (FileStat.S_ISTYPE(mode, FileStat.S_IFDIR)) logger.info("server getattr: IFDIR")
+      // if (FileStat.S_ISTYPE(mode, FileStat.S_IFREG)) logger.info("server getattr: IFREG")
+      // if ((mode & FileStat.ALL_READ) != 0) logger.info("server getattr: HAVE READ PERMISSION")
+      // if ((mode & FileStat.ALL_WRITE) != 0) logger.info("server getattr: HAVE WRITE PERMISSION")
       stat.st_mode.set(mode)
       stat.st_atim.tv_sec.set(aTime)
       stat.st_mtim.tv_sec.set(mTime)

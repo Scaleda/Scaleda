@@ -37,20 +37,15 @@ object Paths {
 
   def getServerTemporalDir(isWindows: Boolean = OS.isWindows): File = {
     if (isWindows) {
-      // target directory should not exist, but parent must exist
       val f =
         new File(
-          // EnvironmentUtils.Backup.env.getOrElse("TEMP", new File(pwd, ".tmp").getAbsolutePath),
-          new File(pwd, ".tmp").getAbsolutePath,
-          "scaledaTmp")
-      // if (f.exists()) {
-      //   if (f.isFile) f.delete()
-      //   else KernelFileUtils.deleteDirectory(f.toPath)
-      // }
-      // require(!f.exists(), "Windows delete target path failed")
+          EnvironmentUtils.Backup.env.getOrElse("TEMP", new File(pwd, ".tmp").getAbsolutePath),
+          // new File(pwd, ".tmp").getAbsolutePath,
+          "scaledaTmp"
+        )
       f
     } else {
-      new File("/home/chiro/tmp", "scaledaTmp")
+      new File("/tmp", "scaledaTmp")
     }
   }
 
