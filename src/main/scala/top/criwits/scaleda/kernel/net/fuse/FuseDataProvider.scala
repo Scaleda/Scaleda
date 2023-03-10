@@ -7,6 +7,7 @@ import kernel.utils.OS
 import com.google.protobuf.ByteString
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
+import ru.serce.jnrfuse.struct.FileStat
 
 import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
@@ -55,7 +56,6 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
         logger.info(s"file ${request.path} attrs: size=${attrs.size()}")
       }
       // 0777 | ...
-      // val modeBad = FuseUtils.fileAttrsToInt(file)
       // var mode = FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
       // var mode = FuseUtils.fileAttrsUnixToInt(file)
       var mode =

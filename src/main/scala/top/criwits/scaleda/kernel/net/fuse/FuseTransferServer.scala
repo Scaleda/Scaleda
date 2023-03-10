@@ -92,6 +92,7 @@ object FuseTransferServer {
       val _ = localObserver.onNext(msg.toMessage)
     } catch {
       case e: Throwable =>
+        KernelLogger.warn("local exception:", e)
         return msg.copy(error = Some(e))
     }
     if (recvData.isEmpty) msg.copy(error = Some(new RuntimeException("No data recv?")))

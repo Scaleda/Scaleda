@@ -74,9 +74,9 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
     val dataProvider   = new FuseDataProvider(Paths.pwd.getAbsolutePath)
     val observer       = new FuseTransferClientObserver(dataProvider)
     val fs             = new ServerSideFuse(new FuseLocalProxy(observer))
-    val mountPoint     = "/tmp/scaledaTest"
-    val mountPointFile = new File(mountPoint)
+    val mountPointFile = new File(Paths.getServerTemporalDir(), "test")
     if (mountPointFile.exists()) KernelFileUtils.deleteDirectory(mountPointFile.toPath)
-    FuseUtils.mountFs(fs, mountPoint, blocking = true)
+    else mountPointFile.mkdirs()
+    FuseUtils.mountFs(fs, mountPointFile.getAbsolutePath, blocking = true)
   }
 }
