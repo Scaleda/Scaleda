@@ -77,8 +77,13 @@ class ModuleDeclarationPsiNode(node: ASTNode)
 
   override def getElementName: String = getName
 
-  def getPorts: Iterable[PortDeclarationPsiNode] = {
-    PsiTreeUtil.findChildrenOfAnyType(this, classOf[PortDeclarationPsiNode]).asScala
+  def getPorts: Array[PortDeclarationPsiNode] = {
+    import scala.jdk.CollectionConverters._
+    val list = PsiTreeUtil.findChildrenOfType(this, classOf[ListOfPortDeclarationsPsiNode]).asScala
+    if (list.isEmpty) return Array.empty[PortDeclarationPsiNode]
+
+    val result  =PsiTreeUtil.getChildrenOfType(list.head, classOf[PortDeclarationPsiNode])
+    if (result == null) Array.empty[PortDeclarationPsiNode] else result
   }
 
   def getFile: VerilogPSIFileRoot = {
