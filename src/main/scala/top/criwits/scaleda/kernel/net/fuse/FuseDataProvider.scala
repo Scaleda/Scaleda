@@ -56,11 +56,16 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       }
       // 0777 | ...
       // val modeBad = FuseUtils.fileAttrsToInt(file)
-      var mode = FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+      // var mode = FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+      // var mode = FuseUtils.fileAttrsUnixToInt(file)
+      var mode =
+        if (OS.isWindows)
+          FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+        else
+          FuseUtils.fileAttrsUnixToInt(file)
       if (Files.isSymbolicLink(file.toPath)) {
         mode = (mode & 0xfff) | (0xa << 12)
       }
-      // logger.warn("bad mode: %x, good mode: %x".format(modeBad, mode))
       GetAttrReply(
         mode = mode,
         size = attrs.size(),
