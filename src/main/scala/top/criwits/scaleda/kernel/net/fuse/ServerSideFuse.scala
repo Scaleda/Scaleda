@@ -124,7 +124,8 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     def applyFilter(filename: String): Int = {
       val nameBuffer = ByteBuffer.allocate(filename.length + 1)
       // nameBuffer.put(filename.getBytes)
-      nameBuffer.put(0, filename.getBytes, 0, filename.length)
+      nameBuffer.put(filename.getBytes, 0, filename.getBytes.length)
+      // nameBuffer.put(0, filename.getBytes, 0, filename.length)
       offsetNow += 1
       filter.apply(buf, nameBuffer, null, offsetNow)
     }
@@ -146,4 +147,18 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     stub.create(PathModeRequest(path = path, mode = mode.toInt)).r
 
   override def utimens(path: String, timespec: Array[Timespec]): Int = 0
+
+  // override def release(path: String, fi: FuseFileInfo) = 0
+  //
+  // override def releasedir(path: String, fi: FuseFileInfo) = 0
+  //
+  // override def access(path: String, mask: Int) = 0
+  //
+  // override def flush(path: String, fi: FuseFileInfo) = 0
+  //
+  // override def getxattr(path: String, name: String, value: Pointer, size: Long) = 0
+  //
+  // override def listxattr(path: String, list: Pointer, size: Long) = 0
+  //
+  // override def setxattr(path: String, name: String, value: Pointer, size: Long, flags: Int) = 0
 }

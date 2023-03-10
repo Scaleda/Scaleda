@@ -88,13 +88,14 @@ class RemoteCommandRunner(
           shutdown.foreach(f => f())
           shutdown = None
         }
+        fsRunning = false
       }
     })
     fsThread.setDaemon(false)
     fsThread.start()
     shellThread.join()
-    // fsThread.join()
-    fsThread.interrupt()
+    // fsThread.interrupt()
+    fsThread.join()
   })
 
   override def run: CommandOutputStream = {
