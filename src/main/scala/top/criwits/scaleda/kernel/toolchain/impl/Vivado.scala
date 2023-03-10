@@ -167,7 +167,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
             .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
             .map(_.getAbsolutePath.replace('\\', '/')),
           sim = sim,
-          testbenchSource = topFile.getAbsolutePath, // if sim == false, then this will not be used
+          testbenchSource = topFile.getAbsolutePath.replace('\\', '/'), // if sim == false, then this will not be used
           vcdFile = if (sim) executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath else ""
         )
         Serialization.getCCParams(context)
