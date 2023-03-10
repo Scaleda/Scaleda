@@ -2,16 +2,15 @@ package top.criwits.scaleda
 package kernel.net.fuse
 
 import kernel.net.fuse.fs._
+import kernel.utils.OS
 
 import com.google.protobuf.ByteString
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
-import ru.serce.jnrfuse.struct.FileStat
-import top.criwits.scaleda.kernel.utils.OS
 
 import java.io.{File, RandomAccessFile}
 import java.nio.file.Files
-import java.nio.file.attribute.{BasicFileAttributes, DosFileAttributes, PosixFileAttributes}
+import java.nio.file.attribute.{DosFileAttributes, PosixFileAttributes}
 import java.util.concurrent.TimeUnit
 import scala.async.Async.{async, await}
 import scala.collection.mutable
@@ -56,7 +55,12 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
         logger.info(s"file ${request.path} attrs: size=${attrs.size()}")
       }
       // 0777 | ...
-      val mode = 0x1ff | (if (attrs.isDirectory) FileStat.S_IFDIR else 0)
+      // val modeBad = FuseUtils.fileAttrsToInt(file)
+      var mode = FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+      if (Files.isSymbolicLink(file.toPath)) {
+        mode = (mode & 0xfff) | (0xa << 12)
+      }
+      // logger.warn("bad mode: %x, good mode: %x".format(modeBad, mode))
       GetAttrReply(
         mode = mode,
         size = attrs.size(),
@@ -200,7 +204,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
 
       def applyFilter(filename: String): Unit = {
         results.addOne(filename)
-        logger.warn(s"add $filename to results")
+        logger.info(s"add $filename to results")
       }
 
       logger.info(

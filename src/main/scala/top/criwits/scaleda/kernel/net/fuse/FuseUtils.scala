@@ -70,8 +70,7 @@ object FuseUtils {
     PosixFilePermissions.toString(perms)
   }
 
-  def fileAttrsUnixToInt(file: File): Int = {
-    val str                    = fileAttrsUnixString(file)
+  def fileAttrsToInt(file: File, str: String): Int = {
     def bitToInt(c: Char): Int = if (c == '-') 0 else 1
     def groupToInt(group: String): Int =
       (0 until 3).map(i => bitToInt(group.charAt(i)) << (2 - i)).sum
@@ -79,6 +78,11 @@ object FuseUtils {
       .map(_ * 3)
       .map(i => groupToInt(str.slice(i, i + 3)) << (6 - i))
       .sum | ((if (file.isDirectory) 4 else 8) << 12)
+  }
+
+  def fileAttrsUnixToInt(file: File): Int = {
+    val str = fileAttrsUnixString(file)
+    fileAttrsToInt(file, str)
   }
 
   def printTextToFile(content: String, file: File): Unit = {

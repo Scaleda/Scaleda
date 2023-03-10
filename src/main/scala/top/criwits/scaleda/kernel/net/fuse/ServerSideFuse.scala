@@ -32,7 +32,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       stat.st_atim.tv_sec.set(aTime)
       stat.st_mtim.tv_sec.set(mTime)
       stat.st_ctim.tv_sec.set(mTime)
-      stat.st_nlink.set(1)
+      // stat.st_nlink.set(1)
     } else {
       logger.warn(s"getattr failed for $path")
       stat.st_size.set(0)
