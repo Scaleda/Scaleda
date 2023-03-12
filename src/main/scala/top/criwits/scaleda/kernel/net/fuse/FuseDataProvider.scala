@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
+import kernel.net.fuse.FuseUtils.Converts._
 import kernel.net.fuse.fs._
 import kernel.utils.OS
 
@@ -9,7 +10,7 @@ import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
 import ru.serce.jnrfuse.struct.FileStat
 
-import java.io.{File, RandomAccessFile}
+import java.io.{File, FileInputStream, IOException, RandomAccessFile}
 import java.nio.file.Files
 import java.nio.file.attribute.{DosFileAttributes, PosixFileAttributes}
 import java.util.concurrent.TimeUnit
@@ -18,6 +19,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.language.implicitConversions
 import scala.sys.process._
 
 /** gRPC data provider for filesystem sync.<br/>
@@ -41,9 +43,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     EmptyReq()
   }
 
-  override def getattr(request: PathRequest): Future[GetAttrReply] = async {
-    val file = getFile(request.path)
-    logger.info(s"getattr(${request.path}) <-> $file")
+  private def getAttrLocal(file: File): GetAttrReply = {
     if (!file.exists()) GetAttrReply(-ErrorCodes.ENOENT)
     else {
       val p = file.toPath
@@ -52,9 +52,6 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
           Files.readAttributes(p, classOf[DosFileAttributes])
         else
           Files.readAttributes(p, classOf[PosixFileAttributes])
-      if (attrs.isRegularFile) {
-        logger.info(s"file ${request.path} attrs: size=${attrs.size()}")
-      }
       // 0777 | ...
       // var mode = FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
       // var mode = FuseUtils.fileAttrsUnixToInt(file)
@@ -76,6 +73,14 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       )
     }
   }
+
+  private def getAttrInner(request: PathRequest): GetAttrReply = {
+    val file = getFile(request.path)
+    logger.info(s"getattr(${request.path}) <-> $file")
+    getAttrLocal(file)
+  }
+
+  override def getattr(request: PathRequest): Future[GetAttrReply] = async { getAttrInner(request) }
 
   override def readlink(request: PathRequest): Future[StringTupleReply] =
     async {
@@ -221,14 +226,13 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
       )
       val list = file.listFiles()
       logger.info(s"listed files: ${list.mkString(", ")}")
-      if (offset == 0) applyFilter(".")
-      if (offset == 1 || offset == 0) applyFilter("..")
-      if (list.length + 2 == offset) ReaddirReply()
-      else if (list.length + 2 < offset) ReaddirReply(-ErrorCodes.ENOENT)
-      else {
-        list.slice(offset - 2, list.length).map(_.getName).foreach(applyFilter)
-        ReaddirReply(name = results.toSeq)
-      }
+      ReaddirReply(entries =
+        list
+          .map(file => {
+            file.getName -> getAttrLocal(file)
+          })
+          .toMap
+      )
     }
   }
 
@@ -239,5 +243,32 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     else if (file.exists() && file.isDirectory) IntReply(-ErrorCodes.EISDIR)
     else if (!file.createNewFile()) IntReply(-ErrorCodes.EIO)
     else await(chmod(request))
+  }
+
+  override def truncate(request: PathOffsetRequest): Future[IntReply] = async {
+    import request._
+    val file = getFile(request.path)
+    if (!file.exists) -ErrorCodes.ENOENT
+    else if (!file.isFile) -ErrorCodes.EISDIR
+    else {
+      val fileInput = new FileInputStream(file).getChannel
+      try {
+        fileInput.position(offset)
+        fileInput.truncate(0)
+        0
+      } catch {
+        case e: IOException =>
+          logger.error("error when truncate file:", e)
+          -ErrorCodes.EIO
+      } finally if (fileInput != null) fileInput.close()
+    }
+  }
+
+  override def `open`(request: PathRequest): Future[IntReply] = async { 0 }
+
+  override def release(request: PathRequest): Future[IntReply] = async { 0 }
+
+  override def statfs(request: PathRequest): Future[StatfsReply] = async {
+    StatfsReply.of(blocks = 1024 * 1024, frsize = 1024, bfree = 1024 * 1024)
   }
 }

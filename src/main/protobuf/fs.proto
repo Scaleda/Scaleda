@@ -7,21 +7,20 @@ service RemoteFuse {
   rpc destroy(EmptyReq) returns (EmptyReq) {}
   rpc getattr(PathRequest) returns (GetAttrReply) {}
   rpc readlink(PathRequest) returns (StringTupleReply) {}
-  //  rpc mknod(EmptyRequest) returns (IntReply) {}
   rpc mkdir(PathModeRequest) returns (IntReply) {}
   rpc unlink(PathRequest) returns (IntReply) {}
   rpc rmdir(PathRequest) returns (IntReply) {}
   rpc symlink(TuplePathRequest) returns (IntReply) {}
   rpc rename(TuplePathRequest) returns (IntReply) {}
-  //  rpc link(TuplePathRequest) returns (IntReply) {}
   rpc chmod(PathModeRequest) returns (IntReply) {}
-  //  rpc chown() returns (IntReply) {}
-  //  rpc truncate(PathSizeRequest) returns (IntReply) {}
-  //  rpc open() returns (IntReply) {}
+  rpc truncate(PathOffsetRequest) returns (IntReply) {}
+  rpc open(PathRequest) returns (IntReply) {}
+  rpc release(PathRequest) returns (IntReply) {}
   rpc read(ReadRequest) returns (ReadReply) {}
   rpc write(WriteRequest) returns (IntReply) {}
   rpc readdir(ReaddirRequest) returns (ReaddirReply) {}
   rpc create(PathModeRequest) returns (IntReply) {}
+  rpc statfs(PathRequest) returns (StatfsReply) {}
 }
 
 message EmptyReq {}
@@ -39,6 +38,10 @@ message PathModeRequest {
 message PathSizeRequest {
   string path = 1;
   uint32 size = 2;
+}
+message PathOffsetRequest {
+  string path = 1;
+  uint64 offset = 2;
 }
 message ReaddirRequest {
   string path = 1;
@@ -76,6 +79,9 @@ message GetAttrReply {
   uint32 mode = 3;
   uint64 a_time = 4;
   uint64 m_time = 5;
+  uint64 c_time = 6;
+  uint64 uid = 7;
+  uint64 gid = 8;
 }
 message ReadReply {
   uint32 size = 1;
@@ -83,7 +89,12 @@ message ReadReply {
 }
 message ReaddirReply {
   uint32 r = 1;
-  repeated string name = 2;
+  map<string, GetAttrReply> entries = 2;
+}
+message StatfsReply {
+  uint64 blocks = 1;
+  uint32 frsize = 2;
+  uint64 bfree = 3;
 }
 
 service RemoteFuseTransfer {

@@ -3,16 +3,15 @@ package kernel.net.fuse
 
 import kernel.net.fuse.fs.RemoteFuseGrpc.RemoteFuseBlockingClient
 import kernel.net.fuse.fs._
+import kernel.utils.{KernelLogger, OS}
 
 import com.google.protobuf.ByteString
 import jnr.ffi.Pointer
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{FuseFillDir, FuseStubFS}
-import top.criwits.scaleda.kernel.utils.{KernelLogger, OS}
 
 import java.io.File
-import java.nio.ByteBuffer
 import scala.language.existentials
 
 /** Fuse running on remote server,
@@ -28,6 +27,28 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     path + pathSeparator + appendStr
   }
 
+  private def applyAttr(reply: GetAttrReply, stat: FileStat): Unit = {
+    import reply._
+    if (r == 0) {
+      stat.st_size.set(size)
+      stat.st_mode.set(mode)
+      stat.st_atim.tv_sec.set(aTime)
+      stat.st_mtim.tv_sec.set(mTime)
+      stat.st_ctim.tv_sec.set(mTime)
+      stat.st_nlink.set(1)
+      stat.st_uid.set(if (uid != 0) uid else getContext.uid.get)
+      stat.st_gid.set(if (gid != 0) uid else getContext.gid.get)
+    } else {
+      logger.warn(s"getattr failed")
+      stat.st_size.set(0)
+      stat.st_mode.set(0)
+      stat.st_atim.tv_sec.set(0)
+      stat.st_mtim.tv_sec.set(0)
+      stat.st_ctim.tv_sec.set(0)
+      stat.st_nlink.set(0)
+    }
+  }
+
   override def getattr(path: String, stat: FileStat): Int = {
     val reply =
       try {
@@ -38,32 +59,10 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
           e.printStackTrace()
           throw e
       }
-    import reply._
-    if (r == 0) {
-      stat.st_size.set(size)
-      // if (FileStat.S_ISTYPE(mode, FileStat.S_IFDIR)) logger.info("server getattr: IFDIR")
-      // if (FileStat.S_ISTYPE(mode, FileStat.S_IFREG)) logger.info("server getattr: IFREG")
-      // if ((mode & FileStat.ALL_READ) != 0) logger.info("server getattr: HAVE READ PERMISSION")
-      // if ((mode & FileStat.ALL_WRITE) != 0) logger.info("server getattr: HAVE WRITE PERMISSION")
-      stat.st_mode.set(mode)
-      stat.st_atim.tv_sec.set(aTime)
-      stat.st_mtim.tv_sec.set(mTime)
-      stat.st_ctim.tv_sec.set(mTime)
-      stat.st_nlink.set(1)
-      stat.st_uid.set(getContext.uid.get)
-      stat.st_gid.set(getContext.gid.get)
-    } else {
-      logger.warn(s"getattr failed for $path")
-      stat.st_size.set(0)
-      stat.st_mode.set(0)
-      stat.st_atim.tv_sec.set(0)
-      stat.st_mtim.tv_sec.set(0)
-      stat.st_ctim.tv_sec.set(0)
-      stat.st_nlink.set(0)
-    }
+    applyAttr(reply, stat)
     logger.warn(s"getattr($path): mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
       .longValue()} uid=${stat.st_uid.get} gid=${stat.st_gid.get}")
-    r
+    reply.r
   }
 
   override def readlink(path: String, buf: Pointer, size: Long): Int = {
@@ -141,26 +140,18 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       fi: FuseFileInfo
   ): Int = {
     val reply = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
-    // var offsetNow = offset
-    def applyFilter(filename: String): Unit = {
-      // val nameBuffer = ByteBuffer.allocate(filename.length + 1)
-      // nameBuffer.put(filename.getBytes)
-      // nameBuffer.put(filename.getBytes, 0, filename.getBytes.length)
-      // nameBuffer.put(0, filename.getBytes, 0, filename.length)
-      // offsetNow += 1
-      // filter.apply(buf, nameBuffer, null, offsetNow)
-      val fileStat = FileStat.of(buf)
-      if (filename.equals(".") || filename.equals("..")) filter.apply(buf, filename, null, 0)
-      else if (getattr(appendPath(path, filename), fileStat) == 0) {
-        KernelLogger.debug("applying filename", filename)
-        filter.apply(buf, filename, fileStat, 0)
-      } else {
-        KernelLogger.warn(s"getattr failed for file $filename")
-      }
+    if (reply.r == 0) {
+      filter.apply(buf, ".", null, 0)
+      filter.apply(buf, "..", null, 0)
+      reply.entries.foreach(f => {
+        val (name, attr) = f
+        if (attr.r == 0) {
+          val fileStat = FileStat.of(buf)
+          applyAttr(attr, fileStat)
+          filter.apply(buf, name, fileStat, 0)
+        }
+      })
     }
-    if (reply.r == 0)
-      reply.name.foreach(name => applyFilter(name))
-
     KernelLogger.debug("readdir done")
     reply.r
   }

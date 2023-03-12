@@ -1,12 +1,14 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
+import kernel.net.fuse.fs.GetAttrReply
+import kernel.utils.OS
+
+import jnr.ffi.Pointer
 import jnr.ffi.types.{mode_t, off_t, size_t}
-import jnr.ffi.{Platform, Pointer}
 import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs}
 import ru.serce.jnrfuse.{ErrorCodes, FuseFillDir, FuseStubFS}
-import top.criwits.scaleda.kernel.utils.OS
 
 import java.io.{File, FileInputStream, FileOutputStream, IOException}
 import java.nio.ByteBuffer
@@ -125,9 +127,16 @@ class FuseSimple(private val rootDirectory: File) extends FuseStubFS {
     }
   }
 
-  def simpleReadDir(path: String): Seq[String] = {
+  def simpleReadDir(path: String): Map[String, GetAttrReply] = {
     val p = getPath(path)
-    Seq(".", "..") ++ p.listFiles().map(file => file.getName)
+    p.listFiles()
+      .map(file => {
+        file.getName -> GetAttrReply(
+          mode = if (file.isDirectory) FileStat.S_IFDIR | 0x1ff else FileStat.S_IFREG | 0x1ff,
+          size = if (file.isDirectory) 0 else file.length()
+        )
+      })
+      .toMap
   }
 
   override def readdir(path: String, buf: Pointer, filter: FuseFillDir, @off_t offset: Long, fi: FuseFileInfo): Int = {

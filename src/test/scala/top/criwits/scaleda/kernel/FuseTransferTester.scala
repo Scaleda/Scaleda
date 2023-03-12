@@ -82,7 +82,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
 
   it should "test simple transfer" in {
     val fuseSimple         = new FuseSimple(Paths.pwd)
-    val simpleDataProvider = new FuseSimpleDataProvider(fuseSimple)
+    val simpleDataProvider = new FuseSimpleDataProviderWrapper(fuseSimple)
     val observer           = new FuseTransferClientObserver(simpleDataProvider)
     val fs                 = new ServerSideFuse(new FuseLocalProxy(observer))
     val mountPointFile     = new File(Paths.getServerTemporalDir(), "test")
@@ -91,4 +91,13 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
     FuseUtils.mountFs(fs, mountPointFile.getAbsolutePath, blocking = true)
   }
 
+  it should "test simple data provider" in {
+    val simpleDataProvider = new FuseSimpleDataProvider(Paths.pwd)
+    val observer           = new FuseTransferClientObserver(simpleDataProvider)
+    val fs                 = new ServerSideFuse(new FuseLocalProxy(observer))
+    val mountPointFile     = new File(Paths.getServerTemporalDir(), "test")
+    if (mountPointFile.exists()) KernelFileUtils.deleteDirectory(mountPointFile.toPath)
+    else mountPointFile.mkdirs()
+    FuseUtils.mountFs(fs, mountPointFile.getAbsolutePath, blocking = true)
+  }
 }

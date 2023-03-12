@@ -4,10 +4,12 @@ package kernel.net.fuse
 import kernel.utils.{KernelFileUtils, KernelLogger, OS}
 
 import ru.serce.jnrfuse.{FuseException, FuseStubFS}
+import top.criwits.scaleda.kernel.net.fuse.fs.{EmptyReq, IntReply, PathRequest}
 
 import java.io.{File, PrintWriter}
 import java.nio.file.attribute.{PosixFileAttributes, PosixFilePermissions}
 import java.nio.file.{Files, Paths}
+import scala.language.implicitConversions
 import scala.sys.process._
 
 object FuseUtils {
@@ -105,5 +107,13 @@ object FuseUtils {
     if (OS.isWindows) {
       // System.setProperty("jnrfuse.winfsp.path", "D:\\Programs\\scaleda\\src\\main\\resources\\bin\\winfsp_x64.dll")
     }
+  }
+
+  object Converts {
+    implicit def convert(a: Unit): EmptyReq = EmptyReq()
+
+    implicit def convert(a: Int): IntReply = IntReply.of(a)
+
+    implicit def convert(a: PathRequest): String = a.path
   }
 }

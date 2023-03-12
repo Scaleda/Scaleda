@@ -44,6 +44,14 @@ class FuseDataProxy(identifier: String) extends RemoteFuseBlockingClient {
   override def readdir(request: ReaddirRequest): ReaddirReply = makeRequest(request)
 
   override def create(request: PathModeRequest): IntReply = makeRequest(request)
+
+  override def truncate(request: PathOffsetRequest): IntReply = makeRequest(request)
+
+  override def `open`(request: PathRequest): IntReply = makeRequest(request)
+
+  override def release(request: PathRequest): IntReply = makeRequest(request)
+
+  override def statfs(request: PathRequest): StatfsReply = makeRequest(request)
 }
 
 object GetFunctionNameTest extends App {
