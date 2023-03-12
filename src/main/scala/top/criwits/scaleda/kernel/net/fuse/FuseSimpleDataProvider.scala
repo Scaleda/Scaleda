@@ -38,7 +38,7 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
 
   override def init(request: EmptyReq): Future[EmptyReq] = async {}
 
-  override def destroy(request: EmptyReq): Future[EmptyReq] = async {}
+  // override def destroy(request: EmptyReq): Future[EmptyReq] = async {}
 
   private def getAttrInner(request: PathRequest): GetAttrReply = {
     import request._
@@ -65,7 +65,7 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
 
   override def getattr(request: PathRequest): Future[GetAttrReply] = async { getAttrInner(request) }
 
-  override def readlink(request: PathRequest): Future[StringTupleReply] = ???
+  // override def readlink(request: PathRequest): Future[StringTupleReply] = ???
 
   override def mkdir(request: PathModeRequest): Future[IntReply] = async {
     import request._
@@ -112,7 +112,7 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
     }
   }
 
-  override def symlink(request: TuplePathRequest): Future[IntReply] = ???
+  // override def symlink(request: TuplePathRequest): Future[IntReply] = ???
 
   override def rename(request: TuplePathRequest): Future[IntReply] = async {
     logger.info("正在更改文件名, path: {}, newName: {}", request.oldpath, request.newpath)
@@ -127,7 +127,7 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
     }
   }
 
-  override def chmod(request: PathModeRequest): Future[IntReply] = async { 0 }
+  // override def chmod(request: PathModeRequest): Future[IntReply] = async { 0 }
 
   override def truncate(request: PathOffsetRequest): Future[IntReply] = async {
     import request._
@@ -151,28 +151,12 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
 
   override def `open`(request: PathRequest): Future[IntReply] = async {
     import request._
-    logger.info("正在创建文件, filePath: {}", path)
-    if (getPath(path).exists) {
-      // 文件存在的情况下返回 EEXIST(文件已存在) 错误码
-      -ErrorCodes.EEXIST
-    } else {
-      // 获取父级 File 并检查其是否为目录
-      // 其实这里应该还要检查是否在映射的目录下的，不过假设请求没问题，就忽略了
-      val parent = getParentPath(path)
-      if (parent.isDirectory)
-        try {
-          // 当没有问题且不需要返回什么的时候就返回 0，代表操作成功
-          if (getPath(path).createNewFile) 0
-          else -ErrorCodes.EIO
-        } catch {
-          case e: IOException =>
-            logger.error("创建文件失败", e)
-            // 当读写发生错误时的万能代码（如果能在 ErrorCodes 里找到对应代码就最好不过，没找到可使用 EIO 代替）
-            -ErrorCodes.EIO
-        }
-      // 未找到指定文件或目录则返回 ENOENT(No such file or directory) 错误码
-      -ErrorCodes.ENOENT
-    }
+    logger.info("正在打开文件, path: {}", path)
+    // 建议该方法仅检查是否存在和是否为文件即可，不适宜打开 FileChannel
+    val p = getPath(path)
+    if (!p.exists) -ErrorCodes.ENOENT
+    if (!p.isFile) -ErrorCodes.EISDIR
+    else 0
   }
 
   override def read(request: ReadRequest): Future[ReadReply] = async {

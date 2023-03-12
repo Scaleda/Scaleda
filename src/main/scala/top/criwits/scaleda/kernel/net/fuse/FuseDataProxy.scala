@@ -19,11 +19,11 @@ class FuseDataProxy(identifier: String) extends RemoteFuseBlockingClient {
 
   override def init(request: EmptyReq): EmptyReq = makeRequest(request)
 
-  override def destroy(request: EmptyReq): EmptyReq = makeRequest(request)
+  // override def destroy(request: EmptyReq): EmptyReq = makeRequest(request)
 
   override def getattr(request: PathRequest): GetAttrReply = makeRequest(request)
 
-  override def readlink(request: PathRequest): StringTupleReply = makeRequest(request)
+  // override def readlink(request: PathRequest): StringTupleReply = makeRequest(request)
 
   override def mkdir(request: PathModeRequest): IntReply = makeRequest(request)
 
@@ -31,11 +31,11 @@ class FuseDataProxy(identifier: String) extends RemoteFuseBlockingClient {
 
   override def rmdir(request: PathRequest): IntReply = makeRequest(request)
 
-  override def symlink(request: TuplePathRequest): IntReply = makeRequest(request)
+  // override def symlink(request: TuplePathRequest): IntReply = makeRequest(request)
 
   override def rename(request: TuplePathRequest): IntReply = makeRequest(request)
 
-  override def chmod(request: PathModeRequest): IntReply = makeRequest(request)
+  // override def chmod(request: PathModeRequest): IntReply = makeRequest(request)
 
   override def read(request: ReadRequest): ReadReply = makeRequest(request)
 

@@ -94,8 +94,8 @@ class RemoteCommandRunner(
     fsThread.setDaemon(false)
     fsThread.start()
     shellThread.join()
-    // fsThread.interrupt()
-    fsThread.join()
+    fsThread.interrupt()
+    // fsThread.join()
   })
 
   override def run: CommandOutputStream = {

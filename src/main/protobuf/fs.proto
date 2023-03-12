@@ -4,23 +4,23 @@ package top.criwits.scaleda.kernel.net.fuse;
 
 service RemoteFuse {
   rpc init(EmptyReq) returns (EmptyReq) {}
-  rpc destroy(EmptyReq) returns (EmptyReq) {}
+  rpc create(PathModeRequest) returns (IntReply) {}
   rpc getattr(PathRequest) returns (GetAttrReply) {}
-  rpc readlink(PathRequest) returns (StringTupleReply) {}
   rpc mkdir(PathModeRequest) returns (IntReply) {}
-  rpc unlink(PathRequest) returns (IntReply) {}
-  rpc rmdir(PathRequest) returns (IntReply) {}
-  rpc symlink(TuplePathRequest) returns (IntReply) {}
+  rpc read(ReadRequest) returns (ReadReply) {}
+  rpc readdir(ReaddirRequest) returns (ReaddirReply) {}
+  rpc statfs(PathRequest) returns (StatfsReply) {}
   rpc rename(TuplePathRequest) returns (IntReply) {}
-  rpc chmod(PathModeRequest) returns (IntReply) {}
+  rpc rmdir(PathRequest) returns (IntReply) {}
   rpc truncate(PathOffsetRequest) returns (IntReply) {}
+  rpc unlink(PathRequest) returns (IntReply) {}
   rpc open(PathRequest) returns (IntReply) {}
   rpc release(PathRequest) returns (IntReply) {}
-  rpc read(ReadRequest) returns (ReadReply) {}
   rpc write(WriteRequest) returns (IntReply) {}
-  rpc readdir(ReaddirRequest) returns (ReaddirReply) {}
-  rpc create(PathModeRequest) returns (IntReply) {}
-  rpc statfs(PathRequest) returns (StatfsReply) {}
+//  rpc destroy(EmptyReq) returns (EmptyReq) {}
+//  rpc readlink(PathRequest) returns (StringTupleReply) {}
+//  rpc symlink(TuplePathRequest) returns (IntReply) {}
+//  rpc chmod(PathModeRequest) returns (IntReply) {}
 }
 
 message EmptyReq {}

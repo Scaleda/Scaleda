@@ -27,7 +27,7 @@ object FuseSimpleDataProviderWrapper {
 class FuseSimpleDataProviderWrapper(source: FuseSimple) extends RemoteFuseGrpc.RemoteFuse {
   override def init(request: EmptyReq): Future[EmptyReq] = async {}
 
-  override def destroy(request: EmptyReq): Future[EmptyReq] = async {}
+  // override def destroy(request: EmptyReq): Future[EmptyReq] = async {}
 
   override def getattr(request: PathRequest): Future[GetAttrReply] = async {
     import request._
@@ -47,7 +47,7 @@ class FuseSimpleDataProviderWrapper(source: FuseSimple) extends RemoteFuseGrpc.R
     )
   }
 
-  override def readlink(request: PathRequest): Future[StringTupleReply] = ???
+  // override def readlink(request: PathRequest): Future[StringTupleReply] = ???
 
   override def mkdir(request: PathModeRequest): Future[IntReply] = async {
     source.mkdir(request.path, request.mode)
@@ -61,13 +61,13 @@ class FuseSimpleDataProviderWrapper(source: FuseSimple) extends RemoteFuseGrpc.R
     source.rmdir(request)
   }
 
-  override def symlink(request: TuplePathRequest): Future[IntReply] = ???
+  // override def symlink(request: TuplePathRequest): Future[IntReply] = ???
 
   override def rename(request: TuplePathRequest): Future[IntReply] = async {
     source.rename(request.oldpath, request.newpath)
   }
 
-  override def chmod(request: PathModeRequest): Future[IntReply] = async { 0 }
+  // override def chmod(request: PathModeRequest): Future[IntReply] = async { 0 }
 
   override def read(request: ReadRequest): Future[ReadReply] = async {
     val buf  = Memory.allocate(jnr.ffi.Runtime.getSystemRuntime, request.size)
