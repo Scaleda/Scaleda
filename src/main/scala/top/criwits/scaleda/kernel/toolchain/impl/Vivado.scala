@@ -247,20 +247,22 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       taskConfig = rt.task
     )
     templateRenderer.render()
-    // remove old vivado project if exists
-    val top = rt.task.findTopModule.getOrElse("NONE")
-    val pathsToDelete = Seq(
-      s"$top/$top.sim",
-      s"$top/$top.cache",
-      s"$top/$top.hw",
-      s"$top/$top.ip_user_files",
-      s"$top/$top.runs"
-    )
-    pathsToDelete.foreach(f => {
-      val file = new File(rt.executor.workingDir, f)
-      KernelLogger.info("vivado preset: removing", file, "exists:", file.exists())
-      KernelFileUtils.deleteDirectory(file.toPath)
-    })
+    if (rt.profile.isRemoteProfile) {
+      // remove old vivado project if exists and only for remote
+      val top = rt.task.findTopModule.getOrElse("NONE")
+      val pathsToDelete = Seq(
+        s"$top/$top.sim",
+        s"$top/$top.cache",
+        s"$top/$top.hw",
+        s"$top/$top.ip_user_files",
+        s"$top/$top.runs"
+      )
+      pathsToDelete.foreach(f => {
+        val file = new File(rt.executor.workingDir, f)
+        KernelLogger.info("vivado preset: removing", file, "exists:", file.exists())
+        KernelFileUtils.deleteDirectory(file.toPath)
+      })
+    }
     val rtNew = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"
       case TaskType.Synthesis   => "run_synth.tcl"
