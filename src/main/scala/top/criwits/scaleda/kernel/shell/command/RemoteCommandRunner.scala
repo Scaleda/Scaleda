@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell.command
 
+import kernel.database.UserException
 import kernel.net.fuse.fs.FuseTransferMessage
 import kernel.net.fuse.{FuseDataProvider, FuseTransferClient}
 import kernel.net.remote.RunReplyType._
@@ -44,10 +45,11 @@ class RemoteCommandRunner(
       val (client, shutdown) = RemoteClient(remoteCommandDeps.host, port = remoteCommandDeps.port)
       for (r <- client.run(request)) {
         r.replyType match {
-          case RUN_REPLY_TYPE_STDOUT => stdOut.put(r.strValue)
-          case RUN_REPLY_TYPE_STDERR => stdErr.put(r.strValue)
-          case RUN_REPLY_TYPE_RETURN => returnValue.success(r.intValue)
-          case e                     => KernelLogger.error(s"invalid message: ${r}")
+          case RUN_REPLY_TYPE_STDOUT   => stdOut.put(r.strValue)
+          case RUN_REPLY_TYPE_STDERR   => stdErr.put(r.strValue)
+          case RUN_REPLY_TYPE_RETURN   => returnValue.success(r.intValue)
+          case RUN_REPLY_TYPE_ERR_AUTH => throw new UserException("User Authorization failed!")
+          case e                       => KernelLogger.error(s"invalid message: ${r}")
         }
       }
       shutdown()

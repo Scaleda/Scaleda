@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.toolchain.impl
 
 import idea.runner.ScaledaRuntimeInfo
+import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
@@ -10,8 +11,6 @@ import kernel.template.ResourceTemplateRender
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
-
-import top.criwits.scaleda.kernel.net.remote.RemoteInfo
 
 import java.io.File
 import scala.async.Async.{async, await}
@@ -222,11 +221,13 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       return None
     }
     // TODO: request for remote mnt base
-    val replace =
+    implicit val replace =
       if (rt.profile.isRemoteProfile) {
+        require(remoteInfo.nonEmpty, "remote info required before handle preset")
         // this path may not exist on local
-        // val remoteTargetPath = new File(Paths.getServerTemporalDir(false), userTokenBean.username).getAbsolutePath
-        val remoteTargetPath = remoteInfo.get.tempPrefix + "/" + userTokenBean.username
+        val remoteTargetPath = remoteInfo.get.tempPrefix +
+          (if (remoteInfo.get.os.isRemoteOsTypeWindows) "\\" else "/") +
+          userTokenBean.username
         new ImplicitPathReplace(rt.workingDir.getAbsolutePath, remoteTargetPath) {
           override def doReplace(src: String) = {
             KernelLogger.info(
@@ -244,8 +245,21 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       executor = rt.executor,
       targetConfig = rt.target,
       taskConfig = rt.task
-    )(replace)
+    )
     templateRenderer.render()
+    // remove old vivado project if exists
+    val top = rt.task.findTopModule.getOrElse("NONE")
+    val pathsToDelete = Seq(
+      s"$top/$top.sim",
+      s"$top/$top.cache",
+      s"$top/$top.hw",
+      s"$top/$top.ip_user_files"
+    )
+    pathsToDelete.foreach(f => {
+      val file = new File(rt.executor.workingDir, f)
+      KernelLogger.info("vivado preset: removing", file, "exists:", file.exists())
+      KernelFileUtils.deleteDirectory(file.toPath)
+    })
     val rtNew = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"
       case TaskType.Synthesis   => "run_synth.tcl"
