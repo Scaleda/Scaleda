@@ -87,10 +87,10 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
       if (!returnValue.isCompleted) returnValue.success(-1)
     }
   })
-  thread.setName(s"command-runner-${args.headOption.getOrElse("unknown")}")
 
   override def run: CommandOutputStream = {
     thread.setDaemon(true)
+    thread.setName(s"command-runner-${args.headOption.getOrElse("unknown")}")
     // thread.setDaemon(false)
     thread.start()
     CommandOutputStream(returnValue.future, stdOut, stdErr)

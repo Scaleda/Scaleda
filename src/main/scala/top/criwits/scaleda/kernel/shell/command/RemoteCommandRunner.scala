@@ -30,12 +30,14 @@ class RemoteCommandRunner(
     envs = deps.envs.map(t => new StringTriple(t._1, t._2))
   )
   override val thread = new Thread(() => {
-    val fuseStarted = new Object
+    val fuseStartWaits = new Object
+    var fuseStarted    = false
     val shellThread = new Thread(() => {
       // wait until fuse started
-      fuseStarted.synchronized {
-        fuseStarted.wait()
+      fuseStartWaits.synchronized {
+        fuseStartWaits.wait(10000)
       }
+      if (!fuseStarted) throw new RuntimeException("FUSE starting error")
       KernelLogger.info("shell thread started")
       val (client, shutdown) = RemoteClient(remoteCommandDeps.host, port = remoteCommandDeps.port)
       for (r <- client.run(request)) {
@@ -65,15 +67,17 @@ class RemoteCommandRunner(
               stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
               KernelLogger.info("shell thread started, wait server side fuse mount...")
               observer.initFlag.synchronized {
-                observer.initFlag.wait()
+                observer.initFlag.wait(10000)
               }
+              if (!observer.initDone) throw new RuntimeException("fuse server side mount timeout")
               KernelLogger.info("recv init signal")
               // Thread.sleep(2000)
               Thread.sleep(5000)
               // Thread.sleep(500000)
               KernelLogger.info("fs thread notifies shell thread")
-              fuseStarted.synchronized {
-                fuseStarted.notify()
+              fuseStartWaits.synchronized {
+                fuseStarted = true
+                fuseStartWaits.notify()
               }
               while (true) {
                 Thread.sleep(100)

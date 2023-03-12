@@ -20,6 +20,7 @@ class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extend
   def setTx(stream: StreamObserver[FuseTransferMessage]): Unit =
     tx = stream
   val initFlag = new Object
+  var initDone = false
 
   override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.debug("client: onNext", msg.toProtoString)
@@ -34,6 +35,7 @@ class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extend
     val respFuture: Future[_] = msg.function match {
       case "init" =>
         initFlag.synchronized {
+          initDone = true
           initFlag.notify()
         }
         dataProvider.init(requestMessageInto(req))
