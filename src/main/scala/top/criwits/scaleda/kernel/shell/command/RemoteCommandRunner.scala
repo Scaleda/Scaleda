@@ -30,7 +30,8 @@ class RemoteCommandRunner(
     commands = deps.args,
     path = deps.path,
     envs = deps.envs.map(t => new StringTriple(t._1, t._2)),
-    projectBase = remoteCommandDeps.projectRoot.getAbsolutePath
+    // Note: all presets should use '/' instead of '\\'
+    projectBase = remoteCommandDeps.projectRoot.getAbsolutePath.replace('\\', '/')
   )
   override val thread = new Thread(() => {
     val fuseStartWaits = new Object

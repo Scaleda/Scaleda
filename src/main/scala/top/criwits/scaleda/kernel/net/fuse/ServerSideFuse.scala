@@ -128,8 +128,8 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     val reply = stub.readdir(ReaddirRequest(path = path, offset = math.max(0, offset.toInt - 2)))
     if (reply.r == 0) {
       if (reply.enableOffset) {
-        if (offset == 0) filter.apply(buf, ".", null, 0)
-        if (offset == 0 || offset == 1) filter.apply(buf, "..", null, 0)
+        if (offset == 0) filter.apply(buf, ".", null, 1)
+        if (offset == 0 || offset == 1) filter.apply(buf, "..", null, 2)
         if (offset >= 2) {
           val entries    = reply.entries.toSeq
           var offsetNext = offset + 1
@@ -167,9 +167,9 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     null
   }
 
-  // override def destroy(initResult: Pointer): Unit = {
-  //   stub.destroy(EmptyReq())
-  // }
+  override def destroy(initResult: Pointer): Unit = {
+    stub.destroy(EmptyReq())
+  }
 
   override def create(path: String, mode: Long, fi: FuseFileInfo): Int =
     stub.create(PathModeRequest(path = path, mode = mode.toInt)).r

@@ -145,10 +145,11 @@ class FuseSimple(private val rootDirectory: File) extends FuseStubFS {
     if (!p.exists) return -ErrorCodes.ENOENT
     if (!p.isDirectory) return -ErrorCodes.ENOTDIR
     // 似乎是必须加入的？照顾一下 Linux 的似乎。
-    filter.apply(buf, ".", null, 0)
-    filter.apply(buf, "..", null, 0)
-    val files = p.listFiles
-    if (files != null) for (file <- files) {
+    if (offset == 0) filter.apply(buf, ".", null, 1)
+    if (offset == 0 || offset == 1) filter.apply(buf, "..", null, 2)
+    val files      = p.listFiles
+    var offsetNext = offset + 1
+    if (files != null) for (file <- files.slice(offset.toInt, files.length)) {
       // 创建一个新的文件元数据结构对象
       val fileStat = FileStat.of(buf)
       // 注意：传递给 getattr 的路径需要是子项路径
@@ -156,7 +157,8 @@ class FuseSimple(private val rootDirectory: File) extends FuseStubFS {
       if (getattr(FuseSimple.appendPath(path, file.getName), fileStat) == 0) {
         // 加入一个项目，参数 1 只需要传递方法传入的 buf 即可，参数 4 也只需要传递 0 就好了
         // 参数 2 传入子项文件名（不含全路径），参数 3 传入通过 getattr 获取的文件元数据结构即可
-        filter.apply(buf, file.getName, fileStat, 0)
+        filter.apply(buf, file.getName, fileStat, offsetNext)
+        offsetNext += 1
       }
     }
     // 本方法只需要返回 0 代表成功

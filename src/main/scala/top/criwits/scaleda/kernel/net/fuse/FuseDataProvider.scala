@@ -55,16 +55,15 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
       // var mode = FuseUtils.fileAttrsUnixToInt(file)
       var mode =
         if (OS.isWindows)
-          // FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
-          0x1ff | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
+          FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
+          // 0x1ff | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
         else
           FuseUtils.fileAttrsUnixToInt(file)
-      if (Files.isSymbolicLink(file.toPath)) {
-        mode = (mode & 0xfff) | (0xa << 12)
-      }
+      // if (Files.isSymbolicLink(file.toPath)) {
+      //   mode = (mode & 0xfff) | (0xa << 12)
+      // }
       GetAttrReply(
         mode = mode,
-        // size = attrs.size(),
         size = if (attrs.isDirectory) 0 else file.length(),
         cTime = attrs.creationTime().to(TimeUnit.SECONDS),
         aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
@@ -156,8 +155,8 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
       rf.seek(offset)
       val data = new Array[Byte](size)
       // warning: this func blocks thread
-      rf.read(data, 0, size)
-      ReadReply(size = size, data = ByteString.copyFrom(data))
+      val realRead = rf.read(data, 0, size)
+      ReadReply(size = realRead, data = ByteString.copyFrom(data))
     }
   }
 
@@ -185,13 +184,6 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
       logger.warn(s"file exists? ${file.exists()}, file is dir? ${file.isDirectory}")
       ReaddirReply(-ErrorCodes.ENOENT)
     } else {
-      val results = ArrayBuffer[String]()
-
-      def applyFilter(filename: String): Unit = {
-        results.addOne(filename)
-        logger.info(s"add $filename to results")
-      }
-
       logger.info(
         s"readdir(path=$path, offset=$offset), file=${file.getAbsolutePath}"
       )

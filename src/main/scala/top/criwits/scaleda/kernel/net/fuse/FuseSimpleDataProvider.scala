@@ -229,14 +229,16 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
       // add ".", ".." in server side
       val files   = p.listFiles
       val results = new mutable.HashMap[String, GetAttrReply]()
-      if (files != null) for (file <- files) {
-        // 注意：传递给 getattr 的路径需要是子项路径
-        // 如果无法读取指定子项的属性，就跳过
-        val reply = getAttrInner(PathRequest.of(FuseSimple.appendPath(path, file.getName)))
-        if (reply.r == 0) results.put(file.getName, reply)
+      if (files != null) {
+        for (file <- files.slice(offset, files.length)) {
+          // 注意：传递给 getattr 的路径需要是子项路径
+          // 如果无法读取指定子项的属性，就跳过
+          val reply = getAttrInner(PathRequest.of(FuseSimple.appendPath(path, file.getName)))
+          if (reply.r == 0) results.put(file.getName, reply)
+        }
       }
       // 本方法只需要返回 0 代表成功
-      ReaddirReply(entries = results.toMap)
+      ReaddirReply(entries = results.toMap, enableOffset = true)
     }
   }
 

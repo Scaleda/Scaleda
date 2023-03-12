@@ -64,6 +64,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
     FuseTransferClientTester.run()
   }
 
+
   it should "launch server and client to test execute" in {
     val serverThread = new Thread(() => ScaledaServerMainRunTest.main(Array()))
     serverThread.start()
