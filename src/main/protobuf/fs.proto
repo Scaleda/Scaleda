@@ -88,6 +88,7 @@ message ReadReply {
 message ReaddirReply {
   uint32 r = 1;
   map<string, GetAttrReply> entries = 2;
+  bool enableOffset = 3;
 }
 message StatfsReply {
   uint64 blocks = 1;

@@ -3,7 +3,7 @@ file mkdir $project_dir
 
 puts "Generating project ${project_name}"
 
-create_project $project_name $project_dir -part $part -force
+create_project -part $part -force $project_name $project_dir
 
 {% for s in sourceList %}
 puts "Importing source: {{ s }}"

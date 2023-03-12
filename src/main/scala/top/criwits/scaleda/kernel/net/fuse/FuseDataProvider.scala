@@ -197,12 +197,14 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
       )
       val list = file.listFiles()
       logger.info(s"listed files: ${list.mkString(", ")}")
-      ReaddirReply(entries =
-        list
+      ReaddirReply(
+        entries = list
+          .slice(offset, list.length)
           .map(file => {
             file.getName -> getAttrLocal(file)
           })
-          .toMap
+          .toMap,
+        enableOffset = true
       )
     }
   }

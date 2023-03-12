@@ -7,7 +7,6 @@ import kernel.utils.{KernelLogger, OS}
 
 import com.google.protobuf.ByteString
 import jnr.ffi.Pointer
-import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.struct.{FileStat, FuseFileInfo, Statvfs, Timespec}
 import ru.serce.jnrfuse.{FuseFillDir, FuseStubFS}
 
@@ -18,7 +17,8 @@ import scala.language.existentials
   * all operations will call scaleda client through gRPC
   */
 class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
-  val logger = LoggerFactory.getLogger(getClass)
+  // val logger = LoggerFactory.getLogger(getClass)
+  val logger = KernelLogger
 
   private def appendPath(path: String, appendStr: String) = {
     val trimPath      = path.trim
@@ -124,19 +124,39 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    KernelLogger.debug(s"server side readdir(path=$path, offset=$offset)")
-    val reply = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
+    KernelLogger.info(s"server side readdir(path=$path, offset=$offset)")
+    val reply = stub.readdir(ReaddirRequest(path = path, offset = math.max(0, offset.toInt - 2)))
     if (reply.r == 0) {
-      filter.apply(buf, ".", null, 0)
-      filter.apply(buf, "..", null, 0)
-      reply.entries.foreach(f => {
-        val (name, attr) = f
-        if (attr.r == 0) {
-          val fileStat = FileStat.of(buf)
-          applyAttr(attr, fileStat)
-          filter.apply(buf, name, fileStat, 0)
+      if (reply.enableOffset) {
+        if (offset == 0) filter.apply(buf, ".", null, 0)
+        if (offset == 0 || offset == 1) filter.apply(buf, "..", null, 0)
+        if (offset >= 2) {
+          val entries    = reply.entries.toSeq
+          var offsetNext = offset + 1
+          for (i <- entries.indices) {
+            val (name, attr) = entries(i)
+            if (attr.r == 0) {
+              val fileStat = FileStat.of(buf)
+              logger.info(s"applying entry $name")
+              applyAttr(attr, fileStat)
+              filter.apply(buf, name, fileStat, offsetNext)
+              offsetNext += 1
+            }
+          }
         }
-      })
+      } else {
+        filter.apply(buf, ".", null, 0)
+        filter.apply(buf, "..", null, 0)
+        reply.entries.foreach(f => {
+          val (name, attr) = f
+          if (attr.r == 0) {
+            val fileStat = FileStat.of(buf)
+            logger.info(s"applying entry $name")
+            applyAttr(attr, fileStat)
+            filter.apply(buf, name, fileStat, 0)
+          }
+        })
+      }
     }
     KernelLogger.debug("readdir done")
     reply.r

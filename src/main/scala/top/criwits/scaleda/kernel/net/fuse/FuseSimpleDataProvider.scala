@@ -236,7 +236,7 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
         if (reply.r == 0) results.put(file.getName, reply)
       }
       // 本方法只需要返回 0 代表成功
-      ReaddirReply.of(0, results.toMap)
+      ReaddirReply(entries = results.toMap)
     }
   }
 
