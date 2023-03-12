@@ -6,8 +6,10 @@ import kernel.utils.KernelLogger
 
 import io.grpc.InternalServiceProviders.getCandidatesViaServiceLoader
 import io.grpc._
+import io.grpc.netty.NettyServerBuilder
 import io.grpc.stub.AbstractStub
 
+import java.net.{InetAddress, InetSocketAddress, SocketAddress}
 import scala.language.existentials
 
 object RpcPatch {
@@ -58,16 +60,18 @@ object RpcPatch {
       enableAuthCheck: Boolean = false,
       useReflection: Boolean = true
   ): Server = {
-    val builder: ServerBuilder[_] = if (useReflection) {
-      KernelLogger.info("server using reflection")
-      val provider = RpcPatch.getDefaultServerProvider
-      val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
-      method.setAccessible(true)
-      method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
-    } else {
-      KernelLogger.info("disable server reflection")
-      ServerBuilder.forPort(port)
-    }
+    // val builder: ServerBuilder[_] = if (useReflection) {
+    //   KernelLogger.info("server using reflection")
+    //   val provider = RpcPatch.getDefaultServerProvider
+    //   val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
+    //   method.setAccessible(true)
+    //   method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
+    // } else {
+    //   KernelLogger.info("disable server reflection")
+    //   ServerBuilder.forPort(port)
+    // }
+    // val builder = NettyServerBuilder.forAddress(new InetSocketAddress("127.0.0.1", port))
+    val builder = NettyServerBuilder.forAddress(new InetSocketAddress("0.0.0.0", port))
     services.foreach(service => builder.addService(service))
     KernelLogger.info("scaleda grpc server serve at port", port)
     if (enableAuthCheck) {
