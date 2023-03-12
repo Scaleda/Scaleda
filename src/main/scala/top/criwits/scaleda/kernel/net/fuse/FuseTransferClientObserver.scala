@@ -45,7 +45,7 @@ class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extend
       case "statfs"   => dataProvider.statfs(requestMessageInto(req))
       case "rename"   => dataProvider.rename(requestMessageInto(req))
       case "rmdir"    => dataProvider.rmdir(requestMessageInto(req))
-      case "turncate" => dataProvider.truncate(requestMessageInto(req))
+      case "truncate" => dataProvider.truncate(requestMessageInto(req))
       case "unlink"   => dataProvider.unlink(requestMessageInto(req))
       case "open"     => dataProvider.`open`(requestMessageInto(req))
       case "release"  => dataProvider.release(requestMessageInto(req))
