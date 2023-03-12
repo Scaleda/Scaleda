@@ -27,13 +27,12 @@ class RemoteCommandRunner(
 ) extends CommandRunner(deps)
     with AbstractCommandRunner {
   private def replacePath(src: String): String = src.replace('\\', '/')
-
-  // CLIENT DO ALL REPLACE '\\'->'/' HERE
   val request = new RunRequest(
-    commands = deps.args.map(replacePath),
-    path = replacePath(deps.path),
+    commands = deps.args,
+    // DO NOT DO REPLACE HERE
+    path = deps.path,
     envs = deps.envs.map(t => new StringTriple(t._1, t._2)),
-    projectBase = replacePath(remoteCommandDeps.projectRoot.getAbsolutePath)
+    projectBase = remoteCommandDeps.projectRoot.getAbsolutePath.replace('\\', '/')
   )
   override val thread = new Thread(() => {
     val fuseStartWaits = new Object
