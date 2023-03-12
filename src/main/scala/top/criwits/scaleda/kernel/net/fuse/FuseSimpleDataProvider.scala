@@ -38,7 +38,7 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
 
   override def init(request: EmptyReq): Future[EmptyReq] = async {}
 
-  // override def destroy(request: EmptyReq): Future[EmptyReq] = async {}
+  override def destroy(request: EmptyReq): Future[EmptyReq] = async {}
 
   private def getAttrInner(request: PathRequest): GetAttrReply = {
     import request._
@@ -64,8 +64,6 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
   }
 
   override def getattr(request: PathRequest): Future[GetAttrReply] = async { getAttrInner(request) }
-
-  // override def readlink(request: PathRequest): Future[StringTupleReply] = ???
 
   override def mkdir(request: PathModeRequest): Future[IntReply] = async {
     import request._
@@ -112,8 +110,6 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
     }
   }
 
-  // override def symlink(request: TuplePathRequest): Future[IntReply] = ???
-
   override def rename(request: TuplePathRequest): Future[IntReply] = async {
     logger.info("正在更改文件名, path: {}, newName: {}", request.oldpath, request.newpath)
     val p = getPath(request.oldpath)
@@ -127,7 +123,7 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
     }
   }
 
-  // override def chmod(request: PathModeRequest): Future[IntReply] = async { 0 }
+  override def chmod(request: PathModeRequest): Future[IntReply] = async { 0 }
 
   override def truncate(request: PathOffsetRequest): Future[IntReply] = async {
     import request._

@@ -1,10 +1,10 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
+import kernel.net.fuse.fs.{EmptyReq, IntReply, PathRequest}
 import kernel.utils.{KernelFileUtils, KernelLogger, OS}
 
 import ru.serce.jnrfuse.{FuseException, FuseStubFS}
-import top.criwits.scaleda.kernel.net.fuse.fs.{EmptyReq, IntReply, PathRequest}
 
 import java.io.{File, PrintWriter}
 import java.nio.file.attribute.{PosixFileAttributes, PosixFilePermissions}
@@ -13,7 +13,7 @@ import scala.language.implicitConversions
 import scala.sys.process._
 
 object FuseUtils {
-  val debug = true
+  val debug = false
 
   /** Mount a filesystem, will retry if failed
     * @param fs filesystem

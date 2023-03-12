@@ -65,17 +65,6 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     reply.r
   }
 
-  // override def readlink(path: String, buf: Pointer, size: Long): Int = {
-  //   val reply = stub.readlink(PathRequest(path))
-  //   if (reply.r1 == 0) {
-  //     val res = reply.r2
-  //     val len = math.min(res.length, size.toInt)
-  //     buf.put(0, res.getBytes(), 0, len)
-  //     buf.putByte(len, 0)
-  //   }
-  //   reply.r1
-  // }
-
   override def mkdir(path: String, mode: Long): Int =
     stub.mkdir(PathModeRequest(path = path, mode = mode.toInt)).r
 
@@ -85,14 +74,12 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
   override def rmdir(path: String): Int =
     stub.rmdir(PathRequest(path)).r
 
-  // override def symlink(oldpath: String, newpath: String): Int =
-  //   stub.symlink(TuplePathRequest(oldpath = oldpath, newpath = newpath)).r
-
   override def rename(oldpath: String, newpath: String): Int =
     stub.rename(TuplePathRequest(oldpath = oldpath, newpath = newpath)).r
 
-  // override def chmod(path: String, mode: Long) =
-  //   stub.chmod(PathModeRequest(path = path, mode = mode.toInt)).r
+  override def chmod(path: String, mode: Long) =
+    stub.
+      chmod(PathModeRequest(path = path, mode = mode.toInt)).r
 
   override def read(
       path: String,
@@ -189,10 +176,8 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     0
   }
 
-  override def open(path: String, fi: FuseFileInfo): Int = {
-    KernelLogger.warn("server side open")
+  override def open(path: String, fi: FuseFileInfo): Int =
     stub.`open`(PathRequest(path = path)).r
-  }
 
   override def truncate(path: String, size: Long): Int =
     stub.truncate(PathOffsetRequest(path = path, offset = size)).r

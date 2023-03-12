@@ -51,10 +51,10 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
     def run(): Unit = {
       ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro2", "-p", "1234"))
       // ScaledaShellMain.main(Array("configurations", "-C", "../scaleda-sample-project"))
-      ScaledaShellMain.main(
-        Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost")
-      )
-      // ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation"))
+      // ScaledaShellMain.main(
+      //   Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost")
+      // )
+      ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation"))
     }
   }
 

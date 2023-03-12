@@ -4,15 +4,15 @@ package kernel.net.fuse
 import kernel.net.fuse.FuseTransferServer.{fsProxies, observers, recvData, recvWait}
 import kernel.net.fuse.fs.FuseTransferMessage
 import kernel.net.user.JwtAuthorizationInterceptor
-import kernel.utils.{KernelLogger, Paths}
 import kernel.utils.serialise.BinarySerializeHelper
+import kernel.utils.{KernelLogger, Paths}
 
 import io.grpc.stub.StreamObserver
 
 import java.io.File
 
 class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
-  extends StreamObserver[FuseTransferMessage] {
+    extends StreamObserver[FuseTransferMessage] {
   private var identifier: Option[String] = None
   override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.debug("server onNext: ", msg.toProtoString)
@@ -60,7 +60,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
         val converted =
           FuseTransferMessageCase(msg.id, key, msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
 
-        KernelLogger.info("converted:", converted)
+        KernelLogger.debug("converted:", converted)
         recvData.synchronized {
           recvData.put(
             msg.id,
@@ -95,4 +95,3 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     }
   }
 }
-

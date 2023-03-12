@@ -27,7 +27,7 @@ class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extend
 
     def handleFutureData[T](future: Future[T]): ByteString = {
       val result = Await.result(future, 3000000 seconds)
-      KernelLogger.info("result:", result)
+      KernelLogger.debug("result:", result)
       BinarySerializeHelper.fromAny(result)
     }
 

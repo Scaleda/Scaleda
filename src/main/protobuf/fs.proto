@@ -17,10 +17,8 @@ service RemoteFuse {
   rpc open(PathRequest) returns (IntReply) {}
   rpc release(PathRequest) returns (IntReply) {}
   rpc write(WriteRequest) returns (IntReply) {}
-//  rpc destroy(EmptyReq) returns (EmptyReq) {}
-//  rpc readlink(PathRequest) returns (StringTupleReply) {}
-//  rpc symlink(TuplePathRequest) returns (IntReply) {}
-//  rpc chmod(PathModeRequest) returns (IntReply) {}
+  rpc chmod(PathModeRequest) returns (IntReply) {}
+  rpc destroy(EmptyReq) returns (EmptyReq) {}
 }
 
 message EmptyReq {}

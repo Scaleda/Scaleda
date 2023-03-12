@@ -19,6 +19,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.implicitConversions
+import scala.sys.process._
 
 /** gRPC data provider for filesystem sync.<br/>
   * This thread starts in Scaleda Client side, but actually is a gRPC server.
@@ -36,10 +37,9 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     EmptyReq()
   }
 
-  // override def destroy(request: EmptyReq): Future[EmptyReq] = async {
-  //   logger.info("destroy")
-  //   EmptyReq()
-  // }
+  override def destroy(request: EmptyReq): Future[EmptyReq] = async {
+    logger.info("destroy")
+  }
 
   private def getAttrLocal(file: File): GetAttrReply = {
     if (!file.exists()) GetAttrReply(-ErrorCodes.ENOENT)
@@ -80,26 +80,6 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
 
   override def getattr(request: PathRequest): Future[GetAttrReply] = async { getAttrInner(request) }
 
-  // override def readlink(request: PathRequest): Future[StringTupleReply] =
-  //   async {
-  //     val path = request.path
-  //     val file = getFile(path)
-  //     if (!Files.isSymbolicLink(file.toPath))
-  //       StringTupleReply(-ErrorCodes.ENOENT)
-  //     else {
-  //       // val res = Files.readSymbolicLink(file.toPath).toFile.getAbsolutePath
-  //       val run   = s"readlink ${file.getAbsolutePath}"
-  //       val array = mutable.ArrayBuffer[String]()
-  //       val r = run ! ProcessLogger(
-  //         stdout => array.addOne(stdout),
-  //         _ => {}
-  //       )
-  //       val res = array.mkString("")
-  //       logger.warn(s"readlink: sourcePath=$sourcePath, path=$path, res=$res")
-  //       StringTupleReply(r2 = res)
-  //     }
-  //   }
-
   override def mkdir(request: PathModeRequest): Future[IntReply] = async {
     val path = request.path
     val file = getFile(path)
@@ -135,14 +115,6 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     })
   }
 
-  // override def symlink(request: TuplePathRequest): Future[IntReply] = async {
-  //   import request._
-  //   val fileOld = new File(oldpath)
-  //   val fileNew = getFile(newpath)
-  //   Files.createSymbolicLink(fileNew.toPath, fileOld.toPath)
-  //   IntReply()
-  // }
-
   override def rename(request: TuplePathRequest): Future[IntReply] = async {
     import request._
     IntReply({
@@ -153,23 +125,23 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
     })
   }
 
-  // override def chmod(request: PathModeRequest): Future[IntReply] = async {
-  //   import request._
-  //   val file = getFile(path)
-  //   if (OS.isWindows) {
-  //     IntReply(if (file.exists()) 0 else -ErrorCodes.ENOENT)
-  //   } else {
-  //     IntReply({
-  //       val run =
-  //         s"""chmod ${Integer.toOctalString(mode.toInt & 0xfff)} \"${file.getAbsolutePath}\""""
-  //       logger.info(
-  //         s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
-  //       )
-  //       val r = run.!
-  //       if (r == 0) 0 else -ErrorCodes.ENOENT
-  //     })
-  //   }
-  // }
+  override def chmod(request: PathModeRequest): Future[IntReply] = async {
+    import request._
+    val file = getFile(path)
+    if (OS.isWindows) {
+      IntReply(if (file.exists()) 0 else -ErrorCodes.ENOENT)
+    } else {
+      IntReply({
+        val run =
+          s"""chmod ${Integer.toOctalString(mode.toInt & 0xfff)} \"${file.getAbsolutePath}\""""
+        logger.info(
+          s"chmod(path=$path, mode=${Integer.toOctalString(mode.toInt)}), run: $run"
+        )
+        val r = run.!
+        if (r == 0) 0 else -ErrorCodes.ENOENT
+      })
+    }
+  }
 
   override def read(request: ReadRequest): Future[ReadReply] = async {
     import request._
