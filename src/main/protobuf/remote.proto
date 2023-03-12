@@ -60,6 +60,7 @@ enum RunReplyType {
   RUN_REPLY_TYPE_RETURN = 0;
   RUN_REPLY_TYPE_STDOUT = 1;
   RUN_REPLY_TYPE_STDERR = 2;
+  RUN_REPLY_TYPE_ERR_AUTH = 3;
 }
 
 message RunReply {

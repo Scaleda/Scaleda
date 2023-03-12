@@ -3,7 +3,12 @@ package kernel.net
 
 import kernel.net.fuse.FuseTransferServer
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc
-import kernel.net.remote.RunReplyType.{RUN_REPLY_TYPE_RETURN, RUN_REPLY_TYPE_STDERR, RUN_REPLY_TYPE_STDOUT}
+import kernel.net.remote.RunReplyType.{
+  RUN_REPLY_TYPE_ERR_AUTH,
+  RUN_REPLY_TYPE_RETURN,
+  RUN_REPLY_TYPE_STDERR,
+  RUN_REPLY_TYPE_STDOUT
+}
 import kernel.net.remote._
 import kernel.net.user.{JwtAuthorizationInterceptor, RemoteRegisterLoginImpl}
 import kernel.shell.ScaledaRunHandler
@@ -35,25 +40,20 @@ object RemoteServer {
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
       val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
-      val commandDeps = if (user != null) {
-        // do text replacement
-        val username   = user.getUsername
-        val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
-        val sourcePath = request.projectBase
-        val replacer   = new ImplicitPathReplace(sourcePath, targetPath)
-        CommandDeps(
-          args = request.commands.map(replacer.doReplace),
-          path = replacer.doReplace(request.path),
-          envs = request.envs.map(t => (replacer.doReplace(t.a), replacer.doReplace(t.b)))
-        )
-      } else {
-        KernelLogger.warn("Remote run: user info not found! Replacement fallbacks")
-        CommandDeps(
-          args = request.commands,
-          path = request.path,
-          envs = request.envs.map(t => (t.a, t.b))
-        )
+      if (user == null) {
+        responseObserver.onNext(RunReply(replyType = RUN_REPLY_TYPE_ERR_AUTH))
+        return
       }
+      // do text replacement
+      val username   = user.getUsername
+      val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
+      val sourcePath = request.projectBase
+      val replacer   = new ImplicitPathReplace(sourcePath, targetPath)
+      val commandDeps = CommandDeps(
+        args = request.commands.map(replacer.doReplace),
+        path = replacer.doReplace(request.path),
+        envs = request.envs.map(t => (replacer.doReplace(t.a), replacer.doReplace(t.b)))
+      )
       // Note that there's only one command to execute
       CommandRunner.execute(
         Seq(commandDeps),
@@ -61,14 +61,14 @@ object RemoteServer {
           override def onStdout(data: String) = {
             KernelLogger.info("[remote executor stdout]", data)
             responseObserver.onNext(
-              new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = data)
+              new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = replacer.doInvReplace(data))
             )
           }
 
           override def onStderr(data: String) = {
             KernelLogger.warn("[remote executor stderr]", data)
             responseObserver.onNext(
-              new RunReply(RUN_REPLY_TYPE_STDERR, strValue = data)
+              new RunReply(RUN_REPLY_TYPE_STDERR, strValue = replacer.doInvReplace(data))
             )
           }
 
