@@ -50,10 +50,8 @@ class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extend
       case "open"     => dataProvider.`open`(requestMessageInto(req))
       case "release"  => dataProvider.release(requestMessageInto(req))
       case "write"    => dataProvider.write(requestMessageInto(req))
-      // case "chmod"    => dataProvider.chmod(requestMessageInto(req))
-      // case "symlink"  => dataProvider.symlink(requestMessageInto(req))
-      // case "destroy"  => dataProvider.destroy(requestMessageInto(req))
-      // case "readlink" => dataProvider.readlink(requestMessageInto(req))
+      case "chmod"    => dataProvider.chmod(requestMessageInto(req))
+      case "destroy"  => dataProvider.destroy(requestMessageInto(req))
       case _ =>
         KernelLogger.error("Unknown function name:", msg.function)
         async {
