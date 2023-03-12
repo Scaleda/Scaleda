@@ -14,7 +14,7 @@ import java.io._
 class SimpleProxyFileSystemTest extends AnyFlatSpec with should.Matchers {
   behavior of "SimpleProxyFileSystem"
   it should "simple run test" in {
-    val fs = new FuseSimple(Paths.pwd)
+    val fs = new FuseSimple(new File(Paths.getServerTemporalDir(), "source"))
     FuseUtils.mountFs(fs, new File(Paths.getServerTemporalDir(), "simple").getAbsolutePath, blocking = true)
   }
 }

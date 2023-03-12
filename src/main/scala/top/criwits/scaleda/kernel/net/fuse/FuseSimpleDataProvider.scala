@@ -53,10 +53,8 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
       } else if (p.isFile) {
         reply = reply.copy(mode = FileStat.S_IFREG | 0x1ff, size = p.length())
       }
-      // 不是很明白用来做什么，但必须设置
-      // set in serverSide
-      // reply = reply.copy(uid = getContext.uid.get, gid = getContext.gid.get)
-      logger.warn(
+      // set gid/uid in serverSide
+      logger.info(
         s"getattr($path): mode=${Integer.toOctalString(reply.mode)} size=${reply.mode} uid=${reply.uid} gid=${reply.gid}"
       )
       reply

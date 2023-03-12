@@ -30,12 +30,11 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
   private def applyAttr(reply: GetAttrReply, stat: FileStat): Unit = {
     import reply._
     if (r == 0) {
-      stat.st_size.set(size)
       stat.st_mode.set(mode)
+      stat.st_size.set(size)
       stat.st_atim.tv_sec.set(aTime)
       stat.st_mtim.tv_sec.set(mTime)
-      stat.st_ctim.tv_sec.set(mTime)
-      stat.st_nlink.set(1)
+      stat.st_ctim.tv_sec.set(cTime)
       stat.st_uid.set(if (uid != 0) uid else getContext.uid.get)
       stat.st_gid.set(if (gid != 0) uid else getContext.gid.get)
     } else {
@@ -78,8 +77,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     stub.rename(TuplePathRequest(oldpath = oldpath, newpath = newpath)).r
 
   override def chmod(path: String, mode: Long) =
-    stub.
-      chmod(PathModeRequest(path = path, mode = mode.toInt)).r
+    stub.chmod(PathModeRequest(path = path, mode = mode.toInt)).r
 
   override def read(
       path: String,
@@ -126,6 +124,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
+    KernelLogger.warn(s"server side readdir(path=$path, offset=$offset)")
     val reply = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
     if (reply.r == 0) {
       filter.apply(buf, ".", null, 0)

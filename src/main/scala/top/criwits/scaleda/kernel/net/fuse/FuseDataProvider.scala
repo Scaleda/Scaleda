@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import ru.serce.jnrfuse.ErrorCodes
 import ru.serce.jnrfuse.struct.FileStat
 
-import java.io.{File, FileInputStream, IOException, RandomAccessFile}
+import java.io.{File, FileOutputStream, IOException, RandomAccessFile}
 import java.nio.file.Files
 import java.nio.file.attribute.{DosFileAttributes, PosixFileAttributes}
 import java.util.concurrent.TimeUnit
@@ -66,6 +66,7 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
         mode = mode,
         // size = attrs.size(),
         size = if (attrs.isDirectory) 0 else file.length(),
+        cTime = attrs.creationTime().to(TimeUnit.SECONDS),
         aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
         mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
       )
@@ -217,21 +218,24 @@ class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
   }
 
   override def truncate(request: PathOffsetRequest): Future[IntReply] = async {
-    import request._
     val file = getFile(request.path)
     if (!file.exists) -ErrorCodes.ENOENT
     else if (!file.isFile) -ErrorCodes.EISDIR
     else {
-      val fileInput = new FileInputStream(file).getChannel
+      // val fileInput = new FileInputStream(file).getChannel
       try {
-        fileInput.position(offset)
-        fileInput.truncate(0)
+        // fileInput.position(offset)
+        // fileInput.truncate(0)
+        // 0
+        val _ = new FileOutputStream(file)
         0
       } catch {
         case e: IOException =>
-          logger.error("error when truncate file:", e)
-          -ErrorCodes.EIO
-      } finally if (fileInput != null) fileInput.close()
+          logger.warn(s"error when truncate! $e retry with delete/create")
+          if (!file.delete()) -ErrorCodes.EIO()
+          else if (!file.createNewFile()) -ErrorCodes.EIO()
+          else 0
+      } // finally if (fileInput != null) fileInput.close()
     }
   }
 

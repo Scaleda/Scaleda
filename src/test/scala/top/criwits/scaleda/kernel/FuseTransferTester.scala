@@ -54,7 +54,9 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
       // ScaledaShellMain.main(
       //   Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost")
       // )
-      ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation"))
+      ScaledaShellMain.main(
+        Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation")
+      )
     }
   }
 
@@ -71,7 +73,8 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "test local transfer" in {
-    val dataProvider   = new FuseDataProvider(Paths.pwd.getAbsolutePath)
+    // val dataProvider   = new FuseDataProvider(Paths.pwd.getAbsolutePath)
+    val dataProvider   = new FuseDataProvider(new File(Paths.getServerTemporalDir(), "source").getAbsolutePath)
     val observer       = new FuseTransferClientObserver(dataProvider)
     val fs             = new ServerSideFuse(new FuseLocalProxy(observer))
     val mountPointFile = new File(Paths.getServerTemporalDir(), "test")

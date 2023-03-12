@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package kernel.shell.command
 
 import kernel.net.fuse.fs.FuseTransferMessage
-import kernel.net.fuse.{FuseSimpleDataProvider, FuseTransferClient}
+import kernel.net.fuse.{FuseDataProvider, FuseSimpleDataProvider, FuseTransferClient}
 import kernel.net.remote.RunReplyType._
 import kernel.net.remote.{RunRequest, StringTriple}
 import kernel.net.{RemoteClient, RemoteServer}
@@ -58,8 +58,8 @@ class RemoteCommandRunner(
         var shutdown: Option[() => _] = None
         while (fsRunning) {
           try {
-            // val dataProvider = new FuseDataProvider(deps.path)
-            val dataProvider = new FuseSimpleDataProvider(new File(deps.path))
+            val dataProvider = new FuseDataProvider(deps.path)
+            // val dataProvider = new FuseSimpleDataProvider(new File(deps.path))
             val (_client, stream, observer, _shutdown) =
               FuseTransferClient.asStream(dataProvider)
             shutdown = Some(_shutdown)
