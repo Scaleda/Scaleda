@@ -111,7 +111,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
         case e: InterruptedException => running = false
       }
     }
-  })
+  }, "message-tab-handler")
   messageHandleThread.start()
 
   def attach(runtime: ScaledaRuntimeInfo): Unit = {

@@ -20,7 +20,7 @@ class RvcdLaunchAction extends AnAction {
         ),
         new OutputLogger.StdErrToWarningHandler(event.getProject)
       )
-    }).start()
+    }, "rvcd-instance").start()
   }
 }
 

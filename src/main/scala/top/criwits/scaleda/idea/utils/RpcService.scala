@@ -99,7 +99,7 @@ class RpcService extends Disposable {
           Thread.sleep(3000)
       }
     }
-  })
+  }, "rpc-server-service")
   thread.start()
 
   override def dispose() = {
@@ -109,38 +109,6 @@ class RpcService extends Disposable {
     thread.interrupt()
   }
 }
-
-// object RpcServiceTest extends App {
-//   private final val DEFAULT_PORT = 4151
-//   val loader                     = getClass.getClassLoader
-//   KernelLogger.info(s"loader: $loader")
-//   private val usePatch = false
-//   val builder = if (usePatch) {
-//     val provider = RpcPatch.getDefaultServerProvider
-//     val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
-//     method.setAccessible(true)
-//     method.invoke(provider, DEFAULT_PORT).asInstanceOf[ServerBuilder[_]]
-//   } else {
-//     ServerBuilder.forPort(DEFAULT_PORT)
-//   }
-//   builder.addService(ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => null), ExecutionContext.global))
-//   KernelLogger.info("before start()")
-//   val server = builder.build().start()
-//   val serverThread = new Thread(() => {
-//     server.awaitTermination()
-//   })
-//   serverThread.start()
-//
-//   private val clientBuilder = ManagedChannelBuilder.forAddress("127.0.0.1", DEFAULT_PORT)
-//   clientBuilder.usePlaintext()
-//   val channel = clientBuilder.build()
-//   val stub    = ScaledaRpcGrpc.blockingStub(channel)
-//   stub.ping(ScaledaEmpty.of())
-//   channel.shutdownNow()
-//
-//   server.shutdownNow()
-//   KernelLogger.info("done")
-// }
 
 object RpcService {
   class RpcGotoTopic {

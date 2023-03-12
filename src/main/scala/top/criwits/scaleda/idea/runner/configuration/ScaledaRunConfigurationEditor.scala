@@ -117,7 +117,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
             )
           })
         }
-      })
+      }, "request-remote-info")
       requestProfilesThreads.synchronized {
         requestProfilesThreads.put(host, thread)
       }
