@@ -69,7 +69,7 @@ class FuseSimple(private val rootDirectory: File) extends FuseStubFS {
       // 不是很明白用来做什么，但必须设置
       stat.st_uid.set(getContext.uid.get)
       stat.st_gid.set(getContext.gid.get)
-      logger.warn(s"getattr($path): mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
+      logger.info(s"getattr($path): mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
         .longValue()} uid=${stat.st_uid.get} gid=${stat.st_gid.get}")
       return 0
     }

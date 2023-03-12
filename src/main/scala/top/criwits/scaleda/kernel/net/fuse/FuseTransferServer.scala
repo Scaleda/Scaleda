@@ -81,22 +81,32 @@ object FuseTransferServer {
       msg: FuseTransferMessageCase
   ): FuseTransferMessageCase = {
     var recvData: Option[FuseTransferMessage] = None
-    localObserver.setTx(new StreamObserver[FuseTransferMessage] {
-      override def onNext(value: FuseTransferMessage) = {
-        recvData = Some(value)
+    localObserver.synchronized {
+      localObserver.setTx(new StreamObserver[FuseTransferMessage] {
+        override def onNext(value: FuseTransferMessage) = {
+          KernelLogger.info("recv:", value)
+          recvData = Some(value)
+        }
+
+        override def onError(t: Throwable) = throw t
+
+        override def onCompleted() = {}
+      })
+      try {
+        KernelLogger.info("request:", msg)
+        val _ = localObserver.onNext(msg.toMessage)
+      } catch {
+        case e: Throwable =>
+          KernelLogger.warn("local exception:", e)
+          return msg.copy(error = Some(e))
       }
-      override def onError(t: Throwable) = throw t
-      override def onCompleted() = {}
-    })
-    try {
-      val _ = localObserver.onNext(msg.toMessage)
-    } catch {
-      case e: Throwable =>
-        KernelLogger.warn("local exception:", e)
-        return msg.copy(error = Some(e))
+      if (recvData.isEmpty) {
+        msg.copy(error = Some(new RuntimeException(s"No data recv for id ${msg}?")))
+      } else {
+        require(msg.id == recvData.get.id)
+        val data: Any = BinarySerializeHelper.fromGrpcBytes(recvData.get.message)
+        msg.copy(data = data)
+      }
     }
-    if (recvData.isEmpty) msg.copy(error = Some(new RuntimeException("No data recv?")))
-    val data: Any = BinarySerializeHelper.fromGrpcBytes(recvData.get.message)
-    msg.copy(data = data)
   }
 }

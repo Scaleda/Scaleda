@@ -39,7 +39,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       stat.st_uid.set(if (uid != 0) uid else getContext.uid.get)
       stat.st_gid.set(if (gid != 0) uid else getContext.gid.get)
     } else {
-      logger.warn(s"getattr failed")
+      logger.warn(s"getattr failed! r = $r")
       stat.st_size.set(0)
       stat.st_mode.set(0)
       stat.st_atim.tv_sec.set(0)
@@ -60,7 +60,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
           throw e
       }
     applyAttr(reply, stat)
-    logger.warn(s"getattr($path): mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
+    logger.info(s"getattr($path): ${reply.r} mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
       .longValue()} uid=${stat.st_uid.get} gid=${stat.st_gid.get}")
     reply.r
   }

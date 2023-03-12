@@ -132,16 +132,19 @@ class FuseSimpleDataProvider(rootDirectory: File) extends RemoteFuseGrpc.RemoteF
     if (!p.exists) -ErrorCodes.ENOENT
     else if (!p.isFile) -ErrorCodes.EISDIR
     else {
-      val fileInput = new FileInputStream(p).getChannel
+      // val fileInput = new FileInputStream(p).getChannel
       try {
-        fileInput.position(offset)
-        fileInput.truncate(0)
-        0
+        // fileInput.position(offset)
+        // fileInput.truncate(0)
+        if (!p.delete()) throw new IOException("cannot detele file")
+        else if (!p.createNewFile()) {
+          throw new IOException("cannot delete file")
+        } else 0
       } catch {
         case e: IOException =>
           logger.error("清空文件数据时发生异常", e)
           -ErrorCodes.EIO
-      } finally if (fileInput != null) fileInput.close()
+      } //finally if (fileInput != null) fileInput.close()
     }
   }
 
