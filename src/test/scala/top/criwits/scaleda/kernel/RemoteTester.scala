@@ -3,6 +3,7 @@ package kernel
 
 import kernel.net.RemoteServer
 import kernel.net.remote.{Empty, RemoteGrpc}
+import kernel.project.config.ProjectConfig
 import kernel.shell.ScaledaRunKernelHandler
 import kernel.shell.command.{CommandDeps, RemoteCommandDeps, RemoteCommandRunner}
 
@@ -10,6 +11,7 @@ import io.grpc.{ManagedChannelBuilder, StatusRuntimeException}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
+import java.io.File
 import scala.language.existentials
 
 class RemoteTester extends AnyFlatSpec with should.Matchers {
@@ -33,7 +35,7 @@ class RemoteTester extends AnyFlatSpec with should.Matchers {
 
   it should "test remote command execution" in {
     val t                 = startServer()
-    val remoteCommandDeps = RemoteCommandDeps()
+    val remoteCommandDeps = RemoteCommandDeps(new File(ProjectConfig.projectBase.get))
     val commands = Seq(
       // CommandDeps("ping -c 3 127.0.0.1"),
       CommandDeps(Seq("echo", "hi"))

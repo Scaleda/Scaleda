@@ -9,7 +9,7 @@ import kernel.net.user.{JwtAuthorizationInterceptor, RemoteRegisterLoginImpl}
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.toolchain.Toolchain
-import kernel.utils.{EnvironmentUtils, ImplicitPathReplace, KernelLogger, OS, Paths}
+import kernel.utils._
 
 import io.grpc.stub.StreamObserver
 
@@ -39,11 +39,11 @@ object RemoteServer {
         // do text replacement
         val username   = user.getUsername
         val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
-        val sourcePath = request.path
+        val sourcePath = request.projectBase
         val replacer   = new ImplicitPathReplace(sourcePath, targetPath)
         CommandDeps(
           args = request.commands.map(replacer.doReplace),
-          path = targetPath,
+          path = replacer.doReplace(request.path),
           envs = request.envs.map(t => (replacer.doReplace(t.a), replacer.doReplace(t.b)))
         )
       } else {

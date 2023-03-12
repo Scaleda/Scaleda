@@ -7,6 +7,7 @@ import kernel.utils.KernelLogger
 
 import io.grpc.{Server, ServerBuilder}
 
+import java.io.File
 import scala.concurrent.ExecutionContext
 import scala.language.existentials
 
@@ -29,7 +30,7 @@ class FuseRpcServer(executionContext: ExecutionContext) { self =>
     val builder = ServerBuilder.forPort(FuseRpcServer.port)
     builder.addService(
       RemoteFuseGrpc.bindService(
-        new FuseDataProvider(sourcePath),
+        new FuseDataProvider(new File(sourcePath)),
         executionContext
       )
     )

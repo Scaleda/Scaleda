@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package kernel.shell.command
 
 import kernel.net.fuse.fs.FuseTransferMessage
-import kernel.net.fuse.{FuseDataProvider, FuseSimpleDataProvider, FuseTransferClient}
+import kernel.net.fuse.{FuseDataProvider, FuseTransferClient}
 import kernel.net.remote.RunReplyType._
 import kernel.net.remote.{RunRequest, StringTriple}
 import kernel.net.{RemoteClient, RemoteServer}
@@ -15,6 +15,7 @@ import java.io.File
 import scala.language.existentials
 
 case class RemoteCommandDeps(
+    projectRoot: File,
     host: String = "localhost",
     port: Int = RemoteServer.DEFAULT_PORT
 )
@@ -27,7 +28,8 @@ class RemoteCommandRunner(
   val request = new RunRequest(
     commands = deps.args,
     path = deps.path,
-    envs = deps.envs.map(t => new StringTriple(t._1, t._2))
+    envs = deps.envs.map(t => new StringTriple(t._1, t._2)),
+    projectBase = remoteCommandDeps.projectRoot.getAbsolutePath
   )
   override val thread = new Thread(() => {
     val fuseStartWaits = new Object
@@ -58,8 +60,8 @@ class RemoteCommandRunner(
         var shutdown: Option[() => _] = None
         while (fsRunning) {
           try {
-            val dataProvider = new FuseDataProvider(deps.path)
-            // val dataProvider = new FuseSimpleDataProvider(new File(deps.path))
+            val dataProvider = new FuseDataProvider(remoteCommandDeps.projectRoot)
+            // val dataProvider = new FuseSimpleDataProvider(remoteCommandDeps.projectRoot)
             val (_client, stream, observer, _shutdown) =
               FuseTransferClient.asStream(dataProvider)
             shutdown = Some(_shutdown)

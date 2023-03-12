@@ -23,17 +23,17 @@ import scala.sys.process._
 
 /** gRPC data provider for filesystem sync.<br/>
   * This thread starts in Scaleda Client side, but actually is a gRPC server.
-  * @param sourcePath source data path
+  * @param sourceRoot source data path
   */
-class FuseDataProvider(sourcePath: String) extends RemoteFuseGrpc.RemoteFuse {
+class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
   val logger = LoggerFactory.getLogger(getClass)
   // val logger = KernelLogger
   // logger.setLevel(LogLevel.Debug)
 
-  private def getFile(p: String): File = new File(sourcePath, p)
+  private def getFile(p: String): File = new File(sourceRoot, p)
 
   override def init(request: EmptyReq): Future[EmptyReq] = async {
-    logger.info("init")
+    logger.info(s"init: DataProvider sourcing from $sourceRoot")
     EmptyReq()
   }
 

@@ -63,7 +63,7 @@ class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extend
     try {
       val resp       = handleFutureData(respFuture)
       val messageNew = FuseTransferMessage.of(msg.id, msg.function, resp)
-      KernelLogger.info("client onNext done")
+      KernelLogger.debug("client onNext done")
       tx.onNext(messageNew)
     } catch {
       case e: Throwable =>

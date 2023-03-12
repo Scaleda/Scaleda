@@ -32,7 +32,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
     thread.start()
     Thread.sleep(500)
     val (client, stream, observer, shutdown) =
-      FuseTransferClient.asStream(new FuseDataProvider("/tmp"), port = TEST_PORT)
+      FuseTransferClient.asStream(new FuseDataProvider(new File("/tmp")), port = TEST_PORT)
     stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
     Thread.sleep(100)
     FuseTransferServer.requestThread.start()
@@ -74,7 +74,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
 
   it should "test local transfer" in {
     // val dataProvider   = new FuseDataProvider(Paths.pwd.getAbsolutePath)
-    val dataProvider   = new FuseDataProvider(new File(Paths.getServerTemporalDir(), "source").getAbsolutePath)
+    val dataProvider   = new FuseDataProvider(new File(Paths.getServerTemporalDir(), "source"))
     val observer       = new FuseTransferClientObserver(dataProvider)
     val fs             = new ServerSideFuse(new FuseLocalProxy(observer))
     val mountPointFile = new File(Paths.getServerTemporalDir(), "test")

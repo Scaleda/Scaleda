@@ -124,7 +124,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    KernelLogger.warn(s"server side readdir(path=$path, offset=$offset)")
+    KernelLogger.debug(s"server side readdir(path=$path, offset=$offset)")
     val reply = stub.readdir(ReaddirRequest(path = path, offset = offset.toInt))
     if (reply.r == 0) {
       filter.apply(buf, ".", null, 0)

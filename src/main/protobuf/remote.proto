@@ -53,6 +53,7 @@ message RunRequest {
   repeated string commands = 1;
   string path = 2;
   repeated StringTriple envs = 3;
+  string projectBase = 4;
 }
 
 enum RunReplyType {

@@ -27,7 +27,10 @@ object ScaledaRun {
       rt: ScaledaRuntimeInfo
   ): Unit = {
     require(rt.profile.profileName.nonEmpty, "must provide profile before runTask")
-    val remoteDeps = if (rt.profile.isRemoteProfile) Some(RemoteCommandDeps(host = rt.profile.host)) else None
+    val remoteDeps =
+      if (rt.profile.isRemoteProfile && ProjectConfig.projectBase.nonEmpty)
+        Some(RemoteCommandDeps(new File(ProjectConfig.projectBase.get), host = rt.profile.host))
+      else None
     KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
 
     val info = Toolchain.toolchains(rt.target.toolchain)
