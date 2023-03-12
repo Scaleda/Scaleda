@@ -38,7 +38,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       stat.st_uid.set(if (uid != 0) uid else getContext.uid.get)
       stat.st_gid.set(if (gid != 0) uid else getContext.gid.get)
     } else {
-      logger.warn(s"getattr failed! r = $r")
+      logger.debug(s"getattr failed! r = $r")
       stat.st_size.set(0)
       stat.st_mode.set(0)
       stat.st_atim.tv_sec.set(0)
