@@ -50,7 +50,7 @@ object FuseTransferServer {
     }
   }
 
-  val requestThread = new Thread(() => doRequestThread())
+  val requestThread = new Thread(() => doRequestThread(), "fuse-do-request-thread")
 
   private def doRequestThread(): Unit = {
     var done = false

@@ -53,14 +53,16 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
       val err        = process.get.getErrorStream
       val outScanner = new Scanner(out)
       val errScanner = new Scanner(err)
-      new Thread(() => {
+      val scannerThread = new Thread(() => {
         while (outScanner.hasNextLine) {
           stdOut.put(outScanner.nextLine())
         }
         while (errScanner.hasNextLine) {
           stdErr.put(errScanner.nextLine())
         }
-      }).start()
+      })
+      scannerThread.setName("command-runner-output-scanner")
+      scannerThread.start()
       while (process.get.isAlive) {
         if (terminate && !terminating) {
           terminating = true
@@ -72,6 +74,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
       if (terminate) terminate = false
       if (terminating) terminating = false
       terminated = true
+      scannerThread.interrupt()
       returnValue.success(process.get.exitValue())
     } catch {
       case e: Throwable =>
@@ -84,6 +87,7 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
       if (!returnValue.isCompleted) returnValue.success(-1)
     }
   })
+  thread.setName(s"command-runner-${args.headOption.getOrElse("unknown")}")
 
   override def run: CommandOutputStream = {
     thread.setDaemon(true)

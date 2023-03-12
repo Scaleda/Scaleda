@@ -17,7 +17,7 @@ object ScaledaServerMain {
     val threads = ArrayBuffer[Thread]()
     val threadRpcServer = new Thread(() => {
       RemoteServer.serve()
-    })
+    }, "server-main-rpc-server-thread")
     threadRpcServer.start()
     threads.addOne(threadRpcServer)
     val sendFsRpcMessageThread = FuseTransferServer.requestThread

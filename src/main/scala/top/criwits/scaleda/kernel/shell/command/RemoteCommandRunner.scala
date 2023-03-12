@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package kernel.shell.command
 
 import kernel.net.fuse.fs.FuseTransferMessage
-import kernel.net.fuse.{FuseDataProvider, FuseSimpleDataProvider, FuseTransferClient}
+import kernel.net.fuse.{FuseSimpleDataProvider, FuseTransferClient}
 import kernel.net.remote.RunReplyType._
 import kernel.net.remote.{RunRequest, StringTriple}
 import kernel.net.{RemoteClient, RemoteServer}
@@ -48,53 +48,57 @@ class RemoteCommandRunner(
       }
       shutdown()
     })
+    shellThread.setName("scaleda-run-shell-thread")
     shellThread.start()
-    val fsThread = new Thread(() => {
-      var fsRunning                 = true
-      var shutdown: Option[() => _] = None
-      while (fsRunning) {
-        try {
-          // val dataProvider = new FuseDataProvider(deps.path)
-          val dataProvider = new FuseSimpleDataProvider(new File(deps.path))
-          val (_client, stream, observer, _shutdown) =
-            FuseTransferClient.asStream(dataProvider)
-          shutdown = Some(_shutdown)
+    val fsThread = new Thread(
+      () => {
+        var fsRunning                 = true
+        var shutdown: Option[() => _] = None
+        while (fsRunning) {
           try {
-            stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
-            KernelLogger.info("shell thread started, wait server side fuse mount...")
-            observer.initFlag.synchronized {
-              observer.initFlag.wait()
-            }
-            KernelLogger.info("recv init signal")
-            // Thread.sleep(2000)
-            Thread.sleep(5000)
-            // Thread.sleep(500000)
-            KernelLogger.info("fs thread notifies shell thread")
-            fuseStarted.synchronized {
-              fuseStarted.notify()
-            }
-            while (true) {
-              Thread.sleep(100)
+            // val dataProvider = new FuseDataProvider(deps.path)
+            val dataProvider = new FuseSimpleDataProvider(new File(deps.path))
+            val (_client, stream, observer, _shutdown) =
+              FuseTransferClient.asStream(dataProvider)
+            shutdown = Some(_shutdown)
+            try {
+              stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
+              KernelLogger.info("shell thread started, wait server side fuse mount...")
+              observer.initFlag.synchronized {
+                observer.initFlag.wait()
+              }
+              KernelLogger.info("recv init signal")
+              // Thread.sleep(2000)
+              Thread.sleep(5000)
+              // Thread.sleep(500000)
+              KernelLogger.info("fs thread notifies shell thread")
+              fuseStarted.synchronized {
+                fuseStarted.notify()
+              }
+              while (true) {
+                Thread.sleep(100)
+              }
+            } catch {
+              case e: InterruptedException =>
+                stream.onCompleted()
+                throw e
             }
           } catch {
-            case e: InterruptedException =>
-              stream.onCompleted()
-              throw e
+            case _e: InterruptedException =>
+              KernelLogger.info("fs data provider exits")
+              fsRunning = false
+            case e: Throwable =>
+              KernelLogger.warn("fs data provider restart", e)
+              Thread.sleep(100)
+          } finally {
+            shutdown.foreach(f => f())
+            shutdown = None
           }
-        } catch {
-          case _e: InterruptedException =>
-            KernelLogger.info("fs data provider exits")
-            fsRunning = false
-          case e: Throwable =>
-            KernelLogger.warn("fs data provider restart", e)
-            Thread.sleep(100)
-        } finally {
-          shutdown.foreach(f => f())
-          shutdown = None
+          fsRunning = false
         }
-        fsRunning = false
-      }
-    })
+      },
+      "scaleda-run-fuse-thread"
+    )
     fsThread.setDaemon(false)
     fsThread.start()
     shellThread.join()

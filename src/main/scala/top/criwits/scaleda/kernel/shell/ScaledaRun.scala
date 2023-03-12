@@ -60,7 +60,7 @@ object ScaledaRun {
       runtime: ScaledaRuntimeInfo,
       daemon: Boolean = true
   ): Thread = {
-    val t = new Thread(() => runTask(handler, runtime))
+    val t = new Thread(() => runTask(handler, runtime), s"run-task-${runtime.id}")
     t.setDaemon(daemon)
     t
   }
