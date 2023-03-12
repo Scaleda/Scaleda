@@ -39,6 +39,9 @@ object RemoteServer {
         request: RunRequest,
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
+      KernelLogger.info(
+        s"remote run request: pwd=${request.path}, commands=${request.commands.map(c => s"""\"$c\"""").mkString(" ")}"
+      )
       val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
       if (user == null) {
         responseObserver.onNext(RunReply(replyType = RUN_REPLY_TYPE_ERR_AUTH))
@@ -53,6 +56,10 @@ object RemoteServer {
         args = request.commands.map(replacer.doReplace),
         path = replacer.doReplace(request.path),
         envs = request.envs.map(t => (replacer.doReplace(t.a), replacer.doReplace(t.b)))
+      )
+      KernelLogger.info(
+        s"remote real execute: cd ${"\"" + commandDeps.path + "\""} && " +
+          s"${commandDeps.args.map(c => "\"" + c + "\"").mkString(" ")}"
       )
       // Note that there's only one command to execute
       CommandRunner.execute(
