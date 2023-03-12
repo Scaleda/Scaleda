@@ -35,18 +35,18 @@ object Paths {
 
   def getUserAuthorization: File = new File(getGlobalConfigDir, ".authorization")
 
-  def getServerTemporalDir(isWindows: Boolean = OS.isWindows): File = {
-    if (isWindows) {
-      val f =
-        new File(
-          EnvironmentUtils.Backup.env.getOrElse("TEMP", new File(pwd, ".tmp").getAbsolutePath),
-          // new File(pwd, ".tmp").getAbsolutePath,
-          "scaledaTmp"
-        )
-      f
-    } else {
-      new File("/tmp", "scaledaTmp")
-    }
+  def getServerTemporalDir(isWindows: Boolean = OS.isWindows): String = {
+    (if (isWindows) {
+       val f =
+         new File(
+           EnvironmentUtils.Backup.env.getOrElse("TEMP", new File(pwd, ".tmp").getAbsolutePath),
+           // new File(pwd, ".tmp").getAbsolutePath,
+           "scaledaTmp"
+         )
+       f
+     } else {
+       new File("/tmp", "scaledaTmp")
+     }).getAbsolutePath.replace('\\', '/')
   }
 
   def pwd = new File(System.getProperty("user.dir"))

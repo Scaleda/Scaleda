@@ -49,7 +49,7 @@ object RemoteServer {
       }
       // do text replacement
       val username   = user.getUsername
-      val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath
+      val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath.replace('\\', '/')
       val sourcePath = request.projectBase
       val replacer   = new ImplicitPathReplace(sourcePath, targetPath)
       val commandDeps = CommandDeps(
@@ -107,7 +107,7 @@ object RemoteServer {
           case OS.MacOS   => RemoteOsType.REMOTE_OS_TYPE_MACOS
           case OS.Unix    => RemoteOsType.REMOTE_OS_TYPE_LINUX
         },
-        tempPrefix = Paths.getServerTemporalDir().getAbsolutePath
+        tempPrefix = Paths.getServerTemporalDir()
       )
     }
   }
