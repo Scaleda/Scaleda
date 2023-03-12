@@ -253,7 +253,8 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       s"$top/$top.sim",
       s"$top/$top.cache",
       s"$top/$top.hw",
-      s"$top/$top.ip_user_files"
+      s"$top/$top.ip_user_files",
+      s"$top/$top.runs"
     )
     pathsToDelete.foreach(f => {
       val file = new File(rt.executor.workingDir, f)
