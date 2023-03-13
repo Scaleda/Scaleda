@@ -17,6 +17,7 @@ import java.util.{Base64, Date}
 object JwtManager {
   val publicKey  = EnvironmentUtils.Backup.env.get("JWT_RSA_PUBLIC_KEY")
   val privateKey = EnvironmentUtils.Backup.env.get("JWT_RSA_PRIVATE_KEY")
+  if (publicKey.isEmpty || privateKey.isEmpty) KernelLogger.warn("JWT_RSA_* is empty! RSA Key Pair required for JWT")
   val rsaPublicKey =
     publicKey.map(key =>
       KeyFactory

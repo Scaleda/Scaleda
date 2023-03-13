@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package kernel.net.user
 
 import kernel.utils.serialise.YAMLHelper
-import kernel.utils.{EnvironmentUtils, Paths}
+import kernel.utils.{EnvironmentUtils, KernelLogger, Paths}
 
 object ScaledaAuthorizationProvider {
   def loadTokenPair: Seq[UserTokenBean] = {
@@ -13,11 +13,12 @@ object ScaledaAuthorizationProvider {
     var hasError = false
     val loaded =
       try {
-        val loaded = YAMLHelper(file, classOf[Seq[UserTokenBean]])
-        require(loaded.isInstanceOf[UserTokenBean])
-        loaded
+        val loaded = YAMLHelper(file, classOf[Seq[Map[String, String]]])
+        require(loaded.isInstanceOf[Seq[Map[String, String]]])
+        loaded.map(UserTokenBean.fromMap)
       } catch {
         case e: Throwable =>
+          KernelLogger.warn("Error when loading authorizations", e, "save default file")
           hasError = true
           Seq()
       }
@@ -33,15 +34,19 @@ object ScaledaAuthorizationProvider {
   def loadByHost(host: String) = loadTokenPair.find(_.host == host)
 
   def saveTokenPair(tokenPair: UserTokenBean): Unit = {
-    val file = Paths.getUserAuthorization
-    val original =
-      loadTokenPair.filter(p => !p.equals(UserTokenBean.TEST_MODE_PAIR) && !p.equals(tokenPair)) :+ tokenPair
-    YAMLHelper(original, file)
+    val appended =
+      loadTokenPair
+        .filter(p => !p.equals(UserTokenBean.TEST_MODE_PAIR) && !p.equals(tokenPair)) :+
+        tokenPair
+    YAMLHelper(appended, Paths.getUserAuthorization)
   }
 
   def saveTokenPairs(tokenPairs: Seq[UserTokenBean]): Unit = {
-    val file = Paths.getUserAuthorization
-    YAMLHelper(tokenPairs, file)
+    val file      = Paths.getUserAuthorization
+    val hostNames = tokenPairs.map(_.host).toSet
+    val data: Seq[Map[String, String]] =
+      hostNames.map(host => tokenPairs.find(_.host == host).get.toMap).toSeq
+    YAMLHelper(data, file)
   }
 
   private def getPairByHost(host: String) = loadByHost(host).getOrElse(UserTokenBean(host = host))

@@ -15,6 +15,7 @@ public abstract class LoginDialogInner extends JDialog {
     private JPanel panelState;
     protected JTextField hostField;
     protected JLabel stateLabel;
+    protected JButton buttonRegister;
 
     public LoginDialogInner() {
         setContentPane(contentPane);
@@ -24,6 +25,7 @@ public abstract class LoginDialogInner extends JDialog {
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
         buttonLogin.addActionListener(e -> onLogin());
+        buttonRegister.addActionListener(e -> onRegister());
 
         // 点击 X 时调用 onCancel()
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -42,6 +44,8 @@ public abstract class LoginDialogInner extends JDialog {
     protected abstract void onCancel();
 
     protected abstract void onLogin();
+
+    protected abstract void onRegister();
 
     protected abstract boolean canClickOk();
 }

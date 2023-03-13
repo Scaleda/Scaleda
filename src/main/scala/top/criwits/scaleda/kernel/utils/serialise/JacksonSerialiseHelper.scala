@@ -32,7 +32,8 @@ trait JacksonSerialiseHelper {
 
   def apply(value: Any, file: File): Unit = {
     val writer = new BufferedWriter(new FileWriter(file))
-    writer.write(apply(value))
+    val text = apply(value)
+    writer.write(text)
     writer.close()
   }
 }

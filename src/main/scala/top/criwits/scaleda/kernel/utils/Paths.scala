@@ -33,7 +33,7 @@ object Paths {
 
   def getDatabaseDir: File = createDirIfNonExists(new File(getGlobalConfigDir, "database"))
 
-  def getUserAuthorization: File = new File(getGlobalConfigDir, ".authorization")
+  def getUserAuthorization: File = new File(getGlobalConfigDir, "authorization.yml")
 
   def getServerTemporalDir(isWindows: Boolean = OS.isWindows): String = {
     (if (isWindows) {
