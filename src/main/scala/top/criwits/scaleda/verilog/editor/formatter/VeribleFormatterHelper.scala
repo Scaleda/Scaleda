@@ -11,6 +11,11 @@ object VeribleFormatterHelper {
   private val LINUX64 = "lin64"
   private val FORMATTER = "verible-verilog-format"
 
+  def allVeribleAssets = Seq(
+    VERIBLE + "/" + WIN64 + "/" + FORMATTER,
+    VERIBLE + "/" + LINUX64 + "/" + FORMATTER,
+  )
+
   private val path = VERIBLE + "/" + (OS.getOSType match {
     case OS.Windows => WIN64 // TODO: 32 bit
     case OS.Unix => LINUX64

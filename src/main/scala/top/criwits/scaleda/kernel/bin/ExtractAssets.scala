@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.bin
 
 import kernel.utils.{KernelLogger, OS, Paths}
+import verilog.editor.formatter.VeribleFormatterHelper
 
 import java.io.{File, FileOutputStream}
 import java.util.zip.ZipInputStream
@@ -11,7 +12,7 @@ object ExtractAssets {
   private val ZIP_BUFFER_SIZE = 1024
 
   private val targetDirectory = Paths.getBinaryDir
-  private val binaryList      = Array("rvcd", "rvcd.exe")
+  private val binaryList      = Array("rvcd", "rvcd.exe") ++ VeribleFormatterHelper.allVeribleAssets
   private val resourceFile    = "bin/assets.zip"
 
   def isInstalled: Boolean = {
