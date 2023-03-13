@@ -32,7 +32,7 @@ object RpcPatch {
     val channel = builder.build()
     var stub    = channelType(channel)
     if (enableAuthProvide) {
-      stub = stub.withCallCredentials(new AuthorizationProvideCredentials)
+      stub = stub.withCallCredentials(new AuthorizationProvideCredentials(host = host))
     }
     (stub, () => channel.shutdownNow())
   }

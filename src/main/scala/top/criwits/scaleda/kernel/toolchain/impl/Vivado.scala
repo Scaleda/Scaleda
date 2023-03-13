@@ -214,12 +214,14 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   ToolchainProfileDetector.registerDetector(this)
 
   override def handlePreset(rt: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntimeInfo] = {
-    val userTokenBean = ScaledaAuthorizationProvider.loadTokenPair
+    val userTokenBean = ScaledaAuthorizationProvider.loadTokenPair.get(rt.profile.host)
     // A local username is required...
     // TODO: Move preset process to server side?
-    if (rt.profile.isRemoteProfile && userTokenBean.username.isEmpty) {
-      KernelLogger.warn("Cannot apply Vivado preset! Check your user token info, re-login or register")
-      return None
+    if (rt.profile.isRemoteProfile) {
+      if (userTokenBean.isEmpty || userTokenBean.exists(_.username.isEmpty)) {
+        KernelLogger.warn("Cannot apply Vivado preset! Check your user token info, re-login or register")
+        return None
+      }
     }
     // TODO: request for remote mnt base
     implicit val replace =
@@ -228,7 +230,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         // this path may not exist on local
         val remoteTargetPath = remoteInfo.get.tempPrefix +
           (if (remoteInfo.get.os.isRemoteOsTypeWindows) "\\" else "/") +
-          userTokenBean.username
+          userTokenBean.get.username
         val pathFrom = rt.workingDir.getAbsolutePath.replace('\\', '/')
         new ImplicitPathReplace(rt.workingDir.getAbsolutePath, remoteTargetPath) {
           override def doReplace(src: String) = {

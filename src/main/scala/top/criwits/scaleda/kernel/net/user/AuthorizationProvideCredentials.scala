@@ -7,16 +7,20 @@ import io.grpc.{CallCredentials, Metadata}
 
 import java.util.concurrent.Executor
 
-class AuthorizationProvideCredentials extends CallCredentials {
+class AuthorizationProvideCredentials(host: String) extends CallCredentials {
   override def applyRequestMetadata(
       requestInfo: CallCredentials.RequestInfo,
       appExecutor: Executor,
       applier: CallCredentials.MetadataApplier
   ): Unit = {
     val header    = new Metadata()
-    val tokenPair = ScaledaAuthorizationProvider.loadTokenPair
-    header.put(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY, tokenPair.token)
-    KernelLogger.info("applyRequestMetadata", tokenPair)
+    val tokenPair = ScaledaAuthorizationProvider.loadTokenPair.get(host)
+    tokenPair.foreach(t => header.put(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY, t.token))
+    if (tokenPair.nonEmpty) {
+      KernelLogger.info("applyRequestMetadata", tokenPair)
+    } else {
+      KernelLogger.warn("No token loaded")
+    }
     applier.apply(header)
   }
 
