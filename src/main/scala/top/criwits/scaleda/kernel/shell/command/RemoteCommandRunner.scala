@@ -69,7 +69,7 @@ class RemoteCommandRunner(
             val dataProvider = new FuseDataProvider(remoteCommandDeps.projectRoot)
             // val dataProvider = new FuseSimpleDataProvider(remoteCommandDeps.projectRoot)
             val (_client, stream, observer, _shutdown) =
-              FuseTransferClient.asStream(dataProvider)
+              FuseTransferClient.asStream(dataProvider, host = remoteCommandDeps.host, port = remoteCommandDeps.port)
             shutdown = Some(_shutdown)
             try {
               stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))

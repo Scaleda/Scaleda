@@ -53,11 +53,11 @@ lazy val scaleda = project.in(file(".")).enablePlugins(SbtIdeaPlugin).settings(
     scalapb.gen() -> (Compile / sourceManaged).value
   ),
   libraryDependencies ++= Seq(
-    "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
+    // "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
     "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
   ),
-  // https://mvnrepository.com/artifact/com.hubspot.jinjava/jinjava
-  libraryDependencies += "com.hubspot.jinjava" % "jinjava" % "2.6.0",
+    // https://mvnrepository.com/artifact/com.hubspot.jinjava/jinjava
+  libraryDependencies += "com.hubspot.jinjava" % "jinjava" % "2.7.0",
   // https://mvnrepository.com/artifact/com.google.guava/guava
   libraryDependencies += "com.google.guava" % "guava" % "31.1-jre",
   // https://mvnrepository.com/artifact/commons-io/commons-io

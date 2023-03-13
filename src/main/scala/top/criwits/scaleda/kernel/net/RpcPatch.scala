@@ -6,10 +6,10 @@ import kernel.utils.KernelLogger
 
 import io.grpc.InternalServiceProviders.getCandidatesViaServiceLoader
 import io.grpc._
-import io.grpc.netty.NettyServerBuilder
+import io.grpc.netty.shaded.io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
 import io.grpc.stub.AbstractStub
 
-import java.net.{InetAddress, InetSocketAddress, SocketAddress}
+import java.net.InetSocketAddress
 import scala.language.existentials
 
 object RpcPatch {
@@ -25,11 +25,10 @@ object RpcPatch {
       port: Int,
       enableAuthProvide: Boolean = false
   ) = {
-    val provider = RpcPatch.getDefaultClientProvider
-    val method   = provider.getClass.getDeclaredMethod("builderForAddress", classOf[String], Integer.TYPE)
-    method.setAccessible(true)
-    val builder = method.invoke(provider, host, port).asInstanceOf[ManagedChannelBuilder[_]]
-    builder.usePlaintext()
+    val builder = NettyChannelBuilder
+      .forAddress(host, port)
+      .enableRetry()
+      .usePlaintext()
     val channel = builder.build()
     var stub    = channelType(channel)
     if (enableAuthProvide) {
@@ -57,20 +56,8 @@ object RpcPatch {
   def getStartServer(
       services: => Seq[ServerServiceDefinition],
       port: Int,
-      enableAuthCheck: Boolean = false,
-      useReflection: Boolean = true
+      enableAuthCheck: Boolean = false
   ): Server = {
-    // val builder: ServerBuilder[_] = if (useReflection) {
-    //   KernelLogger.info("server using reflection")
-    //   val provider = RpcPatch.getDefaultServerProvider
-    //   val method   = provider.getClass.getDeclaredMethod("builderForPort", Integer.TYPE)
-    //   method.setAccessible(true)
-    //   method.invoke(provider, port).asInstanceOf[ServerBuilder[_]]
-    // } else {
-    //   KernelLogger.info("disable server reflection")
-    //   ServerBuilder.forPort(port)
-    // }
-    // val builder = NettyServerBuilder.forAddress(new InetSocketAddress("127.0.0.1", port))
     val builder = NettyServerBuilder.forAddress(new InetSocketAddress("0.0.0.0", port))
     services.foreach(service => builder.addService(service))
     KernelLogger.info("scaleda grpc server serve at port", port)

@@ -20,8 +20,7 @@ class RpcServiceTest extends AnyFlatSpec with should.Matchers {
     val server = RpcPatch.getStartServer(
       Seq(ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => null), ExecutionContext.global)),
       DEFAULT_PORT,
-      enableAuthCheck = false,
-      useReflection = true
+      enableAuthCheck = false
     )
     val serverThread = new Thread(() => {
       server.awaitTermination()

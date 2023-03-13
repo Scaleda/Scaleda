@@ -7,6 +7,7 @@ import kernel.utils.KernelLogger
 import kernel.utils.serialise.BinarySerializeHelper
 
 import io.grpc.stub.StreamObserver
+import top.criwits.scaleda.kernel.net.user.JwtAuthorizationInterceptor
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.mutable
@@ -15,7 +16,7 @@ import scala.language.postfixOps
 
 class FuseTransferServer extends RemoteFuseTransfer {
   override def visit(responseObserver: StreamObserver[FuseTransferMessage]): StreamObserver[FuseTransferMessage] = {
-    KernelLogger.info("server: visit established")
+    KernelLogger.info("server: visit established, user=", JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get())
     new FuseTransferServerObserver(responseObserver)
   }
 }
