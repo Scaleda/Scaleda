@@ -88,13 +88,3 @@ object ScaledaMessageRenderer {
 
   def getRendererMap = allRenderers
 }
-
-object TestFileMatches extends App {
-  import ScaledaMessageRenderer._
-  val text =
-    "INFO: [Common 17-1381] The checkpoint '/home/chiro/programs/scaleda-sample-project/.synth/Vivado-Vivado Synth/waterfall/waterfall.runs/synth_1/waterfall.dcp' has been generated. && Run output will be captured here: /home/chiro/programs/scaleda-sample-project/.synth/Vivado-Vivado Synth/waterfall/waterfall.runs/synth_1/runme.log" +
-      " C:\\Scaleda\\a.txt - caleda.vv"
-  val fileMatches = fileRegex.findAllMatchIn(text).toSeq.sortBy(d => d.start - d.end)
-  fileMatches.foreach(p => println("[" + p + "]"))
-  println("slice:", "0123456789".slice(0, 1))
-}

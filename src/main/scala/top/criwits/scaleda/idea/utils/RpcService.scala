@@ -125,14 +125,3 @@ object RpcService {
 
   final val TOPIC: Topic[RpcGotoTopic] = Topic.create("Scaleda RPC", classOf[RpcGotoTopic])
 }
-
-// object RpcServiceClientTest extends App {
-//   private final val DEFAULT_PORT = 4151
-//   private val clientBuilder      = ManagedChannelBuilder.forAddress("127.0.0.1", DEFAULT_PORT)
-//   clientBuilder.usePlaintext()
-//   val channel = clientBuilder.build()
-//   val stub    = ScaledaRpcGrpc.blockingStub(channel)
-//   stub.ping(ScaledaEmpty.of())
-//   channel.shutdownNow()
-//   KernelLogger.info("done")
-// }

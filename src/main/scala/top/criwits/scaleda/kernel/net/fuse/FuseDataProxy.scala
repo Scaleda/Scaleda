@@ -49,19 +49,3 @@ class FuseDataProxy(identifier: String) extends RemoteFuseBlockingClient {
 
   override def statfs(request: PathRequest): StatfsReply = makeRequest(request)
 }
-
-object GetFunctionNameTest extends App {
-  private def getFunctionName(implicit name: Name): String = {
-    val r = name.value
-    println(r)
-    r
-  }
-
-  def test()      = getFunctionName
-  def testName()  = getFunctionName
-  def testName2() = getFunctionName
-
-  test()
-  testName2()
-  testName()
-}

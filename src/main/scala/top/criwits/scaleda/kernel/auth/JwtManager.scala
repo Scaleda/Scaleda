@@ -71,24 +71,3 @@ object JwtManager {
     }
   }
 }
-
-object JwtTest extends App {
-  val token = JwtManager.createToken().get
-  KernelLogger.info(s"token = $token")
-  val decoded = JwtManager.decode(token).get
-  KernelLogger.info(s"decoded = ${decoded}")
-  KernelLogger.info("header", decoded.getHeader, "payload", decoded.getPayload, "signature", decoded.getSignature)
-  KernelLogger.info("exp", decoded.getExpiresAt)
-}
-
-object RSAKeyPairGenerate extends App {
-  val gen = KeyPairGenerator.getInstance("RSA")
-  gen.initialize(2048, new SecureRandom)
-  val keyPair          = gen.generateKeyPair()
-  val publicKey        = keyPair.getPublic
-  val privateKey       = keyPair.getPrivate
-  val publicKeyString  = new String(Base64.getEncoder.encode(publicKey.getEncoded))
-  val privateKeyString = new String(Base64.getEncoder.encode(privateKey.getEncoded))
-  println(s"publicKeyString = $publicKeyString")
-  println(s"privateKeyString = $privateKeyString")
-}

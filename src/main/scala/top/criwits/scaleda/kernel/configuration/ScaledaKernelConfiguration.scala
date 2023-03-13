@@ -89,26 +89,3 @@ object ScaledaKernelConfiguration {
       .toMap
   }
 }
-
-object ScaledaKernelConfigurationTest extends App {
-  private val testDataSimple = """<component name="test">
-                   |</component>""".stripMargin
-  private val testData       = """<component name="ProjectRunConfigurationManager">
-                   |  <configuration default="false" name="Unnamed" type="SCALEDA_TASKS_RUN_CONFIGURATION" factoryName="Scaleda">
-                   |    <scaleda taskName="Run iverilog simulation" targetName="Icarus" profileName="Icarus Verilog" profileHost="" />
-                   |    <method v="2" />
-                   |  </configuration>
-                   |</component>""".stripMargin
-  val objSimple              = XMLHelper(testDataSimple, classOf[ScaledaKernelConfiguration])
-  require(objSimple.name == "test")
-  println(s"objSimple = $objSimple")
-  val obj = XMLHelper(testData, classOf[ScaledaKernelConfiguration])
-  println(s"obj = $obj")
-
-  val create     = ScaledaKernelConfiguration("testConf", "target", "task", "profile", "remote")
-  val createData = XMLHelper(create)
-  println(createData)
-
-  ProjectConfig.projectBase = Some("/home/chiro/programs/scaleda-sample-project/")
-  println(ScaledaKernelConfiguration.configurations)
-}

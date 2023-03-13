@@ -4,7 +4,6 @@ package kernel
 import kernel.net.RpcPatch
 import kernel.net.fuse._
 import kernel.net.fuse.fs.{FuseTransferMessage, PathModeRequest, RemoteFuseTransferGrpc}
-import kernel.server.ScaledaServerMainRunTest
 import kernel.shell.ScaledaShellMain
 import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
@@ -68,7 +67,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "launch server and client to test execute" in {
-    val serverThread = new Thread(() => ScaledaServerMainRunTest.main(Array()))
+    val serverThread = new Thread(() => ScaledaServerMainRunTest.run())
     serverThread.start()
     FuseTransferClientTester.run()
     // serverThread.join()

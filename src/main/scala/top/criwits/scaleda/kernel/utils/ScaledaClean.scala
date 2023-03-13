@@ -18,8 +18,3 @@ object ScaledaClean {
     // TODO: remove .sim, .synth?
   }
 }
-
-object ScaledaCleanTest extends App {
-  ExtractAssets.run()
-  ScaledaClean.run()
-}
