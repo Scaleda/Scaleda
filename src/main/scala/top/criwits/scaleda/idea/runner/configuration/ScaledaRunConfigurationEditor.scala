@@ -4,6 +4,7 @@ package idea.runner.configuration
 import idea.ScaledaBundle
 import idea.utils.MainLogger
 import kernel.net.remote.RemoteProfile
+import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.project.config.ProjectConfig
 import kernel.toolchain.Toolchain
@@ -31,10 +32,12 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     }
 
     override def equals(obj: Any) = {
-      obj match {
-        case e: ProfilePair => e.name.equals(name) && e.host.equals(host)
-        case e: Any         => false
-      }
+      if (obj == null) false
+      else
+        obj match {
+          case e: ProfilePair => e.name.equals(name) && e.host.equals(host)
+          case e: Any         => false
+        }
     }
   }
 
@@ -76,6 +79,17 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
         profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.local"))
       })
     } else {
+      val profileAuth = ScaledaAuthorizationProvider.loadTokenPair.get(profileHost.getText)
+      if (profileAuth.isEmpty) {
+        SwingUtilities.invokeLater(() => {
+          profileStateComp.clear()
+          profileStateComp.setIcon(AllIcons.General.Warning)
+          profileStateComp.append(
+            ScaledaBundle.message("tasks.configuration.profile.state.auth", host)
+          )
+        })
+        return
+      }
       if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty && host == profileHost.getText) {
         profileName.synchronized {
           profileName.removeAllItems()
