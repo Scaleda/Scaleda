@@ -7,6 +7,8 @@ abstract class ConfigNode() {
   @JsonIgnore
   val topModule: Option[String]
   @JsonIgnore
+  val constraints: Option[String]
+  @JsonIgnore
   var parentNode: Option[ConfigNode] = None
 
   @JsonIgnore
@@ -16,5 +18,11 @@ abstract class ConfigNode() {
       case None => None
     }
     case Some(str) => Some(str)
+  }
+
+  @JsonIgnore
+  def findConstraints: Option[String] = constraints match {
+    case Some(str) => Some(str)
+    case None => parentNode.flatMap(_.findConstraints)
   }
 }

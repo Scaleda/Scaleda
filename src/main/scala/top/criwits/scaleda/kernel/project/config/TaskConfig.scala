@@ -1,19 +1,20 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
-import com.fasterxml.jackson.annotation.JsonInclude.Include
-import top.criwits.scaleda.kernel.project.config.TaskConfig.taskTypeList
-import top.criwits.scaleda.kernel.utils.HasDefault
+import kernel.project.config.TaskConfig.taskTypeList
+import kernel.utils.HasDefault
 
-/**
- * Case class for config of task
- * @param name Task name, shown in right panel & config menu
- * @param `type` 'simulation', 'synthesis' or 'implementation'
- * @param topModule Top module, if [[None]] then inherited
- * @param preset Use built-in execution policy
- * @param tcl Path to Tcl script
- */
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+
+/** Case class for config of task
+  * @param name Task name, shown in right panel & config menu
+  * @param `type` 'simulation', 'synthesis', 'implementation' or 'programming'
+  * @param topModule Top module, if [[None]] then inherited
+  * @param preset Use built-in execution policy
+  * @param tcl Path to Tcl script
+  * @param constraints Path to constraints file or directory, if [[None]] then inherited
+  */
 @JsonInclude(Include.NON_EMPTY)
 case class TaskConfig(
     name: String = "",
@@ -21,8 +22,9 @@ case class TaskConfig(
     topModule: Option[String] = None,
     preset: Boolean = true,
     tcl: Option[String] = None,
+    constraints: Option[String] = None,
     // force to use remote host
-    host: Option[String] = None,
+    host: Option[String] = None
 ) extends ConfigNode() {
 
   def taskType = taskTypeList(`type`)._2
@@ -38,8 +40,9 @@ object TaskConfig extends HasDefault[TaskConfig] {
   override def getDefault: TaskConfig = TaskConfig()
 
   val taskTypeList: Map[String, (String, TaskType.Value)] = Map(
-    "simulation" -> ("Simulation", TaskType.Simulation),
-    "synthesis" -> ("Synthesis", TaskType.Synthesis),
-    "implementation" -> ("Implementation", TaskType.Implement)
+    "simulation"     -> ("Simulation", TaskType.Simulation),
+    "synthesis"      -> ("Synthesis", TaskType.Synthesis),
+    "implementation" -> ("Implementation", TaskType.Implement),
+    "programming"    -> ("Programming", TaskType.Programming)
   )
 }

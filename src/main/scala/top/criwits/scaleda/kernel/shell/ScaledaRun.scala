@@ -6,7 +6,7 @@ import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
-import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
+import kernel.toolchain.executor._
 import kernel.toolchain.{Toolchain, ToolchainProfile}
 import kernel.utils.KernelLogger
 
@@ -73,7 +73,7 @@ object ScaledaRun {
     t
   }
 
-  def generateExecutor(
+  private def generateExecutor(
       target: TargetConfig,
       task: TaskConfig,
       profile: ToolchainProfile,
@@ -98,9 +98,28 @@ object ScaledaRun {
           profile = profile
         )
       case TaskType.Implement =>
+        val selectedConstraints = task.findConstraints
+        val singleFile: Option[File] = selectedConstraints.flatMap(path => {
+          val file = new File(path)
+          if (file.exists() && file.isFile) Some(file)
+          else None
+        })
+        val singleDir = selectedConstraints.flatMap(path => {
+          val file = new File(path)
+          if (file.exists() && file.isDirectory) Some(file)
+          else None
+        })
         ImplementExecutor(
           workingDir = new File(new File(workingDir, ".impl"), workingDirName),
           topModule = task.findTopModule.get,
+          profile = profile,
+          // in `handlePreset`, constraintsDir will be scanned to add constraints
+          constraints = singleFile.map(Seq(_)).getOrElse(Seq()),
+          constraintsDir = singleDir
+        )
+      case TaskType.Programming =>
+        ProgrammingExecutor(
+          workingDir = new File(new File(workingDir, ".impl"), workingDirName),
           profile = profile
         )
     }

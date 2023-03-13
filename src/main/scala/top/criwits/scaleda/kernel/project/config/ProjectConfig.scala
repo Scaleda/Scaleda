@@ -24,6 +24,7 @@ case class ProjectConfig(
     source: String = "src/",
     test: String = "test/",
     topModule: Option[String] = None,
+    constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array()
 ) extends ConfigNode() {
   def targetsWithSim =

@@ -4,11 +4,12 @@ package kernel.toolchain.impl
 import idea.runner.ScaledaRuntimeInfo
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
+import kernel.project.config.TaskType.Implement
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
-import kernel.toolchain.executor.{Executor, SimulationExecutor}
+import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
@@ -213,7 +214,8 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   }
   ToolchainProfileDetector.registerDetector(this)
 
-  override def handlePreset(rt: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntimeInfo] = {
+  override def handlePreset(rtOld: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntimeInfo] = {
+    var rt            = rtOld
     val userTokenBean = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
     // A local username is required...
     // TODO: Move preset process to server side?
@@ -223,7 +225,6 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         return None
       }
     }
-    // TODO: request for remote mnt base
     implicit val replace =
       if (rt.profile.isRemoteProfile) {
         require(remoteInfo.nonEmpty, "remote info required before handle preset")
@@ -239,6 +240,21 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
           }
         }
       } else NoPathReplace
+
+    rt.task.taskType match {
+      case Implement =>
+        // load constraints from dir
+        val executor = rt.executor.asInstanceOf[ImplementExecutor]
+        executor.constraintsDir
+          .flatMap(dir => {
+            if (dir.exists() && dir.isDirectory) {
+              val constraints = KernelFileUtils.getAllSourceFiles(sourceDir = dir, suffixing = Set("xdc"))
+              Some(executor.copy(constraints = executor.constraints ++ constraints, constraintsDir = None))
+            } else None
+          })
+          .foreach(executorNew => rt = rt.copy(executor = executorNew))
+      case _ =>
+    }
     val templateRenderer = new Vivado.TemplateRenderer(
       executor = rt.executor,
       targetConfig = rt.target,
@@ -261,12 +277,12 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         KernelFileUtils.deleteDirectory(file.toPath)
       })
     }
-    val rtNew = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
+    rt = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"
       case TaskType.Synthesis   => "run_synth.tcl"
       case TaskType.Implement   => "run_impl.tcl"
       case TaskType.Programming => "run_program.tcl"
     })))
-    Some(rtNew)
+    Some(rt)
   }
 }

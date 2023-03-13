@@ -18,6 +18,7 @@ case class TargetConfig(
     name: String = "",
     toolchain: String = "",
     topModule: Option[String] = None,
+    constraints: Option[String] = None,
     options: Option[Map[String, String]] = None,
     tasks: Array[TaskConfig] = Array()
 ) extends ConfigNode()
