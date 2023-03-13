@@ -153,12 +153,11 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
     else {
       logger.info(s"read(path=$path, size=$size, offset=$offset)")
       val rf = new RandomAccessFile(file, "r")
-      require(offset <= file.length())
+      if (offset > file.length()) logger.warn("read over offset")
       rf.seek(offset)
-      // rf.skipBytes(offset)
       val data = new Array[Byte](size)
       // warning: this func blocks thread
-      val realRead = rf.read(data)
+      val realRead = rf.read(data, 0, size)
       ReadReply(size = realRead, data = ByteString.copyFrom(data))
     }
   }
@@ -172,8 +171,7 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
       else if (file.isDirectory) -ErrorCodes.EISDIR
       else {
         val rf = new RandomAccessFile(file, "rw")
-        require(offset <= file.length())
-        // rf.skipBytes(offset)
+        if (offset > file.length()) logger.warn("write over offset")
         rf.seek(offset)
         rf.write(data.toByteArray)
         rf.close()
