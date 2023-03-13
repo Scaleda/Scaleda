@@ -1,1 +1,17 @@
+source args.tcl
+
+set target_bitstream {${work_dir}/${project_name}/${project_name}.runs/impl_1/${top}.bit}
+
+open_hw_manager
+connect_hw_server -allow_non_jtag
+open_hw_target
+# project_name ~= top ?
+set device_name ${device}_1
+current_hw_device [get_hw_devices ${device_name}]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices ${device_name}] 0]
+set_property PROBES.FILE {} [get_hw_devices ${device_name}]
+set_property FULL_PROBES.FILE {} [get_hw_devices ${device_name}]
+set_property PROGRAM.FILE {${target_bitstream}} [get_hw_devices ${device_name}]
+program_hw_devices [get_hw_devices ${device_name}]
+
 puts "Program done!"

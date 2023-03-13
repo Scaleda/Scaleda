@@ -233,13 +233,21 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
           (if (remoteInfo.get.os.isRemoteOsTypeWindows) "\\" else "/") +
           userTokenBean.get.username
         val pathFrom = rt.workingDir.getAbsolutePath.replace('\\', '/')
-        new ImplicitPathReplace(rt.workingDir.getAbsolutePath, remoteTargetPath) {
-          override def doReplace(src: String) = {
-            KernelLogger.info("Vivado preset replace works", "from", pathFrom, "to", remoteTargetPath)
-            super.doReplace(src)
-          }
-        }
-      } else NoPathReplace
+        new ImplicitPathReplace(
+          rt.workingDir.getAbsolutePath,
+          remoteTargetPath,
+          regexPatten = Some("\\{ ([^\\{\\}]+) \\}"),
+          regexReplacements = Seq("{$1}")
+        )
+      } else {
+        // { waterfall } => {waterfall}
+        new ImplicitPathReplace(
+          "",
+          "",
+          regexPatten = Some("\\{ ([^\\{\\}]+) \\}"),
+          regexReplacements = Seq("{$1}")
+        )
+      }
 
     rt.task.taskType match {
       case Implement =>
@@ -259,7 +267,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       executor = rt.executor,
       targetConfig = rt.target,
       taskConfig = rt.task
-    )
+    )(replace)
     templateRenderer.render()
     if (rt.profile.isRemoteProfile) {
       // remove old vivado project if exists and only for remote

@@ -9,8 +9,12 @@ import org.scalatest.matchers.should
 
 class ShellRunTest extends AnyFlatSpec with should.Matchers {
   behavior of "ShellRun"
-  it should "test vivado impl" in {
+  it should "test vivado impl generate" in {
     EnvironmentUtils.Backup.env.put("SKIP_EXECUTION", "1")
+    ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-t", "Vivado Implementation"))
+  }
+
+  it should "test vivado impl" in {
     ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-t", "Vivado Implementation"))
   }
 }

@@ -49,4 +49,18 @@ class SimpleTester extends AnyFlatSpec with should.Matchers {
     testName2()
     testName()
   }
+
+  it should "test patten replace" in {
+    val source = "set project_name { waterfall } { test-source }  { dest }"
+    val patten = "\\{ ([^\\{\\}]+) \\}"
+    val p      = Pattern.compile(patten)
+    val m      = p.matcher(source)
+    val sb     = new StringBuffer()
+    while (m.find()) {
+      println(m.group(), m.group(1))
+      m.appendReplacement(sb, "{" + m.group(1) + "}")
+    }
+    val result = m.appendTail(sb).toString
+    println(result)
+  }
 }

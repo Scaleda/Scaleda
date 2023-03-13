@@ -49,13 +49,15 @@ object Template {
   def renderResourceTo(resourcePath: String, context: Map[String, Any], targetPath: String)(implicit
       replace: ImplicitPathReplace = NoPathReplace
   ): Unit = {
-    KernelLogger.debug(s"render resource ${resourcePath} to ${targetPath}")
+    KernelLogger.info(s"render resource ${resourcePath} to ${targetPath}")
     val f = new File(targetPath)
     // if (f.exists()) return
     FileUtils.touch(f)
-    val printer = new PrintWriter(f)
-    val result  = renderResource(resourcePath, context)
-    printer.write(replace.doReplace(result))
+    val printer           = new PrintWriter(f)
+    val renderResult      = renderResource(resourcePath, context)
+    val textReplaceResult = replace.doReplace(renderResult)
+    val regexResult       = replace.doRegexReplace(textReplaceResult)
+    printer.write(regexResult)
     printer.close()
   }
 }
