@@ -129,10 +129,15 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
         for (i <- entries.indices) {
           val (name, attr) = entries(i)
           if (attr.r == 0) {
-            val fileStat = FileStat.of(buf)
             logger.info(s"applying entry $name")
-            applyAttr(attr, fileStat)
-            filter.apply(buf, name, fileStat, offsetNext)
+            if (OS.isWindows) {
+              // FIXME: buffer on windows may not so big... so slower
+              filter.apply(buf, name, null, offsetNext)
+            } else {
+              val fileStat = FileStat.of(buf)
+              applyAttr(attr, fileStat)
+              filter.apply(buf, name, fileStat, offsetNext)
+            }
             offsetNext += 1
           } else {
             logger.warn(s"getattr failed for $name when reading dir $path")
@@ -174,7 +179,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     stub.release(PathRequest(path = path)).r
 
   override def statfs(path: String, stbuf: Statvfs) = {
-    logger.warn(s"statfs(path=$path)")
+    logger.info(s"statfs(path=$path)")
     if (OS.isWindows && "/".equals(path)) {
       stbuf.f_blocks.set(1024 * 1024)
       stbuf.f_frsize.set(1024)

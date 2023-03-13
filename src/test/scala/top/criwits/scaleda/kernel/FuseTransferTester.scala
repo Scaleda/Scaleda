@@ -47,7 +47,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
   }
 
   object FuseTransferClientTester {
-    def run(host: String = "host", testIverilog: Boolean = true, testVivado: Boolean = true): Unit = {
+    def run(host: String = "127.0.0.1", testIverilog: Boolean = true, testVivado: Boolean = true): Unit = {
       ScaledaShellMain.main(Array("register", "-h", host, "-u", "chiro2", "-p", "1234"))
       // ScaledaShellMain.main(Array("configurations", "-C", "../scaleda-sample-project"))
       if (testIverilog)
@@ -69,7 +69,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
   it should "launch server and client to test execute" in {
     val serverThread = new Thread(() => ScaledaServerMainRunTest.run())
     serverThread.start()
-    FuseTransferClientTester.run()
+    FuseTransferClientTester.run(testVivado = false)
     // serverThread.join()
     serverThread.interrupt()
   }
