@@ -5,7 +5,10 @@ import verilog.psi.nodes.signal.PortDeclarationPsiNode
 
 import top.criwits.scaleda.verilog.psi.nodes.expression.ExpressionPsiNode
 
-trait PortConnectionPsiNode {
+/**
+ * Abstract base class for port connection
+ */
+abstract class PortConnectionPsiNode {
   def getPort: PortDeclarationPsiNode
   def getSignal: ExpressionPsiNode
 }
