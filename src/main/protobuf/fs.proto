@@ -80,6 +80,7 @@ message GetAttrReply {
   uint64 c_time = 6;
   uint64 uid = 7;
   uint64 gid = 8;
+  uint64 b_time = 9;
 }
 message ReadReply {
   uint32 size = 1;

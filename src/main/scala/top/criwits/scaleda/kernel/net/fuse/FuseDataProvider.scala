@@ -65,7 +65,8 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
       GetAttrReply(
         mode = mode,
         size = if (attrs.isDirectory) 0 else file.length(),
-        cTime = attrs.creationTime().to(TimeUnit.SECONDS),
+        bTime = attrs.creationTime().to(TimeUnit.SECONDS),
+        cTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS),
         aTime = attrs.lastAccessTime().to(TimeUnit.SECONDS),
         mTime = attrs.lastModifiedTime().to(TimeUnit.SECONDS)
       )

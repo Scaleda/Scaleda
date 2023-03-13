@@ -34,7 +34,6 @@ class FuseSimpleDataProviderWrapper(source: FuseSimple) extends RemoteFuseGrpc.R
     val buf      = Memory.allocate(jnr.ffi.Runtime.getSystemRuntime, 2048)
     val fileStat = FileStat.of(buf)
     val r        = source.getattr(path, fileStat)
-    // TODO: time
     GetAttrReply.of(
       r,
       size = fileStat.st_size.longValue(),
@@ -42,6 +41,7 @@ class FuseSimpleDataProviderWrapper(source: FuseSimple) extends RemoteFuseGrpc.R
       aTime = fileStat.st_atim.tv_sec.get(),
       mTime = fileStat.st_mtim.tv_sec.get(),
       cTime = fileStat.st_ctim.tv_sec.get(),
+      bTime = fileStat.st_birthtime.tv_sec.get(),
       uid = fileStat.st_uid.get(),
       gid = fileStat.st_gid.get()
     )
