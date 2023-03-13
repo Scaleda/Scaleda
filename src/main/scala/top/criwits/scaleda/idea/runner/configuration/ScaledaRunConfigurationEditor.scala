@@ -29,6 +29,13 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
       if (host.isEmpty) name
       else s"$host - $name"
     }
+
+    override def equals(obj: Any) = {
+      obj match {
+        case e: ProfilePair => e.name.equals(name) && e.host.equals(host)
+        case e: Any         => false
+      }
+    }
   }
 
   private val targetName       = new ComboBox[String]
@@ -36,6 +43,8 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
   private val profileName      = new ComboBox[ProfilePair]
   private val profileHost      = new TextFieldWithBrowseButton
   private val profileStateComp = new SimpleColoredComponent
+  private var defaultProfilePair: Option[ProfilePair] =
+    None
 
   private val loadedRemoteProfiles   = new mutable.HashMap[String, Seq[RemoteProfile]]
   private val requestProfilesThreads = new mutable.HashMap[String, Thread]()
@@ -44,6 +53,12 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   ProjectConfig.getConfig().foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
 
+  private def maySetProfileToDefault(list: Seq[ProfilePair]): Unit = {
+    defaultProfilePair.foreach(default =>
+      list.find(p => p.equals(default)).foreach(profilePair => profileName.setItem(profilePair))
+    )
+  }
+
   private def requestRemoteProfiles(): Unit = {
     val host = profileHost.getText
     MainLogger.info(s"requestRemoteProfiles: $host")
@@ -51,7 +66,9 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
       // use local profiles
       profileName.synchronized {
         profileName.removeAllItems()
-        Toolchain.profiles().foreach(p => profileName.addItem(ProfilePair("", p.profileName)))
+        val pairs = Toolchain.profiles().map(p => ProfilePair("", p.profileName))
+        pairs.foreach(profileName.addItem)
+        maySetProfileToDefault(pairs.toSeq)
       }
       SwingUtilities.invokeLater(() => {
         profileStateComp.clear()
@@ -62,7 +79,9 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
       if (loadedRemoteProfiles.contains(host) && loadedRemoteProfiles(host).nonEmpty && host == profileHost.getText) {
         profileName.synchronized {
           profileName.removeAllItems()
-          loadedRemoteProfiles(host).foreach(p => profileName.addItem(ProfilePair(host, p.profileName)))
+          val pairs = loadedRemoteProfiles(host).map(p => ProfilePair(host, p.profileName))
+          pairs.foreach(profileName.addItem)
+          maySetProfileToDefault(pairs)
         }
         SwingUtilities.invokeLater(() => {
           profileStateComp.clear()
@@ -73,51 +92,56 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
         })
         return
       }
-      val thread = new Thread(() => {
-        var profiles: Seq[RemoteProfile] = Seq()
-        try {
-          val (client, shutdown) = RemoteClient(host)
+      val thread = new Thread(
+        () => {
+          var profiles: Seq[RemoteProfile] = Seq()
           try {
-            profiles = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of()).profiles
-          } finally {
-            shutdown()
-          }
-        } catch {
-          case e: Throwable =>
-            MainLogger.info("cannot connect server:", e)
-            if (host == profileHost.getText) {
-              profileName.synchronized {
-                profileName.removeAllItems()
-              }
-              SwingUtilities.invokeLater(() => {
-                profileStateComp.clear()
-                profileStateComp.setIcon(AllIcons.General.BalloonError)
-                profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.failed", host, e))
-              })
+            val (client, shutdown) = RemoteClient(host)
+            try {
+              profiles = client.getProfiles(top.criwits.scaleda.kernel.net.remote.Empty.of()).profiles
+            } finally {
+              shutdown()
             }
-        } finally {
-          requestProfilesThreads.synchronized {
-            requestProfilesThreads.remove(host)
+          } catch {
+            case e: Throwable =>
+              MainLogger.info("cannot connect server:", e)
+              if (host == profileHost.getText) {
+                profileName.synchronized {
+                  profileName.removeAllItems()
+                }
+                SwingUtilities.invokeLater(() => {
+                  profileStateComp.clear()
+                  profileStateComp.setIcon(AllIcons.General.BalloonError)
+                  profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.failed", host, e))
+                })
+              }
+          } finally {
+            requestProfilesThreads.synchronized {
+              requestProfilesThreads.remove(host)
+            }
           }
-        }
-        if (profiles.nonEmpty && host == profileHost.getText) {
-          MainLogger.info("got profiles", profiles)
-          loadedRemoteProfiles.synchronized {
-            loadedRemoteProfiles.put(host, profiles)
+          if (profiles.nonEmpty && host == profileHost.getText) {
+            MainLogger.info("got profiles", profiles)
+            loadedRemoteProfiles.synchronized {
+              loadedRemoteProfiles.put(host, profiles)
+            }
+            profileName.synchronized {
+              profileName.removeAllItems()
+              val pairs = profiles.map(p => ProfilePair(host, p.profileName))
+              pairs.foreach(profileName.addItem)
+              maySetProfileToDefault(pairs)
+            }
+            SwingUtilities.invokeLater(() => {
+              profileStateComp.clear()
+              profileStateComp.setIcon(AllIcons.General.InspectionsOK)
+              profileStateComp.append(
+                ScaledaBundle.message("tasks.configuration.profile.state.ok", profiles.length, host)
+              )
+            })
           }
-          profileName.synchronized {
-            profileName.removeAllItems()
-            profiles.foreach(p => profileName.addItem(ProfilePair(host, p.profileName)))
-          }
-          SwingUtilities.invokeLater(() => {
-            profileStateComp.clear()
-            profileStateComp.setIcon(AllIcons.General.InspectionsOK)
-            profileStateComp.append(
-              ScaledaBundle.message("tasks.configuration.profile.state.ok", profiles.length, host)
-            )
-          })
-        }
-      }, "request-remote-info")
+        },
+        "request-remote-info"
+      )
       requestProfilesThreads.synchronized {
         requestProfilesThreads.put(host, thread)
       }
@@ -183,6 +207,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     environmentVarsComponent.setEnvs(CollectionConverters.asJava(s.extraEnvs))
     profileHost.setText(s.profileHost)
     profileName.setItem(ProfilePair(s.profileHost, s.profileName))
+    defaultProfilePair = Some(ProfilePair(s.profileHost, s.profileName))
     requestRemoteProfiles()
   }
 
