@@ -56,7 +56,7 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
       var mode =
         if (OS.isWindows)
           FuseUtils.fileAttrsToInt(file, "rwxrwxrwx")
-          // 0x1ff | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
+        // 0x1ff | (if (attrs.isDirectory) FileStat.S_IFDIR else FileStat.S_IFREG)
         else
           FuseUtils.fileAttrsUnixToInt(file)
       // if (Files.isSymbolicLink(file.toPath)) {
@@ -152,11 +152,10 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
     else if (file.isDirectory) ReadReply(-ErrorCodes.EISDIR)
     else {
       logger.info(s"read(path=$path, size=$size, offset=$offset)")
-      val rf = new RandomAccessFile(file, "r")
-      rf.seek(offset)
+      val rf   = new RandomAccessFile(file, "r")
       val data = new Array[Byte](size)
       // warning: this func blocks thread
-      val realRead = rf.read(data, 0, size)
+      val realRead = rf.read(data, offset, size)
       ReadReply(size = realRead, data = ByteString.copyFrom(data))
     }
   }
