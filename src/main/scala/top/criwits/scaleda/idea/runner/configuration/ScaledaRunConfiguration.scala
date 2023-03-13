@@ -155,6 +155,7 @@ class ScaledaRunConfiguration(
 
       // setup exception handler
       thread.setUncaughtExceptionHandler((_thread: Thread, throwable: Throwable) => {
+        // detach message parser listener
         ScaledaMessageTab.instance.detachFromLogger(runtime.id)
         ScaledaMessageParser.removeParser(runtime.id)
         // TODO: i18n
@@ -165,7 +166,7 @@ class ScaledaRunConfiguration(
             Notification().error("Timeout", e.getMessage, ", check your connections")
           case e: Throwable => throw e
         }
-        handler.destroyProcessImpl()
+        handler.destroyProcess()
       })
 
       // run process in the background

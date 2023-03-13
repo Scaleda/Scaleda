@@ -43,7 +43,7 @@ object FuseTransferServer {
     val resp =
       recvData.synchronized { recvData.get(msg.id) }
     if (resp.isEmpty) {
-      KernelLogger.error(s"Did not recv data! Timeout for message req $msg")
+      if (!msg.function.equals("destroy")) KernelLogger.error(s"Did not recv data! Timeout for message req $msg")
       msg.copy(error = Some(new TimeoutException()))
     } else {
       resp.get
@@ -61,7 +61,7 @@ object FuseTransferServer {
           observers.get(msg.identifier) match {
             case Some(observer) => observer.tx.onNext(msg.toMessage)
             case None =>
-              KernelLogger.error("Cannot send message ", msg, ", no observer!")
+              if (!msg.function.equals("destroy")) KernelLogger.error("Cannot send message ", msg, ", no observer!")
               recvWait.synchronized { recvWait.get(msg.id) }.foreach(o => o.synchronized { o.notify() })
           }
         }

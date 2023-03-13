@@ -57,7 +57,7 @@ object ScaledaRun {
       try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
       catch {
         case e: Throwable =>
-          KernelLogger.warn("Exception", e, "when executing", commands, "on", remoteDeps)
+          KernelLogger.info("Exception", e, "when executing", commands, "on", remoteDeps)
           throw e
       }
     })
