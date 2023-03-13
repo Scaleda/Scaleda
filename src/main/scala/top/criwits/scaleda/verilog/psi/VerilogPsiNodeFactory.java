@@ -9,8 +9,7 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import top.criwits.scaleda.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.nodes.*;
-import top.criwits.scaleda.verilog.psi.nodes.always.AlwaysConstructPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.always.DelayOrEventControlPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.always.*;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseBodyPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode;
@@ -114,6 +113,15 @@ public class VerilogPsiNodeFactory {
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_delay_or_event_control),
         DelayOrEventControlPsiNode.class
+    );
+    /// Assignment
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_nonblocking_assignment),
+        NonblockingAssignmentPsiNode.class
+    );
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_blocking_assignment),
+        BlockingAssignmentPsiNode.class
     );
 
     // Signals
