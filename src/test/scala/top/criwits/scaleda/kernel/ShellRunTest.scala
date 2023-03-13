@@ -21,4 +21,8 @@ class ShellRunTest extends AnyFlatSpec with should.Matchers {
   it should "test remote iverilog simulation" in {
     ScaledaShellMain.main(Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "172.18.189.67"))
   }
+
+  it should "test run server" in {
+    ScaledaShellMain.main(Array("serve"))
+  }
 }

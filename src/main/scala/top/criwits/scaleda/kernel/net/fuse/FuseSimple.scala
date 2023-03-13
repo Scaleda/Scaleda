@@ -127,9 +127,11 @@ class FuseSimple(private val rootDirectory: File) extends FuseStubFS {
     }
   }
 
-  def simpleReadDir(path: String): Map[String, GetAttrReply] = {
-    val p = getPath(path)
-    p.listFiles()
+  def simpleReadDir(path: String, offset: Int = 0): Map[String, GetAttrReply] = {
+    val p     = getPath(path)
+    val files = p.listFiles()
+    files
+      .slice(offset, files.size)
       .map(file => {
         file.getName -> GetAttrReply(
           mode = if (file.isDirectory) FileStat.S_IFDIR | 0x1ff else FileStat.S_IFREG | 0x1ff,

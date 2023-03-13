@@ -20,13 +20,6 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
   // val logger = LoggerFactory.getLogger(getClass)
   val logger = KernelLogger
 
-  private def appendPath(path: String, appendStr: String) = {
-    val trimPath      = path.trim
-    var pathSeparator = File.separator
-    if (trimPath.endsWith("/") || trimPath.endsWith("\\")) pathSeparator = ""
-    path + pathSeparator + appendStr
-  }
-
   private def applyAttr(reply: GetAttrReply, stat: FileStat): Unit = {
     import reply._
     if (r == 0) {
@@ -44,7 +37,8 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       stat.st_atim.tv_sec.set(0)
       stat.st_mtim.tv_sec.set(0)
       stat.st_ctim.tv_sec.set(0)
-      stat.st_nlink.set(0)
+      stat.st_uid.set(0)
+      stat.st_gid.set(0)
     }
   }
 
@@ -124,24 +118,24 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    KernelLogger.info(s"server side readdir(path=$path, offset=$offset)")
+    logger.info(s"server side readdir(path=$path, offset=$offset)")
     val reply = stub.readdir(ReaddirRequest(path = path, offset = math.max(0, offset.toInt - 2)))
     if (reply.r == 0) {
       if (reply.enableOffset) {
         if (offset == 0) filter.apply(buf, ".", null, 1)
         if (offset == 0 || offset == 1) filter.apply(buf, "..", null, 2)
-        if (offset >= 2) {
-          val entries    = reply.entries.toSeq
-          var offsetNext = offset + 1
-          for (i <- entries.indices) {
-            val (name, attr) = entries(i)
-            if (attr.r == 0) {
-              val fileStat = FileStat.of(buf)
-              logger.info(s"applying entry $name")
-              applyAttr(attr, fileStat)
-              filter.apply(buf, name, fileStat, offsetNext)
-              offsetNext += 1
-            }
+        val entries    = reply.entries.toSeq
+        var offsetNext = offset + 1
+        for (i <- entries.indices) {
+          val (name, attr) = entries(i)
+          if (attr.r == 0) {
+            val fileStat = FileStat.of(buf)
+            logger.info(s"applying entry $name")
+            applyAttr(attr, fileStat)
+            filter.apply(buf, name, fileStat, offsetNext)
+            offsetNext += 1
+          } else {
+            logger.warn(s"getattr failed for $name when reading dir $path")
           }
         }
       } else {
@@ -158,7 +152,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
         })
       }
     }
-    KernelLogger.debug("readdir done")
+    logger.debug("readdir done")
     reply.r
   }
 
@@ -180,17 +174,11 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
     stub.release(PathRequest(path = path)).r
 
   override def statfs(path: String, stbuf: Statvfs) = {
+    logger.warn(s"statfs(path=$path)")
     if (OS.isWindows && "/".equals(path)) {
-      // statfs needs to be implemented on Windows in order to allow for copying
-      // data from other devices because winfsp calculates the volume size based
-      // on the statvfs call.
-      // see https://github.com/billziss-gh/winfsp/blob/14e6b402fe3360fdebcc78868de8df27622b565f/src/dll/fuse/fuse_intf.c#L654
-      // 设定块数量
-      stbuf.f_blocks.set(1024 * 1024); // total data blocks in file system
-      // 设定块大小
-      stbuf.f_frsize.set(1024); // fs block size
-      // 剩余可用块
-      stbuf.f_bfree.set(1024 * 1024); // free blocks in fs
+      stbuf.f_blocks.set(1024 * 1024)
+      stbuf.f_frsize.set(1024)
+      stbuf.f_bfree.set(1024 * 1024)
     }
     0
   }

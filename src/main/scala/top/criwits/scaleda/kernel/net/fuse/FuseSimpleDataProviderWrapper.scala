@@ -82,7 +82,7 @@ class FuseSimpleDataProviderWrapper(source: FuseSimple) extends RemoteFuseGrpc.R
   }
 
   override def readdir(request: ReaddirRequest): Future[ReaddirReply] = async {
-    ReaddirReply(entries = source.simpleReadDir(request.path))
+    ReaddirReply(entries = source.simpleReadDir(request.path, offset = request.offset))
   }
 
   override def create(request: PathModeRequest): Future[IntReply] = async {

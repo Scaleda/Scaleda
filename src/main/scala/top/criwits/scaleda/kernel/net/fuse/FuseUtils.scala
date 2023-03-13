@@ -13,7 +13,7 @@ import scala.language.implicitConversions
 import scala.sys.process._
 
 object FuseUtils {
-  val debug = false
+  val debug = true
 
   /** Mount a filesystem, will retry if failed
     * @param fs filesystem
