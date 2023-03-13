@@ -66,6 +66,10 @@ object ScaledaShellMain {
 
   def main(args: Array[String]): Unit = {
     KernelLogger.info(s"This is Scaleda shell! Args: ${args.mkString(" ")}")
+
+    // set exception handler
+    Thread.currentThread().setUncaughtExceptionHandler(new ShellExceptionHandler)
+
     Template.initJinja()
     // invoke Env backup
     val _ = EnvironmentUtils.Backup

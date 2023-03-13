@@ -91,7 +91,6 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   override def run: CommandOutputStream = {
     thread.setDaemon(true)
     thread.setName(s"command-runner-${args.headOption.getOrElse("unknown")}")
-    // thread.setDaemon(false)
     thread.start()
     CommandOutputStream(returnValue.future, stdOut, stdErr)
   }
@@ -162,10 +161,16 @@ object CommandRunner {
       // To ensure output & error are got for the last time
       flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
       flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
-      val returnValue = r.returnValue.value.get.get
-      if (returnValue != handler.expectedReturnValue) meetErrors = true
-      handler.onReturn(returnValue, commands.last == command, meetErrors)
-      step += 1
+      try {
+        val returnValue = r.returnValue.value.get.get
+        if (returnValue != handler.expectedReturnValue) meetErrors = true
+        handler.onReturn(returnValue, commands.last == command, meetErrors)
+        step += 1
+      } catch {
+        case e: Throwable =>
+          KernelLogger.warn("Exception", e, "when executing command", command)
+          throw e
+      }
     })
   }
 

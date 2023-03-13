@@ -13,6 +13,8 @@ import kernel.utils.KernelLogger
 import com.google.protobuf.ByteString
 
 import java.io.File
+import java.lang.Thread.UncaughtExceptionHandler
+import java.util.concurrent.TimeoutException
 import scala.language.existentials
 
 case class RemoteCommandDeps(
@@ -40,9 +42,9 @@ class RemoteCommandRunner(
     val shellThread = new Thread(() => {
       // wait until fuse started
       fuseStartWaits.synchronized {
-        fuseStartWaits.wait(10000)
+        fuseStartWaits.wait(7000)
       }
-      if (!fuseStarted) throw new RuntimeException("FUSE starting error")
+      if (!fuseStarted) throw new TimeoutException("FUSE starting error")
       KernelLogger.info("shell thread started")
       val (client, shutdown) = RemoteClient(remoteCommandDeps.host, port = remoteCommandDeps.port)
       for (r <- client.run(request)) {
@@ -75,7 +77,7 @@ class RemoteCommandRunner(
               observer.initFlag.synchronized {
                 observer.initFlag.wait(10000)
               }
-              if (!observer.initDone) throw new RuntimeException("fuse server side mount timeout")
+              if (!observer.initDone) throw new TimeoutException("fuse server side mount timeout")
               KernelLogger.info("recv init signal")
               // Thread.sleep(2000)
               Thread.sleep(5000)
@@ -95,7 +97,10 @@ class RemoteCommandRunner(
             }
           } catch {
             case _e: InterruptedException =>
-              KernelLogger.info("fs data provider exits")
+              KernelLogger.info("fs data provider interrupted")
+              fsRunning = false
+            case e: TimeoutException =>
+              KernelLogger.warn("time out for:", e, "data provider exit")
               fsRunning = false
             case e: Throwable =>
               KernelLogger.warn("fs data provider restart", e)
@@ -104,20 +109,29 @@ class RemoteCommandRunner(
             shutdown.foreach(f => f())
             shutdown = None
           }
-          fsRunning = false
         }
+        KernelLogger.info("fs data provider exit done")
       },
       "scaleda-run-fuse-thread"
     )
     fsThread.setDaemon(false)
     fsThread.start()
+    shellThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+      override def uncaughtException(thread: Thread, throwable: Throwable) =
+        if (!returnValue.isCompleted) returnValue.failure(throwable)
+    })
     shellThread.join()
-    fsThread.interrupt()
-    // fsThread.join()
+    if (fsThread.isAlive) {
+      fsThread.interrupt()
+      fsThread.join()
+    }
+    KernelLogger.info(Thread.currentThread().getName, "exits")
+    if (!returnValue.isCompleted) returnValue.failure(new RuntimeException("Error"))
   })
 
   override def run: CommandOutputStream = {
     thread.setDaemon(true)
+    thread.setName(s"remote-command-runner-${args.headOption.getOrElse("unknown")}")
     thread.start()
     CommandOutputStream(returnValue.future, stdOut, stdErr)
   }
