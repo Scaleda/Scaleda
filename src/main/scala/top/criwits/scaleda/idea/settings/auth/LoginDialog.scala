@@ -10,6 +10,8 @@ import com.intellij.icons.AllIcons
 
 class LoginDialog(save: Boolean = true, data: Option[UserTokenBean] = None, ignoredHosts: Seq[String] = Seq())
     extends LoginDialogInner {
+  setTitle(ScaledaBundle.message("settings.dialog.login"))
+
   private var userToken: Option[UserTokenBean] = data
   userToken.foreach(t => {
     usernameField.setText(t.username)
