@@ -30,6 +30,7 @@ object RemoteServer {
   final val DEFAULT_PORT = 20051
 
   final val AVAILABLE_REMOTE_HOSTS = Seq(
+    "a.chiro.work",
     "127.0.0.1",
     "pc.chiro.work"
   )
@@ -40,7 +41,8 @@ object RemoteServer {
         responseObserver: StreamObserver[RunReply]
     ): Unit = {
       KernelLogger.info(
-        s"remote run request: pwd=${request.path}, commands=${request.commands.map(c => s"""\"$c\"""").mkString(" ")}"
+        s"remote run request: pwd=${request.path}, base=${request.projectBase}, " +
+          s"commands=${request.commands.map(c => s"""\"$c\"""").mkString(" ")}"
       )
       val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
       if (user == null) {
@@ -51,7 +53,9 @@ object RemoteServer {
       val username   = user.getUsername
       val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath.replace('\\', '/')
       val sourcePath = request.projectBase
-      val replacer   = new ImplicitPathReplace(sourcePath, targetPath)
+      val replacer   = new ImplicitPathReplace(sourcePath, targetPath) {
+        override def doReplace(src: String) = super.doReplace(src.replace('\\', '/'))
+      }
       val commandDeps = CommandDeps(
         args = request.commands.map(replacer.doReplace),
         path = replacer.doReplace(request.path),
