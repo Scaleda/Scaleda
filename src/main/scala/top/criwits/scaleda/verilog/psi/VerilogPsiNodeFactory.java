@@ -114,6 +114,14 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_delay_or_event_control),
         DelayOrEventControlPsiNode.class
     );
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_delay_value),
+        DelayValuePsiNode.class
+    );
+    ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_event_primary),
+        EventPrimaryPsiNode.class
+    );
     /// Assignment
     ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_nonblocking_assignment),
