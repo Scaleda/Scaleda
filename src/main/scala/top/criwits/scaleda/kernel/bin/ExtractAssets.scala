@@ -7,8 +7,10 @@ import verilog.editor.formatter.VeribleFormatterHelper
 import java.io.{File, FileOutputStream}
 import java.util.zip.ZipInputStream
 import scala.collection.mutable.ArrayBuffer
+import scala.io.Source
 
 object ExtractAssets {
+  private val ASSET_VERSION = 1 // Update me when newer assets are loaded
   private val ZIP_BUFFER_SIZE = 1024
 
   private val targetDirectory = Paths.getBinaryDir
@@ -16,52 +18,70 @@ object ExtractAssets {
   private val resourceFile    = "bin/assets.zip"
 
   def isInstalled: Boolean = {
+    // check if version file
+    val versionFile = new File(targetDirectory, "version")
+    if (!versionFile.exists()) return false
+
+    // check
+    val oldVersion = Source.fromFile(versionFile)
+    val version = oldVersion.getLines().mkString("").toInt
+    oldVersion.close()
+    if (version < ASSET_VERSION) return false
+
+    // check integrity
     binaryList.map(binary => new File(targetDirectory, binary).exists()).reduce(_ && _)
   }
 
-  def run(): Unit = {
+  def run(): Boolean = {
     val copiedList = ArrayBuffer[String]()
     if (!targetDirectory.exists()) targetDirectory.mkdirs()
     val resourceStream = getClass.getClassLoader.getResourceAsStream(resourceFile)
     if (resourceStream == null) {
       KernelLogger.warn("Assets not found! Check your", resourceFile)
-      return
+      return false
     }
-    val zipInputStream = new ZipInputStream(resourceStream)
-    var zipEntry       = zipInputStream.getNextEntry
 
-    val buffer = new Array[Byte](ZIP_BUFFER_SIZE)
+    try { // TODO: is it ok here?
+      val zipInputStream = new ZipInputStream(resourceStream)
+      var zipEntry = zipInputStream.getNextEntry
 
-    while (zipEntry != null) {
-      val fileName = zipEntry.getName
+      val buffer = new Array[Byte](ZIP_BUFFER_SIZE)
 
-      if (!zipEntry.isDirectory) {
-        val newFile = new File(targetDirectory, fileName)
-        KernelLogger.info(s"Extracting asset file $fileName")
-        new File(newFile.getParent).mkdirs()
-        val fileOutputStream = new FileOutputStream(newFile)
-        var len              = 0
-        while ({
-          len = zipInputStream.read(buffer)
-          len > 0
-        }) {
-          fileOutputStream.write(buffer, 0, len)
+      while (zipEntry != null) {
+        val fileName = zipEntry.getName
+
+        if (!zipEntry.isDirectory) {
+          val newFile = new File(targetDirectory, fileName)
+          KernelLogger.info(s"Extracting asset file $fileName")
+          new File(newFile.getParent).mkdirs()
+          val fileOutputStream = new FileOutputStream(newFile)
+          var len = 0
+          while ( {
+            len = zipInputStream.read(buffer)
+            len > 0
+          }) {
+            fileOutputStream.write(buffer, 0, len)
+          }
+          fileOutputStream.close()
+
+          // chmod for *nix
+          if (!OS.isWindows && binaryList.contains(fileName)) {
+            import sys.process._
+            s"""chmod +x \"${newFile.getAbsolutePath}\"""".!
+          }
         }
-        fileOutputStream.close()
+        zipInputStream.closeEntry()
 
-        // chmod for *nix
-        if (!OS.isWindows && binaryList.contains(fileName)) {
-          import sys.process._
-          s"""chmod +x \"${newFile.getAbsolutePath}\"""".!
-        }
+        zipEntry = zipInputStream.getNextEntry
       }
+
       zipInputStream.closeEntry()
+      zipInputStream.close()
+      resourceStream.close()
 
-      zipEntry = zipInputStream.getNextEntry
+      true
+    } catch {
+      case _: Throwable => false
     }
-
-    zipInputStream.closeEntry()
-    zipInputStream.close()
-    resourceStream.close()
   }
 }
