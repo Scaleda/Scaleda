@@ -4,56 +4,63 @@ package kernel.net.user
 import kernel.utils.serialise.YAMLHelper
 import kernel.utils.{EnvironmentUtils, Paths}
 
-import scala.collection.mutable
-
 object ScaledaAuthorizationProvider {
-  def loadTokenPair: Map[String, UserTokenBean] = {
+  def loadTokenPair: Seq[UserTokenBean] = {
     val extras = if (EnvironmentUtils.Backup.env.contains("AUTH_DEV_MODE")) {
-      Some("127.0.0.1" -> UserTokenBean.TEST_MODE_PAIR)
+      Some(UserTokenBean.TEST_MODE_PAIR)
     } else None
     val file     = Paths.getUserAuthorization
     var hasError = false
     val loaded =
       try {
-        YAMLHelper(file, classOf[Map[String, UserTokenBean]])
+        val loaded = YAMLHelper(file, classOf[Seq[UserTokenBean]])
+        require(loaded.isInstanceOf[UserTokenBean])
+        loaded
       } catch {
         case e: Throwable =>
           hasError = true
-          Map[String, UserTokenBean]()
+          Seq()
       }
     if (hasError) saveTokenPairs(loaded)
-    if (extras.nonEmpty) loaded + extras.get
-    else loaded
+    val result =
+      if (extras.nonEmpty) loaded :+ extras.get
+      else loaded
+    require(result.isInstanceOf[Seq[UserTokenBean]])
+    result.headOption.foreach(t => require(t.isInstanceOf[UserTokenBean]))
+    result
   }
 
-  def saveTokenPair(host: String, tokenPair: UserTokenBean): Unit = {
-    val file     = Paths.getUserAuthorization
-    val original = new mutable.HashMap[String, UserTokenBean]()
-    original.addAll(loadTokenPair.filter(_._2 != UserTokenBean.TEST_MODE_PAIR))
-    original.put(host, tokenPair)
-    YAMLHelper(original.toMap, file)
+  def loadByHost(host: String) = loadTokenPair.find(_.host == host)
+
+  def saveTokenPair(tokenPair: UserTokenBean): Unit = {
+    val file = Paths.getUserAuthorization
+    val original =
+      loadTokenPair.filter(p => !p.equals(UserTokenBean.TEST_MODE_PAIR) && !p.equals(tokenPair)) :+ tokenPair
+    YAMLHelper(original, file)
   }
 
-  def saveTokenPairs(tokenPairs: Map[String, UserTokenBean]): Unit = {
+  def saveTokenPairs(tokenPairs: Seq[UserTokenBean]): Unit = {
     val file = Paths.getUserAuthorization
     YAMLHelper(tokenPairs, file)
   }
 
+  private def getPairByHost(host: String) = loadByHost(host).getOrElse(UserTokenBean(host = host))
+
   def updateToken(host: String, token: String): Unit = {
-    val tokenPair    = loadTokenPair.getOrElse(host, UserTokenBean())
+    val tokenPair    = getPairByHost(host)
     val newTokenPair = tokenPair.copy(token = token)
-    saveTokenPair(host, newTokenPair)
+    saveTokenPair(newTokenPair)
   }
 
   def updateRefreshToken(host: String, refreshToken: String): Unit = {
-    val tokenPair    = loadTokenPair.getOrElse(host, UserTokenBean(token = refreshToken))
+    val tokenPair    = getPairByHost(host).copy(token = refreshToken)
     val newTokenPair = tokenPair.copy(refreshToken = refreshToken)
-    saveTokenPair(host, newTokenPair)
+    saveTokenPair(newTokenPair)
   }
 
   def updateUsername(host: String, username: String): Unit = {
-    val tokenPair    = loadTokenPair.getOrElse(host, UserTokenBean())
+    val tokenPair    = getPairByHost(host)
     val newTokenPair = tokenPair.copy(username = username)
-    saveTokenPair(host, newTokenPair)
+    saveTokenPair(newTokenPair)
   }
 }

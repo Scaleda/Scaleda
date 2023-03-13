@@ -129,6 +129,11 @@
                                  instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
         <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage"/>
         <langCodeStyleSettingsProvider implementation="top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettingsProvider" />
+        <applicationConfigurable groupId="build"
+                                 bundle="bundles.ScaledaBundle"
+                                 key="settings.auth.name"
+                                 id="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"
+                                 instance="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"/>
     </extensions>
 
     <!-- Module, Project and SDK -->

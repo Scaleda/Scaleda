@@ -214,7 +214,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   ToolchainProfileDetector.registerDetector(this)
 
   override def handlePreset(rt: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntimeInfo] = {
-    val userTokenBean = ScaledaAuthorizationProvider.loadTokenPair.get(rt.profile.host)
+    val userTokenBean = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
     // A local username is required...
     // TODO: Move preset process to server side?
     if (rt.profile.isRemoteProfile) {

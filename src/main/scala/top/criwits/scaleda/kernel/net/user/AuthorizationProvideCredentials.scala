@@ -14,7 +14,7 @@ class AuthorizationProvideCredentials(host: String) extends CallCredentials {
       applier: CallCredentials.MetadataApplier
   ): Unit = {
     val header    = new Metadata()
-    val tokenPair = ScaledaAuthorizationProvider.loadTokenPair.get(host)
+    val tokenPair = ScaledaAuthorizationProvider.loadByHost(host)
     tokenPair.foreach(t => header.put(JwtAuthorizationInterceptor.AUTHORIZATION_META_KEY, t.token))
     if (tokenPair.nonEmpty) {
       KernelLogger.info("applyRequestMetadata", tokenPair)
