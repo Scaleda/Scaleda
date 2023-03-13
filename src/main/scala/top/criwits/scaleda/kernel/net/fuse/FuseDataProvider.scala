@@ -153,9 +153,10 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuseGrpc.RemoteFuse {
     else {
       logger.info(s"read(path=$path, size=$size, offset=$offset)")
       val rf   = new RandomAccessFile(file, "r")
+      rf.seek(offset)
       val data = new Array[Byte](size)
       // warning: this func blocks thread
-      val realRead = rf.read(data, offset, size)
+      val realRead = rf.read(data)
       ReadReply(size = realRead, data = ByteString.copyFrom(data))
     }
   }
