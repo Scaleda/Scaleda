@@ -10,12 +10,12 @@ import org.apache.commons.io.IOUtils
 
 import java.io.File
 import java.sql._
-import java.time.{Duration, Instant, ZoneId, ZonedDateTime}
-import java.util
+import java.time.Instant
 import scala.collection.mutable.ArrayBuffer
 
 class ScaledaDatabase {
-  private val jdbcUrl                      = s"jdbc:sqlite:${new File(Paths.getDatabaseDir, "scaleda.sqlite").getAbsolutePath}"
+  private val jdbcUrl = EnvironmentUtils.Backup.env
+    .getOrElse("JDBC_URL", s"jdbc:sqlite:${new File(Paths.getDatabaseDir, "scaleda.sqlite").getAbsolutePath}")
   private var inner_connection: Connection = _
 
   private def doConnect(): Unit = {
