@@ -3,8 +3,9 @@ package idea.runner.configuration
 
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
-import idea.utils.{ConsoleLogger, MainLogger}
+import idea.utils.{ConsoleLogger, MainLogger, Notification}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
+import kernel.database.UserException
 import kernel.project.config.TaskType
 import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
@@ -23,6 +24,7 @@ import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
 
+import java.util.concurrent.TimeoutException
 import scala.collection.mutable
 import scala.language.existentials
 
@@ -43,7 +45,7 @@ class ScaledaRunConfiguration(
   var profileName = ""
   // set empty to disable remote
   var profileHost = ""
-  val extraEnvs = new mutable.HashMap[String, String]
+  val extraEnvs   = new mutable.HashMap[String, String]
 
   private val STORAGE_ID: String = "scaleda"
 
@@ -150,6 +152,20 @@ class ScaledaRunConfiguration(
       Toolchain.toolchainMessageParser
         .get(runtime.target.toolchain)
         .foreach(parserProvider => ScaledaMessageParser.registerParser(runtime.id, parserProvider.messageParser))
+
+      // setup exception handler
+      thread.setUncaughtExceptionHandler((_thread: Thread, throwable: Throwable) => {
+        ScaledaMessageTab.instance.detachFromLogger(runtime.id)
+        ScaledaMessageParser.removeParser(runtime.id)
+        // TODO: i18n
+        throwable match {
+          case e: UserException =>
+            Notification().error("Authorization Error", e.getMessage, ", register or re-login")
+          case e: TimeoutException =>
+            Notification().error("Timeout", e.getMessage, ", check your connections")
+          case e: Throwable => throw e
+        }
+      })
 
       // run process in the background
       thread.start()
