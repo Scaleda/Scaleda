@@ -28,7 +28,7 @@ import_files -norecurse {{ ip }}
 
 {% for xdc in xdcList %}
 puts "Importing xdc file: {{ xdc }}"
-add_files -fileset constrs_1 {{ xdc }}
+add_files -fileset constrs_1 "{{ xdc }}"
 {% endfor %}
 
 close_project

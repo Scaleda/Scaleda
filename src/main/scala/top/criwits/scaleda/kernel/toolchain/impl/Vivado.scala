@@ -4,8 +4,8 @@ package kernel.toolchain.impl
 import idea.runner.ScaledaRuntimeInfo
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
-import kernel.project.config.TaskType.Implement
-import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
+import kernel.project.config.TaskType.{Implement, Simulation}
+import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
@@ -150,36 +150,36 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
           "run_program.tcl.j2"    -> "run_program.tcl"
         )
       )(replace) {
-    val config = ProjectConfig.getConfig()
 
-    override def context: Map[String, Any] = config
-      .map(config => {
-        def doSeperatorReplace(src: String): String = src.replace('\\', '/')
-        val top =
-          taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
-        val sim             = taskConfig.`type` == "simulation"
-        val topFile         = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
-        val testbenchSource = doSeperatorReplace(topFile.getAbsolutePath)
-        val vcdFile =
-          if (sim) doSeperatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
-        val context = Vivado.TemplateContext(
-          top = top,
-          workDir = doSeperatorReplace(executor.workingDir.getAbsolutePath),
-          device = targetConfig.options.get("device"),     // FIXME
-          `package` = targetConfig.options.get("package"), // FIXME
-          speed = targetConfig.options.get("speed"),       // FIXME
-          sourceList = KernelFileUtils
-            .getAllSourceFiles()
-            .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
-            .map(p => doSeperatorReplace(p.getAbsolutePath)),
-          sim = sim,
-          // if sim == false, then this will not be used
-          testbenchSource = testbenchSource,
-          vcdFile = vcdFile
-        )
-        Serialization.getCCParams(context)
-      })
-      .getOrElse(Map())
+    override def context: Map[String, Any] = {
+      def doSeparatorReplace(src: String): String = src.replace('\\', '/')
+      val top =
+        taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
+      val sim             = taskConfig.taskType == Simulation
+      val topFile         = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
+      val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
+      val vcdFile =
+        if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
+      val impl    = taskConfig.taskType == Implement
+      val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
+      val context = Vivado.TemplateContext(
+        top = top,
+        workDir = doSeparatorReplace(executor.workingDir.getAbsolutePath),
+        device = targetConfig.options.get("device"),     // FIXME
+        `package` = targetConfig.options.get("package"), // FIXME
+        speed = targetConfig.options.get("speed"),       // FIXME
+        sourceList = KernelFileUtils
+          .getAllSourceFiles()
+          .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
+          .map(p => doSeparatorReplace(p.getAbsolutePath)),
+        sim = sim,
+        // if sim == false, then this will not be used
+        testbenchSource = testbenchSource,
+        vcdFile = vcdFile,
+        xdcList = xdcList
+      )
+      Serialization.getCCParams(context)
+    }
   }
 
   override def detectProfiles = async {
