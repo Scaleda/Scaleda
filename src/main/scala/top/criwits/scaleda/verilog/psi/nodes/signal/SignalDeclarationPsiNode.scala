@@ -16,6 +16,14 @@ import java.util
   * @param node The [[ASTNode]]
   */
 abstract class SignalDeclarationPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with TypedDeclaration {
+  def getSignalType: SignalType = {
+    // get type field (reg, wire, tri, integer, ...)
+    val children = this.getChildren
+    val typeField = children.head.getText
+
+    // get width
+    ???
+  }
 
   /** Get type text for a signal.
     *
