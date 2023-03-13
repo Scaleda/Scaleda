@@ -13,6 +13,7 @@ import org.scalatest.matchers.should
 
 import java.io.File
 import scala.concurrent.ExecutionContext
+import scala.util.Random
 
 class FuseTransferTester extends AnyFlatSpec with should.Matchers {
   behavior of "FuseTransfer"
@@ -48,7 +49,7 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
 
   object FuseTransferClientTester {
     def run(host: String = "127.0.0.1", testIverilog: Boolean = true, testVivado: Boolean = true): Unit = {
-      ScaledaShellMain.main(Array("register", "-h", host, "-u", "chiro2", "-p", "1234"))
+      ScaledaShellMain.main(Array("register", "-h", host, "-u", "tester" + new Random().nextInt(), "-p", "1234"))
       // ScaledaShellMain.main(Array("configurations", "-C", "../scaleda-sample-project"))
       if (testIverilog)
         ScaledaShellMain.main(

@@ -302,7 +302,9 @@ object ScaledaShellMain {
               KernelLogger.info("Register done for user", shellConfig.user.getUsername)
               val loginReply = request.login(shellConfig.user.getUsername, shellConfig.user.getPassword)
               if (loginReply.ok) {
-                KernelLogger
+                KernelLogger.info("Login done for user", shellConfig.user.getUsername)
+              } else {
+                KernelLogger.warn("Cannot login for new user", shellConfig.user.getUsername, loginReply.reason)
               }
             }
           case ShellRunMode.Clean =>

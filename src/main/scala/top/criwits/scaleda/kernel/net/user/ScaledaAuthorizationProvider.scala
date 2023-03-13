@@ -34,9 +34,10 @@ object ScaledaAuthorizationProvider {
   def loadByHost(host: String) = loadTokenPair.find(_.host == host)
 
   def saveTokenPair(tokenPair: UserTokenBean): Unit = {
+    val loaded = loadTokenPair.filter(!_.host.equals(tokenPair.host))
     val appended =
-      loadTokenPair
-        .filter(p => !p.equals(UserTokenBean.TEST_MODE_PAIR) && !p.equals(tokenPair)) :+
+      loaded
+        .filter(p => !p.equals(UserTokenBean.TEST_MODE_PAIR)) :+
         tokenPair
     YAMLHelper(appended, Paths.getUserAuthorization)
   }
