@@ -165,6 +165,7 @@ class ScaledaRunConfiguration(
             Notification().error("Timeout", e.getMessage, ", check your connections")
           case e: Throwable => throw e
         }
+        handler.destroyProcessImpl()
       })
 
       // run process in the background
