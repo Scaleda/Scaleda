@@ -8,7 +8,7 @@ import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor._
 import kernel.toolchain.{Toolchain, ToolchainProfile}
-import kernel.utils.KernelLogger
+import kernel.utils.{EnvironmentUtils, KernelLogger}
 
 import io.grpc.StatusRuntimeException
 
@@ -52,15 +52,21 @@ object ScaledaRun {
         s"Cannot apply preset for ${rt.target.toolchain}! Preset supports: ${Toolchain.toolchainPresetHandler.keys}"
       )
     }
-    rtProcessed.foreach(p => {
-      val commands = toolchain.commands(p.task)
-      try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
-      catch {
-        case e: Throwable =>
-          KernelLogger.info("Exception", e, "when executing", commands, "on", remoteDeps)
-          throw e
+    if (rtProcessed.nonEmpty) {
+      if (!EnvironmentUtils.Backup.env.contains("SKIP_EXECUTION")) {
+        rtProcessed.foreach(p => {
+          val commands = toolchain.commands(p.task)
+          try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+          catch {
+            case e: Throwable =>
+              KernelLogger.info("Exception", e, "when executing", commands, "on", remoteDeps)
+              throw e
+          }
+        })
+      } else {
+        KernelLogger.warn("Skipped run:", rtProcessed.get)
       }
-    })
+    }
   }
 
   def runTaskBackground(
@@ -100,12 +106,12 @@ object ScaledaRun {
       case TaskType.Implement =>
         val selectedConstraints = task.findConstraints
         val singleFile: Option[File] = selectedConstraints.flatMap(path => {
-          val file = new File(path)
+          val file = new File(workingDir, path)
           if (file.exists() && file.isFile) Some(file)
           else None
         })
-        val singleDir = selectedConstraints.flatMap(path => {
-          val file = new File(path)
+        val singleDir: Option[File] = selectedConstraints.flatMap(path => {
+          val file = new File(workingDir, path)
           if (file.exists() && file.isDirectory) Some(file)
           else None
         })
