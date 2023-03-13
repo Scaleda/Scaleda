@@ -25,21 +25,6 @@ object RpcPatch {
       port: Int,
       enableAuthProvide: Boolean = false
   ) = {
-    // val channel =
-    //       try {
-    //         NettyChannelBuilder
-    //           .forAddress(host, port)
-    //           .enableRetry()
-    //           .usePlaintext()
-    //           .build()
-    //       } catch {
-    //         case ignored: NoSuchFieldError =>
-    //           KernelLogger.info("using idea netty-grpc client")
-    //           IdeaNettyChannelBuilder
-    //             .forAddress(new InetSocketAddress(host, port))
-    //             .build()
-    //       }
-    //     var stub = channelType(channel)
     val builder = NettyChannelBuilder
       .forAddress(host, port)
       .enableRetry()
@@ -50,22 +35,6 @@ object RpcPatch {
       stub = stub.withCallCredentials(new AuthorizationProvideCredentials)
     }
     (stub, () => channel.shutdownNow())
-  }
-
-  def getNativeClient[T <: AbstractStub[T]](
-      channelType: Channel => T,
-      host: String,
-      port: Int,
-      enableAuthProvide: Boolean = false
-  ) = {
-    val builder = ManagedChannelBuilder.forAddress(host, port)
-    builder.usePlaintext()
-    val channel = builder.build()
-    var stub    = channelType(channel)
-    if (enableAuthProvide) {
-      stub = stub.withCallCredentials(new AuthorizationProvideCredentials)
-    }
-    stub
   }
 
   def getStartServer(
