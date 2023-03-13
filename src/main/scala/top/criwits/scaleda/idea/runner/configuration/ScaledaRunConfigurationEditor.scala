@@ -79,7 +79,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
         profileStateComp.append(ScaledaBundle.message("tasks.configuration.profile.state.local"))
       })
     } else {
-      val profileAuth = ScaledaAuthorizationProvider.loadTokenPair.get(profileHost.getText)
+      val profileAuth = ScaledaAuthorizationProvider.loadByHost(profileHost.getText)
       if (profileAuth.isEmpty) {
         SwingUtilities.invokeLater(() => {
           profileStateComp.clear()
