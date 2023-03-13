@@ -75,11 +75,11 @@ class FuseTransferClientObserver(dataProvider: RemoteFuseGrpc.RemoteFuse) extend
   }
 
   override def onError(t: Throwable) = {
-    KernelLogger.warn("client onError:", t)
+    KernelLogger.info("client onError:", t)
     // if (tx != null) tx.onCompleted()
   }
 
   override def onCompleted() = {
-    KernelLogger.warn("client: onComplete")
+    KernelLogger.info("client: onComplete")
   }
 }
