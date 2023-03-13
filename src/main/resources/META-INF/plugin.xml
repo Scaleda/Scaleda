@@ -85,6 +85,12 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.ModuleInstantiationAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.ModulePortConnectionAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.MultiDrivenAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.AmbiguousClockAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.HierarchicalReferenceAnnotator" />
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
 

@@ -107,12 +107,10 @@ object VerilogLineIndentProvider {
    * @return
    */
   def getIndentString(editor: Editor, offset: Int, policy: Int): String = {
-    val indentLength = CodeStyle.getSettings(editor).getIndentOptions.INDENT_SIZE
-
     val docChars = editor.getDocument.getCharsSequence
     val settings = CodeStyle.getSettings(editor)
     val indentOptions = settings.getIndentOptions(VerilogFileType.instance)
-
+    val indentLength = indentOptions.INDENT_SIZE
     var baseIndent = ""
     if (offset > 0) {
       val indentStart = CharArrayUtil.shiftBackwardUntil(docChars, offset, "\n") + 1
