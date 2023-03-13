@@ -54,7 +54,12 @@ object ScaledaRun {
     }
     rtProcessed.foreach(p => {
       val commands = toolchain.commands(p.task)
-      CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+      try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+      catch {
+        case e: Throwable =>
+          KernelLogger.warn("Exception", e, "when executing", commands, "on", remoteDeps)
+          throw e
+      }
     })
   }
 

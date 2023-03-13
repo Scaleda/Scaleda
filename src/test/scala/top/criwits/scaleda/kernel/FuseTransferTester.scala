@@ -48,20 +48,20 @@ class FuseTransferTester extends AnyFlatSpec with should.Matchers {
   }
 
   object FuseTransferClientTester {
-    def run(): Unit = {
-      ScaledaShellMain.main(Array("register", "-h", "localhost", "-u", "chiro2", "-p", "1234"))
+    def run(host: String = "host"): Unit = {
+      ScaledaShellMain.main(Array("register", "-h", host, "-u", "chiro2", "-p", "1234"))
       // ScaledaShellMain.main(Array("configurations", "-C", "../scaleda-sample-project"))
-      // ScaledaShellMain.main(
-      //   Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", "localhost")
-      // )
       ScaledaShellMain.main(
-        Array("run", "-C", "../scaleda-sample-project", "-h", "localhost", "-t", "Vivado Simulation")
+        Array("run", "-C", "../scaleda-sample-project", "-t", "Run iverilog simulation", "-h", host)
+      )
+      ScaledaShellMain.main(
+        Array("run", "-C", "../scaleda-sample-project", "-h", host, "-t", "Vivado Simulation")
       )
     }
   }
 
-  ignore should "launch client and execute remote profile" in {
-    FuseTransferClientTester.run()
+  it should "launch client and execute remote profile" in {
+    FuseTransferClientTester.run(host = "10.250.174.187")
   }
 
 
