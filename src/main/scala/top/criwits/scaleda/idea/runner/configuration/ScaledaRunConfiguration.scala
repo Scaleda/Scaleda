@@ -2,10 +2,11 @@ package top.criwits.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
+import idea.application.config.ScaledaIdeaConfig
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntime}
-import idea.rvcd.RvcdService
 import idea.settings.auth.AuthorizationEditor
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
+import idea.waveform.WaveformHandler
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.database.UserException
 import kernel.project.config.TaskType
@@ -214,9 +215,16 @@ class ScaledaRunConfiguration(
         rt.task.taskType match {
           // Only call rvcd when simulate
           case TaskType.Simulation =>
-            project
-              .getService(classOf[RvcdService])
-              .launchWithWaveformAndSource(rt.executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
+            val config = ScaledaIdeaConfig.getConfig
+            val doHandleWaveform = () =>
+              WaveformHandler(config.waveformHandler).foreach(
+                _.handle(project, rt.executor.asInstanceOf[SimulationExecutor].vcdFile)
+              )
+            if (config.autoOpenWaveform) doHandleWaveform()
+            else {
+              // TODO: notify waveform update
+              // Notification.NOTIFICATION_GROUP.createNotification()
+            }
           // TODO / FIXME: Source is not given
           case _ =>
         }
