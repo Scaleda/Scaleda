@@ -147,7 +147,9 @@ object IVerilog extends ToolchainPresetProvider {
       lineOffsetStart = lineStart
     )
     val rtWithContext = rt.copy(context =
-      rt.context ++ Map("replaceFiles" -> replaceFiles) ++ Map("sourceFiles" -> KernelFileUtils.getAllSourceFiles())
+      rt.context ++ Map("replaceFiles" -> replaceFiles) ++ Map(
+        "sourceFiles" -> (KernelFileUtils.getAllSourceFiles() :+ testbenchFile)
+      )
     )
     Some(rtWithContext)
   }

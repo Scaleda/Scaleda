@@ -7,11 +7,10 @@ import com.intellij.openapi.project.Project
 import java.io.File
 
 object RvcdHandler extends WaveformHandler {
-  override def handle(project: Project, waveformPath: File): Unit = {
-    // TODO / FIXME: Source is not given
+  override def handle(project: Project, waveformPath: File, sourceFiles: Seq[File]): Unit = {
     project
       .getService(classOf[RvcdService])
-      .launchWithWaveformAndSource(waveformPath, Seq.empty)
+      .launchWithWaveformAndSource(waveformPath, sourceFiles)
   }
 
   override def getId: String = "rvcd"

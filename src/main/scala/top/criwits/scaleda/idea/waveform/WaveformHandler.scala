@@ -12,7 +12,7 @@ trait WaveformHandler {
     * @param project project
     * @param waveformPath file
     */
-  def handle(project: Project, waveformPath: File): Unit
+  def handle(project: Project, waveformPath: File, sourceFiles: Seq[File]): Unit
 }
 
 object WaveformHandler {

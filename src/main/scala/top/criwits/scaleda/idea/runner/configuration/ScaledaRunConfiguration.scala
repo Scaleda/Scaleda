@@ -35,6 +35,7 @@ import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
 
+import java.io.File
 import java.util.concurrent.TimeoutException
 import scala.collection.mutable
 import scala.language.existentials
@@ -130,122 +131,6 @@ class ScaledaRunConfiguration(
         .createBuilder(project, searchScope)
 
     val console = myConsoleBuilder.getConsole
-    def afterExecution(
-        rt: ScaledaRuntime,
-        returnValues: Seq[Int],
-        finishedAll: Boolean,
-        meetErrors: Boolean
-    ): Unit = {
-      // TODO: if errors, switch to message tab
-      if (meetErrors) {
-        // Assert: must be called on EDT
-        // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
-        runInEdt {
-          // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
-          // ToolWindowManager.getInstance(project).getFocusManager.requestFocusInProject(ScaledaMessageTab.instance, project)
-          // ScaledaMessageTab.instance.requestFocusInWindow()
-          // ToolWindowManager.getInstance(project).
-          // not working
-          ScaledaMessageTab.instance.switchToTab()
-        }
-        // DumbService
-        //   .getInstance(project)
-        //   .runWhenSmart(() => {
-        //     ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
-        //   })
-
-        // ToolWindowManager.getInstance(project).getFocusManager
-        // ScaledaMessageTab.instance.switchToTab()
-
-        val causeMessage     = ScaledaMessageTab.instance.getCauseMessage(rt.id)
-        val causeCodeMessage = ScaledaMessageTab.instance.getCauseCode(rt.id)
-
-        // create notification
-        val notification = Notification.NOTIFICATION_GROUP.createNotification(
-          ScaledaBundle.message("notification.runner.error.execute.title"),
-          ScaledaBundle.message(
-            "notification.runner.error.execute.content.prefix",
-            causeMessage
-              .map(m => m.text)
-              .getOrElse(ScaledaBundle.message("notification.runner.error.execute.content.default"))
-          ),
-          Notification.levelMatch(LogLevel.Error)
-        )
-        notification.setSubtitle(ScaledaBundle.message("notification.runner.error.execute.subtitle"))
-        notification.setContextHelpAction(
-          new AnAction(
-            ScaledaBundle.message("notification.runner.error.execute.action.help.title"),
-            ScaledaBundle.message("notification.runner.error.execute.action.help.description"),
-            AllIcons.Actions.Help
-          ) {
-            override def actionPerformed(e: AnActionEvent) = {
-              // TODO: Help dialog
-              MainLogger.warn("help", e)
-            }
-          }
-        )
-        causeMessage.foreach(m => {
-          notification.addAction(
-            new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
-              override def actionPerformed(e: AnActionEvent) = {
-                // TODO: goto message window
-                ScaledaMessageTab.instance.switchToTab()
-              }
-            }
-          )
-        })
-        causeCodeMessage.foreach(m => {
-          notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
-            override def actionPerformed(e: AnActionEvent) = {
-              require(m.file.nonEmpty, "causeCodeMessage.file isEmpty")
-              val descriptor = new OpenFileDescriptor(
-                project,
-                new LocalFilePath(m.file.get, false).getVirtualFile,
-                m.line.getOrElse(0),
-                0
-              )
-              descriptor.navigate(true)
-            }
-          })
-        })
-        notification.notify(project)
-      }
-      // remove message listeners
-      ScaledaMessageTab.instance.detachFromLogger(rt.id)
-      ScaledaMessageParser.removeParser(rt.id)
-      if (!meetErrors) {
-        rt.task.taskType match {
-          // Only call rvcd when simulate
-          case TaskType.Simulation =>
-            val config = ScaledaIdeaConfig.getConfig
-            val doHandleWaveform = () =>
-              WaveformHandler(config.waveformHandler).foreach(
-                _.handle(project, rt.executor.asInstanceOf[SimulationExecutor].vcdFile)
-              )
-            if (config.autoOpenWaveform) doHandleWaveform()
-            else if (config.notifyWaveformUpdate) {
-              val notification =
-                Notification.NOTIFICATION_GROUP.createNotification(
-                  ScaledaBundle.message("notification.runner.ok.simulation"),
-                  ScaledaBundle.message("notification.runner.ok.simulation.waveform"),
-                  NotificationType.INFORMATION
-                )
-              val action = if (config.waveformHandler == RvcdHandler.getId && RvcdService.hasInstance) {
-                new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.reload")) {
-                  override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
-                }
-              } else {
-                new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.open")) {
-                  override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
-                }
-              }
-              notification.addAction(action)
-              notification.notify(project)
-            }
-          case _ =>
-        }
-      }
-    }
 
     val runtimeOptional = ScaledaRun
       .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
@@ -314,6 +199,127 @@ class ScaledaRunConfiguration(
         override def getActions: Array[AnAction] = Array()
 
         override def getProcessHandler: ProcessHandler = handler
+      }
+    }
+  }
+
+  private def afterExecution(
+      rt: ScaledaRuntime,
+      returnValues: Seq[Int],
+      finishedAll: Boolean,
+      meetErrors: Boolean
+  ): Unit = {
+    // TODO: if errors, switch to message tab
+    if (meetErrors) {
+      // Assert: must be called on EDT
+      // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
+      runInEdt {
+        // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
+        // ToolWindowManager.getInstance(project).getFocusManager.requestFocusInProject(ScaledaMessageTab.instance, project)
+        // ScaledaMessageTab.instance.requestFocusInWindow()
+        // ToolWindowManager.getInstance(project).
+        // not working
+        ScaledaMessageTab.instance.switchToTab()
+      }
+      // DumbService
+      //   .getInstance(project)
+      //   .runWhenSmart(() => {
+      //     ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
+      //   })
+
+      // ToolWindowManager.getInstance(project).getFocusManager
+      // ScaledaMessageTab.instance.switchToTab()
+
+      val causeMessage     = ScaledaMessageTab.instance.getCauseMessage(rt.id)
+      val causeCodeMessage = ScaledaMessageTab.instance.getCauseCode(rt.id)
+
+      // create notification
+      val notification = Notification.NOTIFICATION_GROUP.createNotification(
+        ScaledaBundle.message("notification.runner.error.execute.title"),
+        ScaledaBundle.message(
+          "notification.runner.error.execute.content.prefix",
+          causeMessage
+            .map(m => m.text)
+            .getOrElse(ScaledaBundle.message("notification.runner.error.execute.content.default"))
+        ),
+        Notification.levelMatch(LogLevel.Error)
+      )
+      notification.setSubtitle(ScaledaBundle.message("notification.runner.error.execute.subtitle"))
+      notification.setContextHelpAction(
+        new AnAction(
+          ScaledaBundle.message("notification.runner.error.execute.action.help.title"),
+          ScaledaBundle.message("notification.runner.error.execute.action.help.description"),
+          AllIcons.Actions.Help
+        ) {
+          override def actionPerformed(e: AnActionEvent) = {
+            // TODO: Help dialog
+            MainLogger.warn("help", e)
+          }
+        }
+      )
+      causeMessage.foreach(m => {
+        notification.addAction(
+          new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
+            override def actionPerformed(e: AnActionEvent) = {
+              // TODO: goto message window
+              ScaledaMessageTab.instance.switchToTab()
+            }
+          }
+        )
+      })
+      causeCodeMessage.foreach(m => {
+        notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
+          override def actionPerformed(e: AnActionEvent) = {
+            require(m.file.nonEmpty, "causeCodeMessage.file isEmpty")
+            val descriptor = new OpenFileDescriptor(
+              project,
+              new LocalFilePath(m.file.get, false).getVirtualFile,
+              m.line.getOrElse(0),
+              0
+            )
+            descriptor.navigate(true)
+          }
+        })
+      })
+      notification.notify(project)
+    }
+    // remove message listeners
+    ScaledaMessageTab.instance.detachFromLogger(rt.id)
+    ScaledaMessageParser.removeParser(rt.id)
+    if (!meetErrors) {
+      rt.task.taskType match {
+        // Only call waveform when simulate
+        case TaskType.Simulation =>
+          val config = ScaledaIdeaConfig.getConfig
+          val doHandleWaveform = () =>
+            WaveformHandler(config.waveformHandler).foreach(
+              _.handle(
+                project,
+                rt.executor.asInstanceOf[SimulationExecutor].vcdFile,
+                rt.context.get("sourceFiles").map(_.asInstanceOf[Seq[File]]).getOrElse(Seq())
+              )
+            )
+          if (config.autoOpenWaveform) doHandleWaveform()
+          else if (config.notifyWaveformUpdate) {
+            val notification =
+              Notification.NOTIFICATION_GROUP.createNotification(
+                ScaledaBundle.message("notification.runner.ok.simulation"),
+                ScaledaBundle.message("notification.runner.ok.simulation.waveform"),
+                NotificationType.INFORMATION
+              )
+            val action = if (config.waveformHandler == RvcdHandler.getId && RvcdService.hasInstance) {
+              new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.reload")) {
+                override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
+              }
+            } else {
+              new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.open")) {
+                override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
+              }
+            }
+            notification.addAction(action)
+            notification.notify(project)
+          }
+        case _ =>
       }
     }
   }
