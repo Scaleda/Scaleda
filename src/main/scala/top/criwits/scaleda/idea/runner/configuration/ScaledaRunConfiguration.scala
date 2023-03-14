@@ -189,7 +189,7 @@ class ScaledaRunConfiguration(
           )
         })
         causeCodeMessage.foreach(m => {
-          new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
+          notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
             override def actionPerformed(e: AnActionEvent) = {
               require(m.file.nonEmpty, "causeCodeMessage.file isEmpty")
               val descriptor = new OpenFileDescriptor(
@@ -200,7 +200,7 @@ class ScaledaRunConfiguration(
               )
               descriptor.navigate(true)
             }
-          }
+          })
         })
         notification.notify(project)
       }
