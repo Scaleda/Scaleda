@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package idea.runner.configuration
 
+import idea.ScaledaBundle
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
 import idea.settings.auth.AuthorizationEditor
@@ -127,7 +128,7 @@ class ScaledaRunConfiguration(
         finishedAll: Boolean,
         meetErrors: Boolean
     ): Unit = {
-      // if errors, switch to message tab
+      // TODO: if errors, switch to message tab
       if (meetErrors) {
         // Assert: must be called on EDT
         // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
@@ -150,24 +151,33 @@ class ScaledaRunConfiguration(
 
         // create notification
         val notification = Notification.NOTIFICATION_GROUP.createNotification(
-          "Error",
-          "Content",
+          ScaledaBundle.message("notification.runner.error.execute.title"),
+          "content",
           Notification.levelMatch(LogLevel.Error)
         )
-        notification.setSubtitle("Subtitle")
-        notification.setContextHelpAction(new AnAction("help", "Desp", AllIcons.Actions.Help) {
-          override def actionPerformed(e: AnActionEvent) = {
-            MainLogger.warn("help", e)
-          }
-        })
-        Seq(
-          new AnAction("Goto Message") {
+        notification.setSubtitle(ScaledaBundle.message("notification.runner.error.execute.subtitle"))
+        notification.setContextHelpAction(
+          new AnAction(
+            ScaledaBundle.message("notification.runner.error.execute.action.help.title"),
+            ScaledaBundle.message("notification.runner.error.execute.action.help.description"),
+            AllIcons.Actions.Help
+          ) {
             override def actionPerformed(e: AnActionEvent) = {
+              // TODO: Help dialog
+              MainLogger.warn("help", e)
+            }
+          }
+        )
+        Seq(
+          new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
+            override def actionPerformed(e: AnActionEvent) = {
+              // TODO: goto message window
               ScaledaMessageTab.instance.switchToTab()
             }
           },
-          new AnAction("Goto Error Source") {
+          new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
             override def actionPerformed(e: AnActionEvent) = {
+              // TODO: Goto Source Code
             }
           }
         ).foreach(notification.addAction)
@@ -215,17 +225,19 @@ class ScaledaRunConfiguration(
         // detach message parser listener
         ScaledaMessageTab.instance.detachFromLogger(runtime.id)
         ScaledaMessageParser.removeParser(runtime.id)
-        // TODO: i18n
         throwable match {
           case e: UserException =>
             val notification = Notification.NOTIFICATION_GROUP
-              .createNotification("Authorization Error", e.getMessage, Notification.levelMatch(LogLevel.Error))
-            notification.addAction(new AnAction("Setup Scaleda Accounts") {
+              .createNotification(
+                ScaledaBundle.message("notification.runner.error.auth.title"),
+                e.getMessage,
+                Notification.levelMatch(LogLevel.Error)
+              )
+            notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.auth.action")) {
               override def actionPerformed(e: AnActionEvent) = {
                 ShowSettingsUtilImpl.showSettingsDialog(project, AuthorizationEditor.SETTINGS_ID, "")
               }
             })
-          // Notification().error("Authorization Error", e.getMessage, ", register or re-login")
           case e: TimeoutException =>
             Notification().error("Timeout", e.getMessage, ", check your connections")
           case e: Throwable => throw e
