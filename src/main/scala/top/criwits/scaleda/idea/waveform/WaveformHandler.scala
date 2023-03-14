@@ -17,7 +17,8 @@ trait WaveformHandler {
 
 object WaveformHandler {
   def availableHandlers: Map[String, WaveformHandler] = Map(
-    RvcdHandler.getId -> RvcdHandler
+    RvcdHandler.getId    -> RvcdHandler,
+    GTKWaveHandler.getId -> GTKWaveHandler
   )
   def apply(id: String) = availableHandlers.get(id)
 }
