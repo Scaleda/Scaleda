@@ -48,7 +48,6 @@ class ScaledaMain extends StartupActivity {
       builder.anchor = ToolWindowAnchor.RIGHT
       // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
       val toolWindow = toolWindowManager.registerToolWindow(builder.build())
-
     })
 
     toolWindowManager.invokeLater(() => {
@@ -57,6 +56,7 @@ class ScaledaMain extends StartupActivity {
       builder.icon = Icons.mainSmall
       builder.contentFactory = new ScaledaToolWindowFactory
       builder.anchor = ToolWindowAnchor.BOTTOM
+      builder.shouldBeAvailable = true
 
       val messageWindow = toolWindowManager.registerToolWindow(builder.build())
     })

@@ -4,7 +4,7 @@ package idea.windows.tool.message
 import idea.ScaledaBundle
 import idea.runner.ScaledaRuntimeInfo
 import idea.utils.MainLogger
-import idea.windows.tool.logging.ScaledaLoggingService
+import idea.windows.tool.logging.{ConsoleTabManager, ScaledaLoggingService}
 import kernel.utils.LogLevel
 
 import com.intellij.icons.AllIcons
@@ -31,6 +31,16 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 
   private val data         = new mutable.HashMap[String, (ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])]()
   private val viewComboBox = new ComboBox[String]()
+
+  def getDisplayName                                = ScaledaBundle.message("windows.tool.log.message.title")
+  private var tabManager: Option[ConsoleTabManager] = None
+  def setTabManager(p: Option[ConsoleTabManager])   = tabManager = p
+  def getTabManager                                 = tabManager
+  def switchToTab(): Unit = {
+    tabManager.foreach(t => {
+      if (!t.setSelectedContent(getDisplayName)) MainLogger.warn("Cannot switch to message tab!")
+    })
+  }
 
   private val allLevels = Seq(
     LogLevel.Debug,
@@ -90,28 +100,31 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 
   private val messageQueue = new LinkedBlockingQueue[(ScaledaRuntimeInfo, ScaledaMessage)]()
 
-  private val messageHandleThread = new Thread(() => {
-    var running = true
-    while (running) {
-      try {
-        val (rt, message) = messageQueue.take()
-        if (viewComboBox.getItem == rt.id && enabledLevel.contains(message.level)) {
-          dataModel.synchronized {
-            dataModel.addElement(message)
+  private val messageHandleThread = new Thread(
+    () => {
+      var running = true
+      while (running) {
+        try {
+          val (rt, message) = messageQueue.take()
+          if (viewComboBox.getItem == rt.id && enabledLevel.contains(message.level)) {
+            dataModel.synchronized {
+              dataModel.addElement(message)
+            }
+            sortData()
           }
-          sortData()
+          data.synchronized {
+            if (data.contains(rt.id)) data(rt.id)._2.addOne(message)
+            else data.put(rt.id, (rt, ArrayBuffer(message)))
+          }
+          // A delay is necessary, or items in list will flash
+          Thread.sleep(50)
+        } catch {
+          case e: InterruptedException => running = false
         }
-        data.synchronized {
-          if (data.contains(rt.id)) data(rt.id)._2.addOne(message)
-          else data.put(rt.id, (rt, ArrayBuffer(message)))
-        }
-        // A delay is necessary, or items in list will flash
-        Thread.sleep(50)
-      } catch {
-        case e: InterruptedException => running = false
       }
-    }
-  }, "message-tab-handler")
+    },
+    "message-tab-handler"
+  )
   messageHandleThread.start()
 
   def attach(runtime: ScaledaRuntimeInfo): Unit = {
@@ -258,6 +271,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 
   override def dispose() = {
     ScaledaMessageTab.INSTANCE = null
+    tabManager = None
     messageHandleThread.interrupt()
     val service = project.getService(classOf[ScaledaLoggingService])
     service.removeListener(msgSourceId)
@@ -271,5 +285,9 @@ object ScaledaMessageTab {
 
   def instance = INSTANCE
 
-  def apply(project: Project) = if (instance != null) instance else new ScaledaMessageTab(project)
+  def apply(project: Project, tabManager: Option[ConsoleTabManager] = None) = {
+    val ret = if (instance != null) instance else new ScaledaMessageTab(project)
+    if (tabManager.nonEmpty) ret.setTabManager(tabManager)
+    ret
+  }
 }

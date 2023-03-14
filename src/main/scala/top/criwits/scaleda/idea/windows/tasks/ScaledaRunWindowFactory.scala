@@ -2,7 +2,10 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
+import idea.runner.task.edit.{ScaledaCreateNewTargetAction, ScaledaCreateNewTaskAction}
 import idea.runner.task.{ScaledaReloadTasksAction, ScaledaRunToolWindowTaskAction, ScaledaTaskPopupMenuAction}
+import idea.utils.{MainLogger, ProjectNow, invokeLater}
+import idea.windows.tasks.ScaledaRunWindowFactory.model
 import kernel.project.config.{ProjectConfig, TaskConfig}
 
 import com.intellij.execution.impl.RunManagerImpl
@@ -16,22 +19,33 @@ import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
-import top.criwits.scaleda.idea.runner.task.edit.{ScaledaCreateNewTargetAction, ScaledaCreateNewTaskAction}
-import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory.model
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
-import javax.swing.{JPanel, SwingUtilities}
 import javax.swing.tree.DefaultTreeModel
+import javax.swing.{JPanel, SwingUtilities}
 
 class ScaledaRunWindowFactory extends ToolWindowFactory {
+  private var created = false
+
+  override def init(toolWindow: ToolWindow) = {
+    super.init(toolWindow)
+    MainLogger.info("ScaledaRunWindowFactory#init")
+    invokeLater {
+      ProjectNow().foreach(p => createToolWindowContent(p, toolWindow))
+    }
+  }
+
   override def createToolWindowContent(
       project: Project,
       toolWindow: ToolWindow
   ): Unit = {
+    if (created) return
+    else created = true
+    MainLogger.info("ScaledaRunWindowFactory#createToolWindowContent")
     toolWindow.setTitle(ScaledaBundle.message("tasks.tool.window.title"))
     val contentManager = toolWindow.getContentManager
-    val options = new ScaledaRunToolWindowOption(project)
+    val options        = new ScaledaRunToolWindowOption(project)
     DumbService
       .getInstance(project)
       .runWhenSmart(() => {
@@ -81,9 +95,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         )
         tree.addMouseListener(new MouseAdapter {
           override def mousePressed(e: MouseEvent) = {
-            if (
-              e != null && e.getClickCount == 2 && e.getButton == MouseEvent.BUTTON1
-            ) {
+            if (e != null && e.getClickCount == 2 && e.getButton == MouseEvent.BUTTON1) {
               ActionManager
                 .getInstance()
                 .tryToExecute(runTaskAction, e, tree, "", true)
@@ -95,7 +107,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         tree.addMouseListener(new MouseAdapter {
           override def mouseClicked(e: MouseEvent): Unit = {
             if (SwingUtilities.isRightMouseButton(e)) {
-              ActionManager.getInstance().tryToExecute(new ScaledaTaskPopupMenuAction(tree, e, runTaskAction, project), e, tree, null, true)
+              ActionManager
+                .getInstance()
+                .tryToExecute(new ScaledaTaskPopupMenuAction(tree, e, runTaskAction, project), e, tree, null, true)
             }
           }
         })
@@ -135,7 +149,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
           .getInstance()
           .createActionToolbar("ScaledaRunToolbar", group, true)
         toolbar.setTargetComponent(tree)
-        val toolBarPanel = new JPanel(new GridLayout())
+        val toolBarPanel     = new JPanel(new GridLayout())
         val toolbarComponent = toolbar.getComponent
         require(toolbarComponent != null)
         toolBarPanel.add(toolbarComponent)
@@ -146,9 +160,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 }
 
 object ScaledaRunWindowFactory {
-  val WINDOW_ID = "Scaleda Tasks"
+  val WINDOW_ID                       = ScaledaBundle.message("tasks.configuration.name")
   var model: Option[DefaultTreeModel] = None
-  var expandAll: Option[AnAction] = None
+  var expandAll: Option[AnAction]     = None
 
   def getRootNode: ScaledaRunRootNode = {
     ProjectConfig
@@ -158,6 +172,7 @@ object ScaledaRunWindowFactory {
           c.name,
           c.targets.map(t => new ScaledaRunTargetNode(t)).toList
         )
-      }).orNull
+      })
+      .orNull
   }
 }

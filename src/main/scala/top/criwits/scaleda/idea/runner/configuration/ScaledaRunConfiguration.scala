@@ -3,7 +3,7 @@ package idea.runner.configuration
 
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
-import idea.utils.{ConsoleLogger, MainLogger, Notification}
+import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.database.UserException
 import kernel.project.config.TaskType
@@ -19,7 +19,8 @@ import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.options.SettingsEditor
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.{DumbService, Project}
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
@@ -117,18 +118,37 @@ class ScaledaRunConfiguration(
         .createBuilder(project, searchScope)
 
     val console = myConsoleBuilder.getConsole
-    def afterExecution(rt: ScaledaRuntimeInfo): Unit = {
+    def afterExecution(rt: ScaledaRuntimeInfo, returnValues: Seq[Int], finishedAll: Boolean, meetErrors: Boolean): Unit = {
+      // if errors, switch to message tab
+      if (meetErrors) {
+        // Assert: must be called on EDT
+        // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
+        runInEdt {
+          // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
+          ToolWindowManager.getInstance(project).getFocusManager.requestFocusInProject(ScaledaMessageTab.instance, project)
+        }
+        // DumbService
+        //   .getInstance(project)
+        //   .runWhenSmart(() => {
+        //     ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
+        //   })
+
+        // ToolWindowManager.getInstance(project).getFocusManager
+        // ScaledaMessageTab.instance.switchToTab()
+      }
       // remove message listeners
       ScaledaMessageTab.instance.detachFromLogger(rt.id)
       ScaledaMessageParser.removeParser(rt.id)
-      rt.task.taskType match {
-        // Only call rvcd when simulate
-        case TaskType.Simulation =>
-          project
-            .getService(classOf[RvcdService])
-            .launchWithWaveformAndSource(rt.executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
-        // TODO / FIXME: Source is not given
-        case _ =>
+      if (!meetErrors) {
+        rt.task.taskType match {
+          // Only call rvcd when simulate
+          case TaskType.Simulation =>
+            project
+              .getService(classOf[RvcdService])
+              .launchWithWaveformAndSource(rt.executor.asInstanceOf[SimulationExecutor].vcdFile, Seq.empty)
+          // TODO / FIXME: Source is not given
+          case _ =>
+        }
       }
     }
 

@@ -38,5 +38,15 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
     if (switchTo) contentManager.setSelectedContent(content)
   }
 
+  def setSelectedContent(name: String): Boolean = {
+    val found = contentManager.findContent(name)
+    if (found != null) {
+      contentManager.setSelectedContent(found)
+      true
+    } else {
+      false
+    }
+  }
+
   override def dispose(): Unit = {}
 }

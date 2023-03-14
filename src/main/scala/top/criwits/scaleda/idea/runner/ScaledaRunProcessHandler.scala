@@ -11,6 +11,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.openapi.project.Project
 
 import java.io.OutputStream
+import scala.collection.mutable.ArrayBuffer
 
 /** Handle a task process locally or remotely
   * @param logger using logger
@@ -21,7 +22,7 @@ class ScaledaRunProcessHandler(
     project: Project,
     logger: BasicLogger,
     rt: ScaledaRuntimeInfo,
-    invokeAfterFinish: ScaledaRuntimeInfo => Unit = rt => {}
+    invokeAfterFinish: (ScaledaRuntimeInfo, Seq[Int], Boolean, Boolean) => Unit
 ) extends ProcessHandler
     with ScaledaRunHandler {
   // Set terminating <- `true` to invoke stopping
@@ -29,14 +30,16 @@ class ScaledaRunProcessHandler(
   // terminated will be set `true` after process really terminated
   var terminated = false
 
+  val returnValues = ArrayBuffer[Int]()
+
   /** Called when destroy button clicked
     */
   override def destroyProcessImpl(): Unit = {
     MainLogger.warn(
-      s"destroyProcessImpl, running: ${terminated}, stopping: ${terminating}"
+      s"destroyProcessImpl, running: $terminated, stopping: $terminating"
     )
     terminating = true
-    notifyProcessTerminated(ret)
+    notifyProcessTerminated(returnValues.headOption.getOrElse(0))
   }
 
   override def detachProcessImpl(): Unit = {
@@ -73,8 +76,6 @@ class ScaledaRunProcessHandler(
     outputLogger.warn(data)
   }
 
-  var ret: Int = 0
-
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     val msg = ScaledaBundle.message("task.run.return.text", returnValue)
     if (meetErrors) {
@@ -85,12 +86,12 @@ class ScaledaRunProcessHandler(
       logger.debug(msg)
       outputLogger.debug(msg)
     }
-    ret = returnValue
+    returnValues.append(returnValue)
     if (finishedAll || meetErrors) {
       terminating = false
       terminated = true
       // invoke only success all
-      if (!meetErrors) invokeAfterFinish(rt)
+      invokeAfterFinish(rt, returnValues.toSeq, finishedAll, meetErrors)
     }
   }
 
