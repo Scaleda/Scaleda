@@ -138,7 +138,7 @@ object IVerilog extends ToolchainPresetProvider {
     val replaceFiles = rt.context
       .get("replaceFiles")
       .map(_.asInstanceOf[Seq[FileReplaceContext]])
-      .getOrElse(Seq()) :+ FileReplaceContext(from = testbenchFile, to = newTestbenchFile)
+      .getOrElse(Seq()) :+ FileReplaceContext(from = testbenchFile, to = newTestbenchFile, lineOffset = +4)
     val rtWithContext = rt.copy(context = rt.context ++ Map("replaceFiles" -> replaceFiles))
     Some(rtWithContext)
   }

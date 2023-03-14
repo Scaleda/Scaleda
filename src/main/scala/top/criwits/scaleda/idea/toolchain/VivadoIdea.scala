@@ -9,7 +9,7 @@ import kernel.utils.LogLevel
 import java.util.regex.Pattern
 
 object VivadoIdea extends ScaledaMessageToolchainParserProvider {
-  object MessageParser extends ScaledaMessageToolchainDefaultParser {
+  object MessageParser extends ScaledaMessageToolchainParser {
     override def parse(rt: ScaledaRuntime, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
       val prepared = super.parse(rt, text, level)
       val p        = Pattern.compile("(INFO|WARNING|ERROR): \\[(.+)] ?(.+)")

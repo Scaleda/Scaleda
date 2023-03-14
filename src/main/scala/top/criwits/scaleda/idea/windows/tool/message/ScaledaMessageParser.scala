@@ -11,15 +11,11 @@ import java.util.regex.Pattern
 import scala.collection.mutable
 
 trait ScaledaMessageToolchainParser {
-  def parse(rt: ScaledaRuntime, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage]
-}
+  def parse(rt: ScaledaRuntime, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = Some(
+    defaultParse(rt, text, level)
+  )
 
-trait ScaledaMessageToolchainParserProvider {
-  def messageParser: ScaledaMessageToolchainParser
-}
-
-class ScaledaMessageToolchainDefaultParser extends ScaledaMessageToolchainParser {
-  override def parse(rt: ScaledaRuntime, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+  protected def defaultParse(rt: ScaledaRuntime, @Nls text: String, level: LogLevel.Value): ScaledaMessage = {
     val levelPattern = Pattern.compile("\\b(info|warn|warning|error|fatal)\\b", Pattern.CASE_INSENSITIVE)
     val levelMatcher = levelPattern.matcher(text)
     // find first level
@@ -45,11 +41,15 @@ class ScaledaMessageToolchainDefaultParser extends ScaledaMessageToolchainParser
         }
       (Option(path), line)
     } else (None, None)
-    Some(ScaledaMessage(text = text, level = messageLevel, line = fileLine, file = filePath))
+    ScaledaMessage(text = text, level = messageLevel, line = fileLine, file = filePath)
   }
 }
 
-object ScaledaMessageToolchainDefaultParserImpl extends ScaledaMessageToolchainDefaultParser
+trait ScaledaMessageToolchainParserProvider {
+  def messageParser: ScaledaMessageToolchainParser
+}
+
+object ScaledaMessageToolchainDefaultParserImpl extends ScaledaMessageToolchainParser
 
 object ScaledaMessageParser {
   private val allParsers = new mutable.HashMap[String, ScaledaMessageToolchainParser]()
@@ -65,8 +65,8 @@ object ScaledaMessageParser {
   * @param handler callback for logging service
   */
 class ScaledaMessageParser(
-                            rt: ScaledaRuntime,
-                            handler: ScaledaMessage => Unit
+    rt: ScaledaRuntime,
+    handler: ScaledaMessage => Unit
 ) extends ScaledaLogReceiver {
   override def print(
       source: String,

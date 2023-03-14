@@ -9,7 +9,7 @@ import kernel.utils.LogLevel
 import org.jetbrains.annotations.Nls
 
 object IVerilogIdea extends ScaledaMessageToolchainParserProvider {
-  private object MessageParser extends ScaledaMessageToolchainDefaultParser {
+  private object MessageParser extends ScaledaMessageToolchainParser {
     override def parse(rt: ScaledaRuntime, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
       if (text.nonEmpty && level.id >= LogLevel.Info.id) {
         super.parse(rt, text, level)
