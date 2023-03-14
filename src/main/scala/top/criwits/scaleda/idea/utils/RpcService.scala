@@ -2,20 +2,16 @@ package top.criwits.scaleda
 package idea.utils
 
 import kernel.net.RpcPatch
-import kernel.net.fuse.FuseDataProvider
-import kernel.net.fuse.fs.RemoteFuseGrpc
 import kernel.utils.{KernelLogger, Paths}
-import verilog.VerilogPSIFileRoot
 
-import com.intellij.codeInsight.navigation.NavigationUtil
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.LocalFilePath
-import com.intellij.psi.PsiManager
-import com.intellij.util.messages.Topic
 import io.grpc.Server
 import scaleda.scaleda.{ScaledaEmpty, ScaledaGotoSource, ScaledaRpcGrpc}
 
+import java.util.concurrent.LinkedBlockingQueue
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,7 +43,7 @@ class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.Scaled
       // KernelLogger.info("descriptor", descriptor)
       // descriptor.navigate(true)
 
-      project().getMessageBus.syncPublisher(RpcService.TOPIC).navigate(project(), request)
+      // project().getMessageBus.syncPublisher(RpcService.TOPIC).navigate(project(), request)
 
       // val reqService: NavigationRequest = NavigationService.instance().sourceNavigationRequest(new LocalFilePath(request.file, false).getVirtualFile, 0)
       // KernelLogger.warn(s"reqService: $reqService")
@@ -56,6 +52,7 @@ class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.Scaled
       // SymbolNavigationService.getInstance().psiFileNavigationTarget(psi)
       // SymbolNavigationService.getInstance().psiElementNavigationTarget(psi)
     }
+    RpcService.pushGotoInfo(RpcService.RpcGotoInfo(request.file, request.line, request.column))
     ScaledaEmpty.of()
   }
 }
@@ -69,37 +66,40 @@ class RpcService extends Disposable {
 
   var stop                   = false
   var server: Option[Server] = None
-  val thread = new Thread(() => {
-    while (!stop) {
-      val sourcePath       = Paths.pwd.getAbsolutePath
-      val executionContext = ExecutionContext.global
-      try {
-        // TODO: Add all IDEA grpc services here
-        server = Some(
-          RpcPatch.getStartServer(
-            Seq(
-              // IDEA interaction
-              ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), executionContext),
-              // Fuse as data provider
-              // RemoteFuseGrpc.bindService(
-              //   new FuseDataProvider(sourcePath),
-              //   executionContext
-              // )
-            ),
-            DEFAULT_PORT
+  val thread = new Thread(
+    () => {
+      while (!stop) {
+        val sourcePath       = Paths.pwd.getAbsolutePath
+        val executionContext = ExecutionContext.global
+        try {
+          // TODO: Add all IDEA grpc services here
+          server = Some(
+            RpcPatch.getStartServer(
+              Seq(
+                // IDEA interaction
+                ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), executionContext)
+                // Fuse as data provider
+                // RemoteFuseGrpc.bindService(
+                //   new FuseDataProvider(sourcePath),
+                //   executionContext
+                // )
+              ),
+              DEFAULT_PORT
+            )
           )
-        )
-        server.get.awaitTermination()
-      } catch {
-        case _: InterruptedException =>
-          KernelLogger.warn("gRPC Service stopped")
-        case _e: Throwable =>
-          MainLogger.warn("trying", _e)
-          _e.printStackTrace()
-          Thread.sleep(3000)
+          server.get.awaitTermination()
+        } catch {
+          case _: InterruptedException =>
+            KernelLogger.warn("gRPC Service stopped")
+          case _e: Throwable =>
+            MainLogger.warn("trying", _e)
+            _e.printStackTrace()
+            Thread.sleep(3000)
+        }
       }
-    }
-  }, "rpc-server-service")
+    },
+    "rpc-server-service"
+  )
   thread.start()
 
   override def dispose() = {
@@ -111,17 +111,47 @@ class RpcService extends Disposable {
 }
 
 object RpcService {
-  class RpcGotoTopic {
-    def navigate(project: Project, request: ScaledaGotoSource) = {
-      KernelLogger.info(s"RpcGotoTopic(request=$request)")
-      val psi = PsiManager
-        .getInstance(project)
-        .findFile(new LocalFilePath(request.file, false).getVirtualFile)
-        .asInstanceOf[VerilogPSIFileRoot]
-      NavigationUtil.activateFileWithPsiElement(psi, true)
-      psi.navigate(true)
-    }
+  case class RpcGotoInfo(filepath: String, line: Int, column: Int)
+  private val gotoInfoQueue           = new LinkedBlockingQueue[RpcGotoInfo]()
+  def pushGotoInfo(info: RpcGotoInfo) = gotoInfoQueue.put(info)
+
+  def startRpcGotoHandler(project: Project): Thread = {
+    val thread = new Thread(() => {
+      try {
+        while (true) {
+          val info = gotoInfoQueue.take()
+          runInEdt {
+            val descriptor = new OpenFileDescriptor(
+              project,
+              new LocalFilePath(info.filepath, false).getVirtualFile,
+              info.line,
+              info.column
+            )
+            descriptor.navigate(true)
+          }
+        }
+      } catch {
+        case e: InterruptedException =>
+          MainLogger.warn(Thread.currentThread().getName, "exit normally")
+      }
+    })
+    thread.setName("rpc-goto-handler")
+    thread.setDaemon(true)
+    thread.start()
+    thread
   }
 
-  final val TOPIC: Topic[RpcGotoTopic] = Topic.create("Scaleda RPC", classOf[RpcGotoTopic])
+  // class RpcGotoTopic {
+  //   def navigate(project: Project, request: ScaledaGotoSource) = {
+  //     KernelLogger.info(s"RpcGotoTopic(request=$request)")
+  //     val psi = PsiManager
+  //       .getInstance(project)
+  //       .findFile(new LocalFilePath(request.file, false).getVirtualFile)
+  //       .asInstanceOf[VerilogPSIFileRoot]
+  //     NavigationUtil.activateFileWithPsiElement(psi, true)
+  //     psi.navigate(true)
+  //   }
+  // }
+  //
+  // final val TOPIC: Topic[RpcGotoTopic] = Topic.create("Scaleda RPC", classOf[RpcGotoTopic])
 }
