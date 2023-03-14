@@ -86,16 +86,17 @@
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.ModulePortConnectionAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.MultiDrivenAnnotator" />
+                   implementationClass="top.criwits.scaleda.verilog.annotation.MultiDrivenAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.AmbiguousClockAnnotator" />
+                   implementationClass="top.criwits.scaleda.verilog.annotation.AmbiguousClockAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.HierarchicalReferenceAnnotator" />
+                   implementationClass="top.criwits.scaleda.verilog.annotation.HierarchicalReferenceAnnotator"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
 
         <!-- editor -->
-        <spellchecker.support language="Verilog" implementationClass="top.criwits.scaleda.verilog.spell.VerilogSpellcheckStrategy" />
+        <spellchecker.support language="Verilog"
+                              implementationClass="top.criwits.scaleda.verilog.spell.VerilogSpellcheckStrategy"/>
         <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler"/>
         <enterHandlerDelegate
                 implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler"/>
@@ -106,7 +107,7 @@
         <!--        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.formatter.VerilogFormattingBuilderModel" />-->
         <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
         <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
-        <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter" />
+        <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
 
     </extensions>
 
@@ -128,18 +129,25 @@
 
     <!-- Settings -->
     <extensions defaultExtensionNs="com.intellij">
+        <langCodeStyleSettingsProvider
+                implementation="top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettingsProvider"/>
         <applicationConfigurable groupId="build"
                                  bundle="bundles.ScaledaBundle"
-                                 key="settings.toolchains"
-                                 id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
-                                 instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
-        <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage"/>
-        <langCodeStyleSettingsProvider implementation="top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettingsProvider" />
-        <applicationConfigurable groupId="build"
-                                 bundle="bundles.ScaledaBundle"
-                                 key="settings.auth.name"
-                                 id="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"
-                                 instance="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"/>
+                                 key="settings.generic"
+                                 id="top.criwits.scaleda.idea.settings.generic.ScaledaGenericConfigurable"
+                                 instance="top.criwits.scaleda.idea.settings.generic.ScaledaGenericConfigurable">
+            <configurable groupId="build"
+                          bundle="bundles.ScaledaBundle"
+                          key="settings.toolchains"
+                          id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
+                          instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
+            <configurable groupId="build"
+                          bundle="bundles.ScaledaBundle"
+                          key="settings.auth.name"
+                          id="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"
+                          instance="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"/>
+
+        </applicationConfigurable>
     </extensions>
 
     <!-- Module, Project and SDK -->
