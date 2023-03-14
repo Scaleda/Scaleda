@@ -53,4 +53,8 @@ object OutputLogger {
   class StdErrToWarningHandler(project: Project) extends Handler(project) {
     override def onStderr(data: String): Unit = OutputLogger(project).warn(data)
   }
+
+  class StdErrToInfoHandler(project: Project) extends Handler(project) {
+    override def onStderr(data: String): Unit = OutputLogger(project).info(data)
+  }
 }

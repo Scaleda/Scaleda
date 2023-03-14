@@ -1,7 +1,8 @@
 package top.criwits.scaleda
 package idea.rvcd
 
-import idea.utils.{MainLogger, OutputLogger}
+import idea.utils.MainLogger
+import idea.utils.OutputLogger.StdErrToInfoHandler
 import kernel.rvcd.Rvcd
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.utils.{OS, Paths}
@@ -46,7 +47,7 @@ class RvcdService extends Disposable {
             description = "Start RVCD Instance"
           )
         ),
-        new OutputLogger.Handler(myProject)
+        new StdErrToInfoHandler(myProject)
       )
     } else {
       client.openFileWith(

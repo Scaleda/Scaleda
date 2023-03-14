@@ -10,17 +10,20 @@ import rvcd.rvcd.RvcdOpenFileWith
 
 class RvcdLaunchAction extends AnAction {
   override def actionPerformed(event: AnActionEvent): Unit = {
-    new Thread(() => {
-      CommandRunner.execute(
-        Seq(
-          CommandDeps(
-            args = Seq(RvcdService.rvcdFile.getAbsolutePath),
-            description = "Start RVCD Instance"
-          )
-        ),
-        new OutputLogger.StdErrToWarningHandler(event.getProject)
-      )
-    }, "rvcd-instance").start()
+    new Thread(
+      () => {
+        CommandRunner.execute(
+          Seq(
+            CommandDeps(
+              args = Seq(RvcdService.rvcdFile.getAbsolutePath),
+              description = "Start RVCD Instance"
+            )
+          ),
+          new OutputLogger.StdErrToInfoHandler(event.getProject)
+        )
+      },
+      "rvcd-instance"
+    ).start()
   }
 }
 
