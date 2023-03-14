@@ -6,7 +6,7 @@ import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
 import idea.settings.auth.AuthorizationEditor
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
-import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
+import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageParser, ScaledaMessageTab}
 import kernel.database.UserException
 import kernel.project.config.TaskType
 import kernel.shell.ScaledaRun
@@ -149,10 +149,28 @@ class ScaledaRunConfiguration(
         // ToolWindowManager.getInstance(project).getFocusManager
         // ScaledaMessageTab.instance.switchToTab()
 
+        val causeMessage: (ScaledaRuntimeInfo, Option[ScaledaMessage]) =
+          ScaledaMessageTab.instance
+            .getFirstError(rt.id)
+            .getOrElse(
+              ScaledaMessageTab.instance
+                .getFirstWarning(rt.id)
+                .getOrElse(
+                  ScaledaMessageTab.instance
+                    .getFirstInfo(rt.id)
+                    .getOrElse((rt, None))
+                )
+            )
+
         // create notification
         val notification = Notification.NOTIFICATION_GROUP.createNotification(
           ScaledaBundle.message("notification.runner.error.execute.title"),
-          "content",
+          ScaledaBundle.message(
+            "notification.runner.error.execute.content.prefix",
+            causeMessage._2
+              .map(m => m.text)
+              .getOrElse(ScaledaBundle.message("notification.runner.error.execute.content.default"))
+          ),
           Notification.levelMatch(LogLevel.Error)
         )
         notification.setSubtitle(ScaledaBundle.message("notification.runner.error.execute.subtitle"))

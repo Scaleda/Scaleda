@@ -32,6 +32,24 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val data         = new mutable.HashMap[String, (ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])]()
   private val viewComboBox = new ComboBox[String]()
 
+  def getMessageData(key: String): Option[(ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])] =
+    data.get(key)
+
+  def getFirstLargerLevelMessage(
+      key: String,
+      level: LogLevel.Value
+  ): Option[(ScaledaRuntimeInfo, Option[ScaledaMessage])] =
+    getMessageData(key).flatMap(d => {
+      val v = d._2.find(_.level.id >= level.id)
+      if (v.nonEmpty) {
+        Some(d._1, v)
+      } else None
+    })
+
+  def getFirstError(key: String)   = getFirstLargerLevelMessage(key, LogLevel.Error)
+  def getFirstWarning(key: String) = getFirstLargerLevelMessage(key, LogLevel.Warn)
+  def getFirstInfo(key: String)    = getFirstLargerLevelMessage(key, LogLevel.Info)
+
   def getDisplayName                                = ScaledaBundle.message("windows.tool.log.message.title")
   private var tabManager: Option[ConsoleTabManager] = None
   def setTabManager(p: Option[ConsoleTabManager])   = tabManager = p
