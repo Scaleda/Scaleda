@@ -4,9 +4,10 @@ package idea.runner.configuration
 import idea.ScaledaBundle
 import idea.application.config.ScaledaIdeaConfig
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntime}
+import idea.rvcd.RvcdService
 import idea.settings.auth.AuthorizationEditor
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
-import idea.waveform.WaveformHandler
+import idea.waveform.{RvcdHandler, WaveformHandler}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.database.UserException
 import kernel.project.config.TaskType
@@ -24,6 +25,7 @@ import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
 import com.intellij.icons.AllIcons
 import com.intellij.ide.actions.ShowSettingsUtilImpl
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.options.SettingsEditor
@@ -221,11 +223,24 @@ class ScaledaRunConfiguration(
                 _.handle(project, rt.executor.asInstanceOf[SimulationExecutor].vcdFile)
               )
             if (config.autoOpenWaveform) doHandleWaveform()
-            else {
-              // TODO: notify waveform update
-              // Notification.NOTIFICATION_GROUP.createNotification()
+            else if (config.notifyWaveformUpdate) {
+              val notification =
+                Notification.NOTIFICATION_GROUP.createNotification(
+                  ScaledaBundle.message("notification.runner.ok.simulation"),
+                  ScaledaBundle.message("notification.runner.ok.simulation.waveform"),
+                  NotificationType.INFORMATION
+                )
+              val action = if (config.waveformHandler == RvcdHandler.getId && RvcdService.hasInstance) {
+                new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.reload")) {
+                  override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
+                }
+              } else {
+                new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.open")) {
+                  override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
+                }
+              }
+              notification.addAction(action)
             }
-          // TODO / FIXME: Source is not given
           case _ =>
         }
       }

@@ -11,7 +11,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import java.io.File
 
 @JsonInclude(Include.NON_EMPTY)
-case class ScaledaIdeaConfig(autoOpenWaveform: Boolean = true, waveformHandler: String = RvcdHandler.getId)
+case class ScaledaIdeaConfig(
+    autoOpenWaveform: Boolean = true,
+    notifyWaveformUpdate: Boolean = true,
+    waveformHandler: String = RvcdHandler.getId
+)
 
 object ScaledaIdeaConfig {
   private val configFile = new File(Paths.getGlobalConfigDir, "config.yml")
