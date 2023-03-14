@@ -40,7 +40,7 @@ object Notification {
   def apply(project: Project): Notification = new Notification(project)
   def apply(): Notification                 = new Notification(ProjectNow.apply().get)
 
-  private def levelMatch(level: LogLevel.Value): NotificationType = {
+  def levelMatch(level: LogLevel.Value): NotificationType = {
     import LogLevel._
     level match {
       case Info => NotificationType.INFORMATION

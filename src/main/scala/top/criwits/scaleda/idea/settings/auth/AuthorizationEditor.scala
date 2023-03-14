@@ -13,7 +13,7 @@ import javax.swing._
 import scala.jdk.javaapi.CollectionConverters
 
 class AuthorizationEditor extends SearchableConfigurable {
-  override def getId: String = "top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"
+  override def getId: String = AuthorizationEditor.SETTINGS_ID
 
   override def getDisplayName: String = ScaledaBundle.message("settings.auth.name")
 
@@ -112,4 +112,8 @@ class AuthorizationEditor extends SearchableConfigurable {
     })
     .disableUpDownActions()
     .createPanel()
+}
+
+object AuthorizationEditor {
+  val SETTINGS_ID = "top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"
 }

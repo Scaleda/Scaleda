@@ -3,6 +3,7 @@ package idea.runner.configuration
 
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
+import idea.settings.auth.AuthorizationEditor
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.database.UserException
@@ -10,6 +11,7 @@ import kernel.project.config.TaskType
 import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.SimulationExecutor
+import kernel.utils.LogLevel
 
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
@@ -17,10 +19,11 @@ import com.intellij.execution.process.{ProcessHandler, ProcessTerminatedListener
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
-import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.icons.AllIcons
+import com.intellij.ide.actions.ShowSettingsUtilImpl
+import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.options.SettingsEditor
-import com.intellij.openapi.project.{DumbService, Project}
-import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
@@ -118,7 +121,12 @@ class ScaledaRunConfiguration(
         .createBuilder(project, searchScope)
 
     val console = myConsoleBuilder.getConsole
-    def afterExecution(rt: ScaledaRuntimeInfo, returnValues: Seq[Int], finishedAll: Boolean, meetErrors: Boolean): Unit = {
+    def afterExecution(
+        rt: ScaledaRuntimeInfo,
+        returnValues: Seq[Int],
+        finishedAll: Boolean,
+        meetErrors: Boolean
+    ): Unit = {
       // if errors, switch to message tab
       if (meetErrors) {
         // Assert: must be called on EDT
@@ -139,6 +147,31 @@ class ScaledaRunConfiguration(
 
         // ToolWindowManager.getInstance(project).getFocusManager
         // ScaledaMessageTab.instance.switchToTab()
+
+        // create notification
+        val notification = Notification.NOTIFICATION_GROUP.createNotification(
+          "Error",
+          "Content",
+          Notification.levelMatch(LogLevel.Error)
+        )
+        notification.setSubtitle("Subtitle")
+        notification.setContextHelpAction(new AnAction("help", "Desp", AllIcons.Actions.Help) {
+          override def actionPerformed(e: AnActionEvent) = {
+            MainLogger.warn("help", e)
+          }
+        })
+        Seq(
+          new AnAction("Goto Message") {
+            override def actionPerformed(e: AnActionEvent) = {
+              ScaledaMessageTab.instance.switchToTab()
+            }
+          },
+          new AnAction("Goto Error Source") {
+            override def actionPerformed(e: AnActionEvent) = {
+            }
+          }
+        ).foreach(notification.addAction)
+        notification.notify(project)
       }
       // remove message listeners
       ScaledaMessageTab.instance.detachFromLogger(rt.id)
@@ -185,7 +218,14 @@ class ScaledaRunConfiguration(
         // TODO: i18n
         throwable match {
           case e: UserException =>
-            Notification().error("Authorization Error", e.getMessage, ", register or re-login")
+            val notification = Notification.NOTIFICATION_GROUP
+              .createNotification("Authorization Error", e.getMessage, Notification.levelMatch(LogLevel.Error))
+            notification.addAction(new AnAction("Setup Scaleda Accounts") {
+              override def actionPerformed(e: AnActionEvent) = {
+                ShowSettingsUtilImpl.showSettingsDialog(project, AuthorizationEditor.SETTINGS_ID, "")
+              }
+            })
+          // Notification().error("Authorization Error", e.getMessage, ", register or re-login")
           case e: TimeoutException =>
             Notification().error("Timeout", e.getMessage, ", check your connections")
           case e: Throwable => throw e

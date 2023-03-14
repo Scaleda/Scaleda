@@ -10,7 +10,7 @@ import javax.swing.JComponent
 class ToolchainsConfigurable
   extends SearchableConfigurable {
   private val configUI = new ToolchainsPanel
-  override def getId: String = "top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
+  override def getId: String = ToolchainsConfigurable.SETTINGS_ID
   override def getDisplayName: String = ScaledaBundle.message("settings.toolchains")
 
   override def createComponent(): JComponent = configUI
@@ -25,4 +25,8 @@ class ToolchainsConfigurable
     configUI.apply()
   }
 
+}
+
+object ToolchainsConfigurable {
+  val SETTINGS_ID = "top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
 }

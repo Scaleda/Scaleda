@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package idea.settings.toolchains
 
+import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.notification.{NotificationGroupManager, NotificationType}
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
@@ -18,6 +19,11 @@ import scala.concurrent.duration.DurationInt
  */
 class ProfileDetectAction(project: Project) extends AnAction {
   override def actionPerformed(e: AnActionEvent) = {
+    val gotoSettingsAction = new AnAction(ScaledaBundle.message("detector.notification.settings")) {
+      override def actionPerformed(e: AnActionEvent) = {
+        ShowSettingsUtilImpl.showSettingsDialog(project, ToolchainsConfigurable.SETTINGS_ID, "")
+      }
+    }
     val detected = Await.result(ToolchainProfileDetector.detectProfiles(), 30.seconds)
     if (detected.nonEmpty) {
       @Nls
@@ -35,12 +41,12 @@ class ProfileDetectAction(project: Project) extends AnAction {
           notification.expire()
         }
       })
+      notification.addAction(gotoSettingsAction)
       notification.notify(project)
     } else {
-      Notification(project).warn(
-        ScaledaBundle.message("detector.notification.found.title"),
-        ScaledaBundle.message("detector.notification.found.none")
-      )
+      val notification = Notification.NOTIFICATION_GROUP.createNotification(ScaledaBundle.message("detector.notification.found.title"), ScaledaBundle.message("detector.notification.found.none"), NotificationType.WARNING)
+      notification.addAction(gotoSettingsAction)
+      notification.notify(project)
     }
   }
 }

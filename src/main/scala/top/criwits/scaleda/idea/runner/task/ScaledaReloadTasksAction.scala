@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.runner.task
 
 import idea.ScaledaBundle
+import idea.utils.{MainLogger, inReadAction, invokeLater}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import kernel.project.config.ProjectConfig
 
@@ -9,20 +10,18 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.SaveAndSyncHandler
 import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent}
 import com.intellij.openapi.roots.ProjectFileIndex
-import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile, VirtualFileManager}
-import top.criwits.scaleda.idea.utils.{MainLogger, inReadAction}
+import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
 
 import java.io.File
 
-/**
- * Action: reload Scaleda project config, with all its targets and tasks.
- * This action should be performed when
- *
- *  - Start up;
- *  - User press the reload button;
- *  - Config was generated;
- *  - Target / task was added;
- */
+/** Action: reload Scaleda project config, with all its targets and tasks.
+  * This action should be performed when
+  *
+  *  - Start up;
+  *  - User press the reload button;
+  *  - Config was generated;
+  *  - Target / task was added;
+  */
 class ScaledaReloadTasksAction
     extends AnAction(
       ScaledaBundle.message("windows.task.refresh"),
@@ -36,9 +35,7 @@ class ScaledaReloadTasksAction
       ProjectFileIndex
         .getInstance(e.getProject)
         .iterateContent(fileOrDir => {
-          if (
-            !fileOrDir.isDirectory && fileOrDir.getName == ProjectConfig.defaultConfigFile
-          ) {
+          if (!fileOrDir.isDirectory && fileOrDir.getName == ProjectConfig.defaultConfigFile) {
             searchedFile = Some(fileOrDir)
           }
           true
@@ -48,7 +45,9 @@ class ScaledaReloadTasksAction
     if (searchedFile.isEmpty) {
       ProjectConfig.configFile = None
       ProjectConfig.projectBase = None
-      MainLogger.info("No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project")
+      MainLogger.info(
+        "No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project"
+      )
 
       // clear the model
       ScaledaRunWindowFactory.model.foreach(m => {
@@ -69,17 +68,40 @@ class ScaledaReloadTasksAction
         )
       SaveAndSyncHandler.getInstance().scheduleRefresh()
 
-      // Refresh tree panel
-      ScaledaRunWindowFactory.model.foreach(m => {
-        m.setRoot(ScaledaRunWindowFactory.getRootNode)
-        m.reload()
-        // then expand all
-        ScaledaRunWindowFactory.expandAll.foreach(expandAll =>
-          ActionManager
-            .getInstance()
-            .tryToExecute(expandAll, null, null, null, false)
-        )
+      // invokeLater {
+      // Refresh tree panel while model valid
+      val th = new Thread(() => {
+        try {
+          var done = false
+          while (!done) {
+            ScaledaRunWindowFactory.model
+              .map(m => {
+                invokeLater {
+                  m.setRoot(ScaledaRunWindowFactory.getRootNode)
+                  m.reload()
+                  // then expand all
+                  ScaledaRunWindowFactory.expandAll.foreach(expandAll =>
+                    ActionManager
+                      .getInstance()
+                      .tryToExecute(expandAll, null, null, null, false)
+                  )
+                }
+                done = true
+                MainLogger.info("refresh scaleda tree done")
+              })
+              .getOrElse({
+                done = false
+              })
+            Thread.sleep(100)
+          }
+        } catch {
+          case _e: InterruptedException =>
+        }
       })
+      // when all thread is daemon, system exits
+      th.setDaemon(true)
+      th.start()
     }
+    // }
   }
 }
