@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain
 
-import idea.runner.ScaledaRuntimeInfo
+import idea.runner.ScaledaRuntime
 import kernel.net.remote.RemoteInfo
 
 trait ToolchainPresetProvider {
@@ -11,5 +11,5 @@ trait ToolchainPresetProvider {
     * @param remoteInfo remote information
     * @return
     */
-  def handlePreset(rtOld: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntimeInfo]
+  def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntime]
 }

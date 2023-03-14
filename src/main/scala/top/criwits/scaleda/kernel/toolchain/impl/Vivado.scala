@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import idea.runner.ScaledaRuntimeInfo
+import idea.runner.ScaledaRuntime
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.project.config.TaskType.{Implement, Simulation}
@@ -214,7 +214,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   }
   ToolchainProfileDetector.registerDetector(this)
 
-  override def handlePreset(rtOld: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntimeInfo] = {
+  override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntime] = {
     var rt            = rtOld
     val userTokenBean = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
     // A local username is required...

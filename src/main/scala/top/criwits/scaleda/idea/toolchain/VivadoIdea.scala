@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.toolchain
 
-import idea.runner.ScaledaRuntimeInfo
+import idea.runner.ScaledaRuntime
 import idea.windows.tool.message._
 import kernel.toolchain.impl.Vivado.internalID
 import kernel.utils.LogLevel
@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 
 object VivadoIdea extends ScaledaMessageToolchainParserProvider {
   object MessageParser extends ScaledaMessageToolchainDefaultParser {
-    override def parse(rt: ScaledaRuntimeInfo, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+    override def parse(rt: ScaledaRuntime, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
       val prepared = super.parse(rt, text, level)
       val p        = Pattern.compile("(INFO|WARNING|ERROR): \\[(.+)] ?(.+)")
       val m        = p.matcher(text)

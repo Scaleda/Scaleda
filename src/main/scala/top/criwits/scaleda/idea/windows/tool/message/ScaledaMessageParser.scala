@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package idea.windows.tool.message
 
-import idea.runner.ScaledaRuntimeInfo
+import idea.runner.ScaledaRuntime
 import idea.windows.tool.logging.ScaledaLogReceiver
 import kernel.utils.LogLevel
 
@@ -11,7 +11,7 @@ import java.util.regex.Pattern
 import scala.collection.mutable
 
 trait ScaledaMessageToolchainParser {
-  def parse(rt: ScaledaRuntimeInfo, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage]
+  def parse(rt: ScaledaRuntime, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage]
 }
 
 trait ScaledaMessageToolchainParserProvider {
@@ -19,7 +19,7 @@ trait ScaledaMessageToolchainParserProvider {
 }
 
 class ScaledaMessageToolchainDefaultParser extends ScaledaMessageToolchainParser {
-  override def parse(rt: ScaledaRuntimeInfo, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+  override def parse(rt: ScaledaRuntime, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
     val levelPattern = Pattern.compile("\\b(info|warn|warning|error|fatal)\\b", Pattern.CASE_INSENSITIVE)
     val levelMatcher = levelPattern.matcher(text)
     // find first level
@@ -65,8 +65,8 @@ object ScaledaMessageParser {
   * @param handler callback for logging service
   */
 class ScaledaMessageParser(
-    rt: ScaledaRuntimeInfo,
-    handler: ScaledaMessage => Unit
+                            rt: ScaledaRuntime,
+                            handler: ScaledaMessage => Unit
 ) extends ScaledaLogReceiver {
   override def print(
       source: String,

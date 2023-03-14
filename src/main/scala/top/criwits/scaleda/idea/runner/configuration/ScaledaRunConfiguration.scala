@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
-import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
+import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntime}
 import idea.rvcd.RvcdService
 import idea.settings.auth.AuthorizationEditor
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
@@ -125,10 +125,10 @@ class ScaledaRunConfiguration(
 
     val console = myConsoleBuilder.getConsole
     def afterExecution(
-        rt: ScaledaRuntimeInfo,
-        returnValues: Seq[Int],
-        finishedAll: Boolean,
-        meetErrors: Boolean
+                        rt: ScaledaRuntime,
+                        returnValues: Seq[Int],
+                        finishedAll: Boolean,
+                        meetErrors: Boolean
     ): Unit = {
       // TODO: if errors, switch to message tab
       if (meetErrors) {

@@ -72,6 +72,7 @@ class ScaledaMain extends StartupActivity {
         .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
     }
 
+    // Have to launch a thread in an action to handle `gotoSource` request...
     ActionManager
       .getInstance()
       .tryToExecute(

@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import idea.runner.ScaledaRuntimeInfo
+import idea.runner.ScaledaRuntime
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
@@ -24,7 +24,7 @@ object ScaledaRun {
     */
   def runTask(
       handler: ScaledaRunHandler,
-      rt: ScaledaRuntimeInfo
+      rt: ScaledaRuntime
   ): Unit = {
     require(rt.profile.profileName.nonEmpty, "must provide profile before runTask")
     val remoteDeps =
@@ -33,7 +33,9 @@ object ScaledaRun {
       else None
     KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
 
-    val info = Toolchain.toolchains(rt.target.toolchain)
+    val info      = Toolchain.toolchains(rt.target.toolchain)
+    val toolchain = info._2(rt.executor)
+
     val rtProcessed =
       if (rt.task.preset) {
         // fetch remote system info
@@ -46,7 +48,6 @@ object ScaledaRun {
           } else None
         Toolchain.toolchainPresetHandler.get(rt.target.toolchain).flatMap(_.handlePreset(rt, remoteInfo))
       } else Some(rt)
-    val toolchain = info._2(rt.executor)
     if (rtProcessed.isEmpty) {
       KernelLogger.warn(
         s"Cannot apply preset for ${rt.target.toolchain}! Preset supports: ${Toolchain.toolchainPresetHandler.keys}"
@@ -71,7 +72,7 @@ object ScaledaRun {
 
   def runTaskBackground(
       handler: ScaledaRunHandler,
-      runtime: ScaledaRuntimeInfo,
+      runtime: ScaledaRuntime,
       daemon: Boolean = true
   ): Thread = {
     val t = new Thread(() => runTask(handler, runtime), s"run-task-${runtime.id}")
@@ -144,7 +145,7 @@ object ScaledaRun {
       taskName: String,
       profileName: String,
       profileHost: String
-  ): Option[ScaledaRuntimeInfo] = {
+  ): Option[ScaledaRuntime] = {
     val configOptional = ProjectConfig.getConfig()
     if (configOptional.isEmpty) {
       KernelLogger.warn("no configure found")
@@ -194,7 +195,7 @@ object ScaledaRun {
 
           val workingDir = new File(ProjectConfig.projectBase.get)
           val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
-          val runtime = ScaledaRuntimeInfo(
+          val runtime = ScaledaRuntime(
             id = runtimeId,
             target = target,
             task = task,

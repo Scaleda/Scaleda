@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tool.message
 
 import idea.ScaledaBundle
-import idea.runner.ScaledaRuntimeInfo
+import idea.runner.ScaledaRuntime
 import idea.utils.MainLogger
 import idea.windows.tool.logging.{ConsoleTabManager, ScaledaLoggingService}
 import kernel.utils.LogLevel
@@ -29,10 +29,10 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val dataModel     = new DefaultListModel[ScaledaMessage]()
   private val listComponent = new JBList[ScaledaMessage](dataModel)
 
-  private val data         = new mutable.HashMap[String, (ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])]()
+  private val data         = new mutable.HashMap[String, (ScaledaRuntime, ArrayBuffer[ScaledaMessage])]()
   private val viewComboBox = new ComboBox[String]()
 
-  def getMessageData(key: String): Option[(ScaledaRuntimeInfo, ArrayBuffer[ScaledaMessage])] =
+  def getMessageData(key: String): Option[(ScaledaRuntime, ArrayBuffer[ScaledaMessage])] =
     data.get(key)
 
   def getFirstLargerLevelMessage(
@@ -128,7 +128,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     }
   })
 
-  private val messageQueue = new LinkedBlockingQueue[(ScaledaRuntimeInfo, ScaledaMessage)]()
+  private val messageQueue = new LinkedBlockingQueue[(ScaledaRuntime, ScaledaMessage)]()
 
   private val messageHandleThread = new Thread(
     () => {
@@ -157,7 +157,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   )
   messageHandleThread.start()
 
-  def attach(runtime: ScaledaRuntimeInfo): Unit = {
+  def attach(runtime: ScaledaRuntime): Unit = {
     val service = project.getService(classOf[ScaledaLoggingService])
     service.addListener(
       runtime.id,

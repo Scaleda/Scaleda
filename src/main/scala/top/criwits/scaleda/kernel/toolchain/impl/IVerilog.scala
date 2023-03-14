@@ -1,14 +1,13 @@
 package top.criwits.scaleda
 package kernel.toolchain.impl
 
-import idea.runner.ScaledaRuntimeInfo
+import idea.runner.ScaledaRuntime
+import kernel.net.remote.RemoteInfo
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile}
-import kernel.utils.KernelFileUtils
-
-import top.criwits.scaleda.kernel.net.remote.RemoteInfo
+import kernel.utils.{FileReplaceContext, KernelFileUtils}
 
 import java.io.File
 
@@ -27,29 +26,13 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     workingDir.mkdirs()
     assert(workingDir.exists(), f"Cannot create working directory ${workingDir.getAbsolutePath}")
 
-    // get testbench info
-    val testbench     = simExecutor.topModule
-    val testbenchFile = KernelFileUtils.getModuleFile(testbench, testbench = true).get
+    // should be the same behavior with [[handlePreset]]
 
+    // get testbench info
+    val testbench = simExecutor.topModule
     // generate new testbench file
     val newTestbench     = testbench + "_generated"
     val newTestbenchFile = new File(workingDir, newTestbench + ".v")
-
-    // vcd file
-    val vcdFile = simExecutor.vcdFile
-
-    // TODO: move file operations to preset handler?
-    KernelFileUtils.insertAfterModuleHead(
-      testbenchFile,
-      newTestbenchFile,
-      testbench,
-      s"""
-        |initial begin
-        |  $$dumpfile(\"${vcdFile.getName}\");
-        |  $$dumpvars;
-        |end
-        |""".stripMargin
-    )
 
     val sources = KernelFileUtils.getAllSourceFiles()
 
@@ -127,5 +110,36 @@ object IVerilog extends ToolchainPresetProvider {
     }
   }
 
-  override def handlePreset(rt: ScaledaRuntimeInfo, remoteInfo: Option[RemoteInfo]) = Some(rt)
+  override def handlePreset(rt: ScaledaRuntime, remoteInfo: Option[RemoteInfo]) = {
+    require(rt.task.taskType == TaskType.Simulation)
+    val simExecutor = rt.executor.asInstanceOf[SimulationExecutor]
+    // get testbench info
+    val testbench     = simExecutor.topModule
+    val testbenchFile = KernelFileUtils.getModuleFile(testbench, testbench = true).get
+
+    // generate new testbench file
+    val newTestbench     = testbench + "_generated"
+    val newTestbenchFile = new File(simExecutor.workingDir, newTestbench + ".v")
+
+    // vcd file
+    val vcdFile = simExecutor.vcdFile
+
+    KernelFileUtils.insertAfterModuleHead(
+      testbenchFile,
+      newTestbenchFile,
+      testbench,
+      s"""
+         |initial begin
+         |  $$dumpfile(\"${vcdFile.getName}\");
+         |  $$dumpvars;
+         |end
+         |""".stripMargin
+    )
+    val replaceFiles = rt.context
+      .get("replaceFiles")
+      .map(_.asInstanceOf[Seq[FileReplaceContext]])
+      .getOrElse(Seq()) :+ FileReplaceContext(from = testbenchFile, to = newTestbenchFile)
+    val rtWithContext = rt.copy(context = rt.context ++ Map("replaceFiles" -> replaceFiles))
+    Some(rtWithContext)
+  }
 }

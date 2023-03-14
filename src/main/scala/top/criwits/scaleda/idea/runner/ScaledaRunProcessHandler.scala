@@ -14,15 +14,16 @@ import java.io.OutputStream
 import scala.collection.mutable.ArrayBuffer
 
 /** Handle a task process locally or remotely
-  * @param logger using logger
-  * @param rt Runtime of this run
-  * @param invokeAfterFinish will emit with [[ScaledaRuntimeInfo]] after `finishedAll`
+ *
+  * @param logger            using logger
+  * @param rt                Runtime of this run
+  * @param invokeAfterFinish will emit with [[ScaledaRuntime]] after `finishedAll`
   */
 class ScaledaRunProcessHandler(
-    project: Project,
-    logger: BasicLogger,
-    rt: ScaledaRuntimeInfo,
-    invokeAfterFinish: (ScaledaRuntimeInfo, Seq[Int], Boolean, Boolean) => Unit
+                                project: Project,
+                                logger: BasicLogger,
+                                rt: ScaledaRuntime,
+                                invokeAfterFinish: (ScaledaRuntime, Seq[Int], Boolean, Boolean) => Unit
 ) extends ProcessHandler
     with ScaledaRunHandler {
   // Set terminating <- `true` to invoke stopping
