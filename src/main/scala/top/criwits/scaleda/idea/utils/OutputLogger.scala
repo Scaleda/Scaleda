@@ -30,8 +30,8 @@ class OutputLogger(project: Project) extends BasicLogger {
     val service = project.getService(classOf[ScaledaLoggingService])
     service.print(OutputLogger.LOGGER_ID, s"$msg\n", level)
     level match {
-      case Warn | Error => Notification(project).logging(level, xs: _*)
-      case _            => {}
+      case Error => Notification(project).logging(level, xs: _*)
+      case _     => {}
     }
   }
 }
@@ -47,7 +47,9 @@ object OutputLogger {
     override def onStderr(data: String): Unit = OutputLogger(project).warn(data)
 
     override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit =
-      OutputLogger(project).info(s"command done, returns $returnValue, finishedAll: $finishedAll, meerError: $meetErrors")
+      OutputLogger(project).info(
+        s"command done, returns $returnValue, finishedAll: $finishedAll, meerError: $meetErrors"
+      )
   }
 
   class StdErrToWarningHandler(project: Project) extends Handler(project) {
