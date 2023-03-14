@@ -34,6 +34,7 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
 
   def addPanel(panel: JPanel, @Nls name: String, switchTo: Boolean = true) = {
     val content = contentFactory.createContent(panel, name, false)
+    content.setPreferredFocusableComponent(panel)
     contentManager.addContent(content)
     if (switchTo) contentManager.setSelectedContent(content)
   }
@@ -41,7 +42,7 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
   def setSelectedContent(name: String): Boolean = {
     val found = contentManager.findContent(name)
     if (found != null) {
-      contentManager.setSelectedContent(found)
+      contentManager.setSelectedContent(found, true)
       true
     } else {
       false

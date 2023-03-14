@@ -125,7 +125,11 @@ class ScaledaRunConfiguration(
         // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
         runInEdt {
           // ToolWindowManager.getInstance(project).getFocusManager.toFront(ScaledaMessageTab.instance)
-          ToolWindowManager.getInstance(project).getFocusManager.requestFocusInProject(ScaledaMessageTab.instance, project)
+          // ToolWindowManager.getInstance(project).getFocusManager.requestFocusInProject(ScaledaMessageTab.instance, project)
+          // ScaledaMessageTab.instance.requestFocusInWindow()
+          // ToolWindowManager.getInstance(project).
+          // not working
+          ScaledaMessageTab.instance.switchToTab()
         }
         // DumbService
         //   .getInstance(project)
