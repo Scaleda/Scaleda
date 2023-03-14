@@ -63,4 +63,45 @@ class SimpleTester extends AnyFlatSpec with should.Matchers {
     val result = m.appendTail(sb).toString
     println(result)
   }
+
+  it should "test filepath:number" in {
+    // val patten = Pattern.compile(ScaledaMessageRenderer.fileOptionalLineNumberRegexString)
+    val patten =
+      Pattern.compile("((\\w+:)*?[^\\s'\"/\\\\?:]*?/?((/[^&:]+/)|(\\\\[^&:]+\\\\))?)((\\w+)\\.(\\w+))(:(\\w+))?")
+    val text =
+      "/home/chiro/programs/scaleda-sample-project/.sim/Icarus-Run iverilog simulation/tb_waterfall_generated.v:83: error: Unknown module type: xmlx" +
+        "/test/file/no/num.txt here" +
+        "/ysuifasiof/fdsajflsajflsda/fasd.v:12331:123" +
+        "/yfuisadhfs:fdasfds/dsafa.v" +
+        "//fdsa//fdsa//a.v:123"
+    val m = patten.matcher(text)
+    while (m.find()) {
+      println(m.group())
+      for (i <- 0 to m.groupCount()) {
+        println(s"$i: ${m.group(i)}")
+      }
+      println("------")
+    }
+  }
+
+  it should "test match level word" in {
+    // default is NOT case-insensitive
+    // val patten = Pattern.compile("\\s?(info|warn|warning|error|panic)\\s?")
+    val patten = Pattern.compile("\\b(info|warn|warning|error|panic)\\b", Pattern.CASE_INSENSITIVE)
+    val text = "error here\n" +
+      "should not match small_error\n" +
+      "should match error\n" +
+      "BIG WARN\n" +
+      "end info"
+    val m = patten.matcher(text)
+    while (m.find()) {
+      println(
+        m.group(1),
+        m.start(1),
+        m.end(1),
+        text.slice(0, m.start(1)) + "[" + text.slice(m.start(1), m.end(1)) + "]" + text.slice(m.end(1), text.length)
+      )
+      println(m.groupCount())
+    }
+  }
 }

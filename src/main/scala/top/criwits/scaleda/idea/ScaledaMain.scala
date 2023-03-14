@@ -18,6 +18,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
+import top.criwits.scaleda.idea.toolchain.{IVerilogIdea, VivadoIdea}
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -88,5 +89,6 @@ class ScaledaMain extends StartupActivity {
 
     // invoke all toolchains
     Seq(IVerilog, Vivado, PDS, Quartus, Verilator).foreach(KernelLogger.info("Load Toolchain object", _))
+    Seq(VivadoIdea, IVerilogIdea).foreach(KernelLogger.info("Load Toolchain Idea object", _))
   }
 }

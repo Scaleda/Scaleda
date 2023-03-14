@@ -85,7 +85,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   enabledLevel.addAll(allLevels.slice(allLevels.indexOf(LogLevel.Info), allLevels.size))
 
   private def findRenderer(toolchainType: String) =
-    ScaledaMessageRenderer.getRendererMap.getOrElse(toolchainType, ScaledaMessageRendererImpl)
+    ScaledaMessageRenderer.getRendererMap.getOrElse(toolchainType, ScaledaMessageRendererDefault)
 
   // Do sort here, filter is in other part
   private def sortData(): Unit = {
@@ -186,7 +186,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   private val scrollbar = new JBScrollPane()
   // listComponent.setAutoscrolls(true)
   listComponent.setAutoscrolls(false)
-  listComponent.setCellRenderer(ScaledaMessageRendererImpl)
+  listComponent.setCellRenderer(ScaledaMessageRendererDefault)
 
   private val cleanThisRunMessageAction = new AnAction(
     ScaledaBundle.message("windows.message.action.clean.short"),

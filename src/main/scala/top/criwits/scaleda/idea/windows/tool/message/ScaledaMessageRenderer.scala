@@ -1,11 +1,12 @@
 package top.criwits.scaleda
 package idea.windows.tool.message
 
-import idea.utils.{Icons, MainLogger}
+import idea.utils.Icons
 
 import com.intellij.icons.AllIcons
 import com.intellij.ui.{ColoredListCellRenderer, SimpleTextAttributes}
 
+import java.util.regex.Pattern
 import javax.swing.JList
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -29,7 +30,7 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
       case _     => AllIcons.General.Error
     }
     setIcon(icon)
-    val text    = value.text
+    val text    = (if (value.code.nonEmpty) s"[${value.code}] " else "") + value.text
     val matches = fileOptionalLineNumberRegex.findAllMatchIn(text).toSeq.sortBy(_.start)
     if (matches.nonEmpty) {
       val results = ArrayBuffer[(String, Option[SimpleTextAttributes])]()
@@ -68,15 +69,18 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
   }
 }
 
-object ScaledaMessageRendererImpl extends ScaledaMessageRenderer
+object ScaledaMessageRendererDefault extends ScaledaMessageRenderer
 
 object ScaledaMessageRenderer {
-  val fileRegexString                   = "((\\w+\\:)*?[^\\s'\"/\\\\\\?\\:]*?/?((/[^\\&]+/)|(\\\\[^\\&]+\\\\))?)((\\w+)\\.(\\w+))"
-  val fileLineNumberRegexString         = fileRegexString + "\\:(\\w+)"
-  val fileOptionalLineNumberRegexString = fileRegexString + "(\\:(\\w+))?"
+  val fileRegexString                   = "(((\\w+:)*?[^\\s'\"/\\\\?:]*?/?((/[^&:]+/)|(\\\\[^&:]+\\\\))?)((\\w+)\\.(\\w+)))"
+  val fileLineNumberRegexString         = fileRegexString + ":(\\w+)"
+  val fileOptionalLineNumberRegexString = fileRegexString + "(:(\\w+))?"
   val fileRegex                         = new Regex(fileRegexString)
-  val fileLineNumberRegex               = new Regex(fileRegexString)
+  val fileLineNumberRegex               = new Regex(fileLineNumberRegexString)
   val fileOptionalLineNumberRegex       = new Regex(fileOptionalLineNumberRegexString)
+  val filePattern                       = Pattern.compile(fileRegexString)
+  val fileLineNumberPattern             = Pattern.compile(fileLineNumberRegexString)
+  val fileOptionalLineNumberPattern     = Pattern.compile(fileOptionalLineNumberRegexString)
 
   private val allRenderers = new mutable.HashMap[String, ScaledaMessageRenderer]()
 

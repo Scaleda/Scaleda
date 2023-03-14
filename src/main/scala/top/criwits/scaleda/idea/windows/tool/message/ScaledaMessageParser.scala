@@ -7,6 +7,7 @@ import kernel.utils.LogLevel
 
 import org.jetbrains.annotations.Nls
 
+import java.util.regex.Pattern
 import scala.collection.mutable
 
 trait ScaledaMessageToolchainParser {
@@ -16,6 +17,39 @@ trait ScaledaMessageToolchainParser {
 trait ScaledaMessageToolchainParserProvider {
   def messageParser: ScaledaMessageToolchainParser
 }
+
+class ScaledaMessageToolchainDefaultParser extends ScaledaMessageToolchainParser {
+  override def parse(rt: ScaledaRuntimeInfo, text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+    val levelPattern = Pattern.compile("\\b(info|warn|warning|error|fatal)\\b", Pattern.CASE_INSENSITIVE)
+    val levelMatcher = levelPattern.matcher(text)
+    // find first level
+    val messageLevel = if (levelMatcher.find()) {
+      levelMatcher.group().toLowerCase match {
+        case "warn" | "warning" => LogLevel.Warn
+        case "error"            => LogLevel.Error
+        case "fatal"            => LogLevel.Fatal
+        case "info" | _         => LogLevel.Info
+      }
+    } else LogLevel.Info
+    val filePattern = ScaledaMessageRenderer.fileOptionalLineNumberPattern
+    val fileMatcher = filePattern.matcher(text)
+    // find first
+    val (filePath, fileLine) = if (fileMatcher.find()) {
+      // not found, returns null
+      val path = fileMatcher.group(1)
+      val line: Option[Int] =
+        try {
+          Some(Integer.parseInt(fileMatcher.group(fileMatcher.groupCount())))
+        } catch {
+          case e: NumberFormatException => None
+        }
+      (Option(path), line)
+    } else (None, None)
+    Some(ScaledaMessage(text = text, level = messageLevel, line = fileLine, file = filePath))
+  }
+}
+
+object ScaledaMessageToolchainDefaultParserImpl extends ScaledaMessageToolchainDefaultParser
 
 object ScaledaMessageParser {
   private val allParsers = new mutable.HashMap[String, ScaledaMessageToolchainParser]()
@@ -27,6 +61,7 @@ object ScaledaMessageParser {
 }
 
 /** Used to handle messages when running command
+  *
   * @param handler callback for logging service
   */
 class ScaledaMessageParser(
@@ -49,4 +84,8 @@ class ScaledaMessageParser(
       }
     }
   }
+}
+
+object ScaledaMessageToolchainParserDefaultProvider extends ScaledaMessageToolchainParserProvider {
+  override def messageParser = ScaledaMessageToolchainDefaultParserImpl
 }
