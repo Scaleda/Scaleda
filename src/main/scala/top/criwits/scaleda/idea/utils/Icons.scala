@@ -21,6 +21,10 @@ object Icons {
     IconLoader.getIcon("/icons/icon-with-name-plain", Icons.getClass)
   final val folder = IconLoader.getIcon("/icons/icon-over-folder", Icons.getClass)
 
+  final val project = AllIcons.Actions.ModuleDirectory
+  final val target = AllIcons.Actions.RunAll
+  final val task = AllIcons.Actions.Execute
+
   final val verilog = IconLoader.getIcon("/icons/verilog", Icons.getClass)
   final val verilogModule = getIcon("/icons/verilog-module")
   final val verilogWire = getIcon("/icons/verilog-wire")

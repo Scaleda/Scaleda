@@ -2,39 +2,48 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.utils.Icons
-import top.criwits.scaleda.kernel.project.config.TargetConfig
+import kernel.project.config.TargetConfig
 
 import java.util
 import java.util.Collections.enumeration
 import javax.swing.tree.TreeNode
-import scala.jdk.javaapi.CollectionConverters
+import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
-class ScaledaRunTargetNode(val target: TargetConfig)
-    extends ScaledaRunTreeNode(target.name) {
-  override val icon = Icons.mainSmall
+class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(target.name) {
+  override val icon = Icons.target
 
   var parent: Option[ScaledaRunRootNode] = None
 
-  private val taskNodes =
-    CollectionConverters.asJava(target.tasks.map(t => {
-      val n = new ScaledaRunTaskNode(t)
-      n.parent = Some(this)
-      n
-    }))
+  override def getChildAt(i: Int): TreeNode = tasks(i)
 
-  override def getChildAt(i: Int): TreeNode = taskNodes.get(i)
-
-  override def getChildCount: Int = taskNodes.size()
+  override def getChildCount: Int = tasks.size
 
   override def getParent: TreeNode = parent.get
 
-  override def getIndex(treeNode: TreeNode): Int = taskNodes.indexOf(treeNode)
+  override def getIndex(treeNode: TreeNode): Int = tasks.indexOf(treeNode)
 
   override def getAllowsChildren: Boolean = true
 
   override def isLeaf: Boolean = false
 
   override def children(): util.Enumeration[_ <: TreeNode] = enumeration(
-    taskNodes
+    tasks.asJava
+  )
+
+  override var topModule: Option[String]   = target.topModule
+  override var constraints: Option[String] = target.constraints
+  var toolchain: String                    = target.toolchain
+  var options: Option[Map[String, String]] = target.options
+
+  var tasks: mutable.Buffer[ScaledaRunTaskNode] = target.tasks.map(new ScaledaRunTaskNode(_)).toBuffer
+
+  def toTargetConfig: TargetConfig = TargetConfig(
+    name,
+    toolchain,
+    topModule,
+    constraints,
+    options,
+    tasks.map(_.toTaskConfig).toArray
   )
 }
