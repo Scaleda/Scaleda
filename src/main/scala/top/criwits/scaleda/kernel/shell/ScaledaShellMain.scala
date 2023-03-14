@@ -269,6 +269,7 @@ object ScaledaShellMain {
                   KernelLogger.info(s"Run target-task-profile-host: $targetName-$taskName-$profileName-$profileHost")
                   ScaledaRun
                     .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+                    .map(ScaledaRun.preprocess)
                     .map(rt => {
                       ScaledaRun
                         .runTask(

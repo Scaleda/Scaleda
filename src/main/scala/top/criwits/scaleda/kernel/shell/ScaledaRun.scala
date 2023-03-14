@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.shell
 
-import idea.runner.ScaledaRuntime
+import idea.runner.{ScaledaRunStage, ScaledaRuntime}
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
@@ -17,6 +17,28 @@ import java.util.Date
 import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
+
+  /** Must call before run a task, may do preset
+    * @param rt runtime
+    * @return new runtime
+    */
+  def preprocess(rt: ScaledaRuntime): ScaledaRuntime = {
+    if (rt.task.preset && rt.stage == ScaledaRunStage.Prepare) {
+      // fetch remote system info
+      val remoteInfo =
+        if (rt.profile.isRemoteProfile) {
+          val (client, shutdown) = RemoteClient(rt.profile.host)
+          val remoteInfoReply    = client.getRemoteInfo(Empty.of())
+          shutdown()
+          Some(remoteInfoReply)
+        } else None
+      Toolchain.toolchainPresetHandler
+        .get(rt.target.toolchain)
+        .flatMap(_.handlePreset(rt, remoteInfo))
+        .getOrElse(rt)
+        .copy(stage = ScaledaRunStage.PresetDone)
+    } else rt
+  }
 
   /** Run a task.
     * @param handler A [[ScaledaRunHandler]] used to redirect output and error
@@ -36,37 +58,16 @@ object ScaledaRun {
     val info      = Toolchain.toolchains(rt.target.toolchain)
     val toolchain = info._2(rt.executor)
 
-    val rtProcessed =
-      if (rt.task.preset) {
-        // fetch remote system info
-        val remoteInfo =
-          if (rt.profile.isRemoteProfile) {
-            val (client, shutdown) = RemoteClient(rt.profile.host)
-            val remoteInfoReply    = client.getRemoteInfo(Empty.of())
-            shutdown()
-            Some(remoteInfoReply)
-          } else None
-        Toolchain.toolchainPresetHandler.get(rt.target.toolchain).flatMap(_.handlePreset(rt, remoteInfo))
-      } else Some(rt)
-    if (rtProcessed.isEmpty) {
-      KernelLogger.warn(
-        s"Cannot apply preset for ${rt.target.toolchain}! Preset supports: ${Toolchain.toolchainPresetHandler.keys}"
-      )
-    }
-    if (rtProcessed.nonEmpty) {
-      if (!EnvironmentUtils.Backup.env.contains("SKIP_EXECUTION")) {
-        rtProcessed.foreach(p => {
-          val commands = toolchain.commands(p.task)
-          try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
-          catch {
-            case e: Throwable =>
-              KernelLogger.info("Exception", e, "when executing", commands, "on", remoteDeps)
-              throw e
-          }
-        })
-      } else {
-        KernelLogger.warn("Skipped run:", rtProcessed.get)
+    if (!EnvironmentUtils.Backup.env.contains("SKIP_EXECUTION")) {
+      val commands = toolchain.commands(rt.task)
+      try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
+      catch {
+        case e: Throwable =>
+          KernelLogger.info("Exception", e, "when executing", commands, "on", remoteDeps)
+          throw e
       }
+    } else {
+      KernelLogger.warn("Skipped run:", rt)
     }
   }
 

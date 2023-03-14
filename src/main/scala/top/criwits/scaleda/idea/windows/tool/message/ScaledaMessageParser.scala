@@ -3,7 +3,7 @@ package idea.windows.tool.message
 
 import idea.runner.ScaledaRuntime
 import idea.windows.tool.logging.ScaledaLogReceiver
-import kernel.utils.LogLevel
+import kernel.utils.{FileReplaceContext, LogLevel}
 
 import org.jetbrains.annotations.Nls
 
@@ -41,7 +41,20 @@ trait ScaledaMessageToolchainParser {
         }
       (Option(path), line)
     } else (None, None)
-    ScaledaMessage(text = text, level = messageLevel, line = fileLine, file = filePath)
+    var textNow     = text
+    var filePathUse = filePath
+    var fileLineUse = fileLine
+    rt.context
+      .get("replaceFiles")
+      .map(_.asInstanceOf[Seq[FileReplaceContext]])
+      .foreach(_.foreach(replace => {
+        textNow = textNow.replace(replace.to.getAbsolutePath, replace.from.getAbsolutePath)
+        if (filePathUse.nonEmpty && filePathUse.get == replace.to.getAbsolutePath) {
+          filePathUse = Some(replace.from.getAbsolutePath)
+          if (fileLineUse.nonEmpty) fileLineUse = Some(fileLineUse.get - replace.lineOffset)
+        }
+      }))
+    ScaledaMessage(text = textNow, level = messageLevel, line = fileLineUse, file = filePathUse)
   }
 }
 

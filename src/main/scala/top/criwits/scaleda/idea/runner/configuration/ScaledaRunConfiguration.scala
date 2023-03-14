@@ -109,12 +109,6 @@ class ScaledaRunConfiguration(
       environment: ExecutionEnvironment
   ): RunProfileState = {
     MainLogger.info(s"getState: taskName=$taskName, targetName=$targetName, profileName=$profileName")
-    val runtimeOptional = ScaledaRun.generateRuntimeFromName(targetName, taskName, profileName, profileHost)
-    if (runtimeOptional.isEmpty) {
-      MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
-      return null
-    }
-    val runtime = runtimeOptional.get
     val searchScope =
       ExecutionSearchScopes
         .executionScope(project, environment.getRunProfile)
@@ -125,10 +119,10 @@ class ScaledaRunConfiguration(
 
     val console = myConsoleBuilder.getConsole
     def afterExecution(
-                        rt: ScaledaRuntime,
-                        returnValues: Seq[Int],
-                        finishedAll: Boolean,
-                        meetErrors: Boolean
+        rt: ScaledaRuntime,
+        returnValues: Seq[Int],
+        finishedAll: Boolean,
+        meetErrors: Boolean
     ): Unit = {
       // TODO: if errors, switch to message tab
       if (meetErrors) {
@@ -220,15 +214,24 @@ class ScaledaRunConfiguration(
       }
     }
 
-    val handler =
-      new ScaledaRunProcessHandler(
-        project,
-        new ConsoleLogger(console, logSourceId = Some(runtime.id)),
-        runtime,
-        afterExecution
-      )
+    val runtimeOptional = ScaledaRun.generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+    if (runtimeOptional.isEmpty) {
+      MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
+      return null
+    }
 
     (_: Executor, _: ProgramRunner[_]) => {
+      // may run preset
+      val runtime = ScaledaRun.preprocess(runtimeOptional.get)
+
+      val handler =
+        new ScaledaRunProcessHandler(
+          project,
+          new ConsoleLogger(console, logSourceId = Some(runtime.id)),
+          runtime,
+          afterExecution
+        )
+
       // attach listener to control the green dot
       ProcessTerminatedListener.attach(handler)
 

@@ -24,5 +24,11 @@ case class ScaledaRuntime(
     executor: Executor,
     workingDir: File = new File(ProjectConfig.projectBase.get),
     // used in preset and message handler
-    context: Map[String, Any] = Map()
+    context: Map[String, Any] = Map(),
+    // mark, only run preset once
+    stage: ScaledaRunStage.Value = ScaledaRunStage.Prepare
 )
+
+object ScaledaRunStage extends Enumeration {
+  val Prepare, PresetDone, Running = Value
+}
