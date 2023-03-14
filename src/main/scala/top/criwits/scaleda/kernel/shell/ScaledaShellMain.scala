@@ -181,8 +181,10 @@ object ScaledaShellMain {
               .action((x, c) => c.copy(profileName = x))
               .text("Specify profile name, otherwise will auto fill"),
             opt[String]('e', "environment")
-              .action((x, c) => c.copy(extraEnvs = c.extraEnvs + (x.split('=').head -> x.split('=')(1))))
-              .text("Specify environment")
+              .action((x, c) =>
+                c.copy(extraEnvs = c.extraEnvs ++ x.split(';').map(m => (m.split('=').head -> m.split('=')(1))).toMap)
+              )
+              .text("Specify environment, example ENV_A=a;ENV_B=b")
           ),
         help("help").text("Prints this usage text")
       )
