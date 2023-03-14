@@ -33,6 +33,8 @@ class ScaledaKernelConfiguration {
       var profileName: String = ""
       @JacksonXmlProperty
       var profileHost: String = ""
+      @JacksonXmlProperty
+      var extraEnvs: String = ""
     }
     @JacksonXmlProperty
     var scaleda = new Scaleda

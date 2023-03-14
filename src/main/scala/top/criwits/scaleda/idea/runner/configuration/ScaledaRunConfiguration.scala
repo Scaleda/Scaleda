@@ -13,6 +13,7 @@ import kernel.shell.ScaledaRun
 import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.SimulationExecutor
 import kernel.utils.LogLevel
+import kernel.utils.serialise.JSONHelper
 
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
@@ -64,6 +65,7 @@ class ScaledaRunConfiguration(
     else c.setAttribute("profileName", "")
     if (profileHost != null) c.setAttribute("profileHost", profileHost)
     else c.setAttribute("profileHost", "")
+    c.setAttribute("extraEnvs", JSONHelper(extraEnvs.toMap))
     c
   }
 
@@ -72,6 +74,13 @@ class ScaledaRunConfiguration(
     targetName = e.getAttributeValue("targetName")
     profileName = e.getAttributeValue("profileName")
     profileHost = e.getAttributeValue("profileHost")
+    val v = e.getAttributeValue("extraEnvs")
+    extraEnvs.clear()
+    if (v != null) {
+      val m = JSONHelper(v, classOf[Map[String, String]])
+      if (m != null && m.nonEmpty)
+        extraEnvs.addAll(m)
+    }
   }
 
   override def writeExternal(element: Element): Unit = {
@@ -214,7 +223,9 @@ class ScaledaRunConfiguration(
       }
     }
 
-    val runtimeOptional = ScaledaRun.generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+    val runtimeOptional = ScaledaRun
+      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+      .map(_.copy(extraEnvs = extraEnvs.toMap))
     if (runtimeOptional.isEmpty) {
       MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
       return null

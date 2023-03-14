@@ -31,7 +31,8 @@ case class ShellArgs(
     serverHost: String = "",
     profileName: String = "",
     user: User = new User("", "", ""),
-    configureName: String = ""
+    configureName: String = "",
+    extraEnvs: Map[String, String] = Map()
 )
 
 object ScaledaShellMain {
@@ -178,7 +179,10 @@ object ScaledaShellMain {
               .text("Specify the target, otherwise will auto fill"),
             opt[String]('p', "profile")
               .action((x, c) => c.copy(profileName = x))
-              .text("Specify profile name, otherwise will auto fill")
+              .text("Specify profile name, otherwise will auto fill"),
+            opt[String]('e', "environment")
+              .action((x, c) => c.copy(extraEnvs = c.extraEnvs + (x.split('=').head -> x.split('=')(1))))
+              .text("Specify environment")
           ),
         help("help").text("Prints this usage text")
       )
@@ -233,6 +237,7 @@ object ScaledaShellMain {
                 // auto in ScaledaRun
                 var profileName    = shellConfig.profileName
                 val configureName  = shellConfig.configureName
+                var extraEnvs      = shellConfig.extraEnvs
                 val configurations = ScaledaKernelConfiguration.configurations
                 if (configurations.contains(configureName)) {
                   val configuration = configurations(configureName)
@@ -240,6 +245,7 @@ object ScaledaShellMain {
                   targetName = configuration.configuration.scaleda.targetName
                   profileHost = configuration.configuration.scaleda.profileHost
                   profileName = configuration.configuration.scaleda.profileName
+                  extraEnvs = JSONHelper(configuration.configuration.scaleda.extraEnvs, classOf[Map[String, String]])
                 } else {
                   if (taskName.isEmpty) {
                     if (c.taskNames.length > 1) KernelLogger.warn("Multiple tasks available")
@@ -269,6 +275,7 @@ object ScaledaShellMain {
                   KernelLogger.info(s"Run target-task-profile-host: $targetName-$taskName-$profileName-$profileHost")
                   ScaledaRun
                     .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+                    .map(_.copy(extraEnvs = extraEnvs))
                     .map(ScaledaRun.preprocess)
                     .map(rt => {
                       ScaledaRun

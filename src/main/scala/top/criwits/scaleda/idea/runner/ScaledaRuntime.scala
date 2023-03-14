@@ -23,6 +23,7 @@ case class ScaledaRuntime(
     profile: ToolchainProfile,
     executor: Executor,
     workingDir: File = new File(ProjectConfig.projectBase.get),
+    extraEnvs: Map[String, String] = Map(),
     // used in preset and message handler
     context: Map[String, Any] = Map(),
     // mark, only run preset once

@@ -59,7 +59,8 @@ object ScaledaRun {
     val toolchain = info._2(rt.executor)
 
     if (!EnvironmentUtils.Backup.env.contains("SKIP_EXECUTION")) {
-      val commands = toolchain.commands(rt.task)
+      // generic commands and apply envs
+      val commands = toolchain.commands(rt.task).map(c => c.copy(envs = rt.extraEnvs.toSeq))
       try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
       catch {
         case e: Throwable =>
