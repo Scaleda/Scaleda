@@ -25,7 +25,8 @@ class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.Scaled
 
   override def gotoSource(request: ScaledaGotoSource): Future[ScaledaEmpty] = async {
     MainLogger.info(s"grpc gotoSource($request)")
-    RpcService.pushGotoInfo(RpcService.RpcGotoInfo(request.file, request.line, request.column))
+    // Warn: line number starts from 1
+    RpcService.pushGotoInfo(RpcService.RpcGotoInfo(request.file, math.max(0, request.line - 1), request.column))
     ScaledaEmpty.of()
   }
 }
