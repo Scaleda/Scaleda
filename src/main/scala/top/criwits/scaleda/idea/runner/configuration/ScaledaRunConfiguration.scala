@@ -5,7 +5,7 @@ import idea.ScaledaBundle
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntimeInfo}
 import idea.rvcd.RvcdService
 import idea.settings.auth.AuthorizationEditor
-import idea.utils.{ConsoleLogger, MainLogger, Notification, invokeLater, runInEdt}
+import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.database.UserException
 import kernel.project.config.TaskType
@@ -22,7 +22,6 @@ import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
 import com.intellij.icons.AllIcons
 import com.intellij.ide.actions.ShowSettingsUtilImpl
-import com.intellij.navigation.{NavigationRequest, NavigationService}
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.options.SettingsEditor
@@ -152,13 +151,15 @@ class ScaledaRunConfiguration(
         // ToolWindowManager.getInstance(project).getFocusManager
         // ScaledaMessageTab.instance.switchToTab()
 
+        val causeMessage     = ScaledaMessageTab.instance.getCauseMessage(rt.id)
+        val causeCodeMessage = ScaledaMessageTab.instance.getCauseCode(rt.id)
+
         // create notification
         val notification = Notification.NOTIFICATION_GROUP.createNotification(
           ScaledaBundle.message("notification.runner.error.execute.title"),
           ScaledaBundle.message(
             "notification.runner.error.execute.content.prefix",
-            ScaledaMessageTab.instance
-              .getCauseMessage(rt.id)
+            causeMessage
               .map(m => m.text)
               .getOrElse(ScaledaBundle.message("notification.runner.error.execute.content.default"))
           ),
@@ -177,41 +178,30 @@ class ScaledaRunConfiguration(
             }
           }
         )
-        Seq(
-          new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
-            override def actionPerformed(e: AnActionEvent) = {
-              // TODO: goto message window
-              ScaledaMessageTab.instance.switchToTab()
+        causeMessage.foreach(m => {
+          notification.addAction(
+            new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
+              override def actionPerformed(e: AnActionEvent) = {
+                // TODO: goto message window
+                ScaledaMessageTab.instance.switchToTab()
+              }
             }
-          },
+          )
+        })
+        causeCodeMessage.foreach(m => {
           new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
             override def actionPerformed(e: AnActionEvent) = {
-              // TODO: Goto Source Code
-              val filepath = "/home/chiro/programs/scaleda-sample-project/.sim/Icarus-Run iverilog simulation/tb_waterfall_generated.v"
-              // new Thread(() => {
-              //   runInEdt {
-              //     val reqService: NavigationRequest =
-              //       NavigationService
-              //         .instance()
-              //         .sourceNavigationRequest(
-              //           new LocalFilePath(
-              //             filepath,
-              //             false
-              //           ).getVirtualFile,
-              //           0
-              //         )
-              //
-              //     MainLogger.warn(s"reqService: $reqService")
-              //   }
-              // }).start()
-
-              // test ok
-              val descriptor = new OpenFileDescriptor(project, new LocalFilePath(filepath, false).getVirtualFile, 1, 1)
-              MainLogger.info("descriptor", descriptor)
+              require(m.file.nonEmpty, "causeCodeMessage.file isEmpty")
+              val descriptor = new OpenFileDescriptor(
+                project,
+                new LocalFilePath(m.file.get, false).getVirtualFile,
+                m.line.getOrElse(0),
+                0
+              )
               descriptor.navigate(true)
             }
           }
-        ).foreach(notification.addAction)
+        })
         notification.notify(project)
       }
       // remove message listeners

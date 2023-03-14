@@ -43,7 +43,8 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   def getFirstError(key: String)   = getFirstLargerLevelMessage(key, LogLevel.Error)
   def getFirstWarning(key: String) = getFirstLargerLevelMessage(key, LogLevel.Warn)
   def getFirstInfo(key: String)    = getFirstLargerLevelMessage(key, LogLevel.Info)
-  def getCauseMessage(key: String) = {
+
+  def getCauseMessage(key: String): Option[ScaledaMessage] = {
     val v = getFirstError(key)
       .getOrElse(
         getFirstWarning(key)
@@ -53,6 +54,13 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
       )
     Option(v)
   }
+
+  def getCauseCode(key: String, pathSuffix: Set[String] = Set(".v")): Option[ScaledaMessage] =
+    getMessageData(key)
+      .map(_._2)
+      .map(_.toIndexedSeq.reverse)
+      // exist file path that ends with suffix
+      .flatMap(_.find(m => m.file.exists(f => pathSuffix.exists(f.endsWith))))
 
   def getDisplayName                                = ScaledaBundle.message("windows.tool.log.message.title")
   private var tabManager: Option[ConsoleTabManager] = None
@@ -153,10 +161,13 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     val service = project.getService(classOf[ScaledaLoggingService])
     service.addListener(
       runtime.id,
-      new ScaledaMessageParser(message => {
-        messageQueue.put((runtime, message))
-        MainLogger.info(s"[ RUNTIME: ${runtime.id} ] message insert:", message)
-      })
+      new ScaledaMessageParser(
+        runtime,
+        message => {
+          messageQueue.put((runtime, message))
+          MainLogger.info(s"[ RUNTIME: ${runtime.id} ] message insert:", message)
+        }
+      )
     )
     dataModel.synchronized {
       dataModel.clear()

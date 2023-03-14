@@ -1,20 +1,16 @@
 package top.criwits.scaleda
 package idea.toolchain
 
-import idea.windows.tool.message.{
-  ScaledaMessage,
-  ScaledaMessageRenderer,
-  ScaledaMessageToolchainParser,
-  ScaledaMessageToolchainParserProvider
-}
+import idea.windows.tool.message.{ScaledaMessage, ScaledaMessageRenderer, ScaledaMessageToolchainParser, ScaledaMessageToolchainParserProvider}
 import kernel.toolchain.impl.IVerilog.internalID
 import kernel.utils.LogLevel
 
 import org.jetbrains.annotations.Nls
+import top.criwits.scaleda.idea.runner.ScaledaRuntimeInfo
 
 object IVerilogIdea extends ScaledaMessageToolchainParserProvider {
   private object MessageParser extends ScaledaMessageToolchainParser {
-    override def parse(source: String, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
+    override def parse(rt: ScaledaRuntimeInfo, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = {
       if (text.nonEmpty && level.id >= LogLevel.Info.id) {
         var messageLevel = LogLevel.Info
         if (text.toLowerCase.contains("error")) messageLevel = LogLevel.Error

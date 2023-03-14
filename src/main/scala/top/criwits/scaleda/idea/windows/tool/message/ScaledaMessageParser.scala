@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package idea.windows.tool.message
 
+import idea.runner.ScaledaRuntimeInfo
 import idea.windows.tool.logging.ScaledaLogReceiver
 import kernel.utils.LogLevel
 
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Nls
 import scala.collection.mutable
 
 trait ScaledaMessageToolchainParser {
-  def parse(source: String, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage]
+  def parse(rt: ScaledaRuntimeInfo, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage]
 }
 
 trait ScaledaMessageToolchainParserProvider {
@@ -25,7 +26,11 @@ object ScaledaMessageParser {
   def removeParser(key: String) = allParsers.remove(key)
 }
 
+/** Used to handle messages when running command
+  * @param handler callback for logging service
+  */
 class ScaledaMessageParser(
+    rt: ScaledaRuntimeInfo,
     handler: ScaledaMessage => Unit
 ) extends ScaledaLogReceiver {
   override def print(
@@ -36,7 +41,7 @@ class ScaledaMessageParser(
     var parseDone = false
     for ((_k, parser) <- ScaledaMessageParser.allParsers) {
       if (!parseDone) {
-        val result = parser.parse(source, text, level)
+        val result = parser.parse(rt, text, level)
         if (result.nonEmpty) {
           parseDone = true
           handler(result.get)
