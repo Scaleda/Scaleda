@@ -103,7 +103,14 @@ object KernelFileUtils {
     None
   }
 
-  def insertAfterModuleHead(original: File, output: File, moduleName: String, insert: String): Unit = {
+  /** Insert content after module head
+    * @param original file from
+    * @param output file to
+    * @param moduleName target module name
+    * @param insert content to insert
+    * @return line where content inserts
+    */
+  def insertAfterModuleHead(original: File, output: File, moduleName: String, insert: String): Int = {
     KernelLogger.info(s"insertAfterModuleHead $original -> $output")
     val stream     = new FileInputStream(original)
     val charStream = CharStreams.fromStream(stream)
@@ -150,13 +157,16 @@ object KernelFileUtils {
     val visitor = new ModuleHeadVisitor(moduleName)
     visitor.visit(tree)
 
-    val source  = Source.fromFile(original)
-    val newText = new mutable.StringBuilder(source.mkString).insert(visitor.headerEndAt + 1, insert).toString()
+    val source     = Source.fromFile(original)
+    val sourceText = source.mkString
+    val lineStart  = sourceText.slice(0, visitor.headerEndAt).count(_ == '\n')
+    val newText    = new mutable.StringBuilder(sourceText).insert(visitor.headerEndAt + 1, insert).toString()
     source.close()
 
     val outputStream = new FileOutputStream(output)
     outputStream.write(newText.getBytes())
     outputStream.close()
+    lineStart
   }
 
   def getFileMD5(file: File) = {

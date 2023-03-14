@@ -87,7 +87,7 @@ class ScaledaRunProcessHandler(
                     (try Some(Integer.parseInt(line))
                     catch {
                       case e: NumberFormatException => None
-                    }).map(_ - replace.lineOffset)
+                    }).map(n => if (n > replace.lineOffsetStart) n - replace.lineOffset else n)
                   number.map(":" + _.toString).getOrElse("")
                 })
                 .getOrElse("")

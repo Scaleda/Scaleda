@@ -51,7 +51,8 @@ trait ScaledaMessageToolchainParser {
         textNow = textNow.replace(replace.to.getAbsolutePath, replace.from.getAbsolutePath)
         if (filePathUse.nonEmpty && filePathUse.get == replace.to.getAbsolutePath) {
           filePathUse = Some(replace.from.getAbsolutePath)
-          if (fileLineUse.nonEmpty) fileLineUse = Some(fileLineUse.get - replace.lineOffset)
+          if (fileLineUse.nonEmpty)
+            fileLineUse = fileLineUse.map(n => if (n > replace.lineOffsetStart) n - replace.lineOffset else n)
         }
       }))
     ScaledaMessage(text = textNow, level = messageLevel, line = fileLineUse, file = filePathUse)

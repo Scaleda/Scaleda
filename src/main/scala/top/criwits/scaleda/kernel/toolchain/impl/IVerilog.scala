@@ -124,7 +124,7 @@ object IVerilog extends ToolchainPresetProvider {
     // vcd file
     val vcdFile = simExecutor.vcdFile
 
-    KernelFileUtils.insertAfterModuleHead(
+    val lineStart = KernelFileUtils.insertAfterModuleHead(
       testbenchFile,
       newTestbenchFile,
       testbench,
@@ -138,7 +138,12 @@ object IVerilog extends ToolchainPresetProvider {
     val replaceFiles = rt.context
       .get("replaceFiles")
       .map(_.asInstanceOf[Seq[FileReplaceContext]])
-      .getOrElse(Seq()) :+ FileReplaceContext(from = testbenchFile, to = newTestbenchFile, lineOffset = +4)
+      .getOrElse(Seq()) :+ FileReplaceContext(
+      from = testbenchFile,
+      to = newTestbenchFile,
+      lineOffset = +4,
+      lineOffsetStart = lineStart
+    )
     val rtWithContext = rt.copy(context = rt.context ++ Map("replaceFiles" -> replaceFiles))
     Some(rtWithContext)
   }
