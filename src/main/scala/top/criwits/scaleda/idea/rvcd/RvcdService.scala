@@ -12,6 +12,10 @@ import com.intellij.openapi.project.Project
 import rvcd.rvcd.RvcdEmpty
 
 import java.io.File
+import scala.async.Async.{async, await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.language.implicitConversions
 
 /** Daemon service for RVCD, the waveform viewer of Scaleda.
   */
@@ -25,7 +29,7 @@ class RvcdService extends Disposable {
 
   var (client, shutdown) = Rvcd()
 
-  def launchWithWaveformAndSource(waveform: File, source: Seq[File]): Unit = {
+  def launchWithWaveformAndSource(waveform: File, source: Seq[File]): Future[Unit] = async {
     if (!hasInstance) {
       // No instance is running, launch
       if (!RvcdService.rvcdFile.canExecute) {
@@ -40,14 +44,16 @@ class RvcdService extends Disposable {
       MainLogger.info(s"Starting RVCD with command line: ${cmdLine.mkString(" ")}")
 
       // run
-      CommandRunner.execute(
-        Seq(
-          CommandDeps(
-            args = cmdLine,
-            description = "Start RVCD Instance"
-          )
-        ),
-        new StdErrToInfoHandler(myProject)
+      await(
+        CommandRunner.executeAsync(
+          Seq(
+            CommandDeps(
+              args = cmdLine,
+              description = "Start RVCD Instance"
+            )
+          ),
+          new StdErrToInfoHandler(myProject)
+        )
       )
     } else {
       client.openFileWith(

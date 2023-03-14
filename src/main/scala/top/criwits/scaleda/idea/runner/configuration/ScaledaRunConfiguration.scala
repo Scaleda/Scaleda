@@ -240,6 +240,7 @@ class ScaledaRunConfiguration(
                 }
               }
               notification.addAction(action)
+              notification.notify(project)
             }
           case _ =>
         }

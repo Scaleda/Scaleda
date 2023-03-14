@@ -7,6 +7,11 @@ import java.io.File
 
 trait WaveformHandler {
   def getId: String
+
+  /** Handle waveform file in this project, blocking ui thread
+    * @param project project
+    * @param waveformPath file
+    */
   def handle(project: Project, waveformPath: File): Unit
 }
 
