@@ -38,17 +38,21 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   def getFirstLargerLevelMessage(
       key: String,
       level: LogLevel.Value
-  ): Option[(ScaledaRuntimeInfo, Option[ScaledaMessage])] =
-    getMessageData(key).flatMap(d => {
-      val v = d._2.find(_.level.id >= level.id)
-      if (v.nonEmpty) {
-        Some(d._1, v)
-      } else None
-    })
+  ): Option[ScaledaMessage] = getMessageData(key).flatMap(_._2.find(_.level.id >= level.id))
 
   def getFirstError(key: String)   = getFirstLargerLevelMessage(key, LogLevel.Error)
   def getFirstWarning(key: String) = getFirstLargerLevelMessage(key, LogLevel.Warn)
   def getFirstInfo(key: String)    = getFirstLargerLevelMessage(key, LogLevel.Info)
+  def getCauseMessage(key: String) = {
+    val v = getFirstError(key)
+      .getOrElse(
+        getFirstWarning(key)
+          .getOrElse(
+            getFirstInfo(key).orNull
+          )
+      )
+    Option(v)
+  }
 
   def getDisplayName                                = ScaledaBundle.message("windows.tool.log.message.title")
   private var tabManager: Option[ConsoleTabManager] = None
