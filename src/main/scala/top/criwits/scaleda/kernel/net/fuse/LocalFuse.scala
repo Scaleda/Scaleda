@@ -352,7 +352,7 @@ class LocalFuse(sourcePath: String) extends FuseStubFS {
 object LocalFuse {
   // !! NEVER RUN THIS !!
   // !! YOUR JVM WILL CRASH AND CANNOT RESTART !!
-  def main(args: Array[String]): Unit = {
+  def _main(args: Array[String]): Unit = {
     val source = "/tmp/mnt-source"
     val dest   = "/tmp/mnt"
     s"mkdir -p $source".!
