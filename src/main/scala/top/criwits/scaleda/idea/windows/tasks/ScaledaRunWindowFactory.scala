@@ -16,7 +16,6 @@ import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
-import top.criwits.scaleda.idea.runner.task.edit.{ScaledaCreateNewTargetAction, ScaledaCreateNewTaskAction}
 import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory.model
 
 import java.awt.GridLayout
@@ -36,8 +35,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
       .getInstance(project)
       .runWhenSmart(() => {
         model = Some(new DefaultTreeModel(null))
+
         val panel = new SimpleToolWindowPanel(true)
-        val tree = new Tree(model.get) with DataProvider {
+        val tree = new Tree(model.get) /*with DataProvider {
           override def getData(dataId: String): AnyRef = {
             if (
               /*PlatformCoreDataKeys.BGT_DATA_PROVIDER.is(dataId)*/
@@ -65,7 +65,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
               })
               .orNull
           }
-        }
+        } */
+
+        tree.setCellRenderer(new ScaledaRunTreeCellRenderer)
         TreeUtil.installActions(tree)
         new TreeSpeedSearch(tree)
         panel.add(ScrollPaneFactory.createScrollPane(tree))
@@ -79,6 +81,8 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
           new CustomShortcutSet(KeyEvent.VK_ENTER),
           panel
         )
+
+        // Double click
         tree.addMouseListener(new MouseAdapter {
           override def mousePressed(e: MouseEvent) = {
             if (
@@ -91,7 +95,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
           }
         })
-
+        // Right click
         tree.addMouseListener(new MouseAdapter {
           override def mouseClicked(e: MouseEvent): Unit = {
             if (SwingUtilities.isRightMouseButton(e)) {
@@ -102,7 +106,6 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
         val group = new DefaultActionGroup()
         group.add(runTaskAction)
-
         group.addSeparator()
 
         val treeExpander = new DefaultTreeExpander(tree)
@@ -120,11 +123,14 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         )
 
         group.addSeparator()
+        group.add(new ScaledaEditTasksAction)
 
-        val createTargetAction = new ScaledaCreateNewTargetAction(model.get, project)
-        group.add(createTargetAction)
-        val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
-        group.add(createTaskAction)
+//        group.addSeparator()
+//
+//        val createTargetAction = new ScaledaCreateNewTargetAction(model.get, project)
+//        group.add(createTargetAction)
+//        val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
+//        group.add(createTaskAction)
 
         group.addSeparator()
 
@@ -154,10 +160,7 @@ object ScaledaRunWindowFactory {
     ProjectConfig
       .getConfig()
       .map(c => {
-        new ScaledaRunRootNode(
-          c.name,
-          c.targets.map(t => new ScaledaRunTargetNode(t)).toList
-        )
+        new ScaledaRunRootNode(c)
       }).orNull
   }
 }

@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package idea.runner.task.edit.modules
+package idea.windows.tasks.modules
 
 import idea.utils.Icons
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode

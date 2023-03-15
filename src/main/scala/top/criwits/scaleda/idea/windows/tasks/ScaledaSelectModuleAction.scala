@@ -1,12 +1,12 @@
 package top.criwits.scaleda
-package idea.runner.task.edit
+package idea.windows.tasks
 
 import idea.ScaledaBundle
+import idea.windows.tasks.modules.SelectModuleDialogWrapper
+import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
-import top.criwits.scaleda.idea.runner.task.edit.modules.SelectModuleDialogWrapper
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 class ScaledaSelectModuleAction(
     project: Project

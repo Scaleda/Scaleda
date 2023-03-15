@@ -1,10 +1,10 @@
 package top.criwits.scaleda
-package idea.runner.task.edit.modules
+package idea.windows.tasks.modules
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
+import idea.ScaledaBundle
+import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import javax.swing.JComponent
 

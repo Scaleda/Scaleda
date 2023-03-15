@@ -39,7 +39,7 @@ object TaskType extends Enumeration {
 object TaskConfig extends HasDefault[TaskConfig] {
   override def getDefault: TaskConfig = TaskConfig()
 
-  val taskTypeList: Map[String, (String, TaskType.Value)] = Map(
+  val taskTypeList: Map[String, (String, TaskType.Value)] = Map( // TODO: extract to bundle
     "simulation"     -> ("Simulation", TaskType.Simulation),
     "synthesis"      -> ("Synthesis", TaskType.Synthesis),
     "implementation" -> ("Implementation", TaskType.Implement),

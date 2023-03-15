@@ -37,6 +37,7 @@ class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(
   var options: Option[Map[String, String]] = target.options
 
   var tasks: mutable.Buffer[ScaledaRunTaskNode] = target.tasks.map(new ScaledaRunTaskNode(_)).toBuffer
+  tasks.foreach(_.parent = Some(this))
 
   def toTargetConfig: TargetConfig = TargetConfig(
     name,
