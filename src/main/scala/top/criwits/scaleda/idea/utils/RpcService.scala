@@ -11,6 +11,7 @@ import com.intellij.openapi.vcs.LocalFilePath
 import io.grpc.Server
 import scaleda.scaleda.{ScaledaEmpty, ScaledaGotoSource, ScaledaRpcGrpc}
 
+import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -93,16 +94,21 @@ object RpcService {
     val thread = new Thread(() => {
       try {
         while (true) {
-          val info = gotoInfoQueue.take()
-          runInEdt {
-            val descriptor = new OpenFileDescriptor(
-              project,
-              new LocalFilePath(info.filepath, false).getVirtualFile,
-              info.line,
-              info.column
-            )
-            descriptor.navigate(true)
-          }
+          val info        = gotoInfoQueue.take()
+          var virtualFile = new LocalFilePath(info.filepath, false).getVirtualFile
+          if (virtualFile == null)
+            virtualFile = new LocalFilePath(
+              new File(project.getProjectFilePath, info.filepath).getAbsolutePath,
+              false
+            ).getVirtualFile
+          if (virtualFile == null) {
+            // TODO: i18n
+            Notification().warn("File not found:", info.filepath)
+          } else
+            runInEdt {
+              val descriptor = new OpenFileDescriptor(project, virtualFile, info.line, info.column)
+              descriptor.navigate(true)
+            }
         }
       } catch {
         case e: InterruptedException =>

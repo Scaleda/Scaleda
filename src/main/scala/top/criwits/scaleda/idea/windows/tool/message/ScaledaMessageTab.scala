@@ -3,7 +3,7 @@ package idea.windows.tool.message
 
 import idea.ScaledaBundle
 import idea.runner.ScaledaRuntime
-import idea.utils.MainLogger
+import idea.utils.{MainLogger, RpcService}
 import idea.windows.tool.logging.{ConsoleTabManager, ScaledaLoggingService}
 import kernel.utils.LogLevel
 
@@ -31,6 +31,21 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 
   private val data         = new mutable.HashMap[String, (ScaledaRuntime, ArrayBuffer[ScaledaMessage])]()
   private val viewComboBox = new ComboBox[String]()
+
+  // TODO: jump to source when clicked
+  // listComponent.addListSelectionListener(e => {
+  //   data
+  //     .get(viewComboBox.getItem)
+  //     .foreach(d => {
+  //       val array = d._2
+  //       if (array.size >= e.getFirstIndex) {
+  //         val item = array(e.getFirstIndex)
+  //         if (item.file.nonEmpty) {
+  //           RpcService.pushGotoInfo(RpcService.RpcGotoInfo(item.file.get, item.line.getOrElse(0), 0))
+  //         }
+  //       }
+  //     })
+  // })
 
   def getMessageData(key: String): Option[(ScaledaRuntime, ArrayBuffer[ScaledaMessage])] =
     data.get(key)

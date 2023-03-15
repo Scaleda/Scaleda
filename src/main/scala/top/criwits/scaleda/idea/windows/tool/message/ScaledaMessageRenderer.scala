@@ -30,8 +30,10 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
       case _     => AllIcons.General.Error
     }
     setIcon(icon)
-    val text    = (if (value.code.nonEmpty) s"[${value.code}] " else "") + value.text
-    val matches = fileOptionalLineNumberRegex.findAllMatchIn(text).toSeq.sortBy(_.start)
+    val text                     = (if (value.code.nonEmpty) s"[${value.code}] " else "") + value.text
+    val matches                  = fileOptionalLineNumberRegex.findAllMatchIn(text).toSeq.sortBy(_.start)
+    var filePath: Option[String] = None
+    var fileLine: Option[Int]    = None
     if (matches.nonEmpty) {
       val results = ArrayBuffer[(String, Option[SimpleTextAttributes])]()
       // handle start
@@ -42,6 +44,18 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
       for (i <- matches.indices) {
         // handle this match and next plain text
         results.addOne((matches(i).matched, Some(SimpleTextAttributes.LINK_ATTRIBUTES)))
+        if (filePath.isEmpty) { // redo-match
+          val m = fileOptionalLineNumberPattern.matcher(matches(i).matched)
+          if (m.find()) {
+            filePath = Some(m.group(1))
+            fileLine = Option(m.group(m.groupCount())).map(n =>
+              try Integer.parseInt(n)
+              catch {
+                case e: Throwable => 0
+              }
+            )
+          }
+        }
         if (i < matches.size - 1) {
           if (matches(i).end < text.length - 1) {
             results.addOne((text.slice(matches(i).end, matches(i + 1).start), None))
@@ -50,6 +64,16 @@ class ScaledaMessageRenderer extends ColoredListCellRenderer[ScaledaMessage] {
           results.addOne((text.slice(matches(i).end, text.length), None))
         }
       }
+      // addFocusListener(new FocusListener {
+      //   override def focusGained(focusEvent: FocusEvent) = {
+      //     MainLogger.info("focusGained")
+      //     filePath.foreach(path => {
+      //       RpcService.pushGotoInfo(RpcService.RpcGotoInfo(path, fileLine.getOrElse(0), 0))
+      //     })
+      //   }
+      //
+      //   override def focusLost(focusEvent: FocusEvent) = {}
+      // })
       results.toSeq
     } else {
       Seq((text, None))
