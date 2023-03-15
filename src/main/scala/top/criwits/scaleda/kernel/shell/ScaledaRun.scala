@@ -8,7 +8,7 @@ import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor._
 import kernel.toolchain.{Toolchain, ToolchainProfile}
-import kernel.utils.{EnvironmentUtils, KernelLogger, NameLegalization}
+import kernel.utils.{EnvironmentUtils, KernelLogger}
 
 import io.grpc.StatusRuntimeException
 
@@ -193,7 +193,9 @@ object ScaledaRun {
           None
         } else {
           val runtimeId =
-            NameLegalization.legalization(s"${target.toolchain}-${target.name}-${task.name}-${new Date()}")
+            // NameLegalization.legalization(
+            s"${target.toolchain}-${target.name}-${task.name}-${new Date()}"
+          // )
 
           val workingDir = new File(ProjectConfig.projectBase.get)
           val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
