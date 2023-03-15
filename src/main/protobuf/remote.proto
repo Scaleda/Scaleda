@@ -54,6 +54,7 @@ message RunRequest {
   string path = 2;
   repeated StringTriple envs = 3;
   string projectBase = 4;
+  string runId = 5;
 }
 
 enum RunReplyType {

@@ -4,3 +4,4 @@ target/
 null/
 /.env
 /.tmp/
+/docs/

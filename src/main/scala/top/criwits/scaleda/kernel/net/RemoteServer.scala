@@ -17,6 +17,7 @@ import kernel.toolchain.Toolchain
 import kernel.utils._
 
 import io.grpc.stub.StreamObserver
+import org.apache.commons.codec.digest.DigestUtils
 
 import java.io.File
 import scala.async.Async.async
@@ -50,10 +51,13 @@ object RemoteServer {
         return
       }
       // do text replacement
-      val username   = user.getUsername
-      val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath.replace('\\', '/')
+      val username = user.getUsername
+      val targetPath = new File(
+        Paths.getServerTemporalDir(),
+        username + "-" + DigestUtils.sha256Hex(request.runId)
+      ).getAbsolutePath.replace('\\', '/')
       val sourcePath = request.projectBase
-      val replacer   = new ImplicitPathReplace(sourcePath, targetPath) {
+      val replacer = new ImplicitPathReplace(sourcePath, targetPath) {
         override def doReplace(src: String) = super.doReplace(src.replace('\\', '/'))
       }
       val commandDeps = CommandDeps(

@@ -13,6 +13,8 @@ import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecuto
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
+import org.apache.commons.codec.digest.DigestUtils
+
 import java.io.File
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
@@ -238,8 +240,8 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         // this path may not exist on local
         val remoteTargetPath = remoteInfo.get.tempPrefix +
           (if (remoteInfo.get.os.isRemoteOsTypeWindows) "\\" else "/") +
-          userTokenBean.get.username
-        val pathFrom = rt.workingDir.getAbsolutePath.replace('\\', '/')
+          userTokenBean.get.username + "-" + DigestUtils.sha256Hex(rt.id)
+        // val pathFrom = rt.workingDir.getAbsolutePath.replace('\\', '/')
         new ImplicitPathReplace(
           rt.workingDir.getAbsolutePath,
           remoteTargetPath,
@@ -292,16 +294,16 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         KernelFileUtils.deleteDirectory(file.toPath)
       })
     }
+    // add sources
+    rt = rt.copy(context =
+      rt.context ++ Map("sourceFiles" -> generateContext(rt.executor, rt.target, rt.task).sourceList.map(new File(_)))
+    )
     rt = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"
       case TaskType.Synthesis   => "run_synth.tcl"
       case TaskType.Implement   => "run_impl.tcl"
       case TaskType.Programming => "run_program.tcl"
     })))
-    // add sources
-    rt = rt.copy(context =
-      rt.context ++ Map("sourceFiles" -> generateContext(rt.executor, rt.target, rt.task).sourceList.map(new File(_)))
-    )
     Some(rt)
   }
 }

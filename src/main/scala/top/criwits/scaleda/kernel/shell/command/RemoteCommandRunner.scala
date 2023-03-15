@@ -9,8 +9,7 @@ import kernel.net.remote.{RunRequest, StringTriple}
 import kernel.net.{RemoteClient, RemoteServer}
 import kernel.shell.ScaledaRunHandler
 import kernel.utils.KernelLogger
-
-import com.google.protobuf.ByteString
+import kernel.utils.serialise.BinarySerializeHelper
 
 import java.io.File
 import java.lang.Thread.UncaughtExceptionHandler
@@ -21,7 +20,7 @@ case class RemoteCommandDeps(
     projectRoot: File,
     host: String = "localhost",
     port: Int = RemoteServer.DEFAULT_PORT,
-    runId: String
+    runId: String = "default"
 )
 
 class RemoteCommandRunner(
@@ -35,7 +34,8 @@ class RemoteCommandRunner(
     // DO NOT DO REPLACE HERE
     path = deps.path,
     envs = deps.envs.map(t => new StringTriple(t._1, t._2)),
-    projectBase = remoteCommandDeps.projectRoot.getAbsolutePath.replace('\\', '/')
+    projectBase = remoteCommandDeps.projectRoot.getAbsolutePath.replace('\\', '/'),
+    runId = remoteCommandDeps.runId
   )
   override val thread = new Thread(() => {
     val fuseStartWaits = new Object
@@ -73,7 +73,7 @@ class RemoteCommandRunner(
               FuseTransferClient.asStream(dataProvider, host = remoteCommandDeps.host, port = remoteCommandDeps.port)
             shutdown = Some(_shutdown)
             try {
-              stream.onNext(FuseTransferMessage.of(0, "login", ByteString.EMPTY))
+              stream.onNext(FuseTransferMessage.of(0, "login", BinarySerializeHelper.fromAny(remoteCommandDeps.runId)))
               KernelLogger.info("shell thread started, wait server side fuse mount...")
               observer.initFlag.synchronized {
                 observer.initFlag.wait(10000)
