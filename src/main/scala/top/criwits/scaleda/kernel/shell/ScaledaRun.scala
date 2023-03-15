@@ -8,7 +8,7 @@ import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor._
 import kernel.toolchain.{Toolchain, ToolchainProfile}
-import kernel.utils.{EnvironmentUtils, KernelLogger}
+import kernel.utils.{EnvironmentUtils, KernelLogger, NameLegalization}
 
 import io.grpc.StatusRuntimeException
 
@@ -51,7 +51,7 @@ object ScaledaRun {
     require(rt.profile.profileName.nonEmpty, "must provide profile before runTask")
     val remoteDeps =
       if (rt.profile.isRemoteProfile && ProjectConfig.projectBase.nonEmpty)
-        Some(RemoteCommandDeps(new File(ProjectConfig.projectBase.get), host = rt.profile.host))
+        Some(RemoteCommandDeps(new File(ProjectConfig.projectBase.get), host = rt.profile.host, runId = rt.id))
       else None
     KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
 
@@ -193,7 +193,7 @@ object ScaledaRun {
           None
         } else {
           val runtimeId =
-            s"${target.toolchain}-${target.name}-${task.name}-${new Date()}"
+            NameLegalization.legalization(s"${target.toolchain}-${target.name}-${task.name}-${new Date()}")
 
           val workingDir = new File(ProjectConfig.projectBase.get)
           val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
