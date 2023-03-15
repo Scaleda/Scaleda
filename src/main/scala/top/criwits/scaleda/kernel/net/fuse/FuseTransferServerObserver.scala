@@ -16,6 +16,7 @@ import java.io.File
 class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     extends StreamObserver[FuseTransferMessage] {
   private var identifier: Option[String] = None
+  private var runId: Option[String]      = None
   override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.debug("server onNext: ", msg.toProtoString)
     val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
@@ -35,6 +36,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
                    else user.getUsername) + "-" + runIdHashed
         KernelLogger.info("visit from user:", user, "runIdHashed", runIdHashed, "key", key)
         identifier = Some(key)
+        runId = Some(runIdHashed)
         observers.synchronized {
           observers.put(key, this)
         }

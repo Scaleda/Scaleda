@@ -41,7 +41,7 @@ class ScaledaRunProcessHandler(
       s"destroyProcessImpl, running: $terminated, stopping: $terminating"
     )
     terminating = true
-    notifyProcessTerminated(returnValues.headOption.getOrElse(0))
+    // notifyProcessTerminated(returnValues.headOption.getOrElse(0))
   }
 
   override def detachProcessImpl(): Unit = {
@@ -126,6 +126,7 @@ class ScaledaRunProcessHandler(
       terminated = true
       // invoke only success all
       invokeAfterFinish(rt, returnValues.toSeq, finishedAll, meetErrors)
+      notifyProcessTerminated(returnValue)
     }
   }
 
