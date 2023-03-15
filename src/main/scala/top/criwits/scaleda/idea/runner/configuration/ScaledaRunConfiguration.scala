@@ -5,7 +5,7 @@ import idea.ScaledaBundle
 import idea.application.config.ScaledaIdeaConfig
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntime}
 import idea.rvcd.RvcdService
-import idea.settings.auth.AuthorizationEditor
+import idea.utils.notification.CreateTypicalNotification
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
 import idea.waveform.{RvcdHandler, WaveformHandler}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
@@ -24,7 +24,6 @@ import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
 import com.intellij.icons.AllIcons
-import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
@@ -137,6 +136,11 @@ class ScaledaRunConfiguration(
       .map(_.copy(extraEnvs = extraEnvs.toMap))
     if (runtimeOptional.isEmpty) {
       MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
+      CreateTypicalNotification.makeAuthorizationNotification(
+        project,
+        ScaledaBundle.message("tasks.configuration.profile.state.auth", profileHost),
+        NotificationType.WARNING
+      )
       return null
     }
 
@@ -171,17 +175,7 @@ class ScaledaRunConfiguration(
         ScaledaMessageParser.removeParser(runtime.id)
         throwable match {
           case e: UserException =>
-            val notification = Notification.NOTIFICATION_GROUP
-              .createNotification(
-                ScaledaBundle.message("notification.runner.error.auth.title"),
-                e.getMessage,
-                Notification.levelMatch(LogLevel.Error)
-              )
-            notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.auth.action")) {
-              override def actionPerformed(e: AnActionEvent) = {
-                ShowSettingsUtilImpl.showSettingsDialog(project, AuthorizationEditor.SETTINGS_ID, "")
-              }
-            })
+            CreateTypicalNotification.makeAuthorizationNotification(project, e.getMessage, NotificationType.ERROR)
           case e: TimeoutException =>
             Notification().error("Timeout", e.getMessage, ", check your connections")
           case e: Throwable => throw e

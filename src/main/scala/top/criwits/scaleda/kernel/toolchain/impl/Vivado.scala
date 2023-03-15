@@ -4,12 +4,12 @@ package kernel.toolchain.impl
 import idea.runner.ScaledaRuntime
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
-import kernel.project.config.TaskType.{Implement, Simulation}
+import kernel.project.config.TaskType.{Implement, Simulation, Synthesis}
 import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
-import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor}
+import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
@@ -142,14 +142,32 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   ): TemplateContext = {
     def doSeparatorReplace(src: String): String = src.replace('\\', '/')
 
-    val top =
-      taskConfig.findTopModule.get // TODO / FIXME: Exception // TODO: topModule is in executor???
-    val sim             = taskConfig.taskType == Simulation
+    val sim   = taskConfig.taskType == Simulation
+    val synth = taskConfig.taskType == Synthesis
+    val impl  = taskConfig.taskType == Implement
+    var topOptional =
+      if (sim) Some(executor.asInstanceOf[SimulationExecutor].topModule)
+      else if (synth) Some(executor.asInstanceOf[SynthesisExecutor].topModule)
+      else if (impl) Some(executor.asInstanceOf[ImplementExecutor].topModule)
+      else None
+
+    // FIXME: this may got None...why?
+    if (topOptional.isEmpty)
+      topOptional = taskConfig.findTopModule
+    if (topOptional.isEmpty) {
+      KernelLogger.warn(
+        "cannot find top module for",
+        taskConfig,
+        targetConfig,
+        executor
+      )
+    }
+    // TODO / FIXME: Exception // TODO: topModule is in executor???
+    val top             = topOptional.get
     val topFile         = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
-    val impl    = taskConfig.taskType == Implement
     val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
     Vivado.TemplateContext(
       top = top,
