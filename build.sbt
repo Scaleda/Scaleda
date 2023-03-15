@@ -85,7 +85,9 @@ lazy val scaleda = project
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.41.0.0",
     // https://mvnrepository.com/artifact/com.auth0/java-jwt
     libraryDependencies += "com.auth0" % "java-jwt" % "4.3.0",
-    assembly / assemblyMergeStrategy := {
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    libraryDependencies += "commons-codec" % "commons-codec" % "1.15",
+      assembly / assemblyMergeStrategy := {
       case PathList("javax", "servlet", xs @ _*)               => MergeStrategy.first
       case PathList("io", "grpc", xs @ _*)                     => MergeStrategy.last
       case PathList(ps @ _*) if ps.last endsWith ".properties" => MergeStrategy.first
