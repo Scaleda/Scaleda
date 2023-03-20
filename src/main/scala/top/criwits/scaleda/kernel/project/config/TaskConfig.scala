@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 @JsonInclude(Include.NON_EMPTY)
 case class TaskConfig(
     name: String = "",
-    `type`: String = "",
+    `type`: String = "simulation", //tricky
     topModule: Option[String] = None,
     preset: Boolean = true,
     tcl: Option[String] = None,

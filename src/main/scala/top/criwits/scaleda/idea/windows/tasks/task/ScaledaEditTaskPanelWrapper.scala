@@ -12,6 +12,8 @@ import idea.ScaledaBundle
 import idea.windows.tasks.{ScaledaEditPanelWrapper, ScaledaRunTargetNode, ScaledaRunTaskNode}
 import kernel.toolchain.Toolchain
 
+import top.criwits.scaleda.kernel.utils.KernelFileUtils
+
 import java.awt.{BorderLayout, Color, Font}
 import java.awt.event.{ActionEvent, ActionListener, ItemEvent}
 import javax.swing.JPanel
@@ -116,7 +118,7 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode)
     statusLabel.clear()
     val messages = new ListBuffer[String]
 
-    if (taskConfig.name.contains("\\/\'\"*?<>|:")) messages.addOne(ScaledaBundle.message("windows.edit.task.illegal.name"))
+    if (!KernelFileUtils.isLegalName(taskConfig.name)) messages.addOne(ScaledaBundle.message("windows.edit.task.illegal.name"))
     if (taskConfig.findTopModule.isDefined) messages.addOne(ScaledaBundle.message("windows.edit.task.no.topmodule"))
 
     if (messages.nonEmpty) {

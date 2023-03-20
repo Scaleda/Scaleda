@@ -7,6 +7,8 @@ import com.intellij.icons.AllIcons
 import com.intellij.ui.DocumentAdapter
 import idea.ScaledaBundle
 
+import top.criwits.scaleda.kernel.utils.KernelFileUtils
+
 import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
@@ -14,6 +16,7 @@ import scala.collection.mutable.ListBuffer
 class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode) extends ScaledaEditPanelWrapper {
   val inner = new ScaledaEditProjectPanel
 
+  // initalise values
   inner.projectNameField.setText(projectConfig.name)
   inner.sourceField.setText(projectConfig.source)
   inner.testField.setText(projectConfig.test)
@@ -32,7 +35,7 @@ class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode) exte
   def checkValue: Boolean = {
     inner.statusLabel.clear()
     val messages = new ListBuffer[String]
-    if (projectConfig.name.contains("\\/\'\"*?<>|:")) messages.addOne(ScaledaBundle.message("windows.edit.project.illegal.name"))
+    if (!KernelFileUtils.isLegalName(projectConfig.name)) messages.addOne(ScaledaBundle.message("windows.edit.project.illegal.name"))
     if (projectConfig.source.isEmpty /* todo: check exist */) messages.addOne(ScaledaBundle.message("windows.edit.project.need.src"))
     if (projectConfig.test.isEmpty /* todo: above */) messages.addOne(ScaledaBundle.message("windows.edit.project.need.test"))
 

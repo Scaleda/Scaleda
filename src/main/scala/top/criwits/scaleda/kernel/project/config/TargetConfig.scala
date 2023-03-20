@@ -16,7 +16,7 @@ import top.criwits.scaleda.kernel.utils.HasDefault
 @JsonInclude(Include.NON_EMPTY)
 case class TargetConfig(
     name: String = "",
-    toolchain: String = "",
+    toolchain: String = "iverilog", // tricky
     topModule: Option[String] = None,
     constraints: Option[String] = None,
     options: Option[Map[String, String]] = None,

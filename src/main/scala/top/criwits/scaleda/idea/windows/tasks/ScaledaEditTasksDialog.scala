@@ -1,22 +1,18 @@
 package top.criwits.scaleda
 package idea.windows.tasks
 
-import com.intellij.CommonBundle
-import com.intellij.openapi.options.ex.SingleConfigurableEditor
+import idea.ScaledaBundle
+import kernel.project.config.ProjectConfig
+
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
-import java.awt.event.ActionEvent
-import java.util
-import java.util.{ArrayList, List}
-import javax.swing.{AbstractAction, Action, JComponent}
+import javax.swing.JComponent
 
 class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
   init()
   setTitle(ScaledaBundle.message("windows.edit"))
-  setSize(600, 400)
+  setSize(800, 600)
   setResizable(true)
 
   var mainPanel: ScaledaEditTasksPanel = _
