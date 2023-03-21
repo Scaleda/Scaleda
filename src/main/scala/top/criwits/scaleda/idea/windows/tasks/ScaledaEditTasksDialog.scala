@@ -4,8 +4,10 @@ package idea.windows.tasks
 import idea.ScaledaBundle
 import kernel.project.config.ProjectConfig
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import top.criwits.scaleda.idea.runner.task.ScaledaReloadTasksAction
 
 import javax.swing.JComponent
 
@@ -24,7 +26,11 @@ class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
     if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(rootNode, setValid)
     mainPanel
   }
-  override def doOKAction(): Unit = {}
+  override def doOKAction(): Unit = {
+    ProjectConfig.saveConfig(mainPanel.scaledaRunRootNode.toProjectConfig)
+    ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
+    super.doOKAction()
+  }
 
   private def setValid(ok: Boolean) = {
     setOKActionEnabled(ok)

@@ -1,37 +1,43 @@
 package top.criwits.scaleda
 package idea.windows.tasks
 
+import idea.ScaledaBundle
+import idea.windows.tasks.project.ScaledaEditProjectPanelWrapper
+import idea.windows.tasks.target.ScaledaEditTargetPanelWrapper
+import idea.windows.tasks.task.ScaledaEditTaskPanelWrapper
+import kernel.project.config.{TargetConfig, TaskConfig}
+
 import com.intellij.openapi.ui.Splitter
-import com.intellij.ui.{AnActionButton, ToolbarDecorator}
 import com.intellij.ui.components.JBPanelWithEmptyText
 import com.intellij.ui.treeStructure.Tree
+import com.intellij.ui.{AnActionButton, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.idea.windows.tasks.project.ScaledaEditProjectPanelWrapper
-import top.criwits.scaleda.idea.windows.tasks.target.ScaledaEditTargetPanelWrapper
-import top.criwits.scaleda.idea.windows.tasks.task.ScaledaEditTaskPanelWrapper
-import top.criwits.scaleda.kernel.project.config.{TargetConfig, TaskConfig}
 
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.event.TreeSelectionEvent
-import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.{DefaultTreeModel, TreePath}
 
-/**
- * Panel for task edit window
- * @param scaledaRunRootNode the root node
- * @param setValid a recall function for parent dialog to change 'ok' valid status
- */
-class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
-  private val model = new DefaultTreeModel(scaledaRunRootNode)
+/** Panel for task edit window
+  * @param scaledaRunRootNode the root node
+  * @param setValid a recall function for parent dialog to change 'ok' valid status
+  */
+class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid: Boolean => Unit)
+    extends JPanel(new BorderLayout) {
+  val model = new DefaultTreeModel(scaledaRunRootNode)
   // left side, tree
   private val tree = new Tree(model)
   tree.setCellRenderer(new ScaledaRunTreeCellRenderer)
   tree.addTreeSelectionListener(onItemSelected)
-  private val treePanel = ToolbarDecorator.createDecorator(tree)
-    .setAddAction((e: AnActionButton) => addItem())
-    .setRemoveAction(null) // todo later
-    .disableUpDownActions()
+  tree.setExpandsSelectedPaths(true) //?
+  private val decorator =
+    ToolbarDecorator
+      .createDecorator(tree)
+      .setAddAction((e: AnActionButton) => addItem())
+      .setRemoveAction((e: AnActionButton) => removeItem())
+      .disableUpDownActions()
+
+  private val treePanel = decorator
     .createPanel()
 
   // Right side, default panel
@@ -47,33 +53,76 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
 
   private def onItemSelected(e: TreeSelectionEvent): Unit = {
     // check which node is selected
-    val rootNode = tree.getSelectedNodes(classOf[ScaledaRunRootNode], (_: ScaledaRunRootNode) => true)
+    val rootNode   = tree.getSelectedNodes(classOf[ScaledaRunRootNode], (_: ScaledaRunRootNode) => true)
     val targetNode = tree.getSelectedNodes(classOf[ScaledaRunTargetNode], (_: ScaledaRunTargetNode) => true)
-    val taskNode = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
+    val taskNode   = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
 
-    if (rootNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head, updateOK).getPanel)
-    if (targetNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head, updateOK).getPanel)
-    if (taskNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head, updateOK).getPanel)
+    if (rootNode.nonEmpty)
+      splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head, updateOK).getPanel)
+    if (targetNode.nonEmpty)
+      splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head, updateOK).getPanel)
+    if (taskNode.nonEmpty)
+      splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head, updateOK).getPanel)
   }
 
   private def addItem(): Unit = {
     // check which node is selected
-    val rootNode = tree.getSelectedNodes(classOf[ScaledaRunRootNode], (_: ScaledaRunRootNode) => true)
+    val rootNode   = tree.getSelectedNodes(classOf[ScaledaRunRootNode], (_: ScaledaRunRootNode) => true)
     val targetNode = tree.getSelectedNodes(classOf[ScaledaRunTargetNode], (_: ScaledaRunTargetNode) => true)
-    val taskNode = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
+    val taskNode   = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
 
     if (rootNode.nonEmpty) {
       // add target
-      scaledaRunRootNode.targets.append(new ScaledaRunTargetNode(TargetConfig()))
+      val node = new ScaledaRunTargetNode(TargetConfig())
+      node.parent = Some(rootNode.head)
+      scaledaRunRootNode.targets.append(node)
+
+      model.reload()
+      tree.setSelectionPath(node.toTreePath)
     }
     if (targetNode.nonEmpty) {
       // add task
-      targetNode.head.tasks.append(new ScaledaRunTaskNode(TaskConfig()))
+      val node = new ScaledaRunTaskNode(TaskConfig())
+      node.parent = Some(targetNode.head)
+      targetNode.head.tasks.append(node)
+
+      model.reload()
+      tree.setSelectionPath(node.toTreePath)
     }
     if (taskNode.nonEmpty) {
       // add task
-      taskNode.head.parent.get.tasks.append(new ScaledaRunTaskNode(TaskConfig())) // can it work?
+      val node = new ScaledaRunTaskNode(TaskConfig())
+      node.parent = Some(taskNode.head.getParent.asInstanceOf[ScaledaRunTargetNode])
+      taskNode.head.parent.get.tasks.append(node) // can it work?
+
+      model.reload()
+      tree.setSelectionPath(node.toTreePath)
     }
+
+
+  }
+
+  private def removeItem() = {
+    // check which node is selected
+    val rootNode   = tree.getSelectedNodes(classOf[ScaledaRunRootNode], (_: ScaledaRunRootNode) => true)
+    val targetNode = tree.getSelectedNodes(classOf[ScaledaRunTargetNode], (_: ScaledaRunTargetNode) => true)
+    val taskNode   = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
+
+    if (targetNode.nonEmpty) {
+      val target = targetNode.head
+      val proj   = target.parent.get
+      val idx    = proj.targets.indexOf(target)
+      proj.targets.remove(idx)
+    }
+
+    if (taskNode.nonEmpty) {
+      val task   = taskNode.head
+      val target = task.parent.get
+      val idx    = target.tasks.indexOf(task)
+      target.tasks.remove(idx)
+    }
+
+    model.reload()
   }
 
   private def updateOK: Unit = {

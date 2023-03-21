@@ -120,7 +120,7 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
     val messages = new ListBuffer[String]
 
     if (!KernelFileUtils.isLegalName(taskConfig.name)) messages.addOne(ScaledaBundle.message("windows.edit.task.illegal.name"))
-    if (taskConfig.findTopModule.isDefined) messages.addOne(ScaledaBundle.message("windows.edit.task.no.topmodule"))
+    if (taskConfig.findTopModule.isEmpty) messages.addOne(ScaledaBundle.message("windows.edit.task.no.topmodule"))
 
     if (messages.nonEmpty) {
       statusLabel.setIcon(AllIcons.General.BalloonError)
