@@ -18,6 +18,8 @@ class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
   var mainPanel: ScaledaEditTasksPanel = _
 
   override def createCenterPanel(): JComponent = {
+    // get root node
+    // TODO: if there're no project config?
     val rootNode = new ScaledaRunRootNode(ProjectConfig.getConfig().get)
     if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(rootNode, setValid)
     mainPanel

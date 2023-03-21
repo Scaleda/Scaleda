@@ -5,6 +5,7 @@ import kernel.project.config.TaskConfig
 
 import com.intellij.icons.AllIcons
 import top.criwits.scaleda.idea.utils.Icons
+import top.criwits.scaleda.kernel.utils.KernelFileUtils
 
 import java.util
 import javax.swing.Icon
@@ -42,4 +43,13 @@ class ScaledaRunTaskNode(val task: TaskConfig) extends ScaledaRunTreeNode(task.n
     None,
     None // Scheduled to be removed
   )
+
+  override def validate: Boolean = {
+    KernelFileUtils.isLegalName(name) &&
+      findTopModule.isDefined &&
+      (`type` match {
+        case "implementation" => findConstraints.isDefined
+        case _ => true
+      })
+  }
 }

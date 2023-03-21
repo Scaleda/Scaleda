@@ -29,5 +29,7 @@ abstract class ScaledaRunTreeNode(var name: String) extends TreeNode {
     }
   }
 
+  def validate: Boolean
+
   override def toString = name
 }

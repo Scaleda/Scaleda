@@ -20,7 +20,7 @@ import javax.swing.JPanel
 import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent}
 import scala.collection.mutable.ListBuffer
 
-class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode)
+class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: => Unit)
     extends JPanel
     with ScaledaEditPanelWrapper {
 
@@ -115,6 +115,7 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode)
   override def getPanel: JPanel = this
 
   override def checkValue: Boolean = {
+    setValid
     statusLabel.clear()
     val messages = new ListBuffer[String]
 

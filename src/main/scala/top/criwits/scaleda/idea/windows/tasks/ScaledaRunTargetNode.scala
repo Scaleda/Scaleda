@@ -4,6 +4,9 @@ package idea.windows.tasks
 import idea.utils.Icons
 import kernel.project.config.TargetConfig
 
+import top.criwits.scaleda.kernel.toolchain.impl.Vivado
+import top.criwits.scaleda.kernel.utils.KernelFileUtils
+
 import java.util
 import java.util.Collections.enumeration
 import javax.swing.tree.TreeNode
@@ -47,4 +50,17 @@ class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(
     options,
     tasks.map(_.toTaskConfig).toArray
   )
+
+  override def validate: Boolean = {
+    KernelFileUtils.isLegalName(name) &&
+    (toolchain match {
+      case Vivado.internalID =>
+        options.nonEmpty &&
+        options.get.contains("device") &&
+        options.get.contains("package") &&
+        options.get.contains("speed")
+      // todo: add more?
+      case _ => true
+    }) && tasks.map(_.validate).reduce(_ && _)
+  }
 }

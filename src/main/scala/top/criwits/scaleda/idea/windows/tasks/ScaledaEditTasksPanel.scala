@@ -17,6 +17,11 @@ import javax.swing.JPanel
 import javax.swing.event.TreeSelectionEvent
 import javax.swing.tree.DefaultTreeModel
 
+/**
+ * Panel for task edit window
+ * @param scaledaRunRootNode the root node
+ * @param setValid a recall function for parent dialog to change 'ok' valid status
+ */
 class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
   private val model = new DefaultTreeModel(scaledaRunRootNode)
   // left side, tree
@@ -34,7 +39,6 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
     .withEmptyText(ScaledaBundle.message("windows.edit.empty"))
     .withBorder(JBUI.Borders.emptyLeft(6))
 
-
   // Splitter
   val splitter = new Splitter(false, 0.3f)
   add(splitter, BorderLayout.CENTER)
@@ -47,9 +51,9 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
     val targetNode = tree.getSelectedNodes(classOf[ScaledaRunTargetNode], (_: ScaledaRunTargetNode) => true)
     val taskNode = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
 
-    if (rootNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head).getPanel)
-    if (targetNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head).getPanel)
-    if (taskNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head).getPanel)
+    if (rootNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head, updateOK).getPanel)
+    if (targetNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head, updateOK).getPanel)
+    if (taskNode.nonEmpty) splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head, updateOK).getPanel)
   }
 
   private def addItem(): Unit = {
@@ -61,18 +65,19 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
     if (rootNode.nonEmpty) {
       // add target
       scaledaRunRootNode.targets.append(new ScaledaRunTargetNode(TargetConfig()))
-      model.reload()
     }
     if (targetNode.nonEmpty) {
       // add task
       targetNode.head.tasks.append(new ScaledaRunTaskNode(TaskConfig()))
-      model.reload()
     }
     if (taskNode.nonEmpty) {
       // add task
       taskNode.head.parent.get.tasks.append(new ScaledaRunTaskNode(TaskConfig())) // can it work?
-      model.reload()
     }
+  }
+
+  private def updateOK: Unit = {
+    setValid(scaledaRunRootNode.validate)
   }
 
   model.reload()

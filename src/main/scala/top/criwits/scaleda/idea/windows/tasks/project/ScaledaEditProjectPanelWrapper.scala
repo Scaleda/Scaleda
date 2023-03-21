@@ -13,7 +13,7 @@ import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
 
-class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode) extends ScaledaEditPanelWrapper {
+class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode, setValid: => Unit) extends ScaledaEditPanelWrapper {
   val inner = new ScaledaEditProjectPanel
 
   // initalise values
@@ -33,11 +33,12 @@ class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode) exte
   }
 
   def checkValue: Boolean = {
+    setValid
     inner.statusLabel.clear()
     val messages = new ListBuffer[String]
     if (!KernelFileUtils.isLegalName(projectConfig.name)) messages.addOne(ScaledaBundle.message("windows.edit.project.illegal.name"))
-    if (projectConfig.source.isEmpty /* todo: check exist */) messages.addOne(ScaledaBundle.message("windows.edit.project.need.src"))
-    if (projectConfig.test.isEmpty /* todo: above */) messages.addOne(ScaledaBundle.message("windows.edit.project.need.test"))
+    if (projectConfig.source.isBlank /* todo: check exist */) messages.addOne(ScaledaBundle.message("windows.edit.project.need.src"))
+    if (projectConfig.test.isBlank /* todo: above */) messages.addOne(ScaledaBundle.message("windows.edit.project.need.test"))
 
     if (messages.nonEmpty) {
       inner.statusLabel.setIcon(AllIcons.General.BalloonError)

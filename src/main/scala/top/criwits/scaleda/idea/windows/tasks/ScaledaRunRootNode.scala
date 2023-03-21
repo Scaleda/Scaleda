@@ -3,6 +3,8 @@ package idea.windows.tasks
 import idea.utils.Icons
 import kernel.project.config.ProjectConfig
 
+import top.criwits.scaleda.kernel.utils.KernelFileUtils
+
 import java.util
 import javax.swing.Icon
 import javax.swing.tree.TreeNode
@@ -40,4 +42,7 @@ class ScaledaRunRootNode(val projectConfig: ProjectConfig)
     targets.map(_.toTargetConfig).toArray
   )
 
+  override def validate: Boolean = {
+    KernelFileUtils.isLegalName(name) && !source.isBlank && !test.isBlank && targets.map(_.validate).reduce(_ && _)
+  }
 }
