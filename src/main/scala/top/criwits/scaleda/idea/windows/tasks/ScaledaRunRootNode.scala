@@ -43,6 +43,6 @@ class ScaledaRunRootNode(val projectConfig: ProjectConfig)
   )
 
   override def validate: Boolean = {
-    KernelFileUtils.isLegalName(name) && !source.isBlank && !test.isBlank && targets.map(_.validate).reduce(_ && _)
+    KernelFileUtils.isLegalName(name) && !source.isBlank && !test.isBlank && (targets.isEmpty || targets.map(_.validate).reduce(_ && _))
   }
 }
