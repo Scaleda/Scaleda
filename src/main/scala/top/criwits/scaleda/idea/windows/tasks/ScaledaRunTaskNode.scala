@@ -1,16 +1,18 @@
 package top.criwits.scaleda
 package idea.windows.tasks
 
+import kernel.project.config.TaskConfig
+
 import com.intellij.icons.AllIcons
-import top.criwits.scaleda.kernel.project.config.TaskConfig
+import top.criwits.scaleda.idea.utils.Icons
+import top.criwits.scaleda.kernel.utils.KernelFileUtils
 
 import java.util
 import javax.swing.Icon
 import javax.swing.tree.TreeNode
 
-class ScaledaRunTaskNode(val task: TaskConfig)
-    extends ScaledaRunTreeNode(task.name) {
-  override val icon: Icon = AllIcons.RunConfigurations.TestState.Run
+class ScaledaRunTaskNode(val task: TaskConfig) extends ScaledaRunTreeNode(task.name) {
+  override val icon: Icon = Icons.task
 
   var parent: Option[ScaledaRunTargetNode] = None
 
@@ -27,4 +29,27 @@ class ScaledaRunTaskNode(val task: TaskConfig)
   override def isLeaf: Boolean = true
 
   override def children(): util.Enumeration[_ <: TreeNode] = null
+
+  override var topModule: Option[String]   = task.topModule
+  override var constraints: Option[String] = task.constraints
+  var `type`: String                       = task.`type`
+
+  def toTaskConfig: TaskConfig = TaskConfig(
+    name,
+    `type`,
+    topModule,
+    true,
+    None,
+    None,
+    None // Scheduled to be removed
+  )
+
+  override def validate: Boolean = {
+    KernelFileUtils.isLegalName(name) &&
+      findTopModule.isDefined &&
+      (`type` match {
+        case "implementation" => findConstraints.isDefined
+        case _ => true
+      })
+  }
 }

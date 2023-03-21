@@ -22,7 +22,7 @@ class ModuleInstantiationAnnotator extends Annotator {
     val reference = instance.getReference
     val result    = reference.multiResolve(true)
     val instantName = PsiTreeUtil.findChildOfType(instance, classOf[NameOfInstancePsiNode])
-    val annotateRange = new TextRange(instance.getTextRange.getStartOffset, instantName.getTextRange.getEndOffset)
+    val annotateRange = new TextRange(instance.getTextRange.getStartOffset, instantName.getTextRange.getEndOffset) // FIXME
 
     if (result.isEmpty) {
       holder.newAnnotation(

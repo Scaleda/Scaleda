@@ -17,6 +17,13 @@ import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 object KernelFileUtils {
+  def isLegalName(s: String): Boolean = {
+    if (s.isBlank) return false
+    Seq("\\", "/", "*", "?", "\"", "\'", "<", ">", "|", ":").foreach(f =>
+      if (s.contains(f)) return false
+    )
+    true
+  }
   def getAllSourceFiles(
       sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.source),
       suffixing: Set[String] = Set("v")

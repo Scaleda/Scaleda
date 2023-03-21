@@ -104,7 +104,7 @@ object ProjectConfig {
 
   def headTask = getConfig().flatMap(c => c.headTask)
 
-  private def saveConfig(projectConfig: ProjectConfig): Unit = {
+  def saveConfig(projectConfig: ProjectConfig): Unit = {
     YAMLHelper(projectConfig, new File(configFile.get))
   }
 
