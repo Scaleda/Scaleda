@@ -32,6 +32,11 @@
                 text="Waveform">
             <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
         </action>
+      <action id="top.criwits.scaleda.idea.project.NewVerilogFileAction" class="top.criwits.scaleda.idea.project.NewVerilogFileAction"
+              text="Verilog File" description="Create new Verilog file">
+          <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+      </action>
+
     </actions>
 
     <!-- Listeners -->
@@ -108,6 +113,7 @@
         <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
         <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
         <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
+        <internalFileTemplate name="Verilog Module" />
 
     </extensions>
 
