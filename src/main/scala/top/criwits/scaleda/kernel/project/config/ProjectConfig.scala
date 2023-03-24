@@ -13,8 +13,9 @@ import java.io.File
   * @param name Project name
   * @param `type` Project type, should be 'rtl'
   * @param source Project source folder
+  * @param sources Project sources, items can be one file or directory
   * @param test Project test folder
-  * @param topModule Top module name, can be overriden by [[TargetConfig]] or [[TaskConfig]]
+  * @param topModule Top module name, can be overridden by [[TargetConfig]] or [[TaskConfig]]
   * @param targets List of [[TargetConfig]]
   */
 @JsonInclude(Include.NON_EMPTY)
@@ -22,6 +23,7 @@ case class ProjectConfig(
     name: String = "default-project",
     `type`: String = "rtl",
     source: String = "src/",
+    sources: Seq[String] = Seq(),
     test: String = "test/",
     topModule: Option[String] = None,
     constraints: Option[String] = None,

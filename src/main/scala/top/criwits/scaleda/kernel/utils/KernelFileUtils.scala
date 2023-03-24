@@ -19,24 +19,45 @@ import scala.io.Source
 object KernelFileUtils {
   def isLegalName(s: String): Boolean = {
     if (s.isBlank) return false
-    Seq("\\", "/", "*", "?", "\"", "\'", "<", ">", "|", ":").foreach(f =>
-      if (s.contains(f)) return false
-    )
+    Seq("\\", "/", "*", "?", "\"", "\'", "<", ">", "|", ":").foreach(f => if (s.contains(f)) return false)
     true
   }
   def getAllSourceFiles(
       sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.source),
+      sources: Seq[String] = ProjectConfig.config.sources,
       suffixing: Set[String] = Set("v")
-  ): Seq[File] =
-    sourceDir
-      .listFiles(new FilenameFilter {
-        override def accept(file: File, s: String) =
-          suffixing
-            .map(suffix => s.endsWith(s".${suffix}"))
-            .reduceOption((a, b) => a || b)
-            .getOrElse(false)
+  ): Seq[File] = {
+    val sourceDirSources =
+      sourceDir
+        .listFiles(new FilenameFilter {
+          override def accept(file: File, s: String) =
+            suffixing
+              .map(suffix => s.endsWith(s".${suffix}"))
+              .reduceOption((a, b) => a || b)
+              .getOrElse(false)
+        })
+        .toList
+    val extraSources = sources
+      .map(s => {
+        val f = new File(s)
+        if (f.exists()) Some(f)
+        else {
+          KernelLogger.warn("Cannot get source from:", s, " - File not found!")
+          None
+        }
       })
-      .toList
+      .filter(_.nonEmpty)
+      .map(_.get)
+      .map(f =>
+        if (f.isFile) Seq(f)
+        else {
+          // recursive call this function
+          getAllSourceFiles(sourceDir = f, sources = Seq(), suffixing = suffixing)
+        }
+      )
+      .foldLeft(Seq[File]())((a, b) => a ++ b)
+    sourceDirSources ++ extraSources
+  }
 
   def getAllTestFiles(): Seq[File] = {
     val target = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
@@ -54,14 +75,14 @@ object KernelFileUtils {
 
   def getAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
     val file = new File(path)
-    file.isAbsolute match {
-      case true =>
-        projectBase match {
-          case Some(base) =>
-            Some(new File(new File(base), path).getAbsolutePath)
-          case None => None
-        }
-      case false => Some(file.getAbsolutePath)
+    if (file.isAbsolute) {
+      projectBase match {
+        case Some(base) =>
+          Some(new File(new File(base), path).getAbsolutePath)
+        case None => None
+      }
+    } else {
+      Some(file.getAbsolutePath)
     }
   }
 

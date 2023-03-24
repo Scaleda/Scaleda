@@ -22,6 +22,7 @@ object FileUtils {
   def getAllVerilogFiles(project: Project, test: Boolean = false): List[VerilogPSIFileRoot] = { // FIXME: if source not in src/ will also match
     ProjectConfig.projectBase.map(projectBase => {
       val sourceDir: File = new File(new File(projectBase).getAbsolutePath, ProjectConfig.config.source)
+      // TODO: Load files from ProjectConfig.sources?
       val testDir: File = new File(new File(projectBase).getAbsolutePath, ProjectConfig.config.test)
 
       val vf = LocalFileSystem.getInstance().findFileByIoFile(if (test) testDir else sourceDir)
