@@ -8,7 +8,6 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import org.jetbrains.annotations.NotNull;
 import top.criwits.scaleda.idea.ScaledaBundle;
-import top.criwits.scaleda.kernel.project.config.TargetConfig;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -16,18 +15,15 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class VivadoConfigPanel extends ExtraConfigPanel {
     private JPanel mainPanel;
-    private JTextField deviceField;
-    private JTextField packageField;
-    private JTextField speedField;
+    private JTextField partField;
     private SimpleColoredComponent statusLabel;
 
     public boolean getStatus() {
-        return !getDeviceName().isEmpty() && !getPackageName().isEmpty() && !getSpeedLevel().isEmpty();
+        return !getPart().isEmpty();
     }
 
     @Override
@@ -37,42 +33,28 @@ public class VivadoConfigPanel extends ExtraConfigPanel {
 
     @Override
     public void addEditListener(DocumentListener listener) {
-        deviceField.getDocument().addDocumentListener(listener);
-        packageField.getDocument().addDocumentListener(listener);
-        speedField.getDocument().addDocumentListener(listener);
+        partField.getDocument().addDocumentListener(listener);
     }
 
     @Override
     public void loadConfig(Map<String, String> options) {
-        deviceField.setText(options.get("device") != null ? options.get("device") : "");
-        packageField.setText(options.get("package") != null ? options.get("package") : "");
-        speedField.setText(options.get("speed") != null ? options.get("speed") : "");
+        partField.setText(options.get("device") != null ? options.get("part") : "");
     }
 
     @Override
     public Map<String, String> getConfig() {
         return Map.of(
-                "device", deviceField.getText(),
-                "package", packageField.getText(),
-                "speed", speedField.getText()
+                "part", partField.getText()
         );
     }
 
 
-    public String getDeviceName() {
-        return deviceField.getText().toLowerCase();
-    }
-
-    public String getPackageName() {
-        return packageField.getText().toLowerCase();
-    }
-
-    public String getSpeedLevel() {
-        return speedField.getText().toLowerCase();
+    public String getPart() {
+        return partField.getText().toLowerCase();
     }
 
     public String getFullDevice() {
-        return getDeviceName() + getPackageName() + "-" + getSpeedLevel();
+        return getPart();
     }
 
     private void checkStatus() {
@@ -117,20 +99,10 @@ public class VivadoConfigPanel extends ExtraConfigPanel {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayoutManager(4, 3, new Insets(0, 0, 0, 0), -1, -1));
         final JLabel label1 = new JLabel();
-        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "windows.edit.target.device"));
+        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "windows.edit.target.part"));
         mainPanel.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label2 = new JLabel();
-        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "windows.edit.target.package"));
-        mainPanel.add(label2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label3 = new JLabel();
-        this.$$$loadLabelText$$$(label3, this.$$$getMessageFromBundle$$$("bundles/ScaledaBundle", "windows.edit.target.speed"));
-        mainPanel.add(label3, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        deviceField = new JTextField();
-        mainPanel.add(deviceField, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        packageField = new JTextField();
-        mainPanel.add(packageField, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        speedField = new JTextField();
-        mainPanel.add(speedField, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        partField = new JTextField();
+        mainPanel.add(partField, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         statusLabel = new SimpleColoredComponent();
         mainPanel.add(statusLabel, new GridConstraints(2, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
