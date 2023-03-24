@@ -38,7 +38,7 @@ public class VivadoConfigPanel extends ExtraConfigPanel {
 
     @Override
     public void loadConfig(Map<String, String> options) {
-        partField.setText(options.get("device") != null ? options.get("part") : "");
+        partField.setText(options.get("part") != null ? options.get("part") : "");
     }
 
     @Override
