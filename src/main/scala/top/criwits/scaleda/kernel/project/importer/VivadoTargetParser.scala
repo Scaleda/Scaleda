@@ -11,7 +11,8 @@ import java.io.File
 class VivadoTargetParser extends BasicTargetParser {
   override def parseAsTarget(path: File): TargetConfig = {
     val projectFile = path.listFiles((file, s) => s.endsWith(".xpr")).head
-    val obj         = XMLHelper(projectFile, classOf[VivadoProjectConfig])
+    val o           = XMLHelper(projectFile, classOf[VivadoProjectConfig])
+    require(o.Version == "7")
     val target = TargetConfig(
       name = "Vivado",
       toolchain = Vivado.internalID

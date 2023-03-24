@@ -122,9 +122,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
   case class TemplateContext(
       top: String, // Top module, if sim == true, then it is testbench; otherwise, it is topmodule
       workDir: String,
-      device: String,
-      `package`: String,
-      speed: String,
+      part: String,
       jobs: Int = OS.cpuCount,
       sourceList: Seq[String] = Seq(), // NOTE: simulation top file is EXCLUDED here!
       sim: Boolean,
@@ -172,9 +170,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
     Vivado.TemplateContext(
       top = top,
       workDir = doSeparatorReplace(executor.workingDir.getAbsolutePath),
-      device = targetConfig.options.get("device"),     // FIXME
-      `package` = targetConfig.options.get("package"), // FIXME
-      speed = targetConfig.options.get("speed"),       // FIXME
+      part = targetConfig.options.get("part"),     // FIXME
       sourceList = KernelFileUtils
         .getAllSourceFiles()
         .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)

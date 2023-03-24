@@ -62,7 +62,7 @@ class FileSet {
 @JsonInclude(Include.NON_EMPTY)
 @JacksonXmlRootElement(localName = "Project")
 class VivadoProjectConfig {
-  // Support Version=7, Minor do not consider now
+  // Support Version == 7, Minor do not consider now
   @JacksonXmlProperty(isAttribute = true)
   var Version: String = "7"
   @JacksonXmlProperty(isAttribute = true)

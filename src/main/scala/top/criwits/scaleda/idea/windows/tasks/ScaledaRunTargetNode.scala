@@ -56,9 +56,7 @@ class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(
     (toolchain match {
       case Vivado.internalID =>
         options.nonEmpty &&
-        options.get.contains("device") &&
-        options.get.contains("package") &&
-        options.get.contains("speed")
+        options.get.contains("part")
       // todo: add more?
       case _ => true
     }) && (tasks.isEmpty || tasks.map(_.validate).reduce(_ && _))

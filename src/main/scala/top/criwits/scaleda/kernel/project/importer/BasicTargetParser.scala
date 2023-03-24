@@ -9,7 +9,8 @@ import java.io.File
 trait BasicTargetParser {
 
   /** Parse a directory as target dir, then returns [[TargetConfig]]<br/>
-    * it is required to check [[BasicProjectDetector]].detect first
+    * It is required to check [[BasicProjectDetector]].detect first<br/>
+    * WARN: When parse errors, exceptions will be thrown.
     * @param path project path
     * @return parsed target config
     */
