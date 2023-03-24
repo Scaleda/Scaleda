@@ -14,15 +14,45 @@ class OptionData {
   var Val  = ""
 }
 
+class AttrData {
+  var Name = ""
+  var Val  = ""
+}
+
+@JsonIgnoreProperties(Array("FileInfo", "Attr"))
+class FileData {
+  @JacksonXmlProperty(isAttribute = true)
+  var Path = ""
+  // @JacksonXmlElementWrapper(localName = "FileInfo", useWrapping = false)
+  // var fileInfo: Seq[AttrData] = Seq()
+}
 class ConfigurationData {
-  @JacksonXmlElementWrapper(localName = "Option", useWrapping = true)
+  @JacksonXmlElementWrapper(localName = "Option")
   var options: Seq[OptionData] = Seq()
+}
+
+@JsonIgnoreProperties(Array("Filter"))
+class FileSet {
+  @JacksonXmlProperty(isAttribute = true)
+  var Name = "sources_1"
+
+  /** DesignSrcs / Constrs / SimulationSrcs / Utils / BlockSrcs
+    */
+  @JacksonXmlProperty(isAttribute = true)
+  var Type = "DesignSrcs"
+  @JacksonXmlProperty(isAttribute = true)
+  var RelSrcDir = "$PSRCDIR/sources_1"
+
+  @JacksonXmlElementWrapper(localName = "Config")
+  var config: Seq[OptionData] = Seq()
+
+  @JacksonXmlElementWrapper(localName = "File")
+  var files: Seq[FileData] = Seq()
 }
 
 @JsonIgnoreProperties(
   Array(
     "DefaultLaunch",
-    "FileSets", // TODO
     "Simulators",
     "Runs", // TODO
     "Board",
@@ -44,4 +74,7 @@ class VivadoProjectConfig {
 
   @JacksonXmlProperty(localName = "Configuration")
   var configuration: ConfigurationData = new ConfigurationData
+
+  @JacksonXmlProperty(localName = "FileSets")
+  var fileSets: Seq[FileSet] = Seq()
 }

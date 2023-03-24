@@ -13,7 +13,7 @@ class ProjectParserTester extends AnyFlatSpec with should.Matchers {
 
   it should "test Vivado project parser" in {
     val fileContent = Source
-      .fromInputStream(getClass.getClassLoader.getResourceAsStream("vivado/project/ip_tests.xpr"))
+      .fromInputStream(getClass.getClassLoader.getResourceAsStream("vivado/project/ip_tests.xml"))
       .getLines()
       .mkString
     val obj = XMLHelper(fileContent, classOf[VivadoProjectConfig])
