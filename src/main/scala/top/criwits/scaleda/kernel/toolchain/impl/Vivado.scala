@@ -273,7 +273,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       }
 
     rt.task.taskType match {
-      case Implement | Synthesis =>
+      case Implement =>
         // load constraints from dir
         val executor = rt.executor.asInstanceOf[ImplementExecutor]
         executor.constraintsDir

@@ -93,7 +93,7 @@ class ModulePortConnectionAnnotator extends Annotator {
           if (
             !connectMap
               .map(_._2.nonEmpty)
-              .reduce(_ && _)
+              .reduceOption(_ && _).getOrElse(false)
           ) {
             holder
               .newAnnotation(
