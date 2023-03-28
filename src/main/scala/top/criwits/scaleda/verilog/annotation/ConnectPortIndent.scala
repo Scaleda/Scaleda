@@ -51,10 +51,11 @@ abstract class ConnectPortIndent(
       .mkString(",")
 
     val original = portConnectionList.getText
+    val originalTrim = original.trim
     doc.replaceString(
       portConnectionList.getTextRange.getStartOffset,
       portConnectionList.getTextRange.getEndOffset,
-      original + (if (original.trim.endsWith(",")) "" else ",") + newPortList
+      original + (if (originalTrim.isEmpty || originalTrim.endsWith(",")) "" else ",") + newPortList
     )
     CodeStyleManager.getInstance(project).reformat(portConnectionList)
   }
