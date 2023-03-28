@@ -21,22 +21,21 @@ object FileUtils {
   def getAllVerilogFiles(project: Project, test: Boolean = false): List[VerilogPSIFileRoot] = {
     // get configuration selected now
     val configuration: RunConfiguration = RunManager.getInstance(project).getSelectedConfiguration.getConfiguration
-    val defaultSources                  = ProjectConfig.getConfig().map(c => c.getSourceSet ++ c.getTestSet).getOrElse(Set())
+    val defaultSources                  = ProjectConfig.getConfig().map(c => c.getSourceSet() ++ c.getTestSet()).getOrElse(Set())
     val sources: Set[String] = configuration match {
       // if it's a valid ScaledaRunProcessHandler, get sources from it
       case configuration: ScaledaRunConfiguration =>
         configuration.generateRuntime
           .map(rt => {
-            rt.task.getSourceSet ++ rt.task.getTestSet
+            rt.task.getSourceSet() ++ rt.task.getTestSet()
           })
           .getOrElse(defaultSources)
       // otherwise, get default sources from ProjectConfig
       case _ => defaultSources
     }
     // may reach `pwd`
-    val projectBase = ProjectConfig.projectBase.getOrElse("")
     // TODO: apply file search paths... example: a.v => test/a.v
-    val sourceFiles        = sources.map(s => new File(projectBase, s)).filter(_.exists())
+    val sourceFiles        = sources.map(new File(_)).filter(_.exists())
     val sourceRegularFiles = sourceFiles.filter(_.isFile)
     val sourceDirectories  = sourceFiles.filter(_.isDirectory)
     val result             = ArrayBuffer[VerilogPSIFileRoot]()

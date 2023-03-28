@@ -1,6 +1,8 @@
 package top.criwits.scaleda
 package kernel.project.config
 
+import kernel.utils.KernelFileUtils
+
 import com.fasterxml.jackson.annotation.JsonIgnore
 
 abstract class ConfigNode() {
@@ -36,16 +38,26 @@ abstract class ConfigNode() {
   }
 
   @JsonIgnore
-  def getSourceSet: Set[String] =
-    (parentNode match {
-      case Some(parent) => parent.getSourceSet
-      case None         => Set()
-    }) ++ Set(source) ++ sources
+  private def parseAsAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase) =
+    KernelFileUtils.toAbsolutePath(path).getOrElse(path)
 
+  /** Get all source set
+    * @return sources in absolute path
+    */
   @JsonIgnore
-  def getTestSet: Set[String] =
+  def getSourceSet(projectBase: Option[String] = ProjectConfig.projectBase): Set[String] =
     (parentNode match {
-      case Some(parent) => parent.getTestSet
+      case Some(parent) => parent.getSourceSet(projectBase = projectBase)
       case None         => Set()
-    }) ++ Set(test) ++ tests
+    }) ++ Set(parseAsAbsolutePath(source)) ++ sources.map(parseAsAbsolutePath(_))
+
+  /** Get testbench source set
+    * @return testbench in absolute path
+    */
+  @JsonIgnore
+  def getTestSet(projectBase: Option[String] = ProjectConfig.projectBase): Set[String] =
+    (parentNode match {
+      case Some(parent) => parent.getTestSet(projectBase = projectBase)
+      case None         => Set()
+    }) ++ Set(parseAsAbsolutePath(test)) ++ tests.map(parseAsAbsolutePath(_))
 }

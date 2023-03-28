@@ -35,7 +35,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     val newTestbenchFile = new File(workingDir, newTestbench + ".v")
 
     // val sources = KernelFileUtils.getAllProjectSourceFiles()
-    val sources = KernelFileUtils.getAllSourceFiles(task.getSourceSet)
+    val sources = KernelFileUtils.getAllSourceFiles(task.getSourceSet())
 
     val simExecutorName = testbench + "_iverilog_executor"
 
@@ -117,7 +117,7 @@ object IVerilog extends ToolchainPresetProvider {
     // get testbench info
     val testbench     = simExecutor.topModule
     // val testbenchFile = KernelFileUtils.getProjectModuleFile(testbench, testbench = true).get
-    val testbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet, module = testbench).get
+    val testbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = testbench).get
 
     // generate new testbench file
     val newTestbench     = testbench + "_generated"
@@ -153,7 +153,7 @@ object IVerilog extends ToolchainPresetProvider {
     )
     val rtWithContext = rt.copy(context =
       rt.context ++ Map("replaceFiles" -> replaceFiles) ++ Map(
-        "sourceFiles" -> (KernelFileUtils.getAllSourceFiles(rt.task.getSourceSet) :+ testbenchFile)
+        "sourceFiles" -> (KernelFileUtils.getAllSourceFiles(rt.task.getSourceSet()) :+ testbenchFile)
       )
     )
     Some(rtWithContext)
