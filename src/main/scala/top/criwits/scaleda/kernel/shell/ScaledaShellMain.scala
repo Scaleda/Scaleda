@@ -19,7 +19,8 @@ import scopt.OParser
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register, RefreshToken =
+  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register, RefreshToken,
+      Create =
     Value
 }
 
@@ -108,6 +109,7 @@ object ScaledaShellMain {
       OParser.sequence(
         programName("scaleda"),
         head("scaleda", "0.1"),
+        help("help").text("Prints this usage text"),
         opt[File]('C', "workdir")
           .action((x, c) => c.copy(workingDir = x))
           .text("Working directory"),
@@ -128,42 +130,51 @@ object ScaledaShellMain {
             c.copy(user = user)
           })
           .text("Specify password"),
-        cmd("install")
-          .text("Install necessary binaries force")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Install)),
-        cmd("serve")
-          .text("Run as server")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
-        cmd("clean")
-          .text("Clean all data on device")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Clean)),
-        cmd("login")
-          .text("Login into server")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Login)),
-        cmd("register")
-          .text("Create account in server")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Register))
+        cmd("remote")
           .children(
-            opt[String]('n', "nickname")
-              .action((x, c) => {
-                val user = c.user
-                user.setNickname(x)
-                c.copy(user = user)
-              })
-              .text("Specify nickname")
+            cmd("serve")
+              .text("Run as server")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
+            cmd("login")
+              .text("Login into server")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Login)),
+            cmd("register")
+              .text("Create account in server")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Register))
+              .children(
+                opt[String]('n', "nickname")
+                  .action((x, c) => {
+                    val user = c.user
+                    user.setNickname(x)
+                    c.copy(user = user)
+                  })
+                  .text("Specify nickname")
+              ),
+            cmd("refresh")
+              .text("Refresh token")
+              .action((_, c) => c.copy(runMode = ShellRunMode.RefreshToken))
           ),
-        cmd("refresh")
-          .text("Refresh token")
-          .action((_, c) => c.copy(runMode = ShellRunMode.RefreshToken)),
-        cmd("profiles")
-          .text("Show loaded profiles")
-          .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
-        cmd("tasks")
-          .text("Show loaded tasks")
-          .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
-        cmd("configurations")
-          .text("Show all configurations to run")
-          .action((_, c) => c.copy(runMode = ShellRunMode.ListConfigurations)),
+        cmd("list")
+          .children(
+            cmd("profiles")
+              .text("Show loaded profiles")
+              .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
+            cmd("tasks")
+              .text("Show loaded tasks")
+              .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
+            cmd("configurations")
+              .text("Show all configurations to run")
+              .action((_, c) => c.copy(runMode = ShellRunMode.ListConfigurations))
+          ),
+        cmd("manage")
+          .children(
+            cmd("install")
+              .text("Install necessary binaries force")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Install)),
+            cmd("clean")
+              .text("Clean all data on device")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Clean))
+          ),
         cmd("run")
           .text("Run task")
           .action((_, c) => c.copy(runMode = ShellRunMode.Run))
@@ -185,8 +196,7 @@ object ScaledaShellMain {
                 c.copy(extraEnvs = c.extraEnvs ++ x.split(';').map(m => (m.split('=').head -> m.split('=')(1))).toMap)
               )
               .text("Specify environment, example ENV_A=a;ENV_B=b")
-          ),
-        help("help").text("Prints this usage text")
+          )
       )
     }
     OParser
