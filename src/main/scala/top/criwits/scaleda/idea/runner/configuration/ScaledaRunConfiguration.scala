@@ -111,6 +111,11 @@ class ScaledaRunConfiguration(
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScaledaRunConfigurationEditor(project)
 
+  def generateRuntime: Option[ScaledaRuntime] =
+    ScaledaRun
+      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+      .map(_.copy(extraEnvs = extraEnvs.toMap))
+
   /** Returns a [[RunProfileState]], which is actually used to run
     * @param ideaExecutor
     * @param environment
@@ -131,9 +136,7 @@ class ScaledaRunConfiguration(
 
     val console = myConsoleBuilder.getConsole
 
-    val runtimeOptional = ScaledaRun
-      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
-      .map(_.copy(extraEnvs = extraEnvs.toMap))
+    val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
       MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
       CreateTypicalNotification.makeAuthorizationNotification(

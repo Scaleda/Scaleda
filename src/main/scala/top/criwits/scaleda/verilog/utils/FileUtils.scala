@@ -1,12 +1,12 @@
 package top.criwits.scaleda
 package verilog.utils
 
-import idea.runner.ScaledaRunProcessHandler
+import idea.runner.configuration.ScaledaRunConfiguration
 import kernel.project.config.ProjectConfig
 import verilog.VerilogPSIFileRoot
 
-import com.intellij.execution.process.ProcessHandler
-import com.intellij.execution.ui.RunContentManager
+import com.intellij.execution.RunManager
+import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
@@ -19,16 +19,19 @@ import scala.jdk.javaapi.CollectionConverters
 
 object FileUtils {
   def getAllVerilogFiles(project: Project, test: Boolean = false): List[VerilogPSIFileRoot] = {
-    // get selected RunConfiguration handler
-    val selectedContent         = RunContentManager.getInstance(project).getSelectedContent
-    val handler: ProcessHandler = if (selectedContent == null) null else selectedContent.getProcessHandler
-    val sources: Set[String] = handler match {
+    // get configuration selected now
+    val configuration: RunConfiguration = RunManager.getInstance(project).getSelectedConfiguration.getConfiguration
+    val defaultSources                  = ProjectConfig.getConfig().map(c => c.getSourceSet ++ c.getTestSet).getOrElse(Set())
+    val sources: Set[String] = configuration match {
       // if it's a valid ScaledaRunProcessHandler, get sources from it
-      case handler: ScaledaRunProcessHandler =>
-        val rt = handler.rt
-        rt.task.getSourceSet ++ rt.task.getTestSet
+      case configuration: ScaledaRunConfiguration =>
+        configuration.generateRuntime
+          .map(rt => {
+            rt.task.getSourceSet ++ rt.task.getTestSet
+          })
+          .getOrElse(defaultSources)
       // otherwise, get default sources from ProjectConfig
-      case _ => ProjectConfig.getConfig().map(c => c.getSourceSet ++ c.getTestSet).getOrElse(Set())
+      case _ => defaultSources
     }
     // may reach `pwd`
     val projectBase = ProjectConfig.projectBase.getOrElse("")
@@ -51,12 +54,13 @@ object FileUtils {
     })
     // search and append files from sourceDirectories
     sourceDirectories.foreach(f => {
-      result ++= PsiTreeUtil
+      val v = PsiTreeUtil
         .findChildrenOfAnyType(
           psiManager.findDirectory(LocalFileSystem.getInstance().findFileByIoFile(f)),
           classOf[VerilogPSIFileRoot]
         )
         .asScala
+      result ++= v
     })
     result.toList
   }
