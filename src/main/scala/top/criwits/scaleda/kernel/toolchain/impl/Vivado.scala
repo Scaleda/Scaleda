@@ -279,7 +279,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         executor.constraintsDir
           .flatMap(dir => {
             if (dir.exists() && dir.isDirectory) {
-              val constraints = KernelFileUtils.getAllSourceFiles(sourceDir = dir, suffixing = Set("xdc"))
+              val constraints = KernelFileUtils.scanDirectory(directory = dir, suffixing = Set("xdc"))
               Some(executor.copy(constraints = executor.constraints ++ constraints, constraintsDir = None))
             } else None
           })

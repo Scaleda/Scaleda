@@ -46,7 +46,7 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
     testFile.delete()
   }
 
-  it should "abs to rel (1)" in {
+  it should "converts between absolute paths and relative paths" in {
     ProjectConfig.projectBase = Some("C:\\Coding\\my_project")
     println(KernelFileUtils.toAbsolutePath("C:\\Coding\\my_project\\src\\1.v"))
     println(KernelFileUtils.toAbsolutePath("src\\2.v"))
@@ -56,5 +56,53 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
     println(KernelFileUtils.toProjectRelativePath("C:\\Coding\\my_project\\test\\2.v"))
     println(KernelFileUtils.toProjectRelativePath("C:/Coding"))
     println(KernelFileUtils.toProjectRelativePath("D:\\a.txt"))
+  }
+
+  it should "generate test files" in {
+    Seq(
+      new File("testProj/src/1.v"),
+      new File("testProj/src/2.v"),
+      new File("testProj/test/tb.v"),
+      new File("testProj/another.v"),
+      new File("another/an.v")
+    ).foreach(f => {
+      new File(f.getParent).mkdirs()
+      f.createNewFile()
+    })
+  }
+
+  it should "scan directory" in {
+    ProjectConfig.projectBase = Some("testProj")
+    println(KernelFileUtils.scanDirectory(Set("v"), new File("testProj")))
+    println(KernelFileUtils.getAllSourceFiles(projectConfig = ProjectConfig(
+      source = "src/",
+      sources = Seq(
+        new File("another/an.v").getAbsolutePath,
+        "another.v"
+      ),
+      test = "test"
+    )))
+    println(KernelFileUtils.getAllTestFiles(projectConfig = ProjectConfig(
+      source = "src/",
+      sources = Seq(
+        new File("another/an.v").getAbsolutePath,
+        "another.v"
+      ),
+      test = "test"
+    )))
+  }
+
+  it should "remove test project" in {
+    Seq(
+      new File("testProj/src/1.v"),
+      new File("testProj/src/2.v"),
+      new File("testProj/src"),
+      new File("testProj/test/tb.v"),
+      new File("testProj/test"),
+      new File("testProj/another.v"),
+      new File("testProj"),
+      new File("another/an.v"),
+      new File("another")
+    ).foreach(_.delete())
   }
 }

@@ -74,58 +74,62 @@ object KernelFileUtils {
     }
   }
 
+  /**
+   * Recursively scan a directory for given type of file
+   * @param suffixing Set of extensions
+   * @param directory the directory
+   * @return
+   */
+  def scanDirectory(suffixing: Set[String], directory: File): Seq[File] = {
+    val files = directory.listFiles()
+    if (files == null) return Seq()
 
-  def getAllSourceFiles(
-      sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.source),
-      sources: Seq[String] = ProjectConfig.config.sources,
-      suffixing: Set[String] = Set("v")
-  ): Seq[File] = {
-    val sourceDirSources =
-      sourceDir
-        .listFiles(new FilenameFilter {
-          override def accept(file: File, s: String) =
-            suffixing
-              .map(suffix => s.endsWith(s".${suffix}"))
-              .reduceOption((a, b) => a || b)
-              .getOrElse(false)
-        })
-        .toList
-    val extraSources = sources
-      .map(s => {
-        val f = new File(s)
-        if (f.exists()) Some(f)
-        else {
-          KernelLogger.warn("Cannot get source from:", s, " - File not found!")
-          None
-        }
-      })
-      .filter(_.nonEmpty)
-      .map(_.get)
-      .map(f =>
-        if (f.isFile) Seq(f)
-        else {
-          // recursive call this function
-          getAllSourceFiles(sourceDir = f, sources = Seq(), suffixing = suffixing)
-        }
-      )
-      .foldLeft(Seq[File]())((a, b) => a ++ b)
+    files.filter(_.isDirectory).map(scanDirectory(suffixing, _)).foldLeft(Seq[File]())(_ ++ _) ++
+    files.filter(!_.isDirectory).map(f => {
+      val fileName = f.getName
+      if (suffixing
+        .map(suffix => fileName.endsWith(s".${suffix}"))
+        .reduceOption((a, b) => a || b)
+        .getOrElse(false)) Seq(f) else Seq()
+    }).foldLeft(Seq[File]())(_ ++ _)
+  }
+
+  /**
+   * Get all source files. That is:
+   *  - files under `source`
+   *  - files given under `sources`
+   * @param suffixing file type
+   * @return
+   */
+  def getAllSourceFiles(suffixing: Set[String] = Set("v"), projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
+    val sourceDir: File = new File(toAbsolutePath(projectConfig.source).get)
+    val sources: Seq[String] = projectConfig.sources
+
+    val sourceDirSources = scanDirectory(suffixing, sourceDir)
+    val extraSources = sources.map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
+      if (f.exists()) {
+        if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
+      } else Seq()
+    }).reduce(_ ++ _)
+
     sourceDirSources ++ extraSources
   }
 
-  def getAllTestFiles(): Seq[File] = {
-    val target = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
-    try {
-      val v = getAllSourceFiles(target)
-      KernelLogger.debug("getAllTestFiles normally returns", v.mkString(", "))
-      v
-    } catch {
-      case e: Throwable =>
-        KernelLogger.warn(s"cannot get test files from $target!", e)
-        e.printStackTrace()
-        Seq()
-    }
+  /**
+   * Get all test files. That is:
+   *  - files under `test`
+   * @return
+   */
+  def getAllTestFiles(projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
+    val testDir = new File(toAbsolutePath(projectConfig.test).get)
+    scanDirectory(Set("v"), testDir)
   }
 
+  /**
+   * Get module titles inside a file.
+   * @param verilogFile the file
+   * @return Seq[String]: All module titles in that file
+   */
   def getModuleTitle(verilogFile: File): Seq[String] = {
     val stream     = new FileInputStream(verilogFile)
     val charStream = CharStreams.fromStream(stream)
@@ -156,6 +160,12 @@ object KernelFileUtils {
     visitor.title.toSeq
   }
 
+  /**
+   * Get the verilog file containing specific module
+   * @param module module title name
+   * @param testbench is testbench? (will search from test sources, instead of sources)
+   * @return
+   */
   def getModuleFile(module: String, testbench: Boolean = false): Option[File] = {
     (if (testbench) getAllTestFiles() else getAllSourceFiles()).foreach(f => {
       val readModule = getModuleTitle(f)
@@ -187,17 +197,6 @@ object KernelFileUtils {
     val tokens = new CommonTokenStream(lexer)
     val parser = new VerilogParser(tokens)
     val tree   = parser.source_text()
-
-//    class ModuleVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
-//      override def visitModule_declaration(ctx: VerilogParser.Module_declarationContext): Int = {
-//        val identifier = ctx.module_head()
-//        if (identifier == null) return -1
-//        val _identifier = identifier.module_identifier()
-//        if (_identifier == null) return -1
-//        val __identifier = _identifier.identifier()
-//        if (__identifier == null) return -1
-//      }
-//    }
 
     class ModuleHeadVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
       var headerEndAt: Int = -1
