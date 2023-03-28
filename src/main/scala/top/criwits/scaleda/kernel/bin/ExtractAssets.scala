@@ -5,12 +5,13 @@ import kernel.utils.{KernelLogger, OS, Paths}
 import verilog.editor.formatter.VeribleFormatterHelper
 
 import java.io.{File, FileOutputStream}
+import java.nio.file.Path
 import java.util.zip.ZipInputStream
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 object ExtractAssets {
-  private val ASSET_VERSION = 1 // Update me when newer assets are loaded
+  private val ASSET_VERSION   = 1 // Update me when newer assets are loaded
   private val ZIP_BUFFER_SIZE = 1024
 
   private val targetDirectory = Paths.getBinaryDir
@@ -24,12 +25,12 @@ object ExtractAssets {
 
     // check
     val oldVersion = Source.fromFile(versionFile)
-    val version = oldVersion.getLines().mkString("").toInt
+    val version    = oldVersion.getLines().mkString("").toInt
     oldVersion.close()
     if (version < ASSET_VERSION) return false
 
     // check integrity
-    binaryList.forall(binary => new File(targetDirectory, binary).exists())
+    binaryList.forall(binary => Path.of(targetDirectory.getAbsolutePath, binary.split('/'): _*).toFile.exists())
   }
 
   def run(): Boolean = {
@@ -43,7 +44,7 @@ object ExtractAssets {
 
     try { // TODO: is it ok here?
       val zipInputStream = new ZipInputStream(resourceStream)
-      var zipEntry = zipInputStream.getNextEntry
+      var zipEntry       = zipInputStream.getNextEntry
 
       val buffer = new Array[Byte](ZIP_BUFFER_SIZE)
 
@@ -55,8 +56,8 @@ object ExtractAssets {
           KernelLogger.info(s"Extracting asset file $fileName")
           new File(newFile.getParent).mkdirs()
           val fileOutputStream = new FileOutputStream(newFile)
-          var len = 0
-          while ( {
+          var len              = 0
+          while ({
             len = zipInputStream.read(buffer)
             len > 0
           }) {
