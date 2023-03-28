@@ -110,7 +110,7 @@ object KernelFileUtils {
       if (f.exists()) {
         if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
       } else Seq()
-    }).reduce(_ ++ _)
+    }).reduceOption(_ ++ _).getOrElse(Seq())
 
     sourceDirSources ++ extraSources
   }
@@ -236,65 +236,21 @@ object KernelFileUtils {
     lineStart
   }
 
-  def getFileMD5(file: File) = {
-    var in: FileInputStream = null
-    try {
-      in = new FileInputStream(file)
-      val ch = in.getChannel
-      MD5(ch.map(FileChannel.MapMode.READ_ONLY, 0, file.length))
-    } catch {
-      case e: FileNotFoundException =>
-        ""
-      case e: IOException =>
-        ""
-    } finally if (in != null)
-      try {
-        in.close()
-      } catch {
-        case e: IOException =>
-        // 关闭流产生的错误一般都可以忽略
-      }
-  }
-
-  private val hexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
-
-  private def MD5(buffer: ByteBuffer) = {
-    var s = ""
-    try {
-      val md = MessageDigest.getInstance("MD5")
-      md.update(buffer)
-      val tmp = md.digest // MD5 的计算结果是一个 128 位的长整数，
-
-      // 用字节表示就是 16 个字节
-      val str = new Array[Char](16 * 2) // 每个字节用 16 进制表示的话，使用两个字符，
-
-      // 所以表示成 16 进制需要 32 个字符
-      var k = 0 // 表示转换结果中对应的字符位置
-
-      for (i <- 0 until 16) { // 从第一个字节开始，对 MD5 的每一个字节
-        // 转换成 16 进制字符的转换
-        val byte0 = tmp(i) // 取第 i 个字节
-
-        str({
-          k += 1;
-          k - 1
-        }) = hexDigits(byte0 >>> 4 & 0xf) // 取字节中高 4 位的数字转换, >>>,
-
-        // 逻辑右移，将符号位一起右移
-        str({
-          k += 1;
-          k - 1
-        }) = hexDigits(byte0 & 0xf) // 取字节中低 4 位的数字转换
-
-      }
-      s = new String(str) // 换后的结果转换为字符串
-    } catch {
-      case e: NoSuchAlgorithmException =>
-        e.printStackTrace()
-    }
-    s
-  }
-
+  /**
+   * Remove a directory in recursive mode
+   * @param path must be a directory
+   */
   def deleteDirectory(path: Path): Unit =
     if (path.toFile.exists()) Files.walkFileTree(path, DeletingPathVisitor.withLongCounters())
+
+  /**
+   * Create parent directory for file creation
+   * @param file target file
+   * @return is parent dir created
+   */
+  def confirmFileParentPath(file: File): Boolean = {
+    val parent = file.getParentFile
+    if (!parent.exists()) parent.mkdirs()
+    else true
+  }
 }

@@ -130,6 +130,9 @@ object IVerilog extends ToolchainPresetProvider {
          |  $$dumpfile(\"${vcdFile.getName}\");
          |  $$dumpvars;
          |end""".stripMargin
+    // make sure dir exists
+    KernelFileUtils.confirmFileParentPath(newTestbenchFile)
+    KernelFileUtils.confirmFileParentPath(vcdFile)
     val lineStart = KernelFileUtils.insertAfterModuleHead(
       testbenchFile,
       newTestbenchFile,
