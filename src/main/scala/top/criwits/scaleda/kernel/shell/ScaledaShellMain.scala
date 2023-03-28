@@ -33,7 +33,9 @@ case class ShellArgs(
     profileName: String = "",
     user: User = new User("", "", ""),
     configureName: String = "",
-    extraEnvs: Map[String, String] = Map()
+    extraEnvs: Map[String, String] = Map(),
+    createProjectName: String = "scaleda-rtl",
+    detectProjectWhenCreate: Boolean = true
 )
 
 object ScaledaShellMain {
@@ -174,6 +176,17 @@ object ScaledaShellMain {
             cmd("clean")
               .text("\tClean all data on device")
               .action((_, c) => c.copy(runMode = ShellRunMode.Clean))
+          ),
+        cmd("create")
+          .text("Create Scaleda Project")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Create))
+          .children(
+            opt[String]('n', "name")
+              .text(s"Specify project name, default is 'scaleda-rtl'")
+              .action((name, c) => c.copy(createProjectName = name)),
+            opt[String]("empty")
+              .text("Create empty project, do not detect project structure")
+              .action((_, c) => c.copy(detectProjectWhenCreate = false))
           ),
         cmd("run")
           .text("Run task")
@@ -334,6 +347,20 @@ object ScaledaShellMain {
             if (new ScaledaRegisterLogin(shellConfig.serverHost).refreshAndStore())
               KernelLogger.info("Refresh token done")
             else KernelLogger.error("Refresh token failed")
+          case ShellRunMode.Create =>
+            require(shellConfig.createProjectName.nonEmpty)
+            // detect directory to find is it a toolchain project
+            val validToolchains = Toolchain.projectDetectors
+              .filter(t => t._2.detect(workingDir))
+              .map(t => t._1)
+            val targets = validToolchains.map(id => {
+              KernelLogger.info(s"Detected toolchain: $id")
+              val parser = Toolchain.targetParser(id)
+              parser.parseAsTarget(workingDir)
+            })
+            val project = new ProjectConfig(name = shellConfig.createProjectName, targets = targets.toArray)
+            printf(project.toString)
+            ProjectConfig.saveConfig(project, targetFile = new File(workingDir, "scaleda.yml"))
           case _ =>
             KernelLogger.error("not implemented.")
         }

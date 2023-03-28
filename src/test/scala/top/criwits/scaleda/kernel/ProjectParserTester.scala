@@ -30,7 +30,7 @@ class ProjectParserTester extends AnyFlatSpec with should.Matchers {
     val path = "/home/chiro/Vivado/Tests/ip_tests/"
     val file = new File(path)
     if (file.exists()) {
-      val parser = new VivadoTargetParser
+      val parser = new VivadoTargetParser {}
       val target = parser.parseAsTarget(file)
       println(target)
       println(target.tasks.toList)

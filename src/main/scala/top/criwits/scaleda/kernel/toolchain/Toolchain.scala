@@ -10,6 +10,8 @@ import kernel.utils.{KernelLogger, Paths}
 
 import top.criwits.scaleda.idea.toolchain.{IVerilogIdea, VivadoIdea}
 import top.criwits.scaleda.idea.windows.tool.message.ScaledaMessageToolchainParserProvider
+import top.criwits.scaleda.kernel.project.detect.BasicProjectDetector
+import top.criwits.scaleda.kernel.project.importer.BasicTargetParser
 
 import java.io.{File, FilenameFilter}
 import scala.collection.mutable.ListBuffer
@@ -65,6 +67,14 @@ object Toolchain {
   def toolchainPresetHandler: Map[String, ToolchainPresetProvider] = Map(
     Vivado.internalID -> Vivado,
     IVerilog.internalID -> IVerilog,
+  )
+
+  def projectDetectors: Seq[(String, BasicProjectDetector)] = Seq(
+    Vivado.internalID -> Vivado
+  )
+
+  def targetParser: Map[String, BasicTargetParser] = Map(
+    Vivado.internalID -> Vivado
   )
 
   /**

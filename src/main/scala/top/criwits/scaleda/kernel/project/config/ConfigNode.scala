@@ -41,23 +41,27 @@ abstract class ConfigNode() {
   private def parseAsAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase) =
     KernelFileUtils.toAbsolutePath(path).getOrElse(path)
 
-  /** Get all source set
+  /** Get all source set. Default is project base.
     * @return sources in absolute path
     */
   @JsonIgnore
-  def getSourceSet(projectBase: Option[String] = ProjectConfig.projectBase): Set[String] =
+  def getSourceSet(projectBase: Option[String] = None): Set[String] = {
+    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
     (parentNode match {
-      case Some(parent) => parent.getSourceSet(projectBase = projectBase)
+      case Some(parent) => parent.getSourceSet(projectBase = base)
       case None         => Set()
     }) ++ Set(parseAsAbsolutePath(source)) ++ sources.map(parseAsAbsolutePath(_))
+  }
 
-  /** Get testbench source set
+  /** Get testbench source set. Default is project base.
     * @return testbench in absolute path
     */
   @JsonIgnore
-  def getTestSet(projectBase: Option[String] = ProjectConfig.projectBase): Set[String] =
+  def getTestSet(projectBase: Option[String] = None): Set[String] = {
+    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
     (parentNode match {
-      case Some(parent) => parent.getTestSet(projectBase = projectBase)
+      case Some(parent) => parent.getTestSet(projectBase = base)
       case None         => Set()
     }) ++ Set(parseAsAbsolutePath(test)) ++ tests.map(parseAsAbsolutePath(_))
+  }
 }

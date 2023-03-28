@@ -10,7 +10,7 @@ import verilog.utils.ModuleUtils
 
 import java.io.File
 
-class VivadoTargetParser extends BasicTargetParser {
+trait VivadoTargetParser extends BasicTargetParser {
   override def parseAsTarget(path: File): TargetConfig = {
     val projectFile = path.listFiles((file, s) => s.endsWith(".xpr")).head
     val projectName = projectFile.getName.split("\\.").head

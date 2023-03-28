@@ -14,8 +14,10 @@ import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, T
 import kernel.utils._
 
 import org.apache.commons.codec.digest.DigestUtils
+import top.criwits.scaleda.kernel.project.detect.BasicProjectDetector
+import top.criwits.scaleda.kernel.project.importer.{BasicTargetParser, VivadoTargetParser}
 
-import java.io.File
+import java.io.{File, FilenameFilter}
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -74,7 +76,9 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
   override def detectProfiles = Vivado.detectProfiles
 }
 
-object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
+object Vivado extends ToolchainProfileDetector
+  with ToolchainPresetProvider with BasicProjectDetector
+  with VivadoTargetParser {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String       = "vivado"
 
@@ -320,5 +324,17 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       case TaskType.Programming => "run_program.tcl"
     })))
     Some(rt)
+  }
+
+  override def detect(path: File) = {
+    // only detect <project-name>.xpr file now
+    if (!path.exists() || !path.isDirectory) false
+    else {
+      val projectFile = path.listFiles(new FilenameFilter {
+        override def accept(file: File, s: String): Boolean = s.endsWith(".xpr")
+      }).headOption
+      if (projectFile.isEmpty) false
+      else true
+    }
   }
 }
