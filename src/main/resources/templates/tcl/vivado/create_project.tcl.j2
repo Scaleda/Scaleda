@@ -23,7 +23,7 @@ update_compile_order -fileset sim_1
 
 {% for ip in ipList %}
 puts "Importing IP core: {{ ip }}"
-import_files -norecurse {{ ip }}
+import_files -norecurse "{{ ip }}"
 {% endfor %}
 
 {% for xdc in xdcList %}

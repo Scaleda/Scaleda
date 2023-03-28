@@ -24,7 +24,8 @@ case class TargetConfig(
     override val source: String = "",
     override val sources: Seq[String] = Seq(),
     override val test: String = "",
-    override val tests: Seq[String] = Seq()
+    override val tests: Seq[String] = Seq(),
+    ips: Seq[String] = Seq(),
 ) extends ConfigNode()
 
 object TargetConfig extends HasDefault[TargetConfig] {

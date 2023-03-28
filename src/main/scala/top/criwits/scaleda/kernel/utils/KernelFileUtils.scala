@@ -102,12 +102,12 @@ object KernelFileUtils {
 
   /**
    * Get all source files from a source set.
-   * @param sources list of paths, each item can be file or dir
+   * @param sources list of paths, each item can be file or dir, empty string will be dropped
    * @param suffixing filter by file type
    * @return list of files
    */
   def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v")): Seq[File] = {
-    sources.map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
+    sources.filter(_.nonEmpty).map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
       if (f.exists()) {
         if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
       } else Seq()
