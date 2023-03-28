@@ -33,6 +33,7 @@ class ProjectParserTester extends AnyFlatSpec with should.Matchers {
       val parser = new VivadoTargetParser
       val target = parser.parseAsTarget(file)
       println(target)
+      println(target.tasks.toList)
     }
   }
 }

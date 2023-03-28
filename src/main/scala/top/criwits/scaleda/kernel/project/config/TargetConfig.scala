@@ -21,9 +21,9 @@ case class TargetConfig(
     constraints: Option[String] = None,
     options: Option[Map[String, String]] = None,
     tasks: Array[TaskConfig] = Array(),
-    override val source: String = "src/",
+    override val source: String = "",
     override val sources: Seq[String] = Seq(),
-    override val test: String = "test/",
+    override val test: String = "",
     override val tests: Seq[String] = Seq()
 ) extends ConfigNode()
 
