@@ -1,11 +1,12 @@
 package top.criwits.scaleda
 package kernel
 
+import kernel.project.detect.VivadoProjectConfig
+import kernel.project.importer.VivadoTargetParser
+import kernel.utils.serialise.XMLHelper
+
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import top.criwits.scaleda.kernel.project.detect.VivadoProjectConfig
-import top.criwits.scaleda.kernel.project.importer.VivadoTargetParser
-import top.criwits.scaleda.kernel.utils.serialise.XMLHelper
 
 import java.io.File
 import scala.io.Source
@@ -19,6 +20,9 @@ class ProjectParserTester extends AnyFlatSpec with should.Matchers {
       .getLines()
       .mkString
     val obj = XMLHelper(fileContent, classOf[VivadoProjectConfig])
+    println(obj.fileSets.map(_.files.map(_.Path)))
+    // FIXME: Vivado target parser cannot get file path, only directory done
+    require(obj.fileSets.forall(_.files.forall(_.Path.nonEmpty)), "File Path parse failed!")
     println(s"obj: ${obj}")
   }
 

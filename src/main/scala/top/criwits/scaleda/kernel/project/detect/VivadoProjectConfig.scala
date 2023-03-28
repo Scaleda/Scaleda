@@ -19,11 +19,18 @@ class AttrData {
   var Val  = ""
 }
 
-@JsonIgnoreProperties(Array("FileInfo", "Attr"))
+class FileInfoData {
+  @JacksonXmlElementWrapper(localName = "Attr", useWrapping = true)
+  var attrs: Seq[AttrData] = Seq()
+}
+
+@JsonIgnoreProperties(Array("Attr"))
 class FileData {
   @JacksonXmlProperty(isAttribute = true)
-  var Path = ""
-  // @JacksonXmlElementWrapper(localName = "FileInfo", useWrapping = false)
+  var Path: String = ""
+  // // @JacksonXmlElementWrapper(localName = "FileInfo", useWrapping = true)
+  // @JacksonXmlProperty(localName = "FileInfo")
+  // // var fileInfo: FileInfoData = new FileInfoData
   // var fileInfo: Seq[AttrData] = Seq()
 }
 class ConfigurationData {
