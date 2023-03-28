@@ -16,12 +16,65 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
+/**
+ * Kernel file utilities
+ */
 object KernelFileUtils {
+  /**
+   * Check whether a file name is legal. This is also applied to project, target & task names, for they will be used to
+   * create files / directories.
+   * @param s the string
+   * @return
+   */
   def isLegalName(s: String): Boolean = {
     if (s.isBlank) return false
     Seq("\\", "/", "*", "?", "\"", "\'", "<", ">", "|", ":").foreach(f => if (s.contains(f)) return false)
     true
   }
+
+  /**
+   * Convert any path into an absolute path. For relative path, it is calculated base on project base.
+   * @param path the original path string
+   * @param projectBase project base
+   * @return [[None]] iff no project base AND relative path; Otherwise an abspath will be returned
+   */
+  def toAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
+    val file = new File(path)
+    if (!file.isAbsolute) {
+      projectBase match {
+        case Some(base) =>
+          Some(new File(new File(base), path).getAbsolutePath)
+        case None => None
+      }
+    } else {
+      Some(file.getAbsolutePath)
+    }
+  }
+
+  /**
+   * Convert any path into an project relative path.
+   * @param path the original path string
+   * @param projectBase project base
+   * @return [[None]] iff no project base OR path can not be relativised; Otherwise a relative path will be returned
+   */
+  def toProjectRelativePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
+    if (projectBase.isEmpty) return None
+    val file = new File(path)
+    if (file.isAbsolute) {
+      val pathAbs = java.nio.file.Paths.get(file.getAbsolutePath)
+      val pathBase = java.nio.file.Paths.get(projectBase.get) // should work
+      try {
+        Some(pathBase.relativize(pathAbs).toString)
+      } catch {
+        case _: Throwable => None
+      }
+    } else {
+      // Notice: won't check if it really exists
+      Some(file.getPath)
+    }
+  }
+
+
   def getAllSourceFiles(
       sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.source),
       sources: Seq[String] = ProjectConfig.config.sources,
@@ -70,19 +123,6 @@ object KernelFileUtils {
         KernelLogger.warn(s"cannot get test files from $target!", e)
         e.printStackTrace()
         Seq()
-    }
-  }
-
-  def getAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
-    val file = new File(path)
-    if (file.isAbsolute) {
-      projectBase match {
-        case Some(base) =>
-          Some(new File(new File(base), path).getAbsolutePath)
-        case None => None
-      }
-    } else {
-      Some(file.getAbsolutePath)
     }
   }
 

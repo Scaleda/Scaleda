@@ -3,6 +3,7 @@ package kernel
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
+import top.criwits.scaleda.kernel.project.config.ProjectConfig
 import top.criwits.scaleda.kernel.utils.KernelFileUtils
 
 import java.io.{File, PrintWriter}
@@ -43,5 +44,17 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
 
   it should "delete test file" in {
     testFile.delete()
+  }
+
+  it should "abs to rel (1)" in {
+    ProjectConfig.projectBase = Some("C:\\Coding\\my_project")
+    println(KernelFileUtils.toAbsolutePath("C:\\Coding\\my_project\\src\\1.v"))
+    println(KernelFileUtils.toAbsolutePath("src\\2.v"))
+    println(KernelFileUtils.toAbsolutePath("src/3/4.v"))
+    println(KernelFileUtils.toProjectRelativePath("src/5.v"))
+    println(KernelFileUtils.toProjectRelativePath("src\\6.v"))
+    println(KernelFileUtils.toProjectRelativePath("C:\\Coding\\my_project\\test\\2.v"))
+    println(KernelFileUtils.toProjectRelativePath("C:/Coding"))
+    println(KernelFileUtils.toProjectRelativePath("D:\\a.txt"))
   }
 }

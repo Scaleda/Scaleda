@@ -17,9 +17,7 @@ import scala.jdk.javaapi.CollectionConverters
 import scala.jdk.CollectionConverters._
 
 object FileUtils {
-
-
-  def getAllVerilogFiles(project: Project, test: Boolean = false): List[VerilogPSIFileRoot] = { // FIXME: if source not in src/ will also match
+  def getAllVerilogFiles(project: Project, test: Boolean = false): List[VerilogPSIFileRoot] = {
     ProjectConfig.projectBase.map(projectBase => {
       val sourceDir: File = new File(new File(projectBase).getAbsolutePath, ProjectConfig.config.source)
       // TODO: Load files from ProjectConfig.sources?

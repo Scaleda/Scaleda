@@ -11,10 +11,12 @@ import com.intellij.ide.SaveAndSyncHandler
 import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent}
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
+import top.criwits.scaleda.idea.settings.toolchains.ProfileDetectAction
+import top.criwits.scaleda.kernel.toolchain.Toolchain
 
 import java.io.File
 
-/** Action: reload Scaleda project config, with all its targets and tasks.
+/** Action: Load Scaleda project config, with all its targets and tasks.
   * This action should be performed when
   *
   *  - Start up;
@@ -61,6 +63,7 @@ class ScaledaReloadTasksAction
       ProjectConfig.projectBase = Some(f.getParent.getPath)
       MainLogger.info(s"Scaleda config file $f detected")
 
+      // Refresh `scaleda.yml`
       LocalFileSystem
         .getInstance()
         .refreshAndFindFileByIoFile(
@@ -68,8 +71,7 @@ class ScaledaReloadTasksAction
         )
       SaveAndSyncHandler.getInstance().scheduleRefresh()
 
-      // invokeLater {
-      // Refresh tree panel while model valid
+      // Refresh tree panel when the model is valid, tricky
       val th = new Thread(() => {
         try {
           var done = false
@@ -102,6 +104,5 @@ class ScaledaReloadTasksAction
       th.setDaemon(true)
       th.start()
     }
-    // }
   }
 }
