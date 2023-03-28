@@ -350,9 +350,12 @@ object ScaledaShellMain {
           case ShellRunMode.Create =>
             require(shellConfig.createProjectName.nonEmpty)
             // detect directory to find is it a toolchain project
-            val validToolchains = Toolchain.projectDetectors
-              .filter(t => t._2.detect(workingDir))
-              .map(t => t._1)
+            val validToolchains =
+              if (shellConfig.detectProjectWhenCreate)
+                Toolchain.projectDetectors
+                  .filter(t => t._2.detect(workingDir))
+                  .map(t => t._1)
+              else Seq()
             val targets = validToolchains.map(id => {
               KernelLogger.info(s"Detected toolchain: $id")
               val parser = Toolchain.targetParser(id)

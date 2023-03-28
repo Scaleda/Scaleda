@@ -48,12 +48,18 @@ trait VivadoTargetParser extends BasicTargetParser {
       topModule = Some(simTop),
       preset = true
     )
+    val relativeSources =
+      sources.map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
+    val relativeTests =
+      tests.map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
     val target = TargetConfig(
       name = "Vivado",
       toolchain = Vivado.internalID,
-      // add source directory
-      sources = sources,
-      tests = tests,
+      // add sources; use relative path; if path is single dir, set to source/test
+      sources = if (relativeSources.size > 1) relativeSources else Seq(),
+      source = if (relativeSources.size == 1) relativeSources.head else "",
+      tests = relativeTests,
+      test = if (relativeTests.size == 1) relativeTests.head else "",
       topModule = if (top.nonEmpty) Some(top) else None,
       tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask),
       options = Some(Map("part" -> part))
