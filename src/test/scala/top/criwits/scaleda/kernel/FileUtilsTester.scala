@@ -1,10 +1,11 @@
 package top.criwits.scaleda
 package kernel
 
+import kernel.project.config.ProjectConfig
+import kernel.utils.{KernelFileUtils, OS}
+
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import top.criwits.scaleda.kernel.project.config.ProjectConfig
-import top.criwits.scaleda.kernel.utils.KernelFileUtils
 
 import java.io.{File, PrintWriter}
 
@@ -28,7 +29,7 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
       |""".stripMargin
 
   val testFileName = "testLoad.v"
-  val testFile = new File(testFileName)
+  val testFile     = new File(testFileName)
 
   behavior of "KernelFileUtils"
 
@@ -47,15 +48,35 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "converts between absolute paths and relative paths" in {
-    ProjectConfig.projectBase = Some("C:\\Coding\\my_project")
-    println(KernelFileUtils.toAbsolutePath("C:\\Coding\\my_project\\src\\1.v"))
-    println(KernelFileUtils.toAbsolutePath("src\\2.v"))
-    println(KernelFileUtils.toAbsolutePath("src/3/4.v"))
-    println(KernelFileUtils.toProjectRelativePath("src/5.v"))
-    println(KernelFileUtils.toProjectRelativePath("src\\6.v"))
-    println(KernelFileUtils.toProjectRelativePath("C:\\Coding\\my_project\\test\\2.v"))
-    println(KernelFileUtils.toProjectRelativePath("C:/Coding"))
-    println(KernelFileUtils.toProjectRelativePath("D:\\a.txt"))
+    // make backup so we can have continuous testing
+    val bkp = ProjectConfig.projectBase
+    if (OS.isWindows) {
+      ProjectConfig.projectBase = Some("C:\\Coding\\my_project")
+      println(KernelFileUtils.toAbsolutePath("\\Coding\\my_project\\src\\1.v"))
+      println(KernelFileUtils.toAbsolutePath("C:\\Coding\\my_project\\src\\1.v"))
+      println(KernelFileUtils.toAbsolutePath("src\\2.v"))
+      println(KernelFileUtils.toAbsolutePath("src/3/4.v"))
+      println(KernelFileUtils.toProjectRelativePath("src/5.v"))
+      println(KernelFileUtils.toProjectRelativePath("src\\6.v"))
+      println(KernelFileUtils.toProjectRelativePath("C:\\Coding\\my_project\\test\\2.v"))
+      println(KernelFileUtils.toProjectRelativePath("C:/Coding"))
+      println(KernelFileUtils.toProjectRelativePath("D:\\a.txt"))
+    } else {
+      // same tests on Linux
+      ProjectConfig.projectBase = Some("/home/criwits/my_project")
+      println(KernelFileUtils.toAbsolutePath("/home/criwits/my_project/src/1.v"))
+      println(KernelFileUtils.toAbsolutePath("/home/criwits/my_project/src/2.v"))
+      println(KernelFileUtils.toAbsolutePath("src/3.v"))
+      println(KernelFileUtils.toAbsolutePath("src/4/5.v"))
+      println(KernelFileUtils.toProjectRelativePath("src/6.v"))
+      println(KernelFileUtils.toProjectRelativePath("src/7.v"))
+      println(KernelFileUtils.toProjectRelativePath("/home/criwits/my_project/test/2.v"))
+      println(KernelFileUtils.toProjectRelativePath("/home/criwits"))
+      println(KernelFileUtils.toProjectRelativePath("/home/criwits/"))
+      println(KernelFileUtils.toProjectRelativePath("/home/criwits/a.txt"))
+    }
+    // restore bkp to original place
+    ProjectConfig.projectBase = bkp
   }
 
   it should "generate test files" in {
@@ -74,22 +95,30 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
   it should "scan directory" in {
     ProjectConfig.projectBase = Some("testProj")
     println(KernelFileUtils.scanDirectory(Set("v"), new File("testProj")))
-    println(KernelFileUtils.getAllSourceFiles(projectConfig = ProjectConfig(
-      source = "src/",
-      sources = Seq(
-        new File("another/an.v").getAbsolutePath,
-        "another.v"
-      ),
-      test = "test"
-    )))
-    println(KernelFileUtils.getAllTestFiles(projectConfig = ProjectConfig(
-      source = "src/",
-      sources = Seq(
-        new File("another/an.v").getAbsolutePath,
-        "another.v"
-      ),
-      test = "test"
-    )))
+    println(
+      KernelFileUtils.getAllSourceFiles(projectConfig =
+        ProjectConfig(
+          source = "src/",
+          sources = Seq(
+            new File("another/an.v").getAbsolutePath,
+            "another.v"
+          ),
+          test = "test"
+        )
+      )
+    )
+    println(
+      KernelFileUtils.getAllTestFiles(projectConfig =
+        ProjectConfig(
+          source = "src/",
+          sources = Seq(
+            new File("another/an.v").getAbsolutePath,
+            "another.v"
+          ),
+          test = "test"
+        )
+      )
+    )
   }
 
   it should "remove test project" in {

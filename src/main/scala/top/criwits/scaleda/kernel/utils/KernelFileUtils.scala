@@ -33,7 +33,8 @@ object KernelFileUtils {
   }
 
   /**
-   * Convert any path into an absolute path. For relative path, it is calculated base on project base.
+   * Convert any path into an absolute path. For relative path, it is calculated base on project base.<br/>
+   * ⚠️ Only work on same OS. Cannot process Window paths on Linux now.
    * @param path the original path string
    * @param projectBase project base
    * @return [[None]] iff no project base AND relative path; Otherwise an abspath will be returned
@@ -52,7 +53,8 @@ object KernelFileUtils {
   }
 
   /**
-   * Convert any path into an project relative path.
+   * Convert any path into an project relative path.<br/>
+   * ⚠️ Only work on same OS. Cannot process Window paths on Linux now.
    * @param path the original path string
    * @param projectBase project base
    * @return [[None]] iff no project base OR path can not be relativised; Otherwise a relative path will be returned
