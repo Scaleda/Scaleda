@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package verilog.utils
 
+import kernel.utils.KernelFileUtils
 import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseListener}
 
 import org.antlr.v4.runtime.tree.IterativeParseTreeWalker
@@ -53,17 +54,14 @@ object ModuleUtils {
 
       override def exitModule_head(ctx: VerilogParser.Module_headContext) = {
         moduleNow = ctx.module_identifier().identifier().Simple_identifier().getText
-        println(s"start $moduleNow")
       }
 
       override def exitModule_instantiation(ctx: VerilogParser.Module_instantiationContext) = {
         val name = ctx.module_identifier().identifier().Simple_identifier().getText
         instances += name
-        println(s"instantiation: ${name}")
       }
 
       override def exitModule_declaration(ctx: VerilogParser.Module_declarationContext) = {
-        println(s"$moduleNow done: ${ctx.getText}")
         modulesInfo(moduleNow) = instances.toSeq
         instances.clear()
       }
@@ -88,5 +86,42 @@ object ModuleUtils {
   def parseVerilogFileModules(file: File) = {
     val tree = parseVerilogFileAST(file)
     parseVerilogASTModules(tree)
+  }
+
+  /** Get maybe top module from source sets, will parse all source code
+    * @param sources source set
+    * @return optional top module
+    */
+  def parseSourceSetTopModules(sources: Set[String]): Set[String] = {
+    val files = KernelFileUtils.getAllSourceFiles(sources)
+    val fileModuleInfo: Map[String, Seq[String]] =
+      files.map(parseVerilogFileModules).reduceOption(_ ++ _).getOrElse(Map())
+    class ModuleNode(val module: String, val children: Set[String]) {
+      var parent: ModuleNode = this
+
+      override def equals(obj: Any) = obj match {
+        case o: ModuleNode => o.module == module
+        case _             => super.equals(obj)
+      }
+
+      override def toString: String = s"Module[$module]"
+    }
+    val modules = fileModuleInfo.map(a => new ModuleNode(a._1, a._2.toSet))
+    // Use simple Union-Find algorithm
+    def find(node: ModuleNode): ModuleNode = if (node.parent == node) node else find(node.parent)
+    def merge(a: ModuleNode, b: ModuleNode) = {
+      val p = find(a)
+      a.parent = p
+      b.parent = p
+    }
+    var tops: Set[ModuleNode] = modules.map(find).toSet
+    var lastTopCount          = 0
+    while (tops.size > 1 && lastTopCount != tops.size) {
+      // find children and merge them
+      tops.foreach(t => t.children.map(name => modules.find(_.module == name).foreach(c => merge(t, c))))
+      lastTopCount = tops.size
+      tops = modules.map(find).toSet
+    }
+    tops.map(_.module)
   }
 }
