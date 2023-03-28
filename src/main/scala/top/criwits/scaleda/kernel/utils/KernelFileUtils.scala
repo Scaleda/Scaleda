@@ -132,7 +132,8 @@ object KernelFileUtils {
    *  - files under `test`
    * @return
    */
-  def getAllTestFiles(projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
+  @Deprecated
+  def getAllProjectTestFiles(projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
     val testDir = new File(toAbsolutePath(projectConfig.test).get)
     scanDirectory(Set("v"), testDir)
   }
@@ -180,7 +181,7 @@ object KernelFileUtils {
    */
   @Deprecated
   def getProjectModuleFile(module: String, testbench: Boolean = false): Option[File] = {
-    val sources = if (testbench) getAllTestFiles() else getAllProjectSourceFiles()
+    val sources = if (testbench) getAllProjectTestFiles() else getAllProjectSourceFiles()
     getModuleFileFromSet(sources.map(_.getAbsolutePath).toSet, module)
   }
 
