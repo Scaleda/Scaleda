@@ -29,7 +29,7 @@ object ExtractAssets {
     if (version < ASSET_VERSION) return false
 
     // check integrity
-    binaryList.map(binary => new File(targetDirectory, binary).exists()).reduce(_ && _)
+    binaryList.forall(binary => new File(targetDirectory, binary).exists())
   }
 
   def run(): Boolean = {

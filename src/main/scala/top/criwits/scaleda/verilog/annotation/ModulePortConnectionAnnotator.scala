@@ -50,7 +50,7 @@ class ModulePortConnectionAnnotator extends Annotator {
           if (
             !mp
               .map(_._2.nonEmpty)
-              .reduce(_ && _)
+              .foldLeft(false)(_ && _)
           ) {
             holder
               .newAnnotation(
@@ -93,7 +93,7 @@ class ModulePortConnectionAnnotator extends Annotator {
           if (
             !connectMap
               .map(_._2.nonEmpty)
-              .reduceOption(_ && _).getOrElse(false)
+              .foldLeft(false)(_ && _)
           ) {
             holder
               .newAnnotation(

@@ -81,7 +81,7 @@ object IVerilog extends ToolchainPresetProvider {
         new File(toolchainProfile.vvpPath)
       )
 
-      if (!iverilogFiles.map(_.exists()).reduce(_ && _)) {
+      if (iverilogFiles.forall(_.exists())) {
         return None
       }
 
@@ -100,7 +100,7 @@ object IVerilog extends ToolchainPresetProvider {
           outputs.exists(_.contains("Icarus Verilog version")),
           outputs.exists(_.contains("iverilog-vpi")),
           outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
-        ).reduce(_ && _)
+        ).foldLeft(false)(_ && _)
       ) {
         (false, None)
       } else {

@@ -111,7 +111,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         returnValues: Seq[Int],
         outputs: Seq[String]
     ): (Boolean, Option[String]) = {
-      if (!returnValues.map(_ == 0).reduce(_ && _)) {
+      if (!returnValues.forall(_ == 0)) {
         (false, None)
       } else {
         (true, Some(outputs.head.split("\\n").head)) // should work

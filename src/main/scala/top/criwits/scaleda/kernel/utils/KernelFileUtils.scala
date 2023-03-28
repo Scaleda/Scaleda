@@ -87,10 +87,8 @@ object KernelFileUtils {
     files.filter(_.isDirectory).map(scanDirectory(suffixing, _)).foldLeft(Seq[File]())(_ ++ _) ++
     files.filter(!_.isDirectory).map(f => {
       val fileName = f.getName
-      if (suffixing
-        .map(suffix => fileName.endsWith(s".${suffix}"))
-        .reduceOption((a, b) => a || b)
-        .getOrElse(false)) Seq(f) else Seq()
+      if (suffixing.exists(suffix => fileName.endsWith(s".$suffix"))) Seq(f)
+      else Seq()
     }).foldLeft(Seq[File]())(_ ++ _)
   }
 

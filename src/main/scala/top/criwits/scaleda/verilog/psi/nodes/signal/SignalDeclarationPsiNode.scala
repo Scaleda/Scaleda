@@ -34,7 +34,7 @@ abstract class SignalDeclarationPsiNode(node: ASTNode) extends ANTLRPsiNode(node
 //    this.getChildren.filter(!_.isInstanceOf[IdentifierPsiNode])
 //      .map(_.getText).reduce(_ + " " + _).replace(";", "")
     val typeChildren: Array[PsiElement] = util.Arrays.copyOf(this.getChildren, this.getChildren.length - 2)
-    typeChildren.map(_.getText).reduce(_ + " " + _) // TODO: array error
+    typeChildren.map(_.getText).foldLeft("")(_ + " " + _) // TODO: array error // may fix
   }
 
   def getIdentifier: SignalIdentifierPsiNode =

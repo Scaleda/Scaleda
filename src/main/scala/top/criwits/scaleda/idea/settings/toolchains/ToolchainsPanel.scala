@@ -179,7 +179,7 @@ class ToolchainsPanel extends JPanel(new BorderLayout) {
     }
   }
 
-  def modified(): Boolean = if (profiles.isEmpty) false else profiles.map(p => p.edited).reduce(_ || _)
+  def modified(): Boolean = if (profiles.isEmpty) false else profiles.map(p => p.edited).foldLeft(false)(_ || _)
   def reset(): Unit = { init() }
   def apply(): Unit = profiles.foreach(p =>  if (p.edited) {
     Toolchain.syncProfile(p)
