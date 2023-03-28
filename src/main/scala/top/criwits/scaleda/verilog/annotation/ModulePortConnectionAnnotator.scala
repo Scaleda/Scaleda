@@ -47,11 +47,7 @@ class ModulePortConnectionAnnotator extends Annotator {
               p._1.getPortType == PortDeclarationPsiNode.INPUT || p._1.getPortType == PortDeclarationPsiNode.INOUT
             )
           // find unconnected (without expression)
-          if (
-            !mp
-              .map(_._2.nonEmpty)
-              .foldLeft(false)(_ && _)
-          ) {
+          if (!mp.forall(_._2.nonEmpty)) {
             holder
               .newAnnotation(
                 HighlightSeverity.ERROR,
