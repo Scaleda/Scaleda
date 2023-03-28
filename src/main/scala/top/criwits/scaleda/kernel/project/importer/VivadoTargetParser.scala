@@ -52,11 +52,16 @@ trait VivadoTargetParser extends BasicTargetParser {
       sources.map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
     val relativeTests =
       tests.map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
+
+    val ips = KernelFileUtils
+      .getAllSourceFiles(sources.toSet, suffixing = Set("xci", "xcix"))
+      .map(_.getAbsolutePath)
+      .map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
     val target = TargetConfig(
       name = "Vivado",
       toolchain = Vivado.internalID,
       // add sources; use relative path; if path is single dir, set to source/test
-      sources = if (relativeSources.size > 1) relativeSources else Seq(),
+      sources = (if (relativeSources.size > 1) relativeSources else Seq()) ++ ips,
       source = if (relativeSources.size == 1) relativeSources.head else "",
       tests = relativeTests,
       test = if (relativeTests.size == 1) relativeTests.head else "",
