@@ -6,6 +6,7 @@ import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseVisitor}
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.apache.commons.io.file.DeletingPathVisitor
+import top.criwits.scaleda.verilog.utils.ModuleUtils
 
 import java.io._
 import java.nio.ByteBuffer
@@ -144,13 +145,7 @@ object KernelFileUtils {
    * @return Seq[String]: All module titles in that file
    */
   def getModuleTitle(verilogFile: File): Seq[String] = {
-    val stream     = new FileInputStream(verilogFile)
-    val charStream = CharStreams.fromStream(stream)
-    stream.close()
-    val lexer  = new VerilogLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new VerilogParser(tokens)
-    val tree   = parser.source_text()
+    val tree   = ModuleUtils.parseVerilogFileAST(verilogFile)
 
     class ModuleIdentifierVisitor extends VerilogParserBaseVisitor[String] {
       val title = new ListBuffer[String]
@@ -215,13 +210,7 @@ object KernelFileUtils {
     */
   def insertAfterModuleHead(original: File, output: File, moduleName: String, insert: String): Int = {
     KernelLogger.info(s"insertAfterModuleHead $original -> $output")
-    val stream     = new FileInputStream(original)
-    val charStream = CharStreams.fromStream(stream)
-    stream.close()
-    val lexer  = new VerilogLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new VerilogParser(tokens)
-    val tree   = parser.source_text()
+    val tree   = ModuleUtils.parseVerilogFileAST(original)
 
     class ModuleHeadVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
       var headerEndAt: Int = -1
