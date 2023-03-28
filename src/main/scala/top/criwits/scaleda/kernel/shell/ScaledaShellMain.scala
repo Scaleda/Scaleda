@@ -359,7 +359,6 @@ object ScaledaShellMain {
               parser.parseAsTarget(workingDir)
             })
             val project = new ProjectConfig(name = shellConfig.createProjectName, targets = targets.toArray)
-            printf(project.toString)
             ProjectConfig.saveConfig(project, targetFile = new File(workingDir, "scaleda.yml"))
           case _ =>
             KernelLogger.error("not implemented.")

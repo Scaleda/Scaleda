@@ -26,7 +26,8 @@ class ShellRunTest extends AnyFlatSpec with should.Matchers {
     ScaledaShellMain.main(Array("serve"))
   }
 
-  it should "test create" in {
+  it should "test create and run" in {
     ScaledaShellMain.main(Array("create", "-C", "/home/chiro/Vivado/Tests/ip_tests"))
+    ScaledaShellMain.main(Array("run", "-C", "/home/chiro/Vivado/Tests/ip_tests", "-t", "Simulation"))
   }
 }

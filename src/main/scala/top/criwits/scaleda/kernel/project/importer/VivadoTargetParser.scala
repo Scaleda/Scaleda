@@ -39,6 +39,7 @@ trait VivadoTargetParser extends BasicTargetParser {
       .getOrElse(
         ModuleUtils.parseSourceSetTopModules(tests.toSet).headOption.getOrElse("")
       )
+    val part = o.options.find(_.Name == "Part").get.Val
     require(o.Version == "7")
     val synthTask = new TaskConfig(name = "Synth", `type` = "synthesis", preset = true)
     val simTask = new TaskConfig(
@@ -54,7 +55,8 @@ trait VivadoTargetParser extends BasicTargetParser {
       sources = sources,
       tests = tests,
       topModule = if (top.nonEmpty) Some(top) else None,
-      tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask)
+      tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask),
+      options = Some(Map("part" -> part))
     )
     target
   }
