@@ -38,7 +38,7 @@ case class ShellArgs(
 
 object ScaledaShellMain {
   private def loadConfig(projectRootPath: String): Unit = {
-    KernelLogger.info(s"loadConfig($projectRootPath)")
+    KernelLogger.debug(s"loadConfig($projectRootPath)")
     val rootDir = new File(projectRootPath)
     if (rootDir.exists() && rootDir.isDirectory) {
       ProjectConfig.projectBase = Some(rootDir.getAbsolutePath)
@@ -48,7 +48,7 @@ object ScaledaShellMain {
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
       ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
       val config = ProjectConfig.getConfig()
-      KernelLogger.info(s"project config: $config")
+      KernelLogger.debug(s"project config: $config")
     }
   }
 
@@ -67,7 +67,7 @@ object ScaledaShellMain {
   }
 
   def main(args: Array[String]): Unit = {
-    KernelLogger.info(s"This is Scaleda shell! Args: ${args.mkString(" ")}")
+    KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
 
     // set exception handler
     Thread.currentThread().setUncaughtExceptionHandler(new ShellExceptionHandler)
@@ -79,7 +79,7 @@ object ScaledaShellMain {
     // install binaries
     if (!ExtractAssets.isInstalled) {
       ExtractAssets.run()
-      KernelLogger.info("All assets ready")
+      KernelLogger.debug("All assets ready")
     }
 
     // preparse workdir
@@ -133,13 +133,13 @@ object ScaledaShellMain {
         cmd("remote")
           .children(
             cmd("serve")
-              .text("Run as server")
+              .text("\tRun as server")
               .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
             cmd("login")
-              .text("Login into server")
+              .text("\tLogin into server")
               .action((_, c) => c.copy(runMode = ShellRunMode.Login)),
             cmd("register")
-              .text("Create account in server")
+              .text("\tCreate account in server")
               .action((_, c) => c.copy(runMode = ShellRunMode.Register))
               .children(
                 opt[String]('n', "nickname")
@@ -151,28 +151,28 @@ object ScaledaShellMain {
                   .text("Specify nickname")
               ),
             cmd("refresh")
-              .text("Refresh token")
+              .text("\tRefresh token")
               .action((_, c) => c.copy(runMode = ShellRunMode.RefreshToken))
           ),
         cmd("list")
           .children(
             cmd("profiles")
-              .text("Show loaded profiles")
+              .text("\tShow loaded profiles")
               .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
             cmd("tasks")
-              .text("Show loaded tasks")
+              .text("\tShow loaded tasks")
               .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
             cmd("configurations")
-              .text("Show all configurations to run")
+              .text("\tShow all configurations to run")
               .action((_, c) => c.copy(runMode = ShellRunMode.ListConfigurations))
           ),
         cmd("manage")
           .children(
             cmd("install")
-              .text("Install necessary binaries force")
+              .text("\tInstall necessary binaries force")
               .action((_, c) => c.copy(runMode = ShellRunMode.Install)),
             cmd("clean")
-              .text("Clean all data on device")
+              .text("\tClean all data on device")
               .action((_, c) => c.copy(runMode = ShellRunMode.Clean))
           ),
         cmd("run")
