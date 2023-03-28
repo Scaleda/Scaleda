@@ -82,11 +82,16 @@ object KernelFileUtils {
    * @param directory the directory
    * @return
    */
-  def scanDirectory(suffixing: Set[String], directory: File): Seq[File] = {
+  def scanDirectory(suffixing: Set[String], directory: File, level: Int = 0, maxLevel: Int = 128): Seq[File] = {
+    // when out of search level, return empty seq
+    if (level > maxLevel) return Seq()
     val files = directory.listFiles()
     if (files == null) return Seq()
 
-    files.filter(_.isDirectory).map(scanDirectory(suffixing, _)).foldLeft(Seq[File]())(_ ++ _) ++
+    // collect dirs
+    files.filter(_.isDirectory).map(d => scanDirectory(suffixing, d, level = level + 1, maxLevel = maxLevel))
+      .foldLeft(Seq[File]())(_ ++ _) ++
+    // collect files
     files.filter(!_.isDirectory).map(f => {
       val fileName = f.getName
       if (suffixing.exists(suffix => fileName.endsWith(s".$suffix"))) Seq(f)
@@ -95,24 +100,31 @@ object KernelFileUtils {
   }
 
   /**
-   * Get all source files. That is:
-   *  - files under `source`
-   *  - files given under `sources`
-   * @param suffixing file type
-   * @return
+   * Get all source files from a source set.
+   * @param sources list of paths, each item can be file or dir
+   * @param suffixing filter by file type
+   * @return list of files
    */
-  def getAllSourceFiles(suffixing: Set[String] = Set("v"), projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
-    val sourceDir: File = new File(toAbsolutePath(projectConfig.source).get)
-    val sources: Seq[String] = projectConfig.sources
-
-    val sourceDirSources = scanDirectory(suffixing, sourceDir)
-    val extraSources = sources.map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
+  def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v")): Seq[File] = {
+    sources.map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
       if (f.exists()) {
         if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
       } else Seq()
     }).reduceOption(_ ++ _).getOrElse(Seq())
+  }
 
-    sourceDirSources ++ extraSources
+  /**
+   * Get all source files under the project. That is:
+   *  - files under `source`
+   *  - files given under `sources`
+   * @param suffixing file type
+   * @return seq of files
+   */
+  @Deprecated
+  def getAllProjectSourceFiles(suffixing: Set[String] = Set("v"), projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
+    val sourceDir: File = new File(toAbsolutePath(projectConfig.source).get)
+    val sources = projectConfig.sources.toSet
+    getAllSourceFiles(sources + sourceDir.getAbsolutePath, suffixing = suffixing)
   }
 
   /**
@@ -166,15 +178,27 @@ object KernelFileUtils {
    * @param testbench is testbench? (will search from test sources, instead of sources)
    * @return
    */
-  def getModuleFile(module: String, testbench: Boolean = false): Option[File] = {
-    (if (testbench) getAllTestFiles() else getAllSourceFiles()).foreach(f => {
+  @Deprecated
+  def getProjectModuleFile(module: String, testbench: Boolean = false): Option[File] = {
+    val sources = if (testbench) getAllTestFiles() else getAllProjectSourceFiles()
+    getModuleFileFromSet(sources.map(_.getAbsolutePath).toSet, module)
+  }
+
+  /**
+   * Get the verilog file containing specific module from one file set
+   * @param sources file set
+   * @param module module name
+   * @return optional file
+   */
+  def getModuleFileFromSet(sources: Set[String], module: String): Option[File] = {
+    getAllSourceFiles(sources).foreach(f => {
       val readModule = getModuleTitle(f)
       val matched    = readModule.filter(_ == module)
       KernelLogger.debug(
         s"getModuleFile filter for $f, target module: $module, read module: $readModule, matched: $matched"
       )
       if (matched.nonEmpty) {
-        return Some(f) // FIXME
+        return Some(f)
       } else None
     })
     KernelLogger.warn("cannot get module file!")

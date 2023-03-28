@@ -162,7 +162,8 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
     }
     // TODO / FIXME: Exception // TODO: topModule is in executor???
     val top             = topOptional.get
-    val topFile         = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
+    val sources         = if (sim) taskConfig.getTestSet else taskConfig.getSourceSet
+    val topFile         = KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
@@ -170,9 +171,9 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
     Vivado.TemplateContext(
       top = top,
       workDir = doSeparatorReplace(executor.workingDir.getAbsolutePath),
-      part = targetConfig.options.get("part"),     // FIXME
+      part = targetConfig.options.get("part"), // FIXME
       sourceList = KernelFileUtils
-        .getAllSourceFiles()
+        .getAllSourceFiles(taskConfig.getSourceSet)
         .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
         .map(p => doSeparatorReplace(p.getAbsolutePath)),
       sim = sim,

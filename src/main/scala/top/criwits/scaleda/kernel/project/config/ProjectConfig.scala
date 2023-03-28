@@ -22,9 +22,10 @@ import java.io.File
 case class ProjectConfig(
     name: String = "default-project",
     `type`: String = "rtl",
-    source: String = "src/",
-    sources: Seq[String] = Seq(),
-    test: String = "test/",
+    override val source: String = "src/",
+    override val sources: Seq[String] = Seq(),
+    override val test: String = "test/",
+    override val tests: Seq[String] = Seq(),
     topModule: Option[String] = None,
     constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array()

@@ -96,7 +96,7 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
     ProjectConfig.projectBase = Some("testProj")
     println(KernelFileUtils.scanDirectory(Set("v"), new File("testProj")))
     println(
-      KernelFileUtils.getAllSourceFiles(projectConfig =
+      KernelFileUtils.getAllProjectSourceFiles(projectConfig =
         ProjectConfig(
           source = "src/",
           sources = Seq(
