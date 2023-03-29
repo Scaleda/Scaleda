@@ -82,7 +82,7 @@ object IVerilog extends ToolchainPresetProvider {
         new File(toolchainProfile.vvpPath)
       )
 
-      if (iverilogFiles.forall(_.exists())) {
+      if (!iverilogFiles.forall(_.exists())) {
         return None
       }
 
