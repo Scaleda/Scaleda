@@ -86,11 +86,7 @@ class ModulePortConnectionAnnotator extends Annotator {
           }
         case ModuleInstantiationPsiNode.ORDERED =>
           val connectMap = instance.getConnectMap
-          if (
-            !connectMap
-              .map(_._2.nonEmpty)
-              .foldLeft(false)(_ && _)
-          ) {
+          if (!connectMap.forall(_._2.nonEmpty)) {
             holder
               .newAnnotation(
                 HighlightSeverity.ERROR,
