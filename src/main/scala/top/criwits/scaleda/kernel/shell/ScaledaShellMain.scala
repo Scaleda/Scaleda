@@ -221,7 +221,7 @@ object ScaledaShellMain {
           else None
         val workingDir = shellConfig.workingDir
         val config     = ProjectConfig.getConfig()
-        KernelLogger.info(s"shell config: $shellConfig")
+        KernelLogger.debug(s"shell config: $shellConfig")
         shellConfig.runMode match {
           case ShellRunMode.ListProfiles =>
             KernelLogger.info("local profile list:")

@@ -15,7 +15,8 @@ trait VivadoTargetParser extends BasicTargetParser {
     val projectFile = path.listFiles((file, s) => s.endsWith(".xpr")).head
     val projectName = projectFile.getName.split("\\.").head
     val o           = XMLHelper(projectFile, classOf[VivadoProjectConfig])
-    val projectBase = o.Path
+    val projectXprFile = new File(o.Path)
+    val projectBase = projectFile.getParentFile.getAbsolutePath
     // $PSRCDIR/sim_1 => <projectBase>/<projectName>.srcs/sim_1
     val replace = new ImplicitPathReplace("", "", Some("(\\$PSRCDIR[/\\\\]?)"), Seq(s"$projectName.srcs/"))
     val srcSets = o.fileSets.filter(_.Type == "DesignSrcs")
@@ -61,13 +62,14 @@ trait VivadoTargetParser extends BasicTargetParser {
       name = "Vivado",
       toolchain = Vivado.internalID,
       // add sources; use relative path; if path is single dir, set to source/test
-      sources = (if (relativeSources.size > 1) relativeSources else Seq()) ++ ips,
+      sources = if (relativeSources.size > 1) relativeSources else Seq(),
       source = if (relativeSources.size == 1) relativeSources.head else "",
-      tests = relativeTests,
+      tests = if (relativeTests.size > 1) relativeTests else Seq(),
       test = if (relativeTests.size == 1) relativeTests.head else "",
       topModule = if (top.nonEmpty) Some(top) else None,
       tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask),
-      options = Some(Map("part" -> part))
+      options = Some(Map("part" -> part)),
+      ips = ips
     )
     target
   }

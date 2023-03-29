@@ -184,7 +184,8 @@ object Vivado extends ToolchainProfileDetector
       // if sim == false, then this will not be used
       testbenchSource = testbenchSource,
       vcdFile = vcdFile,
-      xdcList = xdcList
+      xdcList = xdcList,
+      ipList = targetConfig.ips.map(p => KernelFileUtils.toAbsolutePath(p).getOrElse(p))
     )
   }
 
@@ -301,11 +302,12 @@ object Vivado extends ToolchainProfileDetector
       // remove old vivado project if exists and only for remote
       val top = rt.task.findTopModule.getOrElse("NONE")
       val pathsToDelete = Seq(
-        s"$top/$top.sim",
-        s"$top/$top.cache",
-        s"$top/$top.hw",
-        s"$top/$top.ip_user_files",
-        s"$top/$top.runs"
+        // s"$top/$top.sim",
+        // s"$top/$top.cache",
+        // s"$top/$top.hw",
+        // s"$top/$top.ip_user_files",
+        // s"$top/$top.runs"
+        s"$top"
       )
       pathsToDelete.foreach(f => {
         val file = new File(rt.executor.workingDir, f)

@@ -45,11 +45,11 @@ object KernelFileUtils {
     if (!file.isAbsolute) {
       projectBase match {
         case Some(base) =>
-          Some(new File(new File(base), path).getAbsolutePath)
+          Some(new File(new File(base), path).getAbsolutePath.replace('\\', '/'))
         case None => None
       }
     } else {
-      Some(file.getAbsolutePath)
+      Some(file.getAbsolutePath.replace('\\', '/'))
     }
   }
 
@@ -67,13 +67,13 @@ object KernelFileUtils {
       val pathAbs = java.nio.file.Paths.get(file.getAbsolutePath)
       val pathBase = java.nio.file.Paths.get(projectBase.get) // should work
       try {
-        Some(pathBase.relativize(pathAbs).toString)
+        Some(pathBase.relativize(pathAbs).toString.replace('\\', '/'))
       } catch {
         case _: Throwable => None
       }
     } else {
       // Notice: won't check if it really exists
-      Some(file.getPath)
+      Some(file.getPath.replace('\\', '/'))
     }
   }
 
@@ -102,12 +102,12 @@ object KernelFileUtils {
 
   /**
    * Get all source files from a source set.
-   * @param sources list of paths, each item can be file or dir
+   * @param sources list of paths, each item can be file or dir, empty string will be dropped
    * @param suffixing filter by file type
    * @return list of files
    */
   def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v")): Seq[File] = {
-    sources.map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
+    sources.filter(_.nonEmpty).map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
       if (f.exists()) {
         if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
       } else Seq()
