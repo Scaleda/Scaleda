@@ -82,7 +82,7 @@ object IVerilog extends ToolchainPresetProvider {
         new File(toolchainProfile.vvpPath)
       )
 
-      if (iverilogFiles.forall(_.exists())) {
+      if (!iverilogFiles.forall(_.exists())) {
         return None
       }
 
@@ -96,16 +96,14 @@ object IVerilog extends ToolchainPresetProvider {
       * @return
       */
     override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
-      if (
-        !Seq(
+      if (Seq(
           outputs.exists(_.contains("Icarus Verilog version")),
           outputs.exists(_.contains("iverilog-vpi")),
           outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
-        ).foldLeft(false)(_ && _)
-      ) {
-        (false, None)
-      } else {
+        ).forall(a => a)) {
         (true, Some(outputs.filter(_.contains("Icarus Verilog version")).head))
+      } else {
+        (false, None)
       }
 
     }
@@ -115,7 +113,7 @@ object IVerilog extends ToolchainPresetProvider {
     require(rt.task.taskType == TaskType.Simulation)
     val simExecutor = rt.executor.asInstanceOf[SimulationExecutor]
     // get testbench info
-    val testbench     = simExecutor.topModule
+    val testbench = simExecutor.topModule
     // val testbenchFile = KernelFileUtils.getProjectModuleFile(testbench, testbench = true).get
     val testbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = testbench).get
 

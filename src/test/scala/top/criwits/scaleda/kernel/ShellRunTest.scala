@@ -30,4 +30,8 @@ class ShellRunTest extends AnyFlatSpec with should.Matchers {
     ScaledaShellMain.main(Array("create", "-C", "/home/chiro/Vivado/Tests/ip_tests"))
     ScaledaShellMain.main(Array("run", "-C", "/home/chiro/Vivado/Tests/ip_tests", "-t", "Simulation"))
   }
+
+  it should "extract assets" in {
+    ScaledaShellMain.main("manage install".split(' '))
+  }
 }
