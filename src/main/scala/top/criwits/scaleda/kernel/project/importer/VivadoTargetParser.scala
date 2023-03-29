@@ -15,7 +15,8 @@ trait VivadoTargetParser extends BasicTargetParser {
     val projectFile = path.listFiles((file, s) => s.endsWith(".xpr")).head
     val projectName = projectFile.getName.split("\\.").head
     val o           = XMLHelper(projectFile, classOf[VivadoProjectConfig])
-    val projectBase = o.Path
+    val projectXprFile = new File(o.Path)
+    val projectBase = projectFile.getParentFile.getAbsolutePath
     // $PSRCDIR/sim_1 => <projectBase>/<projectName>.srcs/sim_1
     val replace = new ImplicitPathReplace("", "", Some("(\\$PSRCDIR[/\\\\]?)"), Seq(s"$projectName.srcs/"))
     val srcSets = o.fileSets.filter(_.Type == "DesignSrcs")
