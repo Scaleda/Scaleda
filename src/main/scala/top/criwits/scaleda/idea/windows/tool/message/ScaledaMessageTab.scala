@@ -9,7 +9,7 @@ import kernel.utils.LogLevel
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent, DefaultActionGroup}
+import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent, DefaultActionGroup, ToggleAction}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, SimpleToolWindowPanel}
 import com.intellij.ui.components.{JBList, JBScrollPane}
@@ -240,19 +240,15 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     if (sortByLevel)
       AllIcons.RunConfigurations.Scroll_down
     else AllIcons.General.AutoscrollToSource
-  private val toggleSortAction = new AnAction(
+  private val toggleSortAction = new ToggleAction(
     ScaledaBundle.message("windows.message.action.sort.short"),
     ScaledaBundle.message("windows.message.action.sort"),
-    getToggleSortIcon
+    AllIcons.ObjectBrowser.Sorted
   ) {
-    override def actionPerformed(e: AnActionEvent) = {
-      sortByLevel = !sortByLevel
+    override def isSelected(e: AnActionEvent): Boolean = sortByLevel
+    override def setSelected(e: AnActionEvent, state: Boolean): Unit = {
+      sortByLevel = state
       selectToViewById(viewComboBox.getItem)
-    }
-
-    override def update(e: AnActionEvent) = {
-      // update icon
-      e.getPresentation.setIcon(getToggleSortIcon)
     }
   }
   listComponent.addListSelectionListener((listSelectionEvent: ListSelectionEvent) => {
@@ -275,21 +271,15 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 
   val levelActions = allLevels.map(level => {
     val icon = levelIcons(level)
-    new AnAction(level.toString, level.toString, icon) {
-      override def actionPerformed(e: AnActionEvent) = {
-        if (enabledLevel.contains(level)) enabledLevel.remove(level)
+    new ToggleAction(level.toString, level.toString, icon) {
+      override def setSelected(e: AnActionEvent, state: Boolean) = {
+        if (!state) enabledLevel.remove(level)
         else enabledLevel.add(level)
         selectToViewById(viewComboBox.getItem)
       }
 
-      override def update(e: AnActionEvent) = {
-        if (enabledLevel.contains(level)) {
-          e.getPresentation.setIcon(levelIcons(level))
-          e.getPresentation.setText(s"Enabled $level")
-        } else {
-          e.getPresentation.setIcon(levelDisabledIcon)
-          e.getPresentation.setText(s"Disabled $level")
-        }
+      override def isSelected(e: AnActionEvent): Boolean = {
+        if (enabledLevel.contains(level)) true else false
       }
     }
   })
