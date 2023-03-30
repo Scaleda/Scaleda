@@ -10,7 +10,7 @@ import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
 class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[ScaledaRunConfiguration]{
   override def setupConfigurationFromContext(configuration: ScaledaRunConfiguration, context: ConfigurationContext, sourceElement: Ref[PsiElement]): Boolean = {
-    MainLogger.info("setupConfigurationFromContext config taskName:", configuration.taskName)
+    MainLogger.debug("setupConfigurationFromContext config taskName:", configuration.taskName)
     ProjectConfig.getConfig().map(c => {
       c.headTarget.foreach(t => configuration.targetName = t.name)
       c.headTask.foreach(t => configuration.taskName = t.name)
