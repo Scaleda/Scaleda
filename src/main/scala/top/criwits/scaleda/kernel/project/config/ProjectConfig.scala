@@ -22,6 +22,9 @@ import java.io.File
 @JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
+    description: String = "",
+    version: String = "0.1",
+    author: String = "",
     `type`: String = "rtl",
     override val source: String = "src/",
     override val sources: Seq[String] = Seq(),
@@ -31,7 +34,7 @@ case class ProjectConfig(
     constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array(),
     override val ipFiles: Seq[String] = Seq(),
-    exports: Array[ExportConfig] = Array()
+    exports: Option[ExportConfig] = None
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))

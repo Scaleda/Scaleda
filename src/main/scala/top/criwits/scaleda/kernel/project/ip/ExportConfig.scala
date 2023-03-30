@@ -5,5 +5,15 @@ case class ExportConfig(
     name: String,
     module: String,
     options: Array[ExportOption] = Array(),
-    actions: Map[String, ExportAction] = Map()
-)
+    defaults: Map[String, Any] = Map(),
+    actions: Map[String, ExportAction] = Map(),
+    defines: Array[ExportDefineConfig] = Array()
+) {
+  def getDefineHeadCode: String = {
+    defines
+      .map { define =>
+        s"`define ${define.define} ${define.value}"
+      }
+      .mkString("\n")
+  }
+}
