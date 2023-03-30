@@ -185,7 +185,7 @@ object Vivado extends ToolchainProfileDetector
       testbenchSource = testbenchSource,
       vcdFile = vcdFile,
       xdcList = xdcList,
-      ipList = targetConfig.ips.map(p => KernelFileUtils.toAbsolutePath(p).getOrElse(p))
+      ipList = taskConfig.getIpFiles().toSeq
     )
   }
 

@@ -28,7 +28,8 @@ case class TaskConfig(
     override val source: String = "",
     override val sources: Seq[String] = Seq(),
     override val test: String = "",
-    override val tests: Seq[String] = Seq()
+    override val tests: Seq[String] = Seq(),
+    override val ipFiles: Seq[String] = Seq()
 ) extends ConfigNode() {
 
   def taskType = taskTypeList(`type`)._2

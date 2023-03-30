@@ -30,7 +30,8 @@ case class ProjectConfig(
     topModule: Option[String] = None,
     constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array(),
-    exports: Array[ExportConfig] = Array(),
+    override val ipFiles: Seq[String] = Seq(),
+    exports: Array[ExportConfig] = Array()
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))

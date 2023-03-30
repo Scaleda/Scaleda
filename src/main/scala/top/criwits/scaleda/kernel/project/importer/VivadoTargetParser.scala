@@ -54,7 +54,8 @@ trait VivadoTargetParser extends BasicTargetParser {
     val relativeTests =
       tests.map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
 
-    val ips = KernelFileUtils
+    val simpleIPFiles = KernelFileUtils
+      // search from source set, just from directories
       .getAllSourceFiles(sources.toSet, suffixing = Set("xci", "xcix"))
       .map(_.getAbsolutePath)
       .map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
@@ -69,7 +70,7 @@ trait VivadoTargetParser extends BasicTargetParser {
       topModule = if (top.nonEmpty) Some(top) else None,
       tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask),
       options = Some(Map("part" -> part)),
-      ips = ips
+      ipFiles = simpleIPFiles
     )
     target
   }

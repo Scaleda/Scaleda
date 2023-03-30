@@ -20,7 +20,13 @@ abstract class ConfigNode() {
   val test: String = "src/"
   @JsonIgnore
   val tests: Seq[String] = Seq()
+  @JsonIgnore
+  val ipFiles: Seq[String] = Seq()
 
+  /**
+   * Get top module name
+   * @return top module name, may not exist
+   */
   @JsonIgnore
   def findTopModule: Option[String] = topModule match {
     case None =>
@@ -31,10 +37,14 @@ abstract class ConfigNode() {
     case Some(str) => Some(str)
   }
 
+  /**
+   * Get constraints file or directories
+   * @return constraints file or directories
+   */
   @JsonIgnore
-  def findConstraints: Option[String] = constraints match {
+  def getConstraints: Option[String] = constraints match {
     case Some(str) => Some(str)
-    case None      => parentNode.flatMap(_.findConstraints)
+    case None      => parentNode.flatMap(_.getConstraints)
   }
 
   @JsonIgnore
@@ -65,5 +75,18 @@ abstract class ConfigNode() {
       case None         => Set()
     }) ++ (if (test.nonEmpty) Set(parseAsAbsolutePath(test)) else Set()) ++
       tests.filter(_.nonEmpty).map(parseAsAbsolutePath(_))
+  }
+
+  /**
+   * Get all Simple Target IP files
+   * @return simple target ip files in absolute path
+   */
+  @JsonIgnore
+  def getIpFiles(projectBase: Option[String] = None): Set[String] = {
+    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
+    (parentNode match {
+      case Some(parent) => parent.getIpFiles(projectBase = base)
+      case None         => Set()
+    }) ++ ipFiles.filter(_.nonEmpty).map(parseAsAbsolutePath(_))
   }
 }

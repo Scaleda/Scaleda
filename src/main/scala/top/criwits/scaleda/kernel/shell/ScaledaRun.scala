@@ -110,7 +110,7 @@ object ScaledaRun {
           profile = profile
         )
       case TaskType.Implement =>
-        val selectedConstraints = task.findConstraints
+        val selectedConstraints = task.getConstraints
         val singleFile: Option[File] = selectedConstraints.flatMap(path => {
           val file = new File(workingDir, path)
           if (file.exists() && file.isFile) Some(file)
