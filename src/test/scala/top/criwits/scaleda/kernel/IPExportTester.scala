@@ -4,6 +4,7 @@ package kernel
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import top.criwits.scaleda.kernel.project.config.ProjectConfig
+import top.criwits.scaleda.kernel.template.Template
 import top.criwits.scaleda.kernel.utils.serialise.YAMLHelper
 
 class IPExportTester extends AnyFlatSpec with should.Matchers {
@@ -57,6 +58,11 @@ exports:
       ex.actions.size should be(1)
       ex.actions("all").tcl should not be null
       ex.actions("all").tcl.size should be(2)
+      ex.actions("all").tcl.foreach(tcl => {
+        println(tcl)
+        val r = Template.render(tcl, Map())
+        println(r)
+      })
       // export.actions("all").tcl.head should be("puts \"hello world\"")
       // export.actions("all").tcl(1) should be("puts \"hello world2\"")
       ex.defaults should not be null

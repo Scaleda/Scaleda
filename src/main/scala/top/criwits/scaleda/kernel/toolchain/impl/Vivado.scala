@@ -265,17 +265,11 @@ object Vivado extends ToolchainProfileDetector
         new ImplicitPathReplace(
           rt.workingDir.getAbsolutePath,
           remoteTargetPath,
-          regexPatten = Some("\\{ ([^\\{\\}]+) \\}"),
-          regexReplacements = Seq("{$1}")
+          inner = Some(TemplateContextReplace)
         )
       } else {
         // { waterfall } => {waterfall}
-        new ImplicitPathReplace(
-          "",
-          "",
-          regexPatten = Some("\\{ ([^\\{\\}]+) \\}"),
-          regexReplacements = Seq("{$1}")
-        )
+        TemplateContextReplace
       }
 
     rt.task.taskType match {

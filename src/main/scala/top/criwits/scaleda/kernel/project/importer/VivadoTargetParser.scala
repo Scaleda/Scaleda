@@ -5,28 +5,31 @@ import kernel.project.config.{TargetConfig, TaskConfig}
 import kernel.project.detect.VivadoProjectConfig
 import kernel.toolchain.impl.Vivado
 import kernel.utils.serialise.XMLHelper
-import kernel.utils.{ImplicitPathReplace, KernelFileUtils}
+import kernel.utils.{KernelFileUtils, RegexReplace}
 import verilog.utils.ModuleUtils
 
 import java.io.File
 
 trait VivadoTargetParser extends BasicTargetParser {
   override def parseAsTarget(path: File): TargetConfig = {
-    val projectFile = path.listFiles((file, s) => s.endsWith(".xpr")).head
-    val projectName = projectFile.getName.split("\\.").head
-    val o           = XMLHelper(projectFile, classOf[VivadoProjectConfig])
+    val projectFile    = path.listFiles((file, s) => s.endsWith(".xpr")).head
+    val projectName    = projectFile.getName.split("\\.").head
+    val o              = XMLHelper(projectFile, classOf[VivadoProjectConfig])
     val projectXprFile = new File(o.Path)
-    val projectBase = projectFile.getParentFile.getAbsolutePath
+    val projectBase    = projectFile.getParentFile.getAbsolutePath
     // $PSRCDIR/sim_1 => <projectBase>/<projectName>.srcs/sim_1
-    val replace = new ImplicitPathReplace("", "", Some("(\\$PSRCDIR[/\\\\]?)"), Seq(s"$projectName.srcs/"))
+    val replace = new RegexReplace(
+      regexPatten = "(\\$PSRCDIR[/\\\\]?)",
+      regexReplacements = Seq(s"$projectName.srcs/")
+    )
     val srcSets = o.fileSets.filter(_.Type == "DesignSrcs")
     val simSets = o.fileSets.filter(_.Type == "SimulationSrcs")
     val sources =
       (srcSets.flatMap(_.files.map(_.Path)) ++ srcSets.map(_.RelSrcDir))
         .filter(_.nonEmpty)
-        .map(replace.doRegexReplace)
+        .map(c => replace.doRegexReplace(c))
         .map(p => KernelFileUtils.toAbsolutePath(p, projectBase = Some(projectBase)).getOrElse(p))
-    val tests = o.fileSets.filter(_.Type == "SimulationSrcs").map(_.RelSrcDir).map(replace.doRegexReplace)
+    val tests = o.fileSets.filter(_.Type == "SimulationSrcs").map(_.RelSrcDir).map(c => replace.doRegexReplace(c))
     // options in xpr usually have TopModule item
     val top = srcSets
       .flatMap(_.config.find(_.Name == "TopModule").map(_.Val))

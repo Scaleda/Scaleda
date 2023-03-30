@@ -60,12 +60,12 @@ object RemoteServer {
       ).getAbsolutePath.replace('\\', '/')
       val sourcePath = request.projectBase
       val replacer = new ImplicitPathReplace(sourcePath, targetPath) {
-        override def doReplace(src: String) = super.doReplace(src.replace('\\', '/'))
+        override def doCharReplace(src: String, skipInner: Boolean = false) = super.doCharReplace(src.replace('\\', '/'))
       }
       val commandDeps = CommandDeps(
-        args = request.commands.map(replacer.doReplace),
-        path = replacer.doReplace(request.path),
-        envs = request.envs.map(t => (replacer.doReplace(t.a), replacer.doReplace(t.b)))
+        args = request.commands.map(c => replacer.doCharReplace(c)),
+        path = replacer.doCharReplace(request.path),
+        envs = request.envs.map(t => (replacer.doCharReplace(t.a), replacer.doCharReplace(t.b)))
       )
       // generate command run id
       val commandId = UUID.randomUUID().toString
@@ -92,14 +92,14 @@ object RemoteServer {
             override def onStdout(data: String) = {
               KernelLogger.info("[remote executor stdout]", data)
               responseObserver.onNext(
-                new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = replacer.doInvReplace(data))
+                new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = replacer.doInvCharReplace(data))
               )
             }
 
             override def onStderr(data: String) = {
               KernelLogger.warn("[remote executor stderr]", data)
               responseObserver.onNext(
-                new RunReply(RUN_REPLY_TYPE_STDERR, strValue = replacer.doInvReplace(data))
+                new RunReply(RUN_REPLY_TYPE_STDERR, strValue = replacer.doInvCharReplace(data))
               )
             }
 
