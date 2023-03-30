@@ -26,7 +26,7 @@ object EnvironmentUtils {
         }
       } catch {
         case e: Throwable =>
-          KernelLogger.warn("cannot load extra .env file:", e)
+          KernelLogger.debug("cannot load extra .env file:", e)
       }
     }
   }

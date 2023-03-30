@@ -24,7 +24,11 @@ case class TaskConfig(
     tcl: Option[String] = None,
     constraints: Option[String] = None,
     // force to use remote host
-    host: Option[String] = None
+    host: Option[String] = None,
+    override val source: String = "",
+    override val sources: Seq[String] = Seq(),
+    override val test: String = "",
+    override val tests: Seq[String] = Seq()
 ) extends ConfigNode() {
 
   def taskType = taskTypeList(`type`)._2

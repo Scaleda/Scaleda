@@ -19,6 +19,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
+import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -38,9 +39,8 @@ class ScaledaMain extends StartupActivity {
     // Main service, init jinja and kernel log
     project.getService(classOf[ScaledaMainService])
 
-    // setup windows
+    // Setup windows...
     val toolWindowManager = ToolWindowManager.getInstance(project)
-
     toolWindowManager.invokeLater(() => {
       val builder =
         new RegisterToolWindowTaskBuilder(ScaledaRunWindowFactory.WINDOW_ID)
@@ -50,7 +50,6 @@ class ScaledaMain extends StartupActivity {
       // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
       val toolWindow = toolWindowManager.registerToolWindow(builder.build())
     })
-
     toolWindowManager.invokeLater(() => {
       val builder =
         new RegisterToolWindowTaskBuilder(ScaledaToolWindowFactory.WINDOW_ID)
@@ -62,38 +61,26 @@ class ScaledaMain extends StartupActivity {
       val messageWindow = toolWindowManager.registerToolWindow(builder.build())
     })
 
-    // attempt to load project
-    ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
-
-    // if no profiles loaded, detect all profiles and popup message
-    if (Toolchain.profiles().isEmpty) {
-      ActionManager
-        .getInstance()
-        .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
-    }
-
-    // Have to launch a thread in an action to handle `gotoSource` request...
-    ActionManager
-      .getInstance()
-      .tryToExecute(
-        e => {
-          val thread = RpcService.startRpcGotoHandler(project)
-          // thread.join()
-        },
-        null,
-        null,
-        null,
-        true
-      )
-
-    // check binaries
+    // Check assets
     if (!ExtractAssets.isInstalled) {
       ActionManager
         .getInstance()
         .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
     }
 
-    // Remote
+
+    // Remote and RPC
+    ActionManager
+      .getInstance()
+      .tryToExecute(
+        e => {
+          val thread = RpcService.startRpcGotoHandler(project)
+        },
+        null,
+        null,
+        null,
+        true
+      )
     val rpcService = project.getService(classOf[RpcService])
     rpcService.setProject(project)
     project.getService(classOf[RvcdService]).setProject(project)
@@ -102,7 +89,17 @@ class ScaledaMain extends StartupActivity {
     val _ = ScaledaMessageTab(project)
 
     // invoke all toolchains
-    Seq(IVerilog, Vivado, PDS, Quartus, Verilator).foreach(KernelLogger.info("Load Toolchain object", _))
+    Seq(IVerilog, Vivado).foreach(KernelLogger.info("Load Toolchain object", _))
     Seq(VivadoIdea, IVerilogIdea).foreach(KernelLogger.info("Load Toolchain Idea object", _))
+
+    // Attempt to load project
+    ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
+
+    // Toolchain detect
+    if (Toolchain.profiles().isEmpty) {
+      ActionManager
+        .getInstance()
+        .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
+    }
   }
 }

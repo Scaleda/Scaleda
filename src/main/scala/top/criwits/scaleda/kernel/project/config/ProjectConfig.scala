@@ -23,9 +23,10 @@ import java.io.File
 case class ProjectConfig(
     name: String = "default-project",
     `type`: String = "rtl",
-    source: String = "src/",
-    sources: Seq[String] = Seq(),
-    test: String = "test/",
+    override val source: String = "src/",
+    override val sources: Seq[String] = Seq(),
+    override val test: String = "test/",
+    override val tests: Seq[String] = Seq(),
     topModule: Option[String] = None,
     constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array(),
@@ -108,59 +109,8 @@ object ProjectConfig {
 
   def headTask = getConfig().flatMap(c => c.headTask)
 
-  def saveConfig(projectConfig: ProjectConfig): Unit = {
-    YAMLHelper(projectConfig, new File(configFile.get))
+  def saveConfig(projectConfig: ProjectConfig, targetFile: File = new File(configFile.get)): Unit = {
+    YAMLHelper(projectConfig, targetFile)
   }
 
-  def insertOrReplaceTarget(oldTargetName: String, target: TargetConfig): ProjectConfig = {
-    ProjectConfig
-      .getConfig()
-      .map(c => {
-        val projectConfig = if (c.targets.exists(_.name == oldTargetName)) {
-          val newTargets = c.targets.filter(_.name != oldTargetName) :+ target
-          c.copy(targets = newTargets)
-        } else {
-          c.copy(targets = c.targets :+ target)
-        }
-        saveConfig(projectConfig)
-        projectConfig
-      })
-      .orNull
-  }
-
-  def insertOrReplaceTask(
-      targetName: String,
-      oldTaskName: String,
-      task: TaskConfig
-  ): ProjectConfig = {
-    ProjectConfig
-      .getConfig()
-      .map(projectConfig => {
-        if (!projectConfig.targets.exists(_.name == targetName)) {
-          KernelLogger.error(
-            s"Cannot apply task ${task.name}: no target named ${targetName}"
-          )
-          null
-        } else {
-          val target = projectConfig.targets.find(_.name == targetName).get
-          val r = if (target.tasks.exists(_.name == oldTaskName)) {
-            // replace exist task in target and replace target in config
-            val newTasks  = target.tasks.filter(_.name != oldTaskName) :+ task
-            val newTarget = target.copy(tasks = newTasks)
-            projectConfig.copy(targets = projectConfig.targets.map(t => if (t.name == newTarget.name) newTarget else t))
-          } else {
-            // append task to target, and replace target in config
-            val targets = projectConfig.targets.map(t =>
-              if (t.name == target.name)
-                target.copy(tasks = target.tasks :+ task)
-              else t
-            )
-            projectConfig.copy(targets = targets)
-          }
-          saveConfig(r)
-          r
-        }
-      })
-      .orNull
-  }
 }

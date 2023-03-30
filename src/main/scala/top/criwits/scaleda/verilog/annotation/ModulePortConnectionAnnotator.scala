@@ -47,11 +47,7 @@ class ModulePortConnectionAnnotator extends Annotator {
               p._1.getPortType == PortDeclarationPsiNode.INPUT || p._1.getPortType == PortDeclarationPsiNode.INOUT
             )
           // find unconnected (without expression)
-          if (
-            !mp
-              .map(_._2.nonEmpty)
-              .reduce(_ && _)
-          ) {
+          if (!mp.forall(_._2.nonEmpty)) {
             holder
               .newAnnotation(
                 HighlightSeverity.ERROR,
@@ -90,11 +86,7 @@ class ModulePortConnectionAnnotator extends Annotator {
           }
         case ModuleInstantiationPsiNode.ORDERED =>
           val connectMap = instance.getConnectMap
-          if (
-            !connectMap
-              .map(_._2.nonEmpty)
-              .reduceOption(_ && _).getOrElse(false)
-          ) {
+          if (!connectMap.forall(_._2.nonEmpty)) {
             holder
               .newAnnotation(
                 HighlightSeverity.ERROR,

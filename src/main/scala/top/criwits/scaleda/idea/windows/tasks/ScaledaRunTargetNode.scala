@@ -59,6 +59,6 @@ class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(
         options.get.contains("part")
       // todo: add more?
       case _ => true
-    }) && (tasks.isEmpty || tasks.map(_.validate).reduce(_ && _))
+    }) && (tasks.isEmpty || tasks.forall(_.validate))
   }
 }

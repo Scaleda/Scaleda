@@ -18,11 +18,14 @@ import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
 
-  /** Must call before run a task, may do preset
+  /** Must call before run a task <br/>
+    * 1. may do preset <br/>
+    * 2. prepare workdir <br/>
     * @param rt runtime
     * @return new runtime
     */
   def preprocess(rt: ScaledaRuntime): ScaledaRuntime = {
+    if (!rt.workingDir.exists() && !rt.workingDir.mkdirs()) KernelLogger.warn("Cannot create working directory!")
     if (rt.task.preset && rt.stage == ScaledaRunStage.Prepare) {
       // fetch remote system info
       val remoteInfo =
@@ -159,7 +162,7 @@ object ScaledaRun {
         val (target, task)                                = f
         var remoteProfiles: Option[Seq[ToolchainProfile]] = None
         val profileHostUse                                = task.host.getOrElse(profileHost)
-        KernelLogger.info(s"profileHostUse: $profileHostUse")
+        KernelLogger.debug(s"profileHostUse: $profileHostUse")
         val profile =
           if (profileHostUse == null || profileHostUse.isEmpty) {
             // Run locally if no host argument provided

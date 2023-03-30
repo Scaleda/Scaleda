@@ -14,8 +14,10 @@ import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, T
 import kernel.utils._
 
 import org.apache.commons.codec.digest.DigestUtils
+import top.criwits.scaleda.kernel.project.detect.BasicProjectDetector
+import top.criwits.scaleda.kernel.project.importer.{BasicTargetParser, VivadoTargetParser}
 
-import java.io.File
+import java.io.{File, FilenameFilter}
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -74,7 +76,9 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
   override def detectProfiles = Vivado.detectProfiles
 }
 
-object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
+object Vivado extends ToolchainProfileDetector
+  with ToolchainPresetProvider with BasicProjectDetector
+  with VivadoTargetParser {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String       = "vivado"
 
@@ -111,7 +115,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         returnValues: Seq[Int],
         outputs: Seq[String]
     ): (Boolean, Option[String]) = {
-      if (!returnValues.map(_ == 0).reduce(_ && _)) {
+      if (!returnValues.forall(_ == 0)) {
         (false, None)
       } else {
         (true, Some(outputs.head.split("\\n").head)) // should work
@@ -162,7 +166,8 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
     }
     // TODO / FIXME: Exception // TODO: topModule is in executor???
     val top             = topOptional.get
-    val topFile         = KernelFileUtils.getModuleFile(top, testbench = sim).get // TODO / FIXME
+    val sources         = if (sim) taskConfig.getTestSet() else taskConfig.getSourceSet()
+    val topFile         = KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
@@ -170,16 +175,17 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
     Vivado.TemplateContext(
       top = top,
       workDir = doSeparatorReplace(executor.workingDir.getAbsolutePath),
-      part = targetConfig.options.get("part"),     // FIXME
+      part = targetConfig.options.get("part"), // FIXME
       sourceList = KernelFileUtils
-        .getAllSourceFiles()
+        .getAllSourceFiles(taskConfig.getSourceSet())
         .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
         .map(p => doSeparatorReplace(p.getAbsolutePath)),
       sim = sim,
       // if sim == false, then this will not be used
       testbenchSource = testbenchSource,
       vcdFile = vcdFile,
-      xdcList = xdcList
+      xdcList = xdcList,
+      ipList = targetConfig.ips.map(p => KernelFileUtils.toAbsolutePath(p).getOrElse(p))
     )
   }
 
@@ -279,7 +285,7 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
         executor.constraintsDir
           .flatMap(dir => {
             if (dir.exists() && dir.isDirectory) {
-              val constraints = KernelFileUtils.getAllSourceFiles(sourceDir = dir, suffixing = Set("xdc"))
+              val constraints = KernelFileUtils.scanDirectory(directory = dir, suffixing = Set("xdc"))
               Some(executor.copy(constraints = executor.constraints ++ constraints, constraintsDir = None))
             } else None
           })
@@ -296,11 +302,12 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       // remove old vivado project if exists and only for remote
       val top = rt.task.findTopModule.getOrElse("NONE")
       val pathsToDelete = Seq(
-        s"$top/$top.sim",
-        s"$top/$top.cache",
-        s"$top/$top.hw",
-        s"$top/$top.ip_user_files",
-        s"$top/$top.runs"
+        // s"$top/$top.sim",
+        // s"$top/$top.cache",
+        // s"$top/$top.hw",
+        // s"$top/$top.ip_user_files",
+        // s"$top/$top.runs"
+        s"$top"
       )
       pathsToDelete.foreach(f => {
         val file = new File(rt.executor.workingDir, f)
@@ -319,5 +326,17 @@ object Vivado extends ToolchainProfileDetector with ToolchainPresetProvider {
       case TaskType.Programming => "run_program.tcl"
     })))
     Some(rt)
+  }
+
+  override def detect(path: File) = {
+    // only detect <project-name>.xpr file now
+    if (!path.exists() || !path.isDirectory) false
+    else {
+      val projectFile = path.listFiles(new FilenameFilter {
+        override def accept(file: File, s: String): Boolean = s.endsWith(".xpr")
+      }).headOption
+      if (projectFile.isEmpty) false
+      else true
+    }
   }
 }

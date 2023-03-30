@@ -34,7 +34,8 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     val newTestbench     = testbench + "_generated"
     val newTestbenchFile = new File(workingDir, newTestbench + ".v")
 
-    val sources = KernelFileUtils.getAllSourceFiles()
+    // val sources = KernelFileUtils.getAllProjectSourceFiles()
+    val sources = KernelFileUtils.getAllSourceFiles(task.getSourceSet())
 
     val simExecutorName = testbench + "_iverilog_executor"
 
@@ -81,7 +82,7 @@ object IVerilog extends ToolchainPresetProvider {
         new File(toolchainProfile.vvpPath)
       )
 
-      if (!iverilogFiles.map(_.exists()).reduce(_ && _)) {
+      if (!iverilogFiles.forall(_.exists())) {
         return None
       }
 
@@ -95,16 +96,14 @@ object IVerilog extends ToolchainPresetProvider {
       * @return
       */
     override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
-      if (
-        !Seq(
+      if (Seq(
           outputs.exists(_.contains("Icarus Verilog version")),
           outputs.exists(_.contains("iverilog-vpi")),
           outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
-        ).reduce(_ && _)
-      ) {
-        (false, None)
-      } else {
+        ).forall(a => a)) {
         (true, Some(outputs.filter(_.contains("Icarus Verilog version")).head))
+      } else {
+        (false, None)
       }
 
     }
@@ -114,8 +113,9 @@ object IVerilog extends ToolchainPresetProvider {
     require(rt.task.taskType == TaskType.Simulation)
     val simExecutor = rt.executor.asInstanceOf[SimulationExecutor]
     // get testbench info
-    val testbench     = simExecutor.topModule
-    val testbenchFile = KernelFileUtils.getModuleFile(testbench, testbench = true).get
+    val testbench = simExecutor.topModule
+    // val testbenchFile = KernelFileUtils.getProjectModuleFile(testbench, testbench = true).get
+    val testbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = testbench).get
 
     // generate new testbench file
     val newTestbench     = testbench + "_generated"
@@ -130,6 +130,9 @@ object IVerilog extends ToolchainPresetProvider {
          |  $$dumpfile(\"${vcdFile.getName}\");
          |  $$dumpvars;
          |end""".stripMargin
+    // make sure dir exists
+    KernelFileUtils.confirmFileParentPath(newTestbenchFile)
+    KernelFileUtils.confirmFileParentPath(vcdFile)
     val lineStart = KernelFileUtils.insertAfterModuleHead(
       testbenchFile,
       newTestbenchFile,
@@ -148,7 +151,7 @@ object IVerilog extends ToolchainPresetProvider {
     )
     val rtWithContext = rt.copy(context =
       rt.context ++ Map("replaceFiles" -> replaceFiles) ++ Map(
-        "sourceFiles" -> (KernelFileUtils.getAllSourceFiles() :+ testbenchFile)
+        "sourceFiles" -> (KernelFileUtils.getAllSourceFiles(rt.task.getSourceSet()) :+ testbenchFile)
       )
     )
     Some(rtWithContext)

@@ -23,7 +23,7 @@ import scala.collection.mutable.ArrayBuffer
 class ScaledaRunProcessHandler(
     project: Project,
     logger: BasicLogger,
-    rt: ScaledaRuntime,
+    val rt: ScaledaRuntime,
     invokeAfterFinish: (ScaledaRuntime, Seq[Int], Boolean, Boolean) => Unit
 ) extends ProcessHandler
     with ScaledaRunHandler {

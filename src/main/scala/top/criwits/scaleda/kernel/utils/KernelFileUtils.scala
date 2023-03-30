@@ -6,6 +6,7 @@ import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseVisitor}
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.apache.commons.io.file.DeletingPathVisitor
+import top.criwits.scaleda.verilog.utils.ModuleUtils
 
 import java.io._
 import java.nio.ByteBuffer
@@ -16,84 +17,135 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
+/**
+ * Kernel file utilities
+ */
 object KernelFileUtils {
+  /**
+   * Check whether a file name is legal. This is also applied to project, target & task names, for they will be used to
+   * create files / directories.
+   * @param s the string
+   * @return
+   */
   def isLegalName(s: String): Boolean = {
     if (s.isBlank) return false
     Seq("\\", "/", "*", "?", "\"", "\'", "<", ">", "|", ":").foreach(f => if (s.contains(f)) return false)
     true
   }
-  def getAllSourceFiles(
-      sourceDir: File = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.source),
-      sources: Seq[String] = ProjectConfig.config.sources,
-      suffixing: Set[String] = Set("v")
-  ): Seq[File] = {
-    val sourceDirSources =
-      sourceDir
-        .listFiles(new FilenameFilter {
-          override def accept(file: File, s: String) =
-            suffixing
-              .map(suffix => s.endsWith(s".${suffix}"))
-              .reduceOption((a, b) => a || b)
-              .getOrElse(false)
-        })
-        .toList
-    val extraSources = sources
-      .map(s => {
-        val f = new File(s)
-        if (f.exists()) Some(f)
-        else {
-          KernelLogger.warn("Cannot get source from:", s, " - File not found!")
-          None
-        }
-      })
-      .filter(_.nonEmpty)
-      .map(_.get)
-      .map(f =>
-        if (f.isFile) Seq(f)
-        else {
-          // recursive call this function
-          getAllSourceFiles(sourceDir = f, sources = Seq(), suffixing = suffixing)
-        }
-      )
-      .foldLeft(Seq[File]())((a, b) => a ++ b)
-    sourceDirSources ++ extraSources
-  }
 
-  def getAllTestFiles(): Seq[File] = {
-    val target = new File(new File(ProjectConfig.projectBase.get).getAbsolutePath, ProjectConfig.config.test)
-    try {
-      val v = getAllSourceFiles(target)
-      KernelLogger.debug("getAllTestFiles normally returns", v.mkString(", "))
-      v
-    } catch {
-      case e: Throwable =>
-        KernelLogger.warn(s"cannot get test files from $target!", e)
-        e.printStackTrace()
-        Seq()
-    }
-  }
-
-  def getAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
+  /**
+   * Convert any path into an absolute path. For relative path, it is calculated base on project base.<br/>
+   * ⚠️ Only work on same OS. Cannot process Window paths on Linux now.
+   * @param path the original path string
+   * @param projectBase project base
+   * @return [[None]] iff no project base AND relative path; Otherwise an abspath will be returned
+   */
+  def toAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
     val file = new File(path)
-    if (file.isAbsolute) {
+    if (!file.isAbsolute) {
       projectBase match {
         case Some(base) =>
-          Some(new File(new File(base), path).getAbsolutePath)
+          Some(new File(new File(base), path).getAbsolutePath.replace('\\', '/'))
         case None => None
       }
     } else {
-      Some(file.getAbsolutePath)
+      Some(file.getAbsolutePath.replace('\\', '/'))
     }
   }
 
+  /**
+   * Convert any path into an project relative path.<br/>
+   * ⚠️ Only work on same OS. Cannot process Window paths on Linux now.
+   * @param path the original path string
+   * @param projectBase project base
+   * @return [[None]] iff no project base OR path can not be relativised; Otherwise a relative path will be returned
+   */
+  def toProjectRelativePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
+    if (projectBase.isEmpty) return None
+    val file = new File(path)
+    if (file.isAbsolute) {
+      val pathAbs = java.nio.file.Paths.get(file.getAbsolutePath)
+      val pathBase = java.nio.file.Paths.get(projectBase.get) // should work
+      try {
+        Some(pathBase.relativize(pathAbs).toString.replace('\\', '/'))
+      } catch {
+        case _: Throwable => None
+      }
+    } else {
+      // Notice: won't check if it really exists
+      Some(file.getPath.replace('\\', '/'))
+    }
+  }
+
+  /**
+   * Recursively scan a directory for given type of file
+   * @param suffixing Set of extensions
+   * @param directory the directory
+   * @return
+   */
+  def scanDirectory(suffixing: Set[String], directory: File, level: Int = 0, maxLevel: Int = 128): Seq[File] = {
+    // when out of search level, return empty seq
+    if (level > maxLevel) return Seq()
+    val files = directory.listFiles()
+    if (files == null) return Seq()
+
+    // collect dirs
+    files.filter(_.isDirectory).map(d => scanDirectory(suffixing, d, level = level + 1, maxLevel = maxLevel))
+      .foldLeft(Seq[File]())(_ ++ _) ++
+    // collect files
+    files.filter(!_.isDirectory).map(f => {
+      val fileName = f.getName
+      if (suffixing.exists(suffix => fileName.endsWith(s".$suffix"))) Seq(f)
+      else Seq()
+    }).foldLeft(Seq[File]())(_ ++ _)
+  }
+
+  /**
+   * Get all source files from a source set.
+   * @param sources list of paths, each item can be file or dir, empty string will be dropped
+   * @param suffixing filter by file type
+   * @return list of files
+   */
+  def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v")): Seq[File] = {
+    sources.filter(_.nonEmpty).map(toAbsolutePath(_)).filter(_.nonEmpty).map(f => new File(f.get)).map(f => {
+      if (f.exists()) {
+        if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
+      } else Seq()
+    }).reduceOption(_ ++ _).getOrElse(Seq())
+  }
+
+  /**
+   * Get all source files under the project. That is:
+   *  - files under `source`
+   *  - files given under `sources`
+   * @param suffixing file type
+   * @return seq of files
+   */
+  @Deprecated
+  def getAllProjectSourceFiles(suffixing: Set[String] = Set("v"), projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
+    val sourceDir: File = new File(toAbsolutePath(projectConfig.source).get)
+    val sources = projectConfig.sources.toSet
+    getAllSourceFiles(sources + sourceDir.getAbsolutePath, suffixing = suffixing)
+  }
+
+  /**
+   * Get all test files. That is:
+   *  - files under `test`
+   * @return
+   */
+  @Deprecated
+  def getAllProjectTestFiles(projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
+    val testDir = new File(toAbsolutePath(projectConfig.test).get)
+    scanDirectory(Set("v"), testDir)
+  }
+
+  /**
+   * Get module titles inside a file.
+   * @param verilogFile the file
+   * @return Seq[String]: All module titles in that file
+   */
   def getModuleTitle(verilogFile: File): Seq[String] = {
-    val stream     = new FileInputStream(verilogFile)
-    val charStream = CharStreams.fromStream(stream)
-    stream.close()
-    val lexer  = new VerilogLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new VerilogParser(tokens)
-    val tree   = parser.source_text()
+    val tree   = ModuleUtils.parseVerilogFileAST(verilogFile)
 
     class ModuleIdentifierVisitor extends VerilogParserBaseVisitor[String] {
       val title = new ListBuffer[String]
@@ -116,15 +168,33 @@ object KernelFileUtils {
     visitor.title.toSeq
   }
 
-  def getModuleFile(module: String, testbench: Boolean = false): Option[File] = {
-    (if (testbench) getAllTestFiles() else getAllSourceFiles()).foreach(f => {
+  /**
+   * Get the verilog file containing specific module
+   * @param module module title name
+   * @param testbench is testbench? (will search from test sources, instead of sources)
+   * @return
+   */
+  @Deprecated
+  def getProjectModuleFile(module: String, testbench: Boolean = false): Option[File] = {
+    val sources = if (testbench) getAllProjectTestFiles() else getAllProjectSourceFiles()
+    getModuleFileFromSet(sources.map(_.getAbsolutePath).toSet, module)
+  }
+
+  /**
+   * Get the verilog file containing specific module from one file set
+   * @param sources file set
+   * @param module module name
+   * @return optional file
+   */
+  def getModuleFileFromSet(sources: Set[String], module: String): Option[File] = {
+    getAllSourceFiles(sources).foreach(f => {
       val readModule = getModuleTitle(f)
       val matched    = readModule.filter(_ == module)
       KernelLogger.debug(
         s"getModuleFile filter for $f, target module: $module, read module: $readModule, matched: $matched"
       )
       if (matched.nonEmpty) {
-        return Some(f) // FIXME
+        return Some(f)
       } else None
     })
     KernelLogger.warn("cannot get module file!")
@@ -140,24 +210,7 @@ object KernelFileUtils {
     */
   def insertAfterModuleHead(original: File, output: File, moduleName: String, insert: String): Int = {
     KernelLogger.info(s"insertAfterModuleHead $original -> $output")
-    val stream     = new FileInputStream(original)
-    val charStream = CharStreams.fromStream(stream)
-    stream.close()
-    val lexer  = new VerilogLexer(charStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new VerilogParser(tokens)
-    val tree   = parser.source_text()
-
-//    class ModuleVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
-//      override def visitModule_declaration(ctx: VerilogParser.Module_declarationContext): Int = {
-//        val identifier = ctx.module_head()
-//        if (identifier == null) return -1
-//        val _identifier = identifier.module_identifier()
-//        if (_identifier == null) return -1
-//        val __identifier = _identifier.identifier()
-//        if (__identifier == null) return -1
-//      }
-//    }
+    val tree   = ModuleUtils.parseVerilogFileAST(original)
 
     class ModuleHeadVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
       var headerEndAt: Int = -1
@@ -197,65 +250,21 @@ object KernelFileUtils {
     lineStart
   }
 
-  def getFileMD5(file: File) = {
-    var in: FileInputStream = null
-    try {
-      in = new FileInputStream(file)
-      val ch = in.getChannel
-      MD5(ch.map(FileChannel.MapMode.READ_ONLY, 0, file.length))
-    } catch {
-      case e: FileNotFoundException =>
-        ""
-      case e: IOException =>
-        ""
-    } finally if (in != null)
-      try {
-        in.close()
-      } catch {
-        case e: IOException =>
-        // 关闭流产生的错误一般都可以忽略
-      }
-  }
-
-  private val hexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
-
-  private def MD5(buffer: ByteBuffer) = {
-    var s = ""
-    try {
-      val md = MessageDigest.getInstance("MD5")
-      md.update(buffer)
-      val tmp = md.digest // MD5 的计算结果是一个 128 位的长整数，
-
-      // 用字节表示就是 16 个字节
-      val str = new Array[Char](16 * 2) // 每个字节用 16 进制表示的话，使用两个字符，
-
-      // 所以表示成 16 进制需要 32 个字符
-      var k = 0 // 表示转换结果中对应的字符位置
-
-      for (i <- 0 until 16) { // 从第一个字节开始，对 MD5 的每一个字节
-        // 转换成 16 进制字符的转换
-        val byte0 = tmp(i) // 取第 i 个字节
-
-        str({
-          k += 1;
-          k - 1
-        }) = hexDigits(byte0 >>> 4 & 0xf) // 取字节中高 4 位的数字转换, >>>,
-
-        // 逻辑右移，将符号位一起右移
-        str({
-          k += 1;
-          k - 1
-        }) = hexDigits(byte0 & 0xf) // 取字节中低 4 位的数字转换
-
-      }
-      s = new String(str) // 换后的结果转换为字符串
-    } catch {
-      case e: NoSuchAlgorithmException =>
-        e.printStackTrace()
-    }
-    s
-  }
-
+  /**
+   * Remove a directory in recursive mode
+   * @param path must be a directory
+   */
   def deleteDirectory(path: Path): Unit =
     if (path.toFile.exists()) Files.walkFileTree(path, DeletingPathVisitor.withLongCounters())
+
+  /**
+   * Create parent directory for file creation
+   * @param file target file
+   * @return is parent dir created
+   */
+  def confirmFileParentPath(file: File): Boolean = {
+    val parent = file.getParentFile
+    if (!parent.exists()) parent.mkdirs()
+    else true
+  }
 }
