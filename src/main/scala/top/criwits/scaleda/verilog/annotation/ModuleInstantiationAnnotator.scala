@@ -18,10 +18,13 @@ class ModuleInstantiationAnnotator extends Annotator {
     // check if is module instance
     if (!element.isInstanceOf[ModuleInstantiationPsiNode]) return
     val instance = element.asInstanceOf[ModuleInstantiationPsiNode]
+    if (instance == null) return
 
     val reference = instance.getReference
     val result    = reference.multiResolve(true)
     val instantName = PsiTreeUtil.findChildOfType(instance, classOf[NameOfInstancePsiNode])
+    if (instantName == null) return
+    if (instantName.getTextRange == null) return
     val annotateRange = new TextRange(instance.getTextRange.getStartOffset, instantName.getTextRange.getEndOffset) // FIXME
 
     if (result.isEmpty) {
