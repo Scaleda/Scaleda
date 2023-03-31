@@ -14,6 +14,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 
 import java.io.File
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.jdk.javaapi.CollectionConverters
@@ -34,22 +35,56 @@ object FileUtils {
     }
     // into synchronized block, only one thread to operate ip cache
     val sources = synchronized {
-      val ipFiles = rt
+      // get Scaleda IPs
+      val ips: Seq[(String, ProjectConfig)] = rt
+        .map(rt => {
+          // BFS Search
+          val q         = mutable.Queue.empty[(String, ProjectConfig)]
+          val ipConfigs = rt.task.getIps()
+          // ipConfigs.flatMap(c => {
+          //   c._2.getSourceSet(projectBase = Some(c._1)) ++ c._2.getTestSet(projectBase = Some(c._1))
+          // })
+          q ++= ipConfigs
+          // identifier is IP name, to avoid ring dependence
+          val resultIpNames = new mutable.HashSet[String]()
+          val results       = ArrayBuffer[(String, ProjectConfig)]()
+          while (q.nonEmpty) {
+            val top = q.dequeue()
+            if (!resultIpNames.contains(top._2.exports.get.name)) {
+              resultIpNames += top._2.exports.get.name
+              results += top
+              // only search more ips in ProjectConfig
+              q ++= top._2.getIps(projectBase = Some(top._1))
+            }
+          }
+          results.toSeq
+        })
+        .getOrElse(Seq())
+      // collects single file ip, in this project and every Scaleda IP
+      val singleFileIps = rt
         .map(rt => rt.task.getIpFiles())
-        .getOrElse(Set())
-      KernelFileUtils.doUpdateIpFilesCache(ipFiles)
+        .getOrElse(Set()) ++
+        ips.map(p => p._2.getIpFiles(projectBase = Some(p._1))).foldLeft(Set[String]())(_ ++ _)
+      KernelFileUtils.doUpdateIpFilesCache(singleFileIps)
+      // source set of this project
       val sources: Set[String] = rt match {
         // has runtime, get sources
         case Some(rt) => rt.task.getSourceSet() ++ rt.task.getTestSet()
         // otherwise, get default sources from ProjectConfig
         case None => defaultSources
       }
+      // source set from ips
+      val ipSources: Set[String] = ips
+        .flatMap(c => {
+          c._2.getSourceSet(projectBase = Some(c._1)) ++ c._2.getTestSet(projectBase = Some(c._1))
+        })
+        .toSet
       // search cache directory to get all source files
-      val ipSources = KernelFileUtils
+      val ipFileSources: Set[String] = KernelFileUtils
         .getAllSourceFiles(Set(KernelFileUtils.ipCacheDirectory.getAbsolutePath))
         .map(_.getAbsolutePath)
         .toSet
-      sources ++ ipSources
+      sources ++ ipSources ++ ipFileSources
     }
     // may reach `pwd`
     // TODO: apply file search paths... example: a.v => test/a.v
