@@ -3,7 +3,8 @@ package kernel.project.ip
 
 case class ExportOption(
     name: String,
-    `type`: String
+    `type`: String,
+    default: Any
     // more: ranges, selectable options...
 )
 

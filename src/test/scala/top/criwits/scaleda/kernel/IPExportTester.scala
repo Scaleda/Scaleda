@@ -5,6 +5,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import top.criwits.scaleda.kernel.project.config.ProjectConfig
 import top.criwits.scaleda.kernel.template.Template
+import top.criwits.scaleda.kernel.utils.TemplateContextReplace
 import top.criwits.scaleda.kernel.utils.serialise.YAMLHelper
 
 class IPExportTester extends AnyFlatSpec with should.Matchers {
@@ -19,11 +20,10 @@ exports:
   options:
     - name: clk_in_freq
       type: float
+      default: 50.0
     - name: clk_out_1_freq
       type: float
-  defaults:
-    clk_in_freq: 50.0
-    clk_out_1_freq: 100.0
+      default: 100.0
   actions:
     all:
       tcl:
@@ -60,14 +60,14 @@ exports:
       ex.actions("all").tcl.size should be(2)
       ex.actions("all").tcl.foreach(tcl => {
         println(tcl)
-        val r = Template.render(tcl, Map())
+        val r = Template.render(tcl, ex.getContextMap())(TemplateContextReplace)
         println(r)
       })
       // export.actions("all").tcl.head should be("puts \"hello world\"")
       // export.actions("all").tcl(1) should be("puts \"hello world2\"")
-      ex.defaults should not be null
-      ex.defaults.head._1 should be("clk_in_freq")
-      ex.defaults.head._2 should be(50.0)
+      // ex.defaults should not be null
+      // ex.defaults.head._1 should be("clk_in_freq")
+      // ex.defaults.head._2 should be(50.0)
       // export.defines should not be null
       // export.defines.length should be(2)
       // export.defines(0).define should be("test1")

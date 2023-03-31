@@ -5,11 +5,10 @@ exports:
   options:
     - name: clk_in_freq
       type: float
+      default: 50.0
     - name: clk_out_1_freq
       type: float
-  defaults:
-    clk_in_freq: 50.0
-    clk_out_1_freq: 100.0
+      default: 100.0
   actions:
     all:
       tcl:

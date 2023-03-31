@@ -33,7 +33,7 @@ class ImplicitPathReplace(
             while (m.find()) {
               // TODO: more replace matches? well
               val replacement = regexReplacements.head.replace("$1", m.group(1))
-              KernelLogger.info(m.group(), "replacement", replacement)
+              KernelLogger.debug(m.group(), "replacement", replacement)
               m.appendReplacement(sb, replacement)
             }
             m.appendTail(sb).toString

@@ -5,7 +5,7 @@ case class ExportConfig(
     name: String,
     module: String,
     options: Array[ExportOption] = Array(),
-    defaults: Map[String, Any] = Map(),
+    // defaults: Map[String, Any] = Map(),
     actions: Map[String, ExportAction] = Map(),
     defines: Array[ExportDefineConfig] = Array()
 ) {
@@ -16,4 +16,14 @@ case class ExportConfig(
       }
       .mkString("\n")
   }
+
+  def getOptionContextMap(data: Map[String, Any] = Map()): Map[String, Any] =
+    options.map(t => t.name -> t.default).toMap ++ data
+
+  def getModuleContextMap: Map[String, Any] = Map(
+    "module" -> module,
+    "name"   -> name
+  )
+
+  def getContextMap(data: Map[String, Any] = Map()): Map[String, Any] = getModuleContextMap ++ getOptionContextMap(data)
 }
