@@ -10,7 +10,7 @@ import kernel.project.detect.BasicProjectDetector
 import kernel.project.importer.VivadoTargetParser
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
-import kernel.template.ResourceTemplateRender
+import kernel.template.{ResourceTemplateRender, Template}
 import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
@@ -136,7 +136,8 @@ object Vivado
       ipList: Seq[String] = Seq(),
       xdcList: Seq[String] = Seq(),
       timingReport: Boolean = false,
-      vcdFile: String
+      vcdFile: String,
+      insertTclSection: String = ""
   )
 
   private def generateContext(
@@ -167,6 +168,22 @@ object Vivado
       )
     }
     val ips = taskConfig.getAllIps()
+    val targetAction = Set("all") ++ (if (sim) Set("simulation")
+                                      else if (synth) Set("synthesis")
+                                      else if (impl) Set("implementation")
+                                      else Set(""))
+    val ipTclSections = ips
+      .map(ip => {
+        val actions = ip._2.exports.get.actions
+        val tclSections = actions
+          .filter(a => targetAction.contains(a._1))
+          .map(_._2.tcl)
+          .flatMap(tcl => tcl.map(t => Template.render(t, ip._2.exports.get.getContextMap())(TemplateContextReplace)))
+          .mkString("\n")
+        tclSections
+      })
+      .mkString("\n")
+    // val insertTcl = ips.flatMap(c => c._2.exports).map(c => c.getContextMap())
     // TODO / FIXME: Exception // TODO: topModule is in executor???
     val top = topOptional.get
     val sources =
@@ -199,7 +216,8 @@ object Vivado
       testbenchSource = testbenchSource,
       vcdFile = vcdFile,
       xdcList = xdcList,
-      ipList = ipList
+      ipList = ipList,
+      insertTclSection = ipTclSections
     )
   }
 

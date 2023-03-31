@@ -5,6 +5,8 @@ puts "Generating project ${project_name}"
 
 create_project -part $part -force $project_name $project_dir
 
+{{ insertTclSection }}
+
 {% for s in sourceList %}
 puts "Importing source: {{ s }}"
 add_files -fileset sources_1 { {{ s }} }
