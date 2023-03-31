@@ -166,9 +166,14 @@ object Vivado
         executor
       )
     }
+    val ips = taskConfig.getAllIps()
     // TODO / FIXME: Exception // TODO: topModule is in executor???
-    val top             = topOptional.get
-    val sources         = if (sim) taskConfig.getTestSet() else taskConfig.getSourceSet()
+    val top = topOptional.get
+    val sources =
+      if (sim)
+        taskConfig.getTestSet() ++ ips.flatMap(c => c._2.getTestSet(projectBase = Some(c._1)))
+      else
+        taskConfig.getSourceSet() ++ ips.flatMap(c => c._2.getSourceSet(projectBase = Some(c._1)))
     val topFile         = KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
@@ -186,7 +191,7 @@ object Vivado
       workDir = doSeparatorReplace(executor.workingDir.getAbsolutePath),
       part = targetConfig.options.get("part"), // FIXME
       sourceList = KernelFileUtils
-        .getAllSourceFiles(taskConfig.getSourceSet())
+        .getAllSourceFiles(sources)
         .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
         .map(p => doSeparatorReplace(p.getAbsolutePath)),
       sim = sim,

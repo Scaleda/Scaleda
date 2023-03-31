@@ -75,7 +75,8 @@ abstract class ConfigNode() {
       case Some(parent) => parent.getTestSet(projectBase = base)
       case None         => Set()
     }) ++ (if (test.nonEmpty) Set(parseAsAbsolutePath(test, projectBase = base)) else Set()) ++
-      tests.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
+      tests.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base)) ++
+      getSourceSet(projectBase = projectBase)
   }
 
   /** Get all Simple Target IP files
