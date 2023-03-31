@@ -281,6 +281,10 @@ object Vivado
         TemplateContextReplace
       }
 
+    // FIXME: spaces in vivado tcl support
+    // paths in vivado do not supports spaces, spaces should be replaced as \x20
+    // val dataReplace = new RegexReplace(" ", Seq("\\x20"))
+
     rt.task.taskType match {
       case Implement =>
         // load constraints from dir

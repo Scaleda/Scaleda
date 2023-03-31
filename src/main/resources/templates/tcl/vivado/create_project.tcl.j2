@@ -7,12 +7,12 @@ create_project -part $part -force $project_name $project_dir
 
 {% for s in sourceList %}
 puts "Importing source: {{ s }}"
-add_files -fileset sources_1 "{{ s }}"
+add_files -fileset sources_1 { {{ s }} }
 {% endfor %}
 
 {% if sim %}
 puts "Importing testbench: {{ testbenchSource }}"
-add_files -fileset sim_1 "{{ testbenchSource }}"
+add_files -fileset sim_1 { {{ testbenchSource }} }
 set_property top {{ top }} [get_filesets sim_1]
 {% else %}
 set_property top {{ top }} [get_filesets sources_1]
@@ -23,12 +23,12 @@ update_compile_order -fileset sim_1
 
 {% for ip in ipList %}
 puts "Importing IP core: {{ ip }}"
-import_files -norecurse "{{ ip }}"
+import_files -norecurse { {{ ip }} }
 {% endfor %}
 
 {% for xdc in xdcList %}
 puts "Importing xdc file: {{ xdc }}"
-add_files -fileset constrs_1 "{{ xdc }}"
+add_files -fileset constrs_1 { {{ xdc }} }
 {% endfor %}
 
 close_project
