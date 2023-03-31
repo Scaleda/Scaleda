@@ -6,6 +6,7 @@ import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseVisitor}
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.apache.commons.io.file.DeletingPathVisitor
+import top.criwits.scaleda.kernel.utils.serialise.YAMLHelper
 import top.criwits.scaleda.verilog.utils.ModuleUtils
 
 import java.io._
@@ -266,5 +267,29 @@ object KernelFileUtils {
     val parent = file.getParentFile
     if (!parent.exists()) parent.mkdirs()
     else true
+  }
+
+  /**
+   * Get [[ProjectConfig]] from IP directory
+   * @param path ip path
+   * @return optional [[ProjectConfig]]
+   */
+  def parseIpDirectory(path: File): Option[ProjectConfig] = {
+    path.listFiles(new FilenameFilter {
+      override def accept(file: File, s: String) = s == "scaleda.yml"
+    }).map(f => {
+        val source = Source.fromFile(f)
+        val text   = source.mkString
+        source.close()
+        if (text.contains("exports")) {
+          try {
+            val projectConfig = YAMLHelper(text, classOf[ProjectConfig])
+            if (projectConfig.exports.nonEmpty) Some(projectConfig)
+            else None
+          } catch {
+            case e: Throwable => None
+          }
+        } else None
+    }).headOption.flatten
   }
 }

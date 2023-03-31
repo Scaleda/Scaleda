@@ -6,6 +6,8 @@ import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.project.config.TaskType.{Implement, Simulation, Synthesis}
 import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
+import kernel.project.detect.BasicProjectDetector
+import kernel.project.importer.VivadoTargetParser
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.ResourceTemplateRender
@@ -14,8 +16,6 @@ import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, T
 import kernel.utils._
 
 import org.apache.commons.codec.digest.DigestUtils
-import top.criwits.scaleda.kernel.project.detect.BasicProjectDetector
-import top.criwits.scaleda.kernel.project.importer.{BasicTargetParser, VivadoTargetParser}
 
 import java.io.{File, FilenameFilter}
 import scala.async.Async.{async, await}
@@ -76,9 +76,11 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
   override def detectProfiles = Vivado.detectProfiles
 }
 
-object Vivado extends ToolchainProfileDetector
-  with ToolchainPresetProvider with BasicProjectDetector
-  with VivadoTargetParser {
+object Vivado
+    extends ToolchainProfileDetector
+    with ToolchainPresetProvider
+    with BasicProjectDetector
+    with VivadoTargetParser {
   val userFriendlyName: String = "Xilinx Vivado"
   val internalID: String       = "vivado"
 
@@ -172,6 +174,10 @@ object Vivado extends ToolchainProfileDetector
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
     val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
+    val ipList = KernelFileUtils
+      .getAllSourceFiles(taskConfig.getIpFiles(), suffixing = Set("xcix", "xci"))
+      .filter(_.exists())
+      .map(_.getAbsolutePath)
     Vivado.TemplateContext(
       top = top,
       workDir = doSeparatorReplace(executor.workingDir.getAbsolutePath),
@@ -185,7 +191,7 @@ object Vivado extends ToolchainProfileDetector
       testbenchSource = testbenchSource,
       vcdFile = vcdFile,
       xdcList = xdcList,
-      ipList = taskConfig.getIpFiles().toSeq
+      ipList = ipList
     )
   }
 
@@ -326,9 +332,11 @@ object Vivado extends ToolchainProfileDetector
     // only detect <project-name>.xpr file now
     if (!path.exists() || !path.isDirectory) false
     else {
-      val projectFile = path.listFiles(new FilenameFilter {
-        override def accept(file: File, s: String): Boolean = s.endsWith(".xpr")
-      }).headOption
+      val projectFile = path
+        .listFiles(new FilenameFilter {
+          override def accept(file: File, s: String): Boolean = s.endsWith(".xpr")
+        })
+        .headOption
       if (projectFile.isEmpty) false
       else true
     }
