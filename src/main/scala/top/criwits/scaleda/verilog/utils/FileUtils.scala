@@ -14,7 +14,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 
 import java.io.File
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.jdk.javaapi.CollectionConverters
@@ -35,31 +34,10 @@ object FileUtils {
     }
     // into synchronized block, only one thread to operate ip cache
     val sources = synchronized {
-      // get Scaleda IPs
-      val ips: Seq[(String, ProjectConfig)] = rt
-        .map(rt => {
-          // BFS Search
-          val q         = mutable.Queue.empty[(String, ProjectConfig)]
-          val ipConfigs = rt.task.getIps()
-          // ipConfigs.flatMap(c => {
-          //   c._2.getSourceSet(projectBase = Some(c._1)) ++ c._2.getTestSet(projectBase = Some(c._1))
-          // })
-          q ++= ipConfigs
-          // identifier is IP name, to avoid ring dependence
-          val resultIpNames = new mutable.HashSet[String]()
-          val results       = ArrayBuffer[(String, ProjectConfig)]()
-          while (q.nonEmpty) {
-            val top = q.dequeue()
-            if (!resultIpNames.contains(top._2.exports.get.name)) {
-              resultIpNames += top._2.exports.get.name
-              results += top
-              // only search more ips in ProjectConfig
-              q ++= top._2.getIps(projectBase = Some(top._1))
-            }
-          }
-          results.toSeq
-        })
-        .getOrElse(Seq())
+      // get ALL Scaleda IPs
+      val ips: Map[String, ProjectConfig] = rt
+        .map(_.task.getAllIps())
+        .getOrElse(Map())
       // collects single file ip, in this project and every Scaleda IP
       val singleFileIps = rt
         .map(rt => rt.task.getIpFiles())
