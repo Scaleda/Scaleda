@@ -21,11 +21,15 @@ class ModulePortConnectionAnnotator extends Annotator {
     // check if is module instance
     if (!element.isInstanceOf[ModuleInstantiationPsiNode]) return
     val instance = element.asInstanceOf[ModuleInstantiationPsiNode]
+    if (instance == null) return
 
     val reference     = instance.getReference
     val result        = reference.multiResolve(true)
     val instantName   = PsiTreeUtil.findChildOfType(instance, classOf[NameOfInstancePsiNode])
-    val annotateRange = new TextRange(instance.getTextRange.getStartOffset, instantName.getTextRange.getEndOffset)
+    val textRange = instance.getTextRange
+    val nameTextRange = instantName.getTextRange
+    if (textRange == null || nameTextRange == null) return
+    val annotateRange = new TextRange(textRange.getStartOffset, nameTextRange.getEndOffset)
 
     if (result.nonEmpty) {
       // Module is valid, so should check
