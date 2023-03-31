@@ -21,6 +21,12 @@ class IPTester extends AnyFlatSpec with should.Matchers {
         ProjectConfig.getConfig(path = Some(new File(workDirFile, ProjectConfig.defaultConfigFile).getAbsolutePath)).get
       val ips = config.getAllIps()
       println(ips)
+      val ipSources = ips
+        .flatMap(c => {
+          c._2.getSourceSet(projectBase = Some(c._1)) ++ c._2.getTestSet(projectBase = Some(c._1))
+        })
+        .toSet
+      println(ipSources)
       // restore bkp
       ProjectConfig.projectBase = bkp
     }
