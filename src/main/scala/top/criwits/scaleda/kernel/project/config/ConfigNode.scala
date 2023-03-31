@@ -97,8 +97,8 @@ abstract class ConfigNode() {
   @JsonIgnore
   def getIpPaths(projectBase: Option[String] = None): Set[String] = {
     val base       = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
-    val basicPaths = Set(".ip", "ip", "ips")
-    basicPaths ++ (parentNode match {
+    val basicPaths = ProjectConfig.projectIpPaths(projectBase = base)
+    basicPaths.map(_.getAbsolutePath) ++ (parentNode match {
       case Some(parent) => parent.getIpPaths(projectBase = base)
       case None         => Set()
     }) ++ ipPaths.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
@@ -110,19 +110,13 @@ abstract class ConfigNode() {
   @JsonIgnore
   def getLocalIps(projectBase: Option[String] = None): Map[String, ProjectConfig] = {
     val base  = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
-    val paths = getIpPaths(projectBase = projectBase)
+    val paths = getIpPaths(projectBase = base)
     // search just one layer: .ips/<ip name>
     paths
-      .map(parseAsAbsolutePath(_, projectBase = base))
       .map(new File(_))
-      .flatMap(p => {
-        val list = p.listFiles()
-        if (list != null) list.filter(_.isDirectory).toSet
-        else Set()
-      })
-      .map(path => (path, KernelFileUtils.parseIpDirectory(path)))
-      .filter(_._2.nonEmpty)
-      .map(p => (p._1.getAbsolutePath, p._2.get))
+      .filter(_.exists())
+      .filter(_.isDirectory)
+      .flatMap(p => KernelFileUtils.parseIpParentDirectory(p))
       .toMap
   }
 
@@ -133,7 +127,7 @@ abstract class ConfigNode() {
   def getAllIps(projectBase: Option[String] = None): Map[String, ProjectConfig] = {
     // base of this current project
     val base     = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
-    val localIps = getLocalIps(projectBase = projectBase)
+    val localIps = getLocalIps(projectBase = base)
     // BFS Search
     val q = mutable.Queue.empty[(String, ProjectConfig)]
     q ++= localIps

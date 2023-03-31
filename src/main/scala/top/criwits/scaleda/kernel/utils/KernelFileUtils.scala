@@ -271,11 +271,25 @@ object KernelFileUtils {
     else true
   }
 
+  def parseIpParentDirectory(path: File): Map[String, ProjectConfig] = {
+    if (path.exists() && path.isDirectory) {
+      val list = path.listFiles()
+      if (list != null) {
+        list
+          .filter(_.isDirectory)
+          .map(p => (p, parseIpInDirectory(p)))
+          .filter(_._2.nonEmpty)
+          .map(p => (p._1.getAbsolutePath, p._2.get))
+          .toMap
+      } else Map()
+    } else Map()
+  }
+
   /** Get [[ProjectConfig]] from IP directory
     * @param path ip path
     * @return optional [[ProjectConfig]]
     */
-  def parseIpDirectory(path: File): Option[ProjectConfig] = {
+  def parseIpInDirectory(path: File): Option[ProjectConfig] = {
     val list = path
       .listFiles(new FilenameFilter {
         override def accept(file: File, s: String) = s == ProjectConfig.defaultConfigFile
