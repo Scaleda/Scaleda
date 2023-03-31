@@ -10,7 +10,7 @@ import kernel.project.detect.BasicProjectDetector
 import kernel.project.importer.VivadoTargetParser
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
-import kernel.template.ResourceTemplateRender
+import kernel.template.{ResourceTemplateRender, Template}
 import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
@@ -136,7 +136,8 @@ object Vivado
       ipList: Seq[String] = Seq(),
       xdcList: Seq[String] = Seq(),
       timingReport: Boolean = false,
-      vcdFile: String
+      vcdFile: String,
+      insertTclSection: String = ""
   )
 
   private def generateContext(
@@ -166,16 +167,40 @@ object Vivado
         executor
       )
     }
+    val ips = taskConfig.getAllIps()
+    val targetAction = Set("all") ++ (if (sim) Set("simulation")
+                                      else if (synth) Set("synthesis")
+                                      else if (impl) Set("implementation")
+                                      else Set(""))
+    val ipTclSections = ips
+      .map(ip => {
+        val actions = ip._2.exports.get.actions
+        val tclSections = actions
+          .filter(a => targetAction.contains(a._1))
+          .map(_._2.tcl)
+          .flatMap(tcl => tcl.map(t => Template.render(t, ip._2.exports.get.getContextMap())(TemplateContextReplace)))
+          .mkString("\n")
+        tclSections
+      })
+      .mkString("\n")
+    // val insertTcl = ips.flatMap(c => c._2.exports).map(c => c.getContextMap())
     // TODO / FIXME: Exception // TODO: topModule is in executor???
-    val top             = topOptional.get
-    val sources         = if (sim) taskConfig.getTestSet() else taskConfig.getSourceSet()
+    val top = topOptional.get
+    val sources =
+      if (sim)
+        taskConfig.getTestSet() ++ ips.flatMap(c => c._2.getTestSet(projectBase = Some(c._1)))
+      else
+        taskConfig.getSourceSet() ++ ips.flatMap(c => c._2.getSourceSet(projectBase = Some(c._1)))
     val topFile         = KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
     val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
     val ipList = KernelFileUtils
-      .getAllSourceFiles(taskConfig.getIpFiles(), suffixing = Set("xcix", "xci"))
+      .getAllSourceFiles(
+        taskConfig.getIpFiles() ++ taskConfig.getAllIps().flatMap(c => c._2.getIpFiles(projectBase = Some(c._1))),
+        suffixing = Set("xcix", "xci")
+      )
       .filter(_.exists())
       .map(_.getAbsolutePath)
     Vivado.TemplateContext(
@@ -183,7 +208,7 @@ object Vivado
       workDir = doSeparatorReplace(executor.workingDir.getAbsolutePath),
       part = targetConfig.options.get("part"), // FIXME
       sourceList = KernelFileUtils
-        .getAllSourceFiles(taskConfig.getSourceSet())
+        .getAllSourceFiles(sources)
         .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
         .map(p => doSeparatorReplace(p.getAbsolutePath)),
       sim = sim,
@@ -191,7 +216,8 @@ object Vivado
       testbenchSource = testbenchSource,
       vcdFile = vcdFile,
       xdcList = xdcList,
-      ipList = ipList
+      ipList = ipList,
+      insertTclSection = ipTclSections
     )
   }
 
@@ -277,6 +303,10 @@ object Vivado
         // { waterfall } => {waterfall}
         TemplateContextReplace
       }
+
+    // FIXME: spaces in vivado tcl support
+    // paths in vivado do not supports spaces, spaces should be replaced as \x20
+    // val dataReplace = new RegexReplace(" ", Seq("\\x20"))
 
     rt.task.taskType match {
       case Implement =>

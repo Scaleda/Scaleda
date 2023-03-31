@@ -2,11 +2,13 @@ package top.criwits.scaleda
 package kernel.project.config
 
 import kernel.utils.KernelFileUtils
+import kernel.utils.KernelFileUtils.parseAsAbsolutePath
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import top.criwits.scaleda.kernel.utils.KernelFileUtils.parseAsAbsolutePath
 
 import java.io.File
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 abstract class ConfigNode() {
   @JsonIgnore
@@ -73,7 +75,8 @@ abstract class ConfigNode() {
       case Some(parent) => parent.getTestSet(projectBase = base)
       case None         => Set()
     }) ++ (if (test.nonEmpty) Set(parseAsAbsolutePath(test, projectBase = base)) else Set()) ++
-      tests.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
+      tests.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base)) ++
+      getSourceSet(projectBase = projectBase)
   }
 
   /** Get all Simple Target IP files
@@ -101,20 +104,51 @@ abstract class ConfigNode() {
     }) ++ ipPaths.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
   }
 
-  /** Get all Scaleda IP [[ProjectConfig]]
+  /** Get defined Scaleda IP in this project, but not recursively from other IPs
     * @return map of ip abs-path and [[ProjectConfig]]
     */
   @JsonIgnore
-  def getIps(projectBase: Option[String] = None): Map[String, ProjectConfig] = {
+  def getLocalIps(projectBase: Option[String] = None): Map[String, ProjectConfig] = {
     val base  = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
     val paths = getIpPaths(projectBase = projectBase)
-    // search just one layer
+    // search just one layer: .ips/<ip name>
     paths
       .map(parseAsAbsolutePath(_, projectBase = base))
       .map(new File(_))
+      .flatMap(p => {
+        val list = p.listFiles()
+        if (list != null) list.filter(_.isDirectory).toSet
+        else Set()
+      })
       .map(path => (path, KernelFileUtils.parseIpDirectory(path)))
       .filter(_._2.nonEmpty)
       .map(p => (p._1.getAbsolutePath, p._2.get))
       .toMap
+  }
+
+  /** Recursively get ALL IPs from this project
+    * @return map of ip abs-path and [[ProjectConfig]]
+    */
+  @JsonIgnore
+  def getAllIps(projectBase: Option[String] = None): Map[String, ProjectConfig] = {
+    // base of this current project
+    val base     = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
+    val localIps = getLocalIps(projectBase = projectBase)
+    // BFS Search
+    val q = mutable.Queue.empty[(String, ProjectConfig)]
+    q ++= localIps
+    // identifier is IP name, to avoid ring dependence
+    val resultIpNames = new mutable.HashSet[String]()
+    val results       = ArrayBuffer[(String, ProjectConfig)]()
+    while (q.nonEmpty) {
+      val top = q.dequeue()
+      if (!resultIpNames.contains(top._2.exports.get.name)) {
+        resultIpNames += top._2.exports.get.name
+        results += top
+        // only search more ips in ProjectConfig
+        q ++= top._2.getLocalIps(projectBase = Some(top._1))
+      }
+    }
+    results.toMap
   }
 }

@@ -276,10 +276,12 @@ object KernelFileUtils {
     * @return optional [[ProjectConfig]]
     */
   def parseIpDirectory(path: File): Option[ProjectConfig] = {
-    path
+    val list = path
       .listFiles(new FilenameFilter {
-        override def accept(file: File, s: String) = s == "scaleda.yml"
+        override def accept(file: File, s: String) = s == ProjectConfig.defaultConfigFile
       })
+    if (list == null) return None
+    list
       .map(f => {
         val source = Source.fromFile(f)
         val text   = source.mkString
@@ -308,7 +310,12 @@ object KernelFileUtils {
 
   def ipCacheDirectory = new File(ProjectConfig.projectBase.getOrElse(""), ".cache")
 
-  def getAllCachedIpHash: Set[String] = ipCacheDirectory.listFiles().filter(_.isDirectory).map(_.getName).toSet
+  def getAllCachedIpHash: Set[String] = {
+    val list = ipCacheDirectory.listFiles()
+    if (list != null)
+      list.filter(_.isDirectory).map(_.getName).toSet
+    else Set()
+  }
 
   /** Remove an ip cache by hash
     * @param hash ip file hash
