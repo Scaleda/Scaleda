@@ -27,6 +27,7 @@ class ModulePortConnectionAnnotator extends Annotator {
     val result        = reference.multiResolve(true)
     val instantName   = PsiTreeUtil.findChildOfType(instance, classOf[NameOfInstancePsiNode])
     val textRange = instance.getTextRange
+    if (instantName == null) return
     val nameTextRange = instantName.getTextRange
     if (textRange == null || nameTextRange == null) return
     val annotateRange = new TextRange(textRange.getStartOffset, nameTextRange.getEndOffset)
