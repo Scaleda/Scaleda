@@ -175,7 +175,10 @@ object Vivado
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
     val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
     val ipList = KernelFileUtils
-      .getAllSourceFiles(taskConfig.getIpFiles(), suffixing = Set("xcix", "xci"))
+      .getAllSourceFiles(
+        taskConfig.getIpFiles() ++ taskConfig.getAllIps().flatMap(c => c._2.getIpFiles(projectBase = Some(c._1))),
+        suffixing = Set("xcix", "xci")
+      )
       .filter(_.exists())
       .map(_.getAbsolutePath)
     Vivado.TemplateContext(
