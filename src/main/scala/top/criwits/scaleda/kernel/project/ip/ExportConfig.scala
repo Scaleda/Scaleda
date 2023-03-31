@@ -1,10 +1,12 @@
 package top.criwits.scaleda
 package kernel.project.ip
 
+import kernel.template.Template
+
 case class ExportConfig(
     name: String,
     module: String,
-    stub: String,
+    stub: String = "",
     options: Array[ExportOption] = Array(),
     actions: Map[String, ExportAction] = Map(),
     defines: Array[ExportDefineConfig] = Array()
@@ -25,6 +27,11 @@ case class ExportConfig(
     "name"   -> name
   )
 
-  def getDefaultContextMap(data: Map[String, Any] = Map()): Map[String, Any] =
-    getModuleContextMap ++ getOptionContextMap(data)
+  def getContextMap(context: Map[String, Any] = Map()): Map[String, Any] =
+    getModuleContextMap ++ getOptionContextMap(context)
+
+  def renderStub(context: Map[String, Any] = Map()) = {
+    val contextUse = getContextMap(context)
+    Template.render(stub, contextUse)
+  }
 }
