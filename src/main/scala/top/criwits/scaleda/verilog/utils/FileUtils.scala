@@ -25,13 +25,19 @@ object FileUtils {
   def getAllVerilogFiles(project: Project): List[VerilogPSIFileRoot] = {
     // process long tasks in this function will not block IDEA main thread, just do it
     // get configuration selected now
-    val configuration: RunConfiguration = RunManager.getInstance(project).getSelectedConfiguration.getConfiguration
-    val defaultSources                  = ProjectConfig.getConfig().map(c => c.getSourceSet() ++ c.getTestSet()).getOrElse(Set())
-    val rt = configuration match {
-      // if it's a valid ScaledaRunProcessHandler
-      case configuration: ScaledaRunConfiguration => configuration.generateRuntime
-      case _                                      => None
-    }
+    // this can be null! check first plz!
+    val selectedConfiguration = RunManager.getInstance(project).getSelectedConfiguration
+    val rt =
+      if (selectedConfiguration == null) None
+      else {
+        val configuration: RunConfiguration = selectedConfiguration.getConfiguration
+        configuration match {
+          // if it's a valid ScaledaRunProcessHandler
+          case configuration: ScaledaRunConfiguration => configuration.generateRuntime
+          case _                                      => None
+        }
+      }
+    val defaultSources = ProjectConfig.getConfig().map(c => c.getSourceSet() ++ c.getTestSet()).getOrElse(Set())
     // into synchronized block, only one thread to operate ip cache
     val sources = synchronized {
       // get ALL Scaleda IPs
