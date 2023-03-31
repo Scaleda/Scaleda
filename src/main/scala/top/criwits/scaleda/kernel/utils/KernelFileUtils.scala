@@ -276,10 +276,12 @@ object KernelFileUtils {
     * @return optional [[ProjectConfig]]
     */
   def parseIpDirectory(path: File): Option[ProjectConfig] = {
-    path
+    val list = path
       .listFiles(new FilenameFilter {
-        override def accept(file: File, s: String) = s == "scaleda.yml"
+        override def accept(file: File, s: String) = s == ProjectConfig.defaultConfigFile
       })
+    if (list == null) return None
+    list
       .map(f => {
         val source = Source.fromFile(f)
         val text   = source.mkString

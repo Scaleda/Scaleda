@@ -103,7 +103,7 @@ abstract class ConfigNode() {
     }) ++ ipPaths.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
   }
 
-  /** Get defined Scaleda IP in this project, but not recursive from other IPs
+  /** Get defined Scaleda IP in this project, but not recursively from other IPs
     * @return map of ip abs-path and [[ProjectConfig]]
     */
   @JsonIgnore
@@ -114,13 +114,18 @@ abstract class ConfigNode() {
     paths
       .map(parseAsAbsolutePath(_, projectBase = base))
       .map(new File(_))
+      .flatMap(p => {
+        val list = p.listFiles()
+        if (list != null) list.filter(_.isDirectory).toSet
+        else Set()
+      })
       .map(path => (path, KernelFileUtils.parseIpDirectory(path)))
       .filter(_._2.nonEmpty)
       .map(p => (p._1.getAbsolutePath, p._2.get))
       .toMap
   }
 
-  /** Recursive get ALL IPs from this project
+  /** Recursively get ALL IPs from this project
     * @return map of ip abs-path and [[ProjectConfig]]
     */
   @JsonIgnore
