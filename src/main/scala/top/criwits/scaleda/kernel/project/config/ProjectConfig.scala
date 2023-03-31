@@ -34,7 +34,9 @@ case class ProjectConfig(
     constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array(),
     override val ipFiles: Seq[String] = Seq(),
-    exports: Option[ExportConfig] = None
+    override val ipPaths: Seq[String] = Seq(),
+    exports: Option[ExportConfig] = None,
+    override val ips: Map[String, Map[String, Any]] = Map()
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))

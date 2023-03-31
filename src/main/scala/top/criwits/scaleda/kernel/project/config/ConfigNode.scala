@@ -29,6 +29,8 @@ abstract class ConfigNode() {
   val ipFiles: Seq[String] = Seq()
   @JsonIgnore
   val ipPaths: Seq[String] = Seq()
+  @JsonIgnore
+  val ips: Map[String, Map[String, Any]] = Map()
 
   /** Get top module name
     * @return top module name, may not exist
@@ -144,5 +146,17 @@ abstract class ConfigNode() {
       }
     }
     results.toMap
+  }
+
+  /** Get IP Instances
+    * @return name and context
+    */
+  @JsonIgnore
+  def getIpInstances(projectBase: Option[String] = None): Map[String, Map[String, Any]] = {
+    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
+    ((parentNode match {
+      case Some(parent) => parent.getIpInstances(projectBase = base)
+      case None         => Map()
+    }) ++ ips).toMap
   }
 }

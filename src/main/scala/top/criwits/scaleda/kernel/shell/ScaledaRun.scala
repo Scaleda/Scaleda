@@ -25,7 +25,7 @@ object ScaledaRun {
     * @return new runtime
     */
   def preprocess(rt: ScaledaRuntime): ScaledaRuntime = {
-    if (!rt.workingDir.exists() && !rt.workingDir.mkdirs()) KernelLogger.warn("Cannot create working directory!")
+    if (!rt.executor.workingDir.exists() && !rt.executor.workingDir.mkdirs()) KernelLogger.warn("Cannot create working directory!")
     if (rt.task.preset && rt.stage == ScaledaRunStage.Prepare) {
       // fetch remote system info
       val remoteInfo =
@@ -56,7 +56,7 @@ object ScaledaRun {
       if (rt.profile.isRemoteProfile && ProjectConfig.projectBase.nonEmpty)
         Some(RemoteCommandDeps(new File(ProjectConfig.projectBase.get), host = rt.profile.host, runId = rt.id))
       else None
-    KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
+    KernelLogger.info(s"runTask workingDir=${rt.projectBase.getAbsoluteFile}")
 
     val info      = Toolchain.toolchains(rt.target.toolchain)
     val toolchain = info._2(rt.executor)
@@ -89,14 +89,14 @@ object ScaledaRun {
       target: TargetConfig,
       task: TaskConfig,
       profile: ToolchainProfile,
-      workingDir: File
+      projectBase: File
   ): Executor = {
     val workingDirName = target.name + "-" + task.name
     task.taskType match {
       case TaskType.Simulation =>
         // FIXME: GENERATE TESTBENCH?
         val testbench    = task.findTopModule.get // FIXME: should not get if None, but...
-        val workingPlace = new File(new File(workingDir, ".sim"), workingDirName)
+        val workingPlace = new File(new File(projectBase, ".sim"), workingDirName)
         SimulationExecutor(
           workingDir = workingPlace,
           topModule = testbench,
@@ -105,24 +105,24 @@ object ScaledaRun {
         )
       case TaskType.Synthesis =>
         SynthesisExecutor(
-          workingDir = new File(new File(workingDir, ".synth"), workingDirName),
+          workingDir = new File(new File(projectBase, ".synth"), workingDirName),
           topModule = task.findTopModule.get,
           profile = profile
         )
       case TaskType.Implement =>
         val selectedConstraints = task.getConstraints
         val singleFile: Option[File] = selectedConstraints.flatMap(path => {
-          val file = new File(workingDir, path)
+          val file = new File(projectBase, path)
           if (file.exists() && file.isFile) Some(file)
           else None
         })
         val singleDir: Option[File] = selectedConstraints.flatMap(path => {
-          val file = new File(workingDir, path)
+          val file = new File(projectBase, path)
           if (file.exists() && file.isDirectory) Some(file)
           else None
         })
         ImplementExecutor(
-          workingDir = new File(new File(workingDir, ".impl"), workingDirName),
+          workingDir = new File(new File(projectBase, ".impl"), workingDirName),
           topModule = task.findTopModule.get,
           profile = profile,
           // in `handlePreset`, constraintsDir will be scanned to add constraints
@@ -131,7 +131,7 @@ object ScaledaRun {
         )
       case TaskType.Programming =>
         ProgrammingExecutor(
-          workingDir = new File(new File(workingDir, ".impl"), workingDirName),
+          workingDir = new File(new File(projectBase, ".impl"), workingDirName),
           profile = profile
         )
     }
@@ -200,15 +200,15 @@ object ScaledaRun {
             s"${target.toolchain}-${target.name}-${task.name}-${new Date()}"
           // )
 
-          val workingDir = new File(ProjectConfig.projectBase.get)
-          val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
+          val projectBase = new File(ProjectConfig.projectBase.get)
+          val executor    = ScaledaRun.generateExecutor(target, task, profile.get, projectBase)
           val runtime = ScaledaRuntime(
             id = runtimeId,
             target = target,
             task = task,
             profile = profile.get,
             executor = executor,
-            workingDir = workingDir
+            projectBase = projectBase
           )
 
           Some(runtime)

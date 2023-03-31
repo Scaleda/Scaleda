@@ -13,7 +13,7 @@ import java.io.File
   * @param task task config
   * @param profile profile config
   * @param executor executor
-  * @param workingDir pwd
+  * @param projectBase pwd
   * @param context immutable context data
   */
 case class ScaledaRuntime(
@@ -22,7 +22,7 @@ case class ScaledaRuntime(
     task: TaskConfig,
     profile: ToolchainProfile,
     executor: Executor,
-    workingDir: File = new File(ProjectConfig.projectBase.get),
+    projectBase: File = new File(ProjectConfig.projectBase.get),
     extraEnvs: Map[String, String] = Map(),
     // used in preset and message handler
     context: Map[String, Any] = Map(),

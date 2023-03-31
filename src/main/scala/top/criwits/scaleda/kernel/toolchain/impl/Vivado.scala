@@ -5,7 +5,7 @@ import idea.runner.ScaledaRuntime
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.project.config.TaskType.{Implement, Simulation, Synthesis}
-import kernel.project.config.{TargetConfig, TaskConfig, TaskType}
+import kernel.project.config.{TaskConfig, TaskType}
 import kernel.project.detect.BasicProjectDetector
 import kernel.project.importer.VivadoTargetParser
 import kernel.shell.ScaledaRunHandlerToArray
@@ -17,7 +17,7 @@ import kernel.utils._
 
 import org.apache.commons.codec.digest.DigestUtils
 
-import java.io.{File, FilenameFilter}
+import java.io.{File, FilenameFilter, PrintWriter}
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -141,11 +141,10 @@ object Vivado
   )
 
   private def generateContext(
-      executor: Executor,
-      targetConfig: TargetConfig,
-      taskConfig: TaskConfig
+      rt: ScaledaRuntime
   ): TemplateContext = {
     def doSeparatorReplace(src: String): String = src.replace('\\', '/')
+    val (taskConfig, targetConfig, executor)    = (rt.task, rt.target, rt.executor)
 
     val sim   = taskConfig.taskType == Simulation
     val synth = taskConfig.taskType == Synthesis
@@ -183,6 +182,43 @@ object Vivado
         tclSections
       })
       .mkString("\n")
+    val ipInstances            = taskConfig.getIpInstances()
+    val unsupportedIpInstances = ipInstances.filter(i => !ips.exists(_._2.exports.get.name == i._1))
+    if (unsupportedIpInstances.nonEmpty) {
+      KernelLogger.warn(
+        "unsupported IP instances:",
+        unsupportedIpInstances.keys.mkString(", ")
+      )
+    }
+    val supportedIpInstances = ipInstances.filter(i => !unsupportedIpInstances.contains(i._1))
+    // render template file
+    val targetTemplateFiles: Seq[File] = supportedIpInstances
+      .flatMap(p => {
+        val (name, context) = p
+        ips
+          .find(_._2.exports.get.name == name)
+          .flatMap(ip => {
+            val (path, ipExports) = ip
+            ipExports.exports.map(e => {
+              val targetData =
+                e.renderTemplate(context = if (context != null) context else Map(), projectBase = Some(path))
+              // write target file to workDir/targetFile
+              targetData.map(t => {
+                val targetFile = new File(rt.executor.workingDir, t._1)
+                if (!targetFile.exists()) {
+                  targetFile.getParentFile.mkdirs()
+                  targetFile.createNewFile()
+                }
+                val writer = new PrintWriter(targetFile)
+                writer.write(t._2)
+                writer.close()
+                targetFile
+              })
+            })
+          })
+      })
+      .flatten
+      .toSeq
     // val insertTcl = ips.flatMap(c => c._2.exports).map(c => c.getContextMap())
     // TODO / FIXME: Exception // TODO: topModule is in executor???
     val top = topOptional.get
@@ -210,7 +246,7 @@ object Vivado
       sourceList = KernelFileUtils
         .getAllSourceFiles(sources)
         .filter(f => (!sim) || f.getAbsolutePath != topFile.getAbsolutePath)
-        .map(p => doSeparatorReplace(p.getAbsolutePath)),
+        .map(p => doSeparatorReplace(p.getAbsolutePath)) ++ targetTemplateFiles.map(_.getAbsolutePath),
       sim = sim,
       // if sim == false, then this will not be used
       testbenchSource = testbenchSource,
@@ -221,14 +257,10 @@ object Vivado
     )
   }
 
-  class TemplateRenderer(
-      executor: Executor,
-      targetConfig: TargetConfig,
-      taskConfig: TaskConfig
-  )(implicit replace: ImplicitPathReplace = NoPathReplace)
+  class TemplateRenderer(rt: ScaledaRuntime)(implicit replace: ImplicitPathReplace = NoPathReplace)
       extends ResourceTemplateRender(
         "tcl/vivado",
-        executor.workingDir.getAbsolutePath,
+        rt.executor.workingDir.getAbsolutePath,
         Map(
           "args.tcl.j2"           -> "args.tcl",
           "create_project.tcl.j2" -> "create_project.tcl",
@@ -240,7 +272,7 @@ object Vivado
       )(replace) {
 
     override def context: Map[String, Any] =
-      Serialization.getCCParams(generateContext(executor, targetConfig, taskConfig))
+      Serialization.getCCParams(generateContext(rt))
   }
 
   override def detectProfiles = async {
@@ -295,7 +327,7 @@ object Vivado
           userTokenBean.get.username + "-" + DigestUtils.sha256Hex(rt.id)
         // val pathFrom = rt.workingDir.getAbsolutePath.replace('\\', '/')
         new ImplicitPathReplace(
-          rt.workingDir.getAbsolutePath,
+          rt.projectBase.getAbsolutePath,
           remoteTargetPath,
           inner = Some(TemplateContextReplace)
         )
@@ -322,11 +354,7 @@ object Vivado
           .foreach(executorNew => rt = rt.copy(executor = executorNew))
       case _ =>
     }
-    val templateRenderer = new Vivado.TemplateRenderer(
-      executor = rt.executor,
-      targetConfig = rt.target,
-      taskConfig = rt.task
-    )(replace)
+    val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
     templateRenderer.render()
     if (rt.profile.isRemoteProfile) {
       // remove old vivado project if exists and only for remote
@@ -346,9 +374,7 @@ object Vivado
       })
     }
     // add sources
-    rt = rt.copy(context =
-      rt.context ++ Map("sourceFiles" -> generateContext(rt.executor, rt.target, rt.task).sourceList.map(new File(_)))
-    )
+    rt = rt.copy(context = rt.context ++ Map("sourceFiles" -> generateContext(rt).sourceList.map(new File(_))))
     rt = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"
       case TaskType.Synthesis   => "run_synth.tcl"
