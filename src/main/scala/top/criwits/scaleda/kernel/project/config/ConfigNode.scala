@@ -4,6 +4,7 @@ package kernel.project.config
 import kernel.utils.KernelFileUtils
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import top.criwits.scaleda.kernel.utils.KernelFileUtils.parseAsAbsolutePath
 
 import java.io.File
 
@@ -48,10 +49,6 @@ abstract class ConfigNode() {
     case Some(str) => Some(str)
     case None      => parentNode.flatMap(_.getConstraints)
   }
-
-  @JsonIgnore
-  private def parseAsAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase) =
-    KernelFileUtils.toAbsolutePath(path, projectBase = projectBase).getOrElse(path)
 
   /** Get all source set. Default is project base.
     * @return sources in absolute path
