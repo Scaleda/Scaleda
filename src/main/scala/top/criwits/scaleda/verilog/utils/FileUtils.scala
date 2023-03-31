@@ -80,12 +80,10 @@ object FileUtils {
     // append files from sourceRegularFiles
     val psiManager = PsiManager.getInstance(project)
     sourceRegularFiles.foreach(f => {
-      PsiTreeUtil.getChildOfType(
-        psiManager.findFile(LocalFileSystem.getInstance().findFileByIoFile(f)),
-        classOf[VerilogPSIFileRoot]
-      ) match {
-        case null        =>
-        case psiFileRoot => result += psiFileRoot
+      val foundFile = psiManager.findFile(LocalFileSystem.getInstance().findFileByIoFile(f))
+      foundFile match {
+        case f: VerilogPSIFileRoot => result += f
+        case _                     =>
       }
     })
     // search and append files from sourceDirectories

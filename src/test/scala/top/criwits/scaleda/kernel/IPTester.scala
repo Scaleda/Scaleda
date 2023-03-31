@@ -5,6 +5,7 @@ import kernel.project.config.ProjectConfig
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
+import top.criwits.scaleda.kernel.utils.KernelFileUtils
 
 import java.io.File
 
@@ -27,6 +28,9 @@ class IPTester extends AnyFlatSpec with should.Matchers {
         })
         .toSet
       println(ipSources)
+      // test update cache
+      val ipFiles = config.getIpFiles() ++ ips.flatMap(c => c._2.getIpFiles(projectBase = Some(c._1))).toSet
+      KernelFileUtils.doUpdateIpFilesCache(ipFiles, projectBase = Some(workDir))
       // restore bkp
       ProjectConfig.projectBase = bkp
     }

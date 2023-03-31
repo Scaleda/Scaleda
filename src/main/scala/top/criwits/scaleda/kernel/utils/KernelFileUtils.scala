@@ -310,7 +310,12 @@ object KernelFileUtils {
 
   def ipCacheDirectory = new File(ProjectConfig.projectBase.getOrElse(""), ".cache")
 
-  def getAllCachedIpHash: Set[String] = ipCacheDirectory.listFiles().filter(_.isDirectory).map(_.getName).toSet
+  def getAllCachedIpHash: Set[String] = {
+    val list = ipCacheDirectory.listFiles()
+    if (list != null)
+      list.filter(_.isDirectory).map(_.getName).toSet
+    else Set()
+  }
 
   /** Remove an ip cache by hash
     * @param hash ip file hash
