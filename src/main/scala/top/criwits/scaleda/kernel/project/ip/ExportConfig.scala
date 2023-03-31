@@ -17,7 +17,7 @@ case class ExportConfig(
     module: String,
     stub: String = "",
     vendor: String = "",
-    supports: Map[String, Map[String, String]] = Map(),
+    supports: Map[String, Seq[String]] = Map(),
     options: Array[ExportOption] = Array(),
     actions: Map[String, ExportAction] = Map(),
     defines: Array[ExportDefineConfig] = Array(),

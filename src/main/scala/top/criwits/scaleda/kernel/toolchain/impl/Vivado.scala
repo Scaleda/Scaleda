@@ -5,7 +5,7 @@ import idea.runner.ScaledaRuntime
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.project.config.TaskType.{Implement, Simulation, Synthesis}
-import kernel.project.config.{TaskConfig, TaskType}
+import kernel.project.config.{ProjectConfig, TaskConfig, TaskType}
 import kernel.project.detect.BasicProjectDetector
 import kernel.project.importer.VivadoTargetParser
 import kernel.shell.ScaledaRunHandlerToArray
@@ -141,7 +141,9 @@ object Vivado
   )
 
   private def generateContext(
-      rt: ScaledaRuntime
+      rt: ScaledaRuntime,
+      targetTemplateFiles: Seq[File] = Seq(),
+      ipsData: Map[String, ProjectConfig] = Map()
   ): TemplateContext = {
     def doSeparatorReplace(src: String): String = src.replace('\\', '/')
     val (taskConfig, targetConfig, executor)    = (rt.task, rt.target, rt.executor)
@@ -166,7 +168,7 @@ object Vivado
         executor
       )
     }
-    val ips = taskConfig.getAllIps()
+    val ips: Map[String, ProjectConfig] = if (ipsData.nonEmpty) ipsData else taskConfig.getAllIps()
     val targetAction = Set("all") ++ (if (sim) Set("simulation")
                                       else if (synth) Set("synthesis")
                                       else if (impl) Set("implementation")
@@ -182,43 +184,6 @@ object Vivado
         tclSections
       })
       .mkString("\n")
-    val ipInstances            = taskConfig.getIpInstances()
-    val unsupportedIpInstances = ipInstances.filter(i => !ips.exists(_._2.exports.get.name == i._1))
-    if (unsupportedIpInstances.nonEmpty) {
-      KernelLogger.warn(
-        "unsupported IP instances:",
-        unsupportedIpInstances.keys.mkString(", ")
-      )
-    }
-    val supportedIpInstances = ipInstances.filter(i => !unsupportedIpInstances.contains(i._1))
-    // render template file
-    val targetTemplateFiles: Seq[File] = supportedIpInstances
-      .flatMap(p => {
-        val (name, context) = p
-        ips
-          .find(_._2.exports.get.name == name)
-          .flatMap(ip => {
-            val (path, ipExports) = ip
-            ipExports.exports.map(e => {
-              val targetData =
-                e.renderTemplate(context = if (context != null) context else Map(), projectBase = Some(path))
-              // write target file to workDir/targetFile
-              targetData.map(t => {
-                val targetFile = new File(rt.executor.workingDir, t._1)
-                if (!targetFile.exists()) {
-                  targetFile.getParentFile.mkdirs()
-                  targetFile.createNewFile()
-                }
-                val writer = new PrintWriter(targetFile)
-                writer.write(t._2)
-                writer.close()
-                targetFile
-              })
-            })
-          })
-      })
-      .flatten
-      .toSeq
     // val insertTcl = ips.flatMap(c => c._2.exports).map(c => c.getContextMap())
     // TODO / FIXME: Exception // TODO: topModule is in executor???
     val top = topOptional.get
@@ -354,6 +319,56 @@ object Vivado
           .foreach(executorNew => rt = rt.copy(executor = executorNew))
       case _ =>
     }
+    val ips         = rt.task.getAllIps()
+    val ipInstances = rt.task.getIpInstances()
+    val unsupportedIpInstances = ipInstances.filter(i => {
+      val ipFound = ips.find(_._2.exports.get.name == i._1)
+      val targetSupports: Map[String, Seq[String]] =
+        ipFound.map(ip => ip._2.exports.get.supports).getOrElse(Map()) ++ ipFound
+          .map(ip => Map(ip._2.exports.get.vendor -> Seq("all")))
+          .getOrElse(Map())
+      if (targetSupports.contains(Vivado.internalID)) {
+
+      } else {
+        // see if is generic
+      }
+      ipFound.nonEmpty
+    })
+    if (unsupportedIpInstances.nonEmpty) {
+      KernelLogger.warn(
+        "unsupported IP instances:",
+        unsupportedIpInstances.keys.mkString(", ")
+      )
+    }
+    val supportedIpInstances = ipInstances.filter(i => !unsupportedIpInstances.contains(i._1))
+    // render template file
+    val targetTemplateFiles: Seq[File] = supportedIpInstances
+      .flatMap(p => {
+        val (name, context) = p
+        ips
+          .find(_._2.exports.get.name == name)
+          .flatMap(ip => {
+            val (path, ipExports) = ip
+            ipExports.exports.map(e => {
+              val targetData =
+                e.renderTemplate(context = if (context != null) context else Map(), projectBase = Some(path))
+              // write target file to workDir/targetFile
+              targetData.map(t => {
+                val targetFile = new File(rt.executor.workingDir, t._1)
+                if (!targetFile.exists()) {
+                  targetFile.getParentFile.mkdirs()
+                  targetFile.createNewFile()
+                }
+                val writer = new PrintWriter(targetFile)
+                writer.write(t._2)
+                writer.close()
+                targetFile
+              })
+            })
+          })
+      })
+      .flatten
+      .toSeq
     val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
     templateRenderer.render()
     if (rt.profile.isRemoteProfile) {
@@ -374,7 +389,8 @@ object Vivado
       })
     }
     // add sources
-    rt = rt.copy(context = rt.context ++ Map("sourceFiles" -> generateContext(rt).sourceList.map(new File(_))))
+    val templateContext = generateContext(rt, ipsData = ips, targetTemplateFiles = targetTemplateFiles)
+    rt = rt.copy(context = rt.context ++ Map("sourceFiles" -> templateContext.sourceList.map(new File(_))))
     rt = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"
       case TaskType.Synthesis   => "run_synth.tcl"
