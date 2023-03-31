@@ -60,7 +60,7 @@ exports:
       ex.actions("all").tcl.size should be(2)
       ex.actions("all").tcl.foreach(tcl => {
         println(tcl)
-        val r = Template.render(tcl, ex.getContextMap())(TemplateContextReplace)
+        val r = Template.render(tcl, ex.getDefaultContextMap())(TemplateContextReplace)
         println(r)
       })
       // export.actions("all").tcl.head should be("puts \"hello world\"")

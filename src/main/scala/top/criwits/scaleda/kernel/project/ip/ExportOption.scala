@@ -12,6 +12,7 @@ object ExportOption {
   val availableTypes: Map[String, Class[_]] = Map(
     "string" -> classOf[String],
     "int"    -> classOf[Int],
-    "float"  -> classOf[Float]
+    "float"  -> classOf[Float],
+    "boolean"  -> classOf[Boolean],
   )
 }

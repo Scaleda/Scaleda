@@ -178,7 +178,7 @@ object Vivado
         val tclSections = actions
           .filter(a => targetAction.contains(a._1))
           .map(_._2.tcl)
-          .flatMap(tcl => tcl.map(t => Template.render(t, ip._2.exports.get.getContextMap())(TemplateContextReplace)))
+          .flatMap(tcl => tcl.map(t => Template.render(t, ip._2.exports.get.getDefaultContextMap())(TemplateContextReplace)))
           .mkString("\n")
         tclSections
       })

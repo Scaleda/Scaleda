@@ -4,6 +4,7 @@ package kernel.project.ip
 case class ExportConfig(
     name: String,
     module: String,
+    stub: String,
     options: Array[ExportOption] = Array(),
     actions: Map[String, ExportAction] = Map(),
     defines: Array[ExportDefineConfig] = Array()
@@ -24,5 +25,6 @@ case class ExportConfig(
     "name"   -> name
   )
 
-  def getContextMap(data: Map[String, Any] = Map()): Map[String, Any] = getModuleContextMap ++ getOptionContextMap(data)
+  def getDefaultContextMap(data: Map[String, Any] = Map()): Map[String, Any] =
+    getModuleContextMap ++ getOptionContextMap(data)
 }
