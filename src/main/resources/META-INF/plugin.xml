@@ -160,7 +160,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
         <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType"/>
-        <newProjectWizard.language implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+        <newProjectWizard.language id="scaleda" implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
         <!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
     </extensions>
