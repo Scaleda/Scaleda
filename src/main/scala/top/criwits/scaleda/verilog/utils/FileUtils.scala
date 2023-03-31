@@ -4,7 +4,6 @@ package verilog.utils
 import idea.runner.configuration.ScaledaRunConfiguration
 import kernel.project.config.ProjectConfig
 import kernel.utils.KernelFileUtils
-import kernel.utils.KernelFileUtils.parseAsAbsolutePath
 import verilog.VerilogPSIFileRoot
 
 import com.intellij.execution.RunManager
@@ -13,9 +12,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
-import org.apache.commons.codec.digest.DigestUtils
 
-import java.io.{File, FileInputStream}
+import java.io.File
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.jdk.javaapi.CollectionConverters
@@ -25,6 +23,7 @@ object FileUtils {
   /** Get Verilog sources for IDEA Editor, will search sources by task selected in IDEA
     */
   def getAllVerilogFiles(project: Project): List[VerilogPSIFileRoot] = {
+    // process long tasks in this function will not block IDEA main thread, just do it
     // get configuration selected now
     val configuration: RunConfiguration = RunManager.getInstance(project).getSelectedConfiguration.getConfiguration
     val defaultSources                  = ProjectConfig.getConfig().map(c => c.getSourceSet() ++ c.getTestSet()).getOrElse(Set())
@@ -36,18 +35,9 @@ object FileUtils {
     // into synchronized block, only one thread to operate ip cache
     val sources = synchronized {
       val ipFiles = rt
-        .map(rt => rt.task.getIpFiles().map(parseAsAbsolutePath(_, Some(rt.workingDir.getAbsolutePath))))
+        .map(rt => rt.task.getIpFiles())
         .getOrElse(Set())
-        .map(p => new File(p))
-        .filter(f => f.exists() && f.isFile)
-      // get ip files hashes using commons-codec
-      val ipFilesHashes = ipFiles.map(f => (f, DigestUtils.sha256Hex(new FileInputStream(f))))
-      // get all hashes
-      val allHashes = KernelFileUtils.getAllCachedIpHash
-      // remove caches not in hash list
-      allHashes.filter(h => !ipFilesHashes.exists(_._2 == h)).foreach(KernelFileUtils.removeIpFileCache)
-      // update ip cache
-      ipFilesHashes.foreach(h => KernelFileUtils.updateIpFileCache(h._1, Some(h._2)))
+      KernelFileUtils.doUpdateIpFilesCache(ipFiles)
       val sources: Set[String] = rt match {
         // has runtime, get sources
         case Some(rt) => rt.task.getSourceSet() ++ rt.task.getTestSet()
@@ -55,7 +45,10 @@ object FileUtils {
         case None => defaultSources
       }
       // search cache directory to get all source files
-      val ipSources = KernelFileUtils.getAllSourceFiles(Set(KernelFileUtils.ipCacheDirectory.getAbsolutePath)).map(_.getAbsolutePath).toSet
+      val ipSources = KernelFileUtils
+        .getAllSourceFiles(Set(KernelFileUtils.ipCacheDirectory.getAbsolutePath))
+        .map(_.getAbsolutePath)
+        .toSet
       sources ++ ipSources
     }
     // may reach `pwd`

@@ -321,16 +321,17 @@ object KernelFileUtils {
     }
   }
 
-  /** Update ip cache, extract .xcix file to (cacheDir)/(file hash)
+  /** Update ip cache, extract .xcix file to (cacheDir)/(file hash). If targetDirectory exists and not empty, do nothing
     * @param ipFile ip file, simple target ip
     * @param hash optional hash, if not provided, will calculate hash from file
     */
-  def updateIpFileCache(ipFile: File, hash: Option[String] = None): Unit = {
+  def createIpFileCache(ipFile: File, hash: Option[String] = None): Unit = {
     val hashUse         = hash.getOrElse(DigestUtils.sha256Hex(new FileInputStream(ipFile)))
     val parent          = ipCacheDirectory
     val targetDirectory = new File(parent, hashUse)
-    if (targetDirectory.exists()) deleteDirectory(targetDirectory.toPath)
-    targetDirectory.mkdirs()
+    if (targetDirectory.isFile) targetDirectory.delete()
+    if (targetDirectory.isDirectory && !targetDirectory.listFiles().isEmpty) return
+    if (!targetDirectory.exists()) targetDirectory.mkdirs()
     // extract as zip file to targetDirectory
     val fileInputStream = new FileInputStream(ipFile)
     try {
@@ -366,5 +367,27 @@ object KernelFileUtils {
     } finally {
       fileInputStream.close()
     }
+  }
+
+  /** Operations to update ipFiles cache.<br/>
+    * 1. calculate ip file hash
+    * 2. remove unused cache by hash
+    * 3. update cache directory
+    * @param ipFiles ip files field in [[top.criwits.scaleda.kernel.project.config.ConfigNode]] (from `getIpFiles`)
+    * @param projectBase optional project base
+    */
+  def doUpdateIpFilesCache(ipFiles: Set[String], projectBase: Option[String] = ProjectConfig.projectBase): Unit = {
+    val ipRealFiles = ipFiles
+      .map(parseAsAbsolutePath(_, projectBase = projectBase))
+      .map(new File(_))
+      .filter(f => f.exists() && f.isFile)
+    // get ip files hashes using commons-codec
+    val ipFilesHashes = ipRealFiles.map(f => (f, DigestUtils.sha256Hex(new FileInputStream(f))))
+    // get all hashes
+    val allHashes = KernelFileUtils.getAllCachedIpHash
+    // remove caches not in hash list
+    allHashes.filter(h => !ipFilesHashes.exists(_._2 == h)).foreach(KernelFileUtils.removeIpFileCache)
+    // update ip cache
+    ipFilesHashes.foreach(h => KernelFileUtils.createIpFileCache(h._1, Some(h._2)))
   }
 }
