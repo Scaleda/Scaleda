@@ -10,20 +10,26 @@ import kernel.project.config.ProjectConfig
 import kernel.project.detect.{VivadoProjectConfig, VivadoRun}
 import kernel.utils.serialise.XMLHelper
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunManagerImpl
+import com.intellij.execution.runners.ExecutionEnvironmentBuilder
+import com.intellij.execution.{ExecutionException, Executor}
 import com.intellij.icons.AllIcons
-import com.intellij.ide.actions.runAnything.activity.RunAnythingCommandProvider
-import com.intellij.ide.{CommonActionsManager, DefaultTreeExpander}
+import com.intellij.ide.actions.runAnything.RunAnythingUtil.LOG
+import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
+import com.intellij.ide.{CommonActionsManager, DefaultTreeExpander, IdeBundle}
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.project.{DumbService, Project}
-import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.ui.{Messages, SimpleToolWindowPanel}
+import com.intellij.openapi.vfs.{VirtualFile, VirtualFileManager}
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
 import com.intellij.ui.components.JBList
 import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ColoredListCellRenderer, ListSpeedSearch, ScrollPaneFactory, TreeSpeedSearch}
+import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.ui.tree.TreeUtil
 
 import java.awt.GridLayout
@@ -213,8 +219,37 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
                   // commandLine.addParameter("-source")
                   // val handler = new KillableColoredProcessHandler(commandLine)
                   // new RunAnythingCommandExecutionProvider().execute()
-                  RunAnythingCommandProvider.runCommand(
-                    project.getWorkspaceFile,
+                  def runCommand(
+                      workDirectory: VirtualFile,
+                      commandString: String,
+                      executor: Executor,
+                      dataContext: DataContext
+                  ) = {
+                    val initialCommandLine =
+                      new GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
+                        .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+                        .withWorkDirectory(workDirectory.getPath)
+
+                    val commandLine = initialCommandLine
+                    try {
+                      val runAnythingRunProfile = new RunAnythingRunProfile(
+                        commandLine,
+                        commandString
+                      )
+                      ExecutionEnvironmentBuilder
+                        .create(project, executor, runAnythingRunProfile)
+                        .dataContext(dataContext)
+                        .buildAndExecute()
+                    } catch {
+                      case e: ExecutionException =>
+                        LOG.warn(e)
+                        Messages
+                          .showInfoMessage(project, e.getMessage, IdeBundle.message("run.anything.console.error.title"))
+                    }
+                  }
+
+                  runCommand(
+                    VirtualFileManager.getInstance().findFileByNioPath(new File(project.getBasePath).toPath),
                     "/opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl",
                     DefaultRunExecutor.getRunExecutorInstance,
                     SimpleDataContext.builder().build()
