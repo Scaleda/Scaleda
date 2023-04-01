@@ -4,11 +4,11 @@ package idea.windows.tasks
 import idea.ScaledaBundle
 import idea.runner.task.{ScaledaReloadTasksAction, ScaledaRunToolWindowTaskAction, ScaledaTaskPopupMenuAction}
 import idea.utils.{MainLogger, ProjectNow, invokeLater}
-import kernel.project.config.{ProjectConfig, TaskConfig}
+import idea.windows.tasks.ScaledaRunWindowFactory.model
+import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.ide.{CommonActionsManager, DefaultTreeExpander}
-import com.intellij.openapi.actionSystem.CommonDataKeys._
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.project.{DumbService, Project}
 import com.intellij.openapi.ui.SimpleToolWindowPanel
@@ -17,7 +17,6 @@ import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
-import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory.model
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
@@ -52,7 +51,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         model = Some(new DefaultTreeModel(null))
 
         val panel = new SimpleToolWindowPanel(true)
-        val tree = new Tree(model.get)
+        val tree  = new Tree(model.get)
 
         tree.setCellRenderer(new ScaledaRunTreeCellRenderer)
         TreeUtil.installActions(tree)
@@ -72,9 +71,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         // Double click
         tree.addMouseListener(new MouseAdapter {
           override def mousePressed(e: MouseEvent) = {
-            if (
-              e != null && e.getClickCount == 2 && e.getButton == MouseEvent.BUTTON1
-            ) {
+            if (e != null && e.getClickCount == 2 && e.getButton == MouseEvent.BUTTON1) {
               ActionManager
                 .getInstance()
                 .tryToExecute(runTaskAction, e, tree, "", true)
@@ -86,7 +83,9 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         tree.addMouseListener(new MouseAdapter {
           override def mouseClicked(e: MouseEvent): Unit = {
             if (SwingUtilities.isRightMouseButton(e)) {
-              ActionManager.getInstance().tryToExecute(new ScaledaTaskPopupMenuAction(tree, e, runTaskAction, project), e, tree, null, true)
+              ActionManager
+                .getInstance()
+                .tryToExecute(new ScaledaTaskPopupMenuAction(tree, e, runTaskAction, project), e, tree, null, true)
             }
           }
         })
@@ -110,16 +109,19 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         )
 
         group.addSeparator()
-        group.add(new ScaledaEditTasksAction)
+        // when no project config, disable edit tasks
+        if (ProjectConfig.getConfig().nonEmpty) {
+          group.add(new ScaledaEditTasksAction)
 
-        //        group.addSeparator()
-        //
-        //        val createTargetAction = new ScaledaCreateNewTargetAction(model.get, project)
-        //        group.add(createTargetAction)
-        //        val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
-        //        group.add(createTaskAction)
+          //        group.addSeparator()
+          //
+          //        val createTargetAction = new ScaledaCreateNewTargetAction(model.get, project)
+          //        group.add(createTargetAction)
+          //        val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
+          //        group.add(createTaskAction)
 
-        group.addSeparator()
+          group.addSeparator()
+        }
 
         val refreshTasksAction = new ScaledaReloadTasksAction
         group.add(refreshTasksAction)
@@ -128,7 +130,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
           .getInstance()
           .createActionToolbar("ScaledaRunToolbar", group, true)
         toolbar.setTargetComponent(tree)
-        val toolBarPanel = new JPanel(new GridLayout())
+        val toolBarPanel     = new JPanel(new GridLayout())
         val toolbarComponent = toolbar.getComponent
         require(toolbarComponent != null)
         toolBarPanel.add(toolbarComponent)
@@ -148,6 +150,7 @@ object ScaledaRunWindowFactory {
       .getConfig()
       .map(c => {
         new ScaledaRunRootNode(c)
-      }).orNull
+      })
+      .orNull
   }
 }
