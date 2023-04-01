@@ -7,12 +7,16 @@ import kernel.utils.serialise.YAMLHelper
 import verilog.parser.{VerilogParser, VerilogParserBaseVisitor}
 import verilog.utils.ModuleUtils
 
+import jtermios.JTermios.JTermiosLogging.log
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.file.DeletingPathVisitor
 
 import java.io._
+import java.net.URI
 import java.nio.file.{Files, Path}
-import java.util.zip.ZipInputStream
+import java.util
+import java.util.jar.JarFile
+import java.util.zip.{ZipEntry, ZipInputStream}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
