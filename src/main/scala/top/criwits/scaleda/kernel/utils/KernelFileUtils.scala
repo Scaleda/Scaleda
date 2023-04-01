@@ -414,44 +414,51 @@ object KernelFileUtils {
     ipFilesHashes.foreach(h => KernelFileUtils.createIpFileCache(h._1, Some(h._2)))
   }
 
+  /** Manage IP Stubs cache
+    *  @param ips collected ip info
+    * @param instances collected ip instances (context info)
+    * @param stubsCacheDir target dir (projectBase/.cache)
+    */
   def doUpdateIpStubsCache(
       ips: Map[String, ProjectConfig],
       instances: Map[String, Map[String, Any]],
       stubsCacheDir: File
   ) = {
-    val contextHashes = instances.map { case (name, context) =>
-      (name, context.hashCode().toString)
-    }
-    val existHashes = stubsCacheDir.listFiles().filter(_.isDirectory).map(_.getName).toSet
-    // (name, hash)
-    val needUpdates = contextHashes.filter { case (name, hash) =>
-      !(existHashes.contains(name) || existHashes.contains(hash))
-    }
-    val needRemove = existHashes.filter(h => !contextHashes.exists(_._2 == h))
-    // remove some cache
-    needRemove.foreach(h => {
-      val f = new File(stubsCacheDir, h)
-      if (f.exists()) {
-        if (f.isFile) f.delete()
-        else if (f.isDirectory) KernelFileUtils.deleteDirectory(f.toPath)
+    synchronized {
+      val contextHashes = instances.map { case (name, context) =>
+        (name, DigestUtils.sha256Hex(context.toString()))
       }
-    })
-    // name -> (hash, stub)
-    val stubsUpdates: Map[String, (String, String)] = ips.flatMap { case (_, ip) =>
-      instances
-        .filter(i => needUpdates.contains(i._1))
-        .get(ip.exports.get.name)
-        .map(context => (ip.exports.get.name, (needUpdates(ip.exports.get.name), ip.exports.get.renderStub(context))))
-    }
-    // write to files: (.cache)/stubs/hash/name.v
-    if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
-    stubsUpdates.foreach { case (name, (hash, stub)) =>
-      val hashFile = new File(stubsCacheDir, hash)
-      if (!hashFile.exists()) hashFile.mkdirs()
-      val stubFile = new File(hashFile, s"$name.v")
-      val writer   = new PrintWriter(stubFile)
-      writer.write(stub)
-      writer.close()
+      val existHashes = stubsCacheDir.listFiles().filter(_.isDirectory).filter(_.list().nonEmpty).map(_.getName).toSet
+      // (name, hash)
+      val needUpdates = contextHashes.filter { case (name, hash) =>
+        !(existHashes.contains(name) || existHashes.contains(hash))
+      }
+      val needRemove = existHashes.filter(h => !contextHashes.exists(_._2 == h))
+      // remove some cache
+      needRemove.foreach(h => {
+        val f = new File(stubsCacheDir, h)
+        if (f.exists()) {
+          if (f.isFile) f.delete()
+          else if (f.isDirectory) KernelFileUtils.deleteDirectory(f.toPath)
+        }
+      })
+      // name -> (hash, stub)
+      val stubsUpdates: Map[String, (String, String)] = ips.flatMap { case (_, ip) =>
+        instances
+          .filter(i => needUpdates.contains(i._1))
+          .get(ip.exports.get.name)
+          .map(context => (ip.exports.get.name, (needUpdates(ip.exports.get.name), ip.exports.get.renderStub(context))))
+      }
+      // write to files: (.cache)/stubs/hash/name.v
+      if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
+      stubsUpdates.foreach { case (name, (hash, stub)) =>
+        val hashFile = new File(stubsCacheDir, hash)
+        if (!hashFile.exists()) hashFile.mkdirs()
+        val stubFile = new File(hashFile, s"$name.v")
+        val writer   = new PrintWriter(stubFile)
+        writer.write(stub)
+        writer.close()
+      }
     }
   }
 }
