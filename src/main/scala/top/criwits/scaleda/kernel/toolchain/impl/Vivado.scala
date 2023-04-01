@@ -324,9 +324,7 @@ object Vivado
     val unsupportedIpInstances = ipInstances.filter(i => {
       val ipFound = ips.find(_._2.exports.get.name == i._1)
       val targetSupports: Map[String, Seq[String]] =
-        ipFound.map(ip => ip._2.exports.get.supports).getOrElse(Map()) ++ ipFound
-          .map(ip => Map(ip._2.exports.get.vendor -> Seq("all")))
-          .getOrElse(Map())
+        ipFound.map(ip => ip._2.exports.get.getSupports).getOrElse(Map())
       val targetAction = Set("all") ++ (rt.executor match {
         case _: SimulationExecutor  => Set("simulation")
         case _: SynthesisExecutor   => Set("synthesis")
