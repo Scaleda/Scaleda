@@ -382,8 +382,6 @@ object Vivado
       })
       .flatten
       .toSeq
-    val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
-    templateRenderer.render()
     if (rt.profile.isRemoteProfile) {
       // remove old vivado project if exists and only for remote
       val top = rt.task.findTopModule.getOrElse("NONE")
@@ -410,6 +408,9 @@ object Vivado
       case TaskType.Implement   => "run_impl.tcl"
       case TaskType.Programming => "run_program.tcl"
     })))
+    val useContext = Serialization.getCCParams(templateContext)
+    val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
+    templateRenderer.render(useContext = useContext)
     Some(rt)
   }
 

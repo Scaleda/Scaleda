@@ -65,7 +65,7 @@ object Template {
 }
 
 trait TemplateRenderer {
-  def render(): Unit
+  def render(useContext: Map[String, Any] = Map()): Unit
 }
 
 abstract class ResourceTemplateRender(resourceBase: String, targetBase: String, resources: Map[String, String])(implicit
@@ -73,9 +73,9 @@ abstract class ResourceTemplateRender(resourceBase: String, targetBase: String, 
 ) extends TemplateRenderer {
   def context: Map[String, Any]
 
-  override def render(): Unit =
+  override def render(useContext: Map[String, Any] = Map()): Unit =
     resources
       .map(f => (s"${resourceBase}/${f._1}", s"${targetBase}/${f._2}"))
-      .foreach(f => Template.renderResourceTo(f._1, context, f._2)(replace))
+      .foreach(f => Template.renderResourceTo(f._1, (if (useContext.isEmpty) context else useContext), f._2)(replace))
 
 }
