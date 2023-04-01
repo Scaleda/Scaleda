@@ -321,7 +321,7 @@ object Vivado
     }
     val ips         = rt.task.getAllIps()
     val ipInstances = rt.task.getIpInstances()
-    val unsupportedIpInstances = ipInstances.filter(i => {
+    val unsupportedIpInstances = ipInstances.filterNot(i => {
       val ipFound = ips.find(_._2.exports.get.name == i._1)
       val targetSupports: Map[String, Seq[String]] =
         ipFound.map(ip => ip._2.exports.get.getSupports).getOrElse(Map())
@@ -343,8 +343,8 @@ object Vivado
           }
         }
       }
-      if (!(doTestVendor(Vivado.internalID) || doTestVendor("generic"))) {
-        false
+      if (doTestVendor(Vivado.internalID) || doTestVendor("generic")) {
+        true
       } else ipFound.nonEmpty
     })
     if (unsupportedIpInstances.nonEmpty) {
