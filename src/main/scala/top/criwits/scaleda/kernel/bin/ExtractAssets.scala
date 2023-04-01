@@ -35,32 +35,11 @@ object ExtractAssets {
   // install resources in resources/install -> .scaleda/*
   def install() = {
     val parent = Paths.getGlobalConfigDir
-    // // Test为当前类名// Test为当前类名
-    //
-    // var uri = classOf[Nothing].getProtectionDomain.getCodeSource.getLocation.toURI
-    // // tempPath: 文件保存路径
-    // val tempPath  = parent
-    // val sourceDir = "template" //资源文件夹
-    //
-    // if (uri.toString.startsWith("file")) {
-    //   // IDEA运行时，进行资源复制
-    //
-    // } else {
-    //   // 获取jar包所在路径
-    //   val jarPath = uri.toString
-    //   uri = URI.create(jarPath.substring(jarPath.indexOf("file:"), jarPath.indexOf(".jar") + 4))
-    //   // 打成jar包后，进行资源复制
-    //   copyJarResourcesFileToTemp(uri, tempPath.getAbsolutePath, "BOOT-INF/classes/" + sourceDir)
-    // }
-
-    // val dirs  = Seq("scripts")
     val files = Seq("scripts/vivado_call.tcl")
-    // dirs.foreach(d => new File(parent, d).mkdirs())
     files.foreach(f => {
       val file = new File(parent, f)
       file.getParentFile.mkdirs()
       if (!(file.exists() && file.length() > 1)) {
-        // file.createNewFile()
         val resourceStream   = getClass.getClassLoader.getResourceAsStream("install/" + f)
         val fileOutputStream = new FileOutputStream(file)
         fileOutputStream.write(resourceStream.readAllBytes())

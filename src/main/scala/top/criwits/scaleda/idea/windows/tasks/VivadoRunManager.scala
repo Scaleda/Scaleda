@@ -5,6 +5,9 @@ import idea.runner.SimpleCommandRunner
 import idea.utils.MainLogger
 import idea.windows.tasks.ScaledaRunWindowFactory.{vivadoModel, vivadoProject}
 import kernel.project.detect.{VivadoProjectConfig, VivadoRun}
+import kernel.toolchain.Toolchain
+import kernel.toolchain.impl.Vivado
+import kernel.utils.Paths
 import kernel.utils.serialise.XMLHelper
 
 import com.intellij.execution.impl.RunManagerImpl
@@ -74,11 +77,20 @@ object VivadoRunManager {
             if (item == null) return
             val id = item.Id
 
-            SimpleCommandRunner.runCommand(
-              project,
-              VirtualFileManager.getInstance().findFileByNioPath(new File(project.getBasePath).toPath),
-              s"/opt/Xilinx/Vivado/2019.2/bin/vivado -mode batch -source /home/chiro/programs/scaleda/src/main/resources/bin/vivado_call.tcl -tclargs ${xprFile.getAbsolutePath} ${id}"
-            )
+            Toolchain
+              .profiles()
+              .find(_.toolchainType == Vivado.internalID)
+              .map(_.path)
+              .map(vivadoPath => {
+                SimpleCommandRunner.runCommand(
+                  project,
+                  VirtualFileManager.getInstance().findFileByNioPath(new File(project.getBasePath).toPath),
+                  s"${Vivado.getVivadoExec(vivadoPath)} -mode batch -source ${Paths.getGlobalConfigDir}/scripts/vivado_call.tcl -tclargs ${xprFile.getAbsolutePath} ${id}"
+                )
+              })
+              .getOrElse({
+                MainLogger.warn("cannot find vivado path")
+              })
           }
         }
         val runTaskAction =
