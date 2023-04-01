@@ -58,26 +58,24 @@ abstract class ConfigNode() {
     * @return sources in absolute path
     */
   @JsonIgnore
-  def getSourceSet(projectBase: Option[String] = None): Set[String] = {
-    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
+  def getSourceSet(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Set[String] = {
     (parentNode match {
-      case Some(parent) => parent.getSourceSet(projectBase = base)
+      case Some(parent) => parent.getSourceSet(projectBase = projectBase)
       case None         => Set()
-    }) ++ (if (source.nonEmpty) Set(parseAsAbsolutePath(source, projectBase = base)) else Set()) ++
-      sources.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
+    }) ++ (if (source.nonEmpty) Set(parseAsAbsolutePath(source, projectBase = projectBase)) else Set()) ++
+      sources.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = projectBase))
   }
 
   /** Get testbench source set. Default is project base.
     * @return testbench in absolute path
     */
   @JsonIgnore
-  def getTestSet(projectBase: Option[String] = None): Set[String] = {
-    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
+  def getTestSet(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Set[String] = {
     (parentNode match {
-      case Some(parent) => parent.getTestSet(projectBase = base)
+      case Some(parent) => parent.getTestSet(projectBase = projectBase)
       case None         => Set()
-    }) ++ (if (test.nonEmpty) Set(parseAsAbsolutePath(test, projectBase = base)) else Set()) ++
-      tests.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base)) ++
+    }) ++ (if (test.nonEmpty) Set(parseAsAbsolutePath(test, projectBase = projectBase)) else Set()) ++
+      tests.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = projectBase)) ++
       getSourceSet(projectBase = projectBase)
   }
 
@@ -85,34 +83,31 @@ abstract class ConfigNode() {
     * @return simple target ip files or search path in absolute path
     */
   @JsonIgnore
-  def getIpFiles(projectBase: Option[String] = None): Set[String] = {
-    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
+  def getIpFiles(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Set[String] = {
     (parentNode match {
-      case Some(parent) => parent.getIpFiles(projectBase = base)
+      case Some(parent) => parent.getIpFiles(projectBase = projectBase)
       case None         => Set()
-    }) ++ ipFiles.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
+    }) ++ ipFiles.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = projectBase))
   }
 
   /** Get Scaleda IP search path, including basic paths: .ip, ip, ips
     * @return ip search paths
     */
   @JsonIgnore
-  def getIpPaths(projectBase: Option[String] = None): Set[String] = {
-    val base       = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
-    val basicPaths = ProjectConfig.projectIpPaths(projectBase = base)
+  def getIpPaths(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Set[String] = {
+    val basicPaths = ProjectConfig.projectIpPaths(projectBase = projectBase)
     basicPaths.map(_.getAbsolutePath) ++ (parentNode match {
-      case Some(parent) => parent.getIpPaths(projectBase = base)
+      case Some(parent) => parent.getIpPaths(projectBase = projectBase)
       case None         => Set()
-    }) ++ ipPaths.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = base))
+    }) ++ ipPaths.filter(_.nonEmpty).map(parseAsAbsolutePath(_, projectBase = projectBase))
   }
 
   /** Get defined Scaleda IP in this project, but not recursively from other IPs
     * @return map of ip abs-path and [[ProjectConfig]]
     */
   @JsonIgnore
-  def getLocalIps(projectBase: Option[String] = None): Map[String, ProjectConfig] = {
-    val base  = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
-    val paths = getIpPaths(projectBase = base)
+  def getLocalIps(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Map[String, ProjectConfig] = {
+    val paths = getIpPaths(projectBase = projectBase)
     // search just one layer: .ips/<ip name>
     paths
       .map(new File(_))
@@ -126,10 +121,9 @@ abstract class ConfigNode() {
     * @return map of ip abs-path and [[ProjectConfig]]
     */
   @JsonIgnore
-  def getAllIps(projectBase: Option[String] = None): Map[String, ProjectConfig] = {
+  def getAllIps(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Map[String, ProjectConfig] = {
     // base of this current project
-    val base     = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
-    val localIps = getLocalIps(projectBase = base)
+    val localIps = getLocalIps(projectBase = projectBase)
     // BFS Search
     val q = mutable.Queue.empty[(String, ProjectConfig)]
     q ++= localIps
@@ -152,10 +146,9 @@ abstract class ConfigNode() {
     * @return name and context
     */
   @JsonIgnore
-  def getIpInstances(projectBase: Option[String] = None): Map[String, Map[String, Any]] = {
-    val base = if (projectBase.nonEmpty) projectBase else ProjectConfig.projectBase
+  def getIpInstances(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Map[String, Map[String, Any]] = {
     ((parentNode match {
-      case Some(parent) => parent.getIpInstances(projectBase = base)
+      case Some(parent) => parent.getIpInstances(projectBase = projectBase)
       case None         => Map()
     }) ++ ips).toMap
   }

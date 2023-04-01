@@ -98,7 +98,7 @@ object RpcService {
           var virtualFile = new LocalFilePath(info.filepath, false).getVirtualFile
           if (virtualFile == null)
             virtualFile = new LocalFilePath(
-              new File(project.getProjectFilePath, info.filepath).getAbsolutePath,
+              new File(project.getBasePath, info.filepath).getAbsolutePath,
               false
             ).getVirtualFile
           if (virtualFile == null) {

@@ -321,7 +321,7 @@ object Vivado
     }
     val ips         = rt.task.getAllIps()
     val ipInstances = rt.task.getIpInstances()
-    val unsupportedIpInstances = ipInstances.filter(i => {
+    val unsupportedIpInstances = ipInstances.filterNot(i => {
       val ipFound = ips.find(_._2.exports.get.name == i._1)
       val targetSupports: Map[String, Seq[String]] =
         ipFound.map(ip => ip._2.exports.get.getSupports).getOrElse(Map())
@@ -343,8 +343,8 @@ object Vivado
           }
         }
       }
-      if (!(doTestVendor(Vivado.internalID) || doTestVendor("generic"))) {
-        false
+      if (doTestVendor(Vivado.internalID) || doTestVendor("generic")) {
+        true
       } else ipFound.nonEmpty
     })
     if (unsupportedIpInstances.nonEmpty) {
@@ -382,8 +382,6 @@ object Vivado
       })
       .flatten
       .toSeq
-    val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
-    templateRenderer.render()
     if (rt.profile.isRemoteProfile) {
       // remove old vivado project if exists and only for remote
       val top = rt.task.findTopModule.getOrElse("NONE")
@@ -410,6 +408,9 @@ object Vivado
       case TaskType.Implement   => "run_impl.tcl"
       case TaskType.Programming => "run_program.tcl"
     })))
+    val useContext = Serialization.getCCParams(templateContext)
+    val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
+    templateRenderer.render(useContext = useContext)
     Some(rt)
   }
 

@@ -110,5 +110,5 @@ case class ExportConfig(
     *         }
     */
   @JsonIgnore
-  def getSupports: Map[String, Seq[String]] = Map(vendor -> Seq("all")) ++ supports
+  def getSupports: Map[String, Seq[String]] = Map((if (vendor.nonEmpty) vendor else "generic") -> Seq("all")) ++ supports
 }
