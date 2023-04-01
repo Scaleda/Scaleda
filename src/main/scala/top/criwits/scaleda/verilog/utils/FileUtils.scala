@@ -58,7 +58,7 @@ object FileUtils {
       //   ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
       // }
       // save these stubs to .cache/stubs/name.v
-      val stubsCacheDir               = new File(KernelFileUtils.ipCacheDirectory, "stubs")
+      val stubsCacheDir = new File(KernelFileUtils.ipCacheDirectory, "stubs")
       KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
       val ipStubsSources: Set[String] =
         // KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir).map(_.getAbsolutePath)
@@ -107,19 +107,27 @@ object FileUtils {
         }
       }
     })
-    // search and append files from sourceDirectories
-    sourceDirectories.foreach(f => {
-      val d = LocalFileSystem.getInstance().findFileByIoFile(f)
-      if (d != null) {
-        val v = PsiTreeUtil
-          .findChildrenOfAnyType(
-            psiManager.findDirectory(d),
-            classOf[VerilogPSIFileRoot]
-          )
-          .asScala
-        result ++= v
-      }
-    })
+    def doParseDir(dirs: Set[File]) = {
+      // search and append files from sourceDirectories
+      dirs.foreach(f => {
+        val d = LocalFileSystem.getInstance().findFileByIoFile(f)
+        if (d != null) {
+          val v = PsiTreeUtil
+            .findChildrenOfAnyType(
+              psiManager.findDirectory(d),
+              classOf[VerilogPSIFileRoot]
+            )
+            .asScala
+          result ++= v
+        }
+      })
+    }
+    doParseDir(sourceDirectories)
+    if (result.isEmpty) {
+      // cannot get any sources, try to load all sources from project base
+      if (project.getProjectFile.isInLocalFileSystem)
+        doParseDir(Set(new File(project.getBasePath)))
+    }
     result.toList
   }
 

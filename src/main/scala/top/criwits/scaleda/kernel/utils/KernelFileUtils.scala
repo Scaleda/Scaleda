@@ -428,7 +428,18 @@ object KernelFileUtils {
       val contextHashes = instances.map { case (name, context) =>
         (name, DigestUtils.sha256Hex(context.toString()))
       }
-      val existHashes = stubsCacheDir.listFiles().filter(_.isDirectory).filter(_.list().nonEmpty).map(_.getName).toSet
+      if (stubsCacheDir.exists() && stubsCacheDir.isFile) stubsCacheDir.delete()
+      if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
+      val list = stubsCacheDir.listFiles()
+      val existHashes =
+        if (list != null)
+          list
+            .filter(_.exists())
+            .filter(_.isDirectory)
+            .filter(_.list().nonEmpty)
+            .map(_.getName)
+            .toSet
+        else Set[String]()
       // (name, hash)
       val needUpdates = contextHashes.filter { case (name, hash) =>
         !(existHashes.contains(name) || existHashes.contains(hash))
