@@ -125,7 +125,7 @@ object FileUtils {
     doParseDir(sourceDirectories)
     if (result.isEmpty) {
       // cannot get any sources, try to load all sources from project base
-      if (project.getProjectFile.isInLocalFileSystem)
+      if (project.getProjectFile != null && project.getProjectFile.isInLocalFileSystem)
         doParseDir(Set(new File(project.getBasePath)))
     }
     result.toList
