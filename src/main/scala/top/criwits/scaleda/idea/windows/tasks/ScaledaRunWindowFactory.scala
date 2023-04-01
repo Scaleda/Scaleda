@@ -250,7 +250,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
                   runCommand(
                     VirtualFileManager.getInstance().findFileByNioPath(new File(project.getBasePath).toPath),
-                    "/opt/Xilinx/Vivado/2019.2/bin/vivado -mode tcl",
+                    s"/opt/Xilinx/Vivado/2019.2/bin/vivado -mode batch -source /home/chiro/programs/scaleda/src/main/resources/bin/vivado_call.tcl -tclargs ${xprFile.getAbsolutePath} ${id}",
                     DefaultRunExecutor.getRunExecutorInstance,
                     SimpleDataContext.builder().build()
                   )
