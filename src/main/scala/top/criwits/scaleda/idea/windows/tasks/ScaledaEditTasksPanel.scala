@@ -77,7 +77,7 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
       node.parent = Some(rootNode.head)
       scaledaRunRootNode.targets.append(node)
 
-      model.reload()
+      model.nodesWereInserted(scaledaRunRootNode, Array(scaledaRunRootNode.getIndex(node)))
       tree.setSelectionPath(node.toTreePath)
     }
     if (targetNode.nonEmpty) {
@@ -86,7 +86,7 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
       node.parent = Some(targetNode.head)
       targetNode.head.tasks.append(node)
 
-      model.reload()
+      model.nodesWereInserted(targetNode.head, Array(targetNode.head.getIndex(node)))
       tree.setSelectionPath(node.toTreePath)
     }
     if (taskNode.nonEmpty) {
@@ -95,7 +95,7 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
       node.parent = Some(taskNode.head.getParent.asInstanceOf[ScaledaRunTargetNode])
       taskNode.head.parent.get.tasks.append(node) // can it work?
 
-      model.reload()
+      model.nodesWereInserted(taskNode.head.getParent, Array(taskNode.head.getParent.getIndex(node)))
       tree.setSelectionPath(node.toTreePath)
     }
 
@@ -113,6 +113,7 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
       val proj   = target.parent.get
       val idx    = proj.targets.indexOf(target)
       proj.targets.remove(idx)
+      model.nodesWereRemoved(proj, Array(idx), Array(target))
     }
 
     if (taskNode.nonEmpty) {
@@ -120,9 +121,8 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
       val target = task.parent.get
       val idx    = target.tasks.indexOf(task)
       target.tasks.remove(idx)
+      model.nodesWereRemoved(target, Array(idx), Array(task))
     }
-
-    model.reload()
   }
 
   private def updateOK: Unit = {
