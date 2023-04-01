@@ -42,14 +42,30 @@ object FileUtils {
     val sources = synchronized {
       // get ALL Scaleda IPs
       val ips: Map[String, ProjectConfig] = rt
-        .map(_.task.getAllIps())
+        .map(_.task.getAllIps().filter(_._2.exports.nonEmpty))
         .getOrElse(Map())
       // collects single file ip, in this project and every Scaleda IP
-      val singleFileIps = rt
-        .map(rt => rt.task.getIpFiles())
-        .getOrElse(Set()) ++
-        ips.map(p => p._2.getIpFiles(projectBase = Some(p._1))).foldLeft(Set[String]())(_ ++ _)
-      KernelFileUtils.doUpdateIpFilesCache(singleFileIps)
+      // val singleFileIps = rt
+      //   .map(rt => rt.task.getIpFiles())
+      //   .getOrElse(Set()) ++
+      //   ips.map(p => p._2.getIpFiles(projectBase = Some(p._1))).foldLeft(Set[String]())(_ ++ _)
+      // KernelFileUtils.doUpdateIpFilesCache(singleFileIps)
+      // collect Scaleda IPs and make stubs from ip instances
+      val ipInstances: Map[String, Map[String, Any]] = rt
+        .map(rt => rt.task.getIpInstances().map(t => (t._1, if (t._2 == null) Map[String, Any]() else t._2)))
+        .getOrElse(Map())
+      // val stubs: Map[String, String] = ips.flatMap { case (_, ip) =>
+      //   ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
+      // }
+      // save these stubs to .cache/stubs/name.v
+      val stubsCacheDir               = new File(KernelFileUtils.ipCacheDirectory, "stubs")
+      KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
+      val ipStubsSources: Set[String] =
+        // KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir).map(_.getAbsolutePath)
+        KernelFileUtils
+          .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
+          .map(_.getAbsolutePath)
+          .toSet
       // source set of this project
       val sources: Set[String] = rt match {
         // has runtime, get sources
@@ -64,11 +80,11 @@ object FileUtils {
         })
         .toSet
       // search cache directory to get all source files
-      val ipFileSources: Set[String] = KernelFileUtils
-        .getAllSourceFiles(Set(KernelFileUtils.ipCacheDirectory.getAbsolutePath))
-        .map(_.getAbsolutePath)
-        .toSet
-      sources ++ ipSources ++ ipFileSources
+      // val ipStubsSources: Set[String] = KernelFileUtils
+      //   .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
+      //   .map(_.getAbsolutePath)
+      //   .toSet
+      sources ++ ipSources ++ ipStubsSources
     }
     // may reach `pwd`
     // TODO: apply file search paths... example: a.v => test/a.v
@@ -80,21 +96,29 @@ object FileUtils {
     // append files from sourceRegularFiles
     val psiManager = PsiManager.getInstance(project)
     sourceRegularFiles.foreach(f => {
-      val foundFile = psiManager.findFile(LocalFileSystem.getInstance().findFileByIoFile(f))
-      foundFile match {
-        case f: VerilogPSIFileRoot => result += f
-        case _                     =>
+      if (f != null) {
+        val d = LocalFileSystem.getInstance().findFileByIoFile(f)
+        if (d != null) {
+          val foundFile = psiManager.findFile(d)
+          foundFile match {
+            case f: VerilogPSIFileRoot => result += f
+            case _                     =>
+          }
+        }
       }
     })
     // search and append files from sourceDirectories
     sourceDirectories.foreach(f => {
-      val v = PsiTreeUtil
-        .findChildrenOfAnyType(
-          psiManager.findDirectory(LocalFileSystem.getInstance().findFileByIoFile(f)),
-          classOf[VerilogPSIFileRoot]
-        )
-        .asScala
-      result ++= v
+      val d = LocalFileSystem.getInstance().findFileByIoFile(f)
+      if (d != null) {
+        val v = PsiTreeUtil
+          .findChildrenOfAnyType(
+            psiManager.findDirectory(d),
+            classOf[VerilogPSIFileRoot]
+          )
+          .asScala
+        result ++= v
+      }
     })
     result.toList
   }
