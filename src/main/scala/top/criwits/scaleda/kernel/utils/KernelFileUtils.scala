@@ -271,11 +271,25 @@ object KernelFileUtils {
     else true
   }
 
+  def parseIpParentDirectory(path: File): Map[String, ProjectConfig] = {
+    if (path.exists() && path.isDirectory) {
+      val list = path.listFiles()
+      if (list != null) {
+        list
+          .filter(_.isDirectory)
+          .map(p => (p, parseIpInDirectory(p)))
+          .filter(_._2.nonEmpty)
+          .map(p => (p._1.getAbsolutePath, p._2.get))
+          .toMap
+      } else Map()
+    } else Map()
+  }
+
   /** Get [[ProjectConfig]] from IP directory
     * @param path ip path
     * @return optional [[ProjectConfig]]
     */
-  def parseIpDirectory(path: File): Option[ProjectConfig] = {
+  def parseIpInDirectory(path: File): Option[ProjectConfig] = {
     val list = path
       .listFiles(new FilenameFilter {
         override def accept(file: File, s: String) = s == ProjectConfig.defaultConfigFile
@@ -292,7 +306,9 @@ object KernelFileUtils {
             if (projectConfig.exports.nonEmpty) Some(projectConfig)
             else None
           } catch {
-            case e: Throwable => None
+            case e: Throwable =>
+              KernelLogger.warn("parse IP failed:", e)
+              None
           }
         } else None
       })
@@ -396,5 +412,46 @@ object KernelFileUtils {
     allHashes.filter(h => !ipFilesHashes.exists(_._2 == h)).foreach(KernelFileUtils.removeIpFileCache)
     // update ip cache
     ipFilesHashes.foreach(h => KernelFileUtils.createIpFileCache(h._1, Some(h._2)))
+  }
+
+  def doUpdateIpStubsCache(
+      ips: Map[String, ProjectConfig],
+      instances: Map[String, Map[String, Any]],
+      stubsCacheDir: File
+  ) = {
+    val contextHashes = instances.map { case (name, context) =>
+      (name, context.hashCode().toString)
+    }
+    val existHashes = stubsCacheDir.listFiles().filter(_.isDirectory).map(_.getName).toSet
+    // (name, hash)
+    val needUpdates = contextHashes.filter { case (name, hash) =>
+      !(existHashes.contains(name) || existHashes.contains(hash))
+    }
+    val needRemove = existHashes.filter(h => !contextHashes.exists(_._2 == h))
+    // remove some cache
+    needRemove.foreach(h => {
+      val f = new File(stubsCacheDir, h)
+      if (f.exists()) {
+        if (f.isFile) f.delete()
+        else if (f.isDirectory) KernelFileUtils.deleteDirectory(f.toPath)
+      }
+    })
+    // name -> (hash, stub)
+    val stubsUpdates: Map[String, (String, String)] = ips.flatMap { case (_, ip) =>
+      instances
+        .filter(i => needUpdates.contains(i._1))
+        .get(ip.exports.get.name)
+        .map(context => (ip.exports.get.name, (needUpdates(ip.exports.get.name), ip.exports.get.renderStub(context))))
+    }
+    // write to files: (.cache)/stubs/hash/name.v
+    if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
+    stubsUpdates.foreach { case (name, (hash, stub)) =>
+      val hashFile = new File(stubsCacheDir, hash)
+      if (!hashFile.exists()) hashFile.mkdirs()
+      val stubFile = new File(hashFile, s"$name.v")
+      val writer   = new PrintWriter(stubFile)
+      writer.write(stub)
+      writer.close()
+    }
   }
 }

@@ -1,12 +1,12 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import kernel.utils.KernelLogger
+import kernel.project.ip.ExportConfig
 import kernel.utils.serialise.{JSONHelper, YAMLHelper}
+import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import top.criwits.scaleda.kernel.project.ip.ExportConfig
 
 import java.io.File
 
@@ -34,7 +34,9 @@ case class ProjectConfig(
     constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array(),
     override val ipFiles: Seq[String] = Seq(),
-    exports: Option[ExportConfig] = None
+    override val ipPaths: Seq[String] = Seq(),
+    exports: Option[ExportConfig] = None,
+    override val ips: Map[String, Map[String, Any]] = Map()
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))
@@ -79,7 +81,8 @@ case class ProjectConfig(
   def headTask = targets.headOption.flatMap(t => t.tasks.headOption)
 
   def headTargetTask =
-    targets.headOption.map(target => (target, target.tasks.headOption))
+    targets.headOption
+      .map(target => (target, target.tasks.headOption))
       .filter(_._2.nonEmpty)
       .map(f => (f._1, f._2.get))
 }
@@ -117,4 +120,14 @@ object ProjectConfig {
     YAMLHelper(projectConfig, targetFile)
   }
 
+  def libraryIpPaths: Set[File] = Set(Paths.getIpDir)
+
+  def projectIpPaths(projectBase: Option[String] = ProjectConfig.projectBase): Set[File] =
+    Set(".ip", "ip", "ips").map(p => new File(projectBase.getOrElse(ProjectConfig.projectBase.get), p))
+
+  def libraryIps: Map[String, ProjectConfig] =
+    libraryIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
+
+  def projectBasicIps(projectBase: Option[String] = ProjectConfig.projectBase): Map[String, ProjectConfig] =
+    projectIpPaths(projectBase = projectBase).flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
 }
