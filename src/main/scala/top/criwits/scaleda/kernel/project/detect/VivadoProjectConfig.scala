@@ -52,12 +52,46 @@ class FileSet {
   @JacksonXmlElementWrapper(localName = "File")
   var files: Seq[FileData] = Seq()
 }
+@JsonIgnoreProperties(
+  Array(
+    "Strategy",
+    "GeneratedRun",
+    "ReportStrategy",
+    "Report",
+    "RQSFiles",
+    "SynthRun",
+    "GenFullBitstream"
+  )
+)
+class VivadoRun {
+  @JacksonXmlProperty(isAttribute = true)
+  var Id = ""
+  @JacksonXmlProperty(isAttribute = true)
+  var Type = ""
+  @JacksonXmlProperty(isAttribute = true)
+  var SrcSet = "sources_1"
+  @JacksonXmlProperty(isAttribute = true)
+  var Part = ""
+  @JacksonXmlProperty(isAttribute = true)
+  var ConstrsSet = "constrs_1"
+  @JacksonXmlProperty(isAttribute = true)
+  var Description = ""
+  @JacksonXmlProperty(isAttribute = true)
+  var AutoIncrementalCheckpoint = "false"
+  @JacksonXmlProperty(isAttribute = true)
+  var WriteIncrSynthDcp = "false"
+  @JacksonXmlProperty(isAttribute = true)
+  var State = "current"
+  @JacksonXmlProperty(isAttribute = true)
+  var IncludeInArchive = "true"
+  @JacksonXmlProperty(isAttribute = true)
+  var Dir = "true"
+}
 
 @JsonIgnoreProperties(
   Array(
     "DefaultLaunch",
     "Simulators",
-    "Runs", // TODO
     "Board",
     "DashboardSummary" // TODO
   )
@@ -80,4 +114,7 @@ class VivadoProjectConfig {
 
   @JacksonXmlProperty(localName = "FileSets")
   var fileSets: Seq[FileSet] = Seq()
+
+  @JacksonXmlProperty(localName = "Runs")
+  var runs: Seq[VivadoRun] = Seq()
 }
