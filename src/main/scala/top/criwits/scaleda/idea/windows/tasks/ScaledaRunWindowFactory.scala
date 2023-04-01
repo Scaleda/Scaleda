@@ -17,6 +17,8 @@ import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
+import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory.model
+import top.criwits.scaleda.idea.windows.tasks.ip.ScaledaIPManageAction
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
@@ -109,19 +111,17 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         )
 
         group.addSeparator()
-        // when no project config, disable edit tasks
-        if (ProjectConfig.getConfig().nonEmpty) {
-          group.add(new ScaledaEditTasksAction)
+        group.add(new ScaledaEditTasksAction)
+        group.add(new ScaledaIPManageAction)
 
-          //        group.addSeparator()
-          //
-          //        val createTargetAction = new ScaledaCreateNewTargetAction(model.get, project)
-          //        group.add(createTargetAction)
-          //        val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
-          //        group.add(createTaskAction)
+        //        group.addSeparator()
+        //
+        //        val createTargetAction = new ScaledaCreateNewTargetAction(model.get, project)
+        //        group.add(createTargetAction)
+        //        val createTaskAction = new ScaledaCreateNewTaskAction(tree, project)
+        //        group.add(createTaskAction)
 
-          group.addSeparator()
-        }
+        group.addSeparator()
 
         val refreshTasksAction = new ScaledaReloadTasksAction
         group.add(refreshTasksAction)
