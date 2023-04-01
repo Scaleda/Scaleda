@@ -11,7 +11,7 @@ import kernel.project.importer.VivadoTargetParser
 import kernel.shell.ScaledaRunHandlerToArray
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.template.{ResourceTemplateRender, Template}
-import kernel.toolchain.executor.{Executor, ImplementExecutor, SimulationExecutor, SynthesisExecutor}
+import kernel.toolchain.executor._
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile, ToolchainProfileDetector}
 import kernel.utils._
 
@@ -172,7 +172,7 @@ object Vivado
     val targetAction = Set("all") ++ (if (sim) Set("simulation")
                                       else if (synth) Set("synthesis")
                                       else if (impl) Set("implementation")
-                                      else Set(""))
+                                      else Set())
     val ipTclSections = ips
       .map(ip => {
         val actions = ip._2.exports.get.actions
@@ -327,12 +327,27 @@ object Vivado
         ipFound.map(ip => ip._2.exports.get.supports).getOrElse(Map()) ++ ipFound
           .map(ip => Map(ip._2.exports.get.vendor -> Seq("all")))
           .getOrElse(Map())
-      if (targetSupports.contains(Vivado.internalID)) {
-
-      } else {
-        // see if is generic
+      val targetAction = Set("all") ++ (rt.executor match {
+        case _: SimulationExecutor  => Set("simulation")
+        case _: SynthesisExecutor   => Set("synthesis")
+        case _: ImplementExecutor   => Set("implement")
+        case _: ProgrammingExecutor => Set("programming")
+        case _                      => Set()
+      })
+      def doTestVendor(vendor: String): Boolean = {
+        if (!targetSupports.contains(vendor)) {
+          false
+        } else {
+          if (targetSupports(vendor).contains("all")) {
+            true
+          } else {
+            targetAction.intersect(targetSupports(vendor).toSet).nonEmpty
+          }
+        }
       }
-      ipFound.nonEmpty
+      if (!(doTestVendor(Vivado.internalID) || doTestVendor("generic"))) {
+        false
+      } else ipFound.nonEmpty
     })
     if (unsupportedIpInstances.nonEmpty) {
       KernelLogger.warn(
