@@ -13,12 +13,12 @@ import java.awt.Dimension
 import javax.swing.event.ListSelectionEvent
 import javax.swing.{JComponent, JPanel, ListSelectionModel}
 
-class ScaledaChooseIPDialog(project: Project, ips: Seq[IP]) extends DialogWrapper(project) {
+class ScaledaChooseIPDialog(project: Project, ips: Iterable[IP]) extends DialogWrapper(project) {
 
   private val myTable      = new TableView[IP]
   private val myTableModel = new IPTableModel
 
-  private var mySelectedIP: Option[IP] = None
+  var mySelectedIP: Option[IP] = None
 
   locally {
     setTitle(ScaledaBundle.message("windows.ip.choose.title"))

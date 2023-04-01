@@ -19,7 +19,7 @@ class ScaledaIPManagerDialog(project: Project) extends DialogWrapper(project) {
   var mainPanel: ScaledaIPManagerPanel = _
 
   override def createCenterPanel(): JComponent = {
-    if (mainPanel == null) mainPanel = new ScaledaIPManagerPanel
+    if (mainPanel == null) mainPanel = new ScaledaIPManagerPanel(project)
     mainPanel
   }
 

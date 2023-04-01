@@ -18,6 +18,7 @@ import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
 import com.intellij.util.ui.tree.TreeUtil
 import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory.model
+import top.criwits.scaleda.idea.windows.tasks.ip.ScaledaIPManageAction
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
@@ -111,6 +112,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
         group.addSeparator()
         group.add(new ScaledaEditTasksAction)
+        group.add(new ScaledaIPManageAction)
 
         //        group.addSeparator()
         //
