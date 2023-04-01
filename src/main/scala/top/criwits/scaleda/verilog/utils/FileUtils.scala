@@ -13,7 +13,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.jdk.javaapi.CollectionConverters
@@ -42,14 +42,31 @@ object FileUtils {
     val sources = synchronized {
       // get ALL Scaleda IPs
       val ips: Map[String, ProjectConfig] = rt
-        .map(_.task.getAllIps())
+        .map(_.task.getAllIps().filter(_._2.exports.nonEmpty))
         .getOrElse(Map())
       // collects single file ip, in this project and every Scaleda IP
-      val singleFileIps = rt
-        .map(rt => rt.task.getIpFiles())
-        .getOrElse(Set()) ++
-        ips.map(p => p._2.getIpFiles(projectBase = Some(p._1))).foldLeft(Set[String]())(_ ++ _)
-      KernelFileUtils.doUpdateIpFilesCache(singleFileIps)
+      // val singleFileIps = rt
+      //   .map(rt => rt.task.getIpFiles())
+      //   .getOrElse(Set()) ++
+      //   ips.map(p => p._2.getIpFiles(projectBase = Some(p._1))).foldLeft(Set[String]())(_ ++ _)
+      // KernelFileUtils.doUpdateIpFilesCache(singleFileIps)
+      // collect Scaleda IPs and make stubs from ip instances
+      val ipInstances: Map[String, Map[String, Any]] = rt
+        .map(rt => rt.task.getIpInstances().map(t => (t._1, if (t._2 == null) Map[String, Any]() else t._2)))
+        .getOrElse(Map())
+      val stubs: Map[String, String] = ips.flatMap { case (_, ip) =>
+        ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
+      }
+      // save these stubs to .cache/stubs/name.v
+      val stubsCacheDir = new File(KernelFileUtils.ipCacheDirectory, "stubs")
+      if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
+      stubs.foreach { case (name, stub) =>
+        val stubFile = new File(stubsCacheDir, s"$name.v")
+        if (!stubFile.exists()) stubFile.createNewFile()
+        val writer = new PrintWriter(stubFile)
+        writer.write(stub)
+        writer.close()
+      }
       // source set of this project
       val sources: Set[String] = rt match {
         // has runtime, get sources
@@ -64,11 +81,11 @@ object FileUtils {
         })
         .toSet
       // search cache directory to get all source files
-      val ipFileSources: Set[String] = KernelFileUtils
-        .getAllSourceFiles(Set(KernelFileUtils.ipCacheDirectory.getAbsolutePath))
+      val ipStubsSources: Set[String] = KernelFileUtils
+        .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
         .map(_.getAbsolutePath)
         .toSet
-      sources ++ ipSources ++ ipFileSources
+      sources ++ ipSources ++ ipStubsSources
     }
     // may reach `pwd`
     // TODO: apply file search paths... example: a.v => test/a.v
@@ -81,22 +98,28 @@ object FileUtils {
     val psiManager = PsiManager.getInstance(project)
     sourceRegularFiles.foreach(f => {
       if (f != null) {
-        val foundFile = psiManager.findFile(LocalFileSystem.getInstance().findFileByIoFile(f))
-        foundFile match {
-          case f: VerilogPSIFileRoot => result += f
-          case _                     =>
+        val d = LocalFileSystem.getInstance().findFileByIoFile(f)
+        if (d != null) {
+          val foundFile = psiManager.findFile(d)
+          foundFile match {
+            case f: VerilogPSIFileRoot => result += f
+            case _                     =>
+          }
         }
       }
     })
     // search and append files from sourceDirectories
     sourceDirectories.foreach(f => {
-      val v = PsiTreeUtil
-        .findChildrenOfAnyType(
-          psiManager.findDirectory(LocalFileSystem.getInstance().findFileByIoFile(f)),
-          classOf[VerilogPSIFileRoot]
-        )
-        .asScala
-      result ++= v
+      val d = LocalFileSystem.getInstance().findFileByIoFile(f)
+      if (d != null) {
+        val v = PsiTreeUtil
+          .findChildrenOfAnyType(
+            psiManager.findDirectory(d),
+            classOf[VerilogPSIFileRoot]
+          )
+          .asScala
+        result ++= v
+      }
     })
     result.toList
   }

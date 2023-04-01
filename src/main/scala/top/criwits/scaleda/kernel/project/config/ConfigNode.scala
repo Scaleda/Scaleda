@@ -159,4 +159,9 @@ abstract class ConfigNode() {
       case None         => Map()
     }) ++ ips).toMap
   }
+
+  // TODO: get ip instances recursively
+  // @JsonIgnore
+  // def getAllIpInstances(projectBase: Option[String] = None): Map[String, Map[String, Any]] = {
+  // }
 }

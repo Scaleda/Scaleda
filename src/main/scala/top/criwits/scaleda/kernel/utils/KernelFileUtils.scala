@@ -306,7 +306,9 @@ object KernelFileUtils {
             if (projectConfig.exports.nonEmpty) Some(projectConfig)
             else None
           } catch {
-            case e: Throwable => None
+            case e: Throwable =>
+              KernelLogger.warn("parse IP failed:", e)
+              None
           }
         } else None
       })
