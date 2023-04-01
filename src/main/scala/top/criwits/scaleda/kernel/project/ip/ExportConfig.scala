@@ -10,6 +10,19 @@ import org.apache.commons.io.IOUtils
 
 import java.io.{File, FileInputStream}
 
+/**
+ * The following is an example
+ * @param id "xilinx.pll"
+ * @param name "Xilinx PLL"
+ * @param module "clk_wiz"
+ * @param stub .<...>
+ * @param vendor "vivado"
+ * @param supports (empty), only vendor is supported
+ * @param options
+ * @param actions
+ * @param defines
+ * @param templates
+ */
 case class ExportConfig(
     // identifier
     id: String,
