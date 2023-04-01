@@ -13,7 +13,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 
-import java.io.{File, PrintWriter}
+import java.io.File
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 import scala.jdk.javaapi.CollectionConverters
@@ -58,15 +58,14 @@ object FileUtils {
         ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
       }
       // save these stubs to .cache/stubs/name.v
-      val stubsCacheDir = new File(KernelFileUtils.ipCacheDirectory, "stubs")
-      if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
-      stubs.foreach { case (name, stub) =>
-        val stubFile = new File(stubsCacheDir, s"$name.v")
-        if (!stubFile.exists()) stubFile.createNewFile()
-        val writer = new PrintWriter(stubFile)
-        writer.write(stub)
-        writer.close()
-      }
+      val stubsCacheDir               = new File(KernelFileUtils.ipCacheDirectory, "stubs")
+      KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
+      val ipStubsSources: Set[String] =
+        // KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir).map(_.getAbsolutePath)
+        KernelFileUtils
+          .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
+          .map(_.getAbsolutePath)
+          .toSet
       // source set of this project
       val sources: Set[String] = rt match {
         // has runtime, get sources
@@ -81,10 +80,10 @@ object FileUtils {
         })
         .toSet
       // search cache directory to get all source files
-      val ipStubsSources: Set[String] = KernelFileUtils
-        .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
-        .map(_.getAbsolutePath)
-        .toSet
+      // val ipStubsSources: Set[String] = KernelFileUtils
+      //   .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
+      //   .map(_.getAbsolutePath)
+      //   .toSet
       sources ++ ipSources ++ ipStubsSources
     }
     // may reach `pwd`
