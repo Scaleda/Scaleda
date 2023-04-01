@@ -11,8 +11,9 @@ import com.intellij.ui.{AnActionButton, ColoredListCellRenderer, DocumentAdapter
 import com.intellij.util.ui.{FormBuilder, JBUI, UIUtil}
 
 import java.awt.BorderLayout
-import javax.swing.event.{DocumentEvent, ListSelectionEvent}
-import javax.swing.{DefaultListModel, JList, JPanel}
+import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelectionEvent}
+import javax.swing.{DefaultListModel, JCheckBox, JList, JPanel, JSpinner, SpinnerNumberModel}
+import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayout) {
   private val projIP = ProjectConfig.projectBasicIps()
@@ -22,7 +23,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
   private val listModel      = new DefaultListModel[IPInstance]
   private val ipInstanceList = new JBList[IPInstance](listModel)
   ipInstanceList.setCellRenderer(new MyCellRenderer)
-  ipInstanceList.addListSelectionListener(null) // TODO
+  ipInstanceList.addListSelectionListener(onItemSelected) // TODO
 
   // Splitter
   val splitter = new Splitter(false, 0.3f)
@@ -54,7 +55,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
         new IPInstance(
           ip.config.exports.get.module,
           ip.config.exports.get.id,
-          ip.config.exports.get.options.map(e => (e.name, e.default)).toMap
+          ip.config.exports.get.options.map(e => (e.name, e.default)).to(mutable.Map)
         )
       )
     })
@@ -75,8 +76,11 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
     val ip = ips.head
 
     // Build UI
-    val form = FormBuilder.createFormBuilder().setAlignLabelOnRight(false).setHorizontalGap(UIUtil.DEFAULT_HGAP)
-    .setVerticalGap(UIUtil.DEFAULT_VGAP)
+    val form = FormBuilder
+      .createFormBuilder()
+      .setAlignLabelOnRight(false)
+      .setHorizontalGap(UIUtil.DEFAULT_HGAP)
+      .setVerticalGap(UIUtil.DEFAULT_VGAP)
     ip.config.exports.get.options.foreach(option => {
       option.`type` match {
         case "string" =>
@@ -87,9 +91,57 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
           form.addLabeledComponent(option.name, field) // FIXME: Nls
 
         case "int" =>
-          form.addLabeledComponent(option.name, new JBTextField(item.options(option.name).asInstanceOf[Int].toString)) // FIXME: Nls
+          val spinnerModel = new SpinnerNumberModel(
+            item.options(option.name).asInstanceOf[Int],
+            null, // TODO in FUTURE: We can have max & min
+            null,
+            Integer.valueOf(1)
+          )
+          spinnerModel.addChangeListener(new ChangeListener {
+            override def stateChanged(e: ChangeEvent): Unit = {
+              item.options.put(option.name, spinnerModel.getValue.asInstanceOf[Int])
+            }
+          })
+          val spinner = new JSpinner(spinnerModel)
+          form.addLabeledComponent(
+            option.name,
+            spinner
+          ) // FIXME: Nls
+
+        case "float" =>
+          val spinnerModel = new SpinnerNumberModel(
+            item.options(option.name).asInstanceOf[Double], // Should double?
+            null, // TODO in FUTURE: We can have max & min
+            null,
+            0.001d // TODO: Step?
+          )
+          spinnerModel.addChangeListener(new ChangeListener {
+            override def stateChanged(e: ChangeEvent): Unit = {
+              item.options.put(option.name, spinnerModel.getValue.asInstanceOf[Double])
+            }
+          })
+          val spinner = new JSpinner(spinnerModel)
+          form.addLabeledComponent(
+            option.name,
+            spinner
+          )
+
+        case "boolean" =>
+          val checkBox = new JCheckBox()
+          checkBox.setSelected(item.options(option.name).asInstanceOf[Boolean])
+          checkBox.addChangeListener(new ChangeListener {
+            override def stateChanged(e: ChangeEvent): Unit = {
+              item.options.put(option.name, checkBox.isSelected)
+            }
+          })
+          form.addLabeledComponent(
+            option.name,
+            checkBox)
+        case _ =>
       }
     })
+
+    splitter.setSecondComponent(form.getPanel)
 
   }
 
