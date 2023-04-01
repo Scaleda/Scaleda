@@ -54,9 +54,9 @@ object FileUtils {
       val ipInstances: Map[String, Map[String, Any]] = rt
         .map(rt => rt.task.getIpInstances().map(t => (t._1, if (t._2 == null) Map[String, Any]() else t._2)))
         .getOrElse(Map())
-      val stubs: Map[String, String] = ips.flatMap { case (_, ip) =>
-        ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
-      }
+      // val stubs: Map[String, String] = ips.flatMap { case (_, ip) =>
+      //   ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
+      // }
       // save these stubs to .cache/stubs/name.v
       val stubsCacheDir               = new File(KernelFileUtils.ipCacheDirectory, "stubs")
       KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
