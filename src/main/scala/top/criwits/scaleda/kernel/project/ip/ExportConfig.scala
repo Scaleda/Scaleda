@@ -5,6 +5,7 @@ import kernel.project.config.ProjectConfig
 import kernel.template.Template
 import kernel.utils.{ImplicitPathReplace, NoPathReplace, RegexReplace}
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.apache.commons.io.IOUtils
 
 import java.io.{File, FileInputStream}
@@ -23,6 +24,7 @@ case class ExportConfig(
     defines: Array[ExportDefineConfig] = Array(),
     templates: Seq[String] = Seq()
 ) {
+  @JsonIgnore
   def getDefineHeadCode: String = {
     defines
       .map { define =>
@@ -31,9 +33,11 @@ case class ExportConfig(
       .mkString("\n")
   }
 
+  @JsonIgnore
   def getOptionContextMap(data: Map[String, Any] = Map()): Map[String, Any] =
     options.map(t => t.name -> t.default).toMap ++ data
 
+  @JsonIgnore
   def getModuleContextMap: Map[String, Any] = Map(
     "module" -> module,
     "name"   -> name
@@ -43,6 +47,7 @@ case class ExportConfig(
     * @param context instance options
     * @return context map
     */
+  @JsonIgnore
   def getContextMap(context: Map[String, Any] = Map()): Map[String, Any] =
     getModuleContextMap ++ getOptionContextMap(context)
 
@@ -51,6 +56,7 @@ case class ExportConfig(
     * @param replace path replacer
     * @return rendered stub text
     */
+  @JsonIgnore
   def renderStub(context: Map[String, Any] = Map())(implicit
       replace: ImplicitPathReplace = NoPathReplace
   ) = {
@@ -64,6 +70,7 @@ case class ExportConfig(
     * @param replace path replacer
     * @return map of target filename and rendered content
     */
+  @JsonIgnore
   def renderTemplate(context: Map[String, Any] = Map(), projectBase: Option[String] = None)(implicit
       replace: ImplicitPathReplace = NoPathReplace
   ): Map[String, String] = {
@@ -82,4 +89,13 @@ case class ExportConfig(
       })
       .toMap
   }
+
+  /** @return Example: <br/>
+    *         {
+    *         "vivado": ["all", ],
+    *         "generic": ["simulation", ]
+    *         }
+    */
+  @JsonIgnore
+  def getSupports: Map[String, Seq[String]] = Map(vendor -> Seq("all")) ++ supports
 }
