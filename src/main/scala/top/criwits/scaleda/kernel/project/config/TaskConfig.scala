@@ -1,18 +1,18 @@
 package top.criwits.scaleda
 package kernel.project.config
 
+import idea.windows.tasks.ip.IPInstance
 import kernel.project.config.TaskConfig.taskTypeList
 import kernel.utils.HasDefault
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import top.criwits.scaleda.idea.windows.tasks.ip.IPInstance
 
 /** Case class for config of task
   * @param name Task name, shown in right panel & config menu
   * @param `type` 'simulation', 'synthesis', 'implementation' or 'programming'
   * @param topModule Top module, if [[None]] then inherited
-  * @param preset Use built-in execution policy
+  * @param custom Use built-in execution policy
   * @param tcl Path to Tcl script
   * @param constraints Path to constraints file or directory, if [[None]] then inherited
   */
@@ -21,7 +21,7 @@ case class TaskConfig(
     name: String = "",
     `type`: String = "simulation", //tricky
     topModule: Option[String] = None,
-    preset: Boolean = true,
+    custom: Boolean = false,
     tcl: Option[String] = None,
     constraints: Option[String] = None,
     // force to use remote host
