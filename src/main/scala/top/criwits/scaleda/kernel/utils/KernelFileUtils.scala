@@ -428,10 +428,10 @@ object KernelFileUtils {
     synchronized {
       // ("id-module", hash)
       val contextHashes: Map[String, String] =
-        instances.map(p => (s"${p.typeId}-${p.module}", DigestUtils.sha256Hex(p.options.toMap.toString()))).toMap
+        instances.map(p => (s"${p.typeId}-${p.module}", DigestUtils.sha256Hex(p.getOptions.toString()))).toMap
       if (stubsCacheDir.exists() && stubsCacheDir.isFile) stubsCacheDir.delete()
       if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
-      val list = stubsCacheDir.listFiles()
+      val list: Array[File] = stubsCacheDir.listFiles()
       val existHashes =
         if (list != null)
           list
@@ -457,10 +457,10 @@ object KernelFileUtils {
       // name(id-module) -> (hash, stub)
       val stubsUpdates: Map[String, (String, String)] = ips.flatMap(ip =>
         instances
-          .filter(i => needUpdates.contains(s"${i.typeId}-${i.module}"))
+          .filter(i => needUpdates.contains(s"${i.typeId}-${i.module}") && i.typeId == ip._2.exports.get.id)
           .map(i => {
             val idAndModule = s"${i.typeId}-${i.module}"
-            (idAndModule, (needUpdates(idAndModule), ip._2.exports.get.renderStub(i.options.toMap)))
+            (idAndModule, (needUpdates(idAndModule), ip._2.exports.get.renderStub(i.getOptions)))
           })
       )
       // write to files: (.cache)/stubs/hash/name.v

@@ -58,7 +58,7 @@ object FileUtils {
       // val stubs: Map[String, String] = ips.flatMap { case (_, ip) =>
       //   ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
       // }
-      // save these stubs to .cache/stubs/name.v
+      // save these stubs to .cache/stubs/hash/id-module.v
       val stubsCacheDir = new File(KernelFileUtils.ipCacheDirectory, "stubs")
       KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
       val ipStubsSources: Set[String] =

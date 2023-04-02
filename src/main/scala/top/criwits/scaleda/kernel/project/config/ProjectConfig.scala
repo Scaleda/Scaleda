@@ -1,13 +1,13 @@
 package top.criwits.scaleda
 package kernel.project.config
 
+import idea.windows.tasks.ip.IPInstance
 import kernel.project.ip.ExportConfig
 import kernel.utils.serialise.{JSONHelper, YAMLHelper}
 import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import top.criwits.scaleda.idea.windows.tasks.ip.IPInstance
 
 import java.io.File
 
@@ -99,14 +99,20 @@ object ProjectConfig {
   def getConfig(path: Option[String] = configFile): Option[ProjectConfig] = {
     path match {
       case Some(p) =>
-        val config = YAMLHelper(new File(p), classOf[ProjectConfig])
-        KernelLogger.debug(s"Loaded project config ${JSONHelper(config)}")
-        // generate node relationship
-        config.targets.foreach(target => {
-          target.parentNode = Some(config)
-          target.tasks.foreach(task => task.parentNode = Some(target))
-        })
-        Some(config)
+        try {
+          val config = YAMLHelper(new File(p), classOf[ProjectConfig])
+          KernelLogger.debug(s"Loaded project config ${JSONHelper(config)}")
+          // generate node relationship
+          config.targets.foreach(target => {
+            target.parentNode = Some(config)
+            target.tasks.foreach(task => task.parentNode = Some(target))
+          })
+          Some(config)
+        } catch {
+          case e: com.fasterxml.jackson.databind.exc.MismatchedInputException =>
+            KernelLogger.warn(s"Failed to parse project config file $p")
+            None
+        }
       case None => None
     }
   }

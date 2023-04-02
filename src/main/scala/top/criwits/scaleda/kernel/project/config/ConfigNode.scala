@@ -155,7 +155,7 @@ abstract class ConfigNode() {
       new IPInstance(
         module = i.module,
         typeId = i.typeId,
-        options = if (i.options.nonEmpty) i.options else mutable.Map()
+        options = if (i.options != null && i.options.nonEmpty) i.options else mutable.Map()
       )
     )
   }
