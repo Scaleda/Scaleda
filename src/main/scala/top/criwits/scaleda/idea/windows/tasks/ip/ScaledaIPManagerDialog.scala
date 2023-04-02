@@ -7,6 +7,7 @@ import kernel.utils.KernelFileUtils
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
 import java.awt.AWTEvent
 import javax.swing.JComponent
@@ -35,7 +36,8 @@ class ScaledaIPManagerDialog(project: Project) extends DialogWrapper(project) {
 
     // Export IP information
     val ips = mainPanel.toIPInstances
-    println(ips)
+    val newProjectConfig = ProjectConfig.config.copy(ips = ips)
+    ProjectConfig.saveConfig(newProjectConfig)
 
     // Re-generate, only update caches from ProjectConfig layer, and before this `ips` in ProjectConfig should be updated
     KernelFileUtils.doUpdateStubCacheFromProject()
