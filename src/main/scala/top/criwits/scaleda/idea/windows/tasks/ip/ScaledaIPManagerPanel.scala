@@ -30,6 +30,11 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
   // Left side, list
   private val listModel      = new DefaultListModel[IPInstance]
   private val ipInstanceList = new JBList[IPInstance](listModel)
+
+  // load ip instances from ProjectConfig on initialization
+  ProjectConfig.config.ips.foreach(ip => {
+    listModel.addElement(ip)
+  })
   ipInstanceList.setCellRenderer(new MyCellRenderer)
   ipInstanceList.addListSelectionListener(onItemSelected) // TODO
 
@@ -40,7 +45,7 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
   val listPanel: JPanel = ToolbarDecorator
     .createDecorator(ipInstanceList)
     .setAddAction((e: AnActionButton) => addIP(e))
-    .setRemoveAction((e: AnActionButton) => {removeIP(e)})
+    .setRemoveAction((e: AnActionButton) => { removeIP(e) })
     .disableUpDownActions()
     .createPanel()
 
@@ -144,7 +149,9 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
     ip.config.exports.get.options.foreach(option => {
       option.`type` match {
         case "string" =>
-          val field = new JBTextField(item.options(option.name).asInstanceOf[String])
+          val field = new JBTextField(
+            ip.config.exports.get.getContextMap(item.getRenderOptions).getOrElse(option.name, "").asInstanceOf[String]
+          )
           field.getDocument.addDocumentListener(new DocumentAdapter {
             override def textChanged(e: DocumentEvent): Unit = {
               item.options.put(option.name, field.getText)
@@ -155,16 +162,14 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
 
         case "int" =>
           val spinnerModel = new SpinnerNumberModel(
-            item.options(option.name).asInstanceOf[Int],
+            ip.config.exports.get.getContextMap(item.getRenderOptions).getOrElse(option.name, 0).asInstanceOf[Int],
             null, // TODO in FUTURE: We can have max & min
             null,
             Integer.valueOf(1)
           )
-          spinnerModel.addChangeListener(new ChangeListener {
-            override def stateChanged(e: ChangeEvent): Unit = {
-              item.options.put(option.name, spinnerModel.getValue.asInstanceOf[Int])
-              renderEditor
-            }
+          spinnerModel.addChangeListener((e: ChangeEvent) => {
+            item.options.put(option.name, spinnerModel.getValue.asInstanceOf[Int])
+            renderEditor
           })
           val spinner = new JSpinner(spinnerModel)
           form.addLabeledComponent(
@@ -174,8 +179,11 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
 
         case "float" =>
           val spinnerModel = new SpinnerNumberModel(
-            item.options(option.name).asInstanceOf[Double], // Should double?
-            null,                                           // TODO in FUTURE: We can have max & min
+            ip.config.exports.get
+              .getContextMap(item.getRenderOptions)
+              .getOrElse(option.name, 0.0)
+              .asInstanceOf[Double], // Should double?
+            null,                    // TODO in FUTURE: We can have max & min
             null,
             0.001d // TODO: Step?
           )
@@ -193,7 +201,12 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
 
         case "boolean" =>
           val checkBox = new JCheckBox()
-          checkBox.setSelected(item.options(option.name).asInstanceOf[Boolean])
+          checkBox.setSelected(
+            ip.config.exports.get
+              .getContextMap(item.getRenderOptions)
+              .getOrElse(option.name, false)
+              .asInstanceOf[Boolean]
+          )
           checkBox.addChangeListener(new ChangeListener {
             override def stateChanged(e: ChangeEvent): Unit = {
               item.options.put(option.name, checkBox.isSelected)
