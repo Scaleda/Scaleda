@@ -41,7 +41,8 @@ object ExtractAssets {
     val files = Seq(
       "scripts/vivado_call.tcl",
       "ip/scaleda_bram/bram2.v.j2",
-      "ip/scaleda_bram/scaleda.yml"
+      "ip/scaleda_bram/scaleda.yml",
+      "ip/clocking-wizard/scaleda.yml"
     )
     files.foreach(f => {
       val file = new File(parent, f)

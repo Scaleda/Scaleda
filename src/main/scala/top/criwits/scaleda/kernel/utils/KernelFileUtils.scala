@@ -516,35 +516,33 @@ object KernelFileUtils {
     val supportedIpInstances: Seq[IPInstance] =
       ipInstances.filter(i => !unsupportedIpInstances.exists(_.module == i.module))
     // render template file
-    val targetTemplateFiles: Seq[File] = supportedIpInstances
-      .map(p => {
-        val (id, context) = (p.typeId, p.getRenderOptions)
-        ips
-          .find(_._2.exports.get.id == id)
-          .map(ip => {
-            val (path, ipExports) = ip
-            val e                 = ipExports.exports.get
-            val targetData =
-              e.renderTemplate(context = context, projectBase = Some(path))
-            // write target file to workDir/targetFile
-            val renderedFile: Seq[File] = targetData.toSeq
-              .map(t => {
-                val targetFile = new File(targetDirectory, t._1)
-                if (!targetFile.exists()) {
-                  targetFile.getParentFile.mkdirs()
-                  targetFile.createNewFile()
-                }
-                val writer = new PrintWriter(targetFile)
-                writer.write(t._2)
-                writer.close()
-                targetFile
-              })
-              .toSeq
-            renderedFile
-          })
-          .foldLeft(Seq[File]())((a, b) => a ++ b)
-      })
-      .flatten
+    val targetTemplateFiles: Seq[File] = supportedIpInstances.flatMap(p => {
+      val (id, context) = (p.typeId, p.getRenderOptions)
+      ips
+        .find(_._2.exports.get.id == id)
+        .map(ip => {
+          val (path, ipExports) = ip
+          val e = ipExports.exports.get
+          val targetData =
+            e.renderTemplate(context = context, projectBase = Some(path))
+          // write target file to workDir/targetFile
+          val renderedFile: Seq[File] = targetData.toSeq
+            .map(t => {
+              val targetFile = new File(targetDirectory, t._1)
+              if (!targetFile.exists()) {
+                targetFile.getParentFile.mkdirs()
+                targetFile.createNewFile()
+              }
+              val writer = new PrintWriter(targetFile)
+              writer.write(t._2)
+              writer.close()
+              targetFile
+            })
+            .toSeq
+          renderedFile
+        })
+        .foldLeft(Seq[File]())((a, b) => a ++ b)
+    })
     targetTemplateFiles
   }
 }
