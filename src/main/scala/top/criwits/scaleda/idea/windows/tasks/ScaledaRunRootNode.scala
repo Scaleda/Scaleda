@@ -31,6 +31,11 @@ class ScaledaRunRootNode(val projectConfig: ProjectConfig) extends ScaledaRunTre
   var targets: mutable.Buffer[ScaledaRunTargetNode] = projectConfig.targets.map(new ScaledaRunTargetNode(_)).toBuffer
   targets.foreach(_.parent = Some(this))
 
+  /**
+   * Re-generate project configuration
+   * TODO: IP passthrough
+   * @return
+   */
   def toProjectConfig: ProjectConfig = ProjectConfig(
     name = name,
     `type` = `type`,

@@ -18,12 +18,12 @@ final class IPTableModel
         },
         new ColumnInfo[IP, String](ScaledaBundle.message("windows.ip.vendor")) {
           override def valueOf(item: IP): String =
-            Toolchain.toolchains.get(item.config.exports.get.vendor).map(_._1).getOrElse("Genric")
+            Toolchain.toolchains.get(item.config.exports.get.vendor).map(_._1).getOrElse("Generic")
           override def getPreferredStringValue: String = "Generic"
         },
         new ColumnInfo[IP, String](ScaledaBundle.message("windows.ip.repository")) {
-          override def valueOf(item: IP): String       = item.path
-          override def getPreferredStringValue: String = "/"
+          override def valueOf(item: IP): String       = if (item.library) "Library" else "Project"
+          override def getPreferredStringValue: String = "Library"
         }
       ) ++
         Toolchain.toolchains
