@@ -32,14 +32,17 @@ class ScaledaRunRootNode(val projectConfig: ProjectConfig) extends ScaledaRunTre
   targets.foreach(_.parent = Some(this))
 
   /** Re-generate project configuration
-    * TODO: IP passthrough
+    * TODO: IP pass through
     * @return
     */
   def toProjectConfig: ProjectConfig = projectConfig.copy(
     name = name,
+    // description, author, version
     `type` = `type`,
     source = source,
+    // sources
     test = test,
+    // tests
     topModule = topModule,
     constraints = constraints,
     targets = targets.map(_.toTargetConfig).toArray

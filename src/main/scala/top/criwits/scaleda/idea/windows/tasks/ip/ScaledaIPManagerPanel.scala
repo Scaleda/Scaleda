@@ -2,24 +2,25 @@ package top.criwits.scaleda
 package idea.windows.tasks.ip
 
 import idea.ScaledaBundle
+import idea.windows.tasks.ip.ScaledaIPManagerPanel.createConfigEditor
 import kernel.project.config.ProjectConfig
 
 import com.intellij.lang.Language
 import com.intellij.openapi.editor.colors.impl.DefaultColorsScheme
-import com.intellij.openapi.editor.{EditorFactory, EditorSettings}
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.LayeredLexerEditorHighlighter
+import com.intellij.openapi.editor.{EditorFactory, EditorSettings}
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory.getSyntaxHighlighter
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.components.{JBList, JBPanelWithEmptyText, JBTextField}
-import com.intellij.ui.{AnActionButton, ColoredListCellRenderer, DocumentAdapter, ToolbarDecorator}
-import com.intellij.util.ui.{FormBuilder, JBUI, UIUtil}
-import top.criwits.scaleda.idea.windows.tasks.ip.ScaledaIPManagerPanel.createConfigEditor
+import com.intellij.ui._
+import com.intellij.util.ui.{FormBuilder, JBUI}
+import top.criwits.scaleda.idea.utils.inWriteAction
 
 import java.awt.BorderLayout
 import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelectionEvent}
-import javax.swing.{DefaultListModel, JCheckBox, JList, JPanel, JSpinner, SpinnerNumberModel}
+import javax.swing._
 import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayout) {
@@ -80,11 +81,12 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
   }
 
   private def loadItem(item: IPInstance): Unit = {
-    // First remove previous
+    // First dispose previous editor (required)
     if (editor != null) {
       EditorFactory.getInstance().releaseEditor(editor)
       editor = null
     }
+
     // check IP model
     val ips = ipList.filter(_.config.exports.get.id == item.typeId)
     if (ips.isEmpty) return // TODO: shall never reach here...
@@ -96,10 +98,13 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
     editor = createConfigEditor
     rpanel.previewPanel.setLayout(new BorderLayout)
     rpanel.previewPanel.add(editor.getComponent)
+
     def renderEditor: Unit = {
-      editor.getDocument.setText(
-        ip.config.exports.get.renderStub(item.getRenderOptions)
-      )
+      inWriteAction {
+        editor.getDocument.setText(
+          ip.config.exports.get.renderStub(item.getRenderOptions)
+        )
+      }
     }
 
     rpanel.nameField.setText(item.module)
@@ -110,8 +115,6 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
         ipInstanceList.repaint() // wow!
       }
     })
-
-
 
     // Build UI
     val form = FormBuilder
@@ -152,7 +155,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
         case "float" =>
           val spinnerModel = new SpinnerNumberModel(
             item.options(option.name).asInstanceOf[Double], // Should double?
-            null, // TODO in FUTURE: We can have max & min
+            null,                                           // TODO in FUTURE: We can have max & min
             null,
             0.001d // TODO: Step?
           )
@@ -177,9 +180,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
               renderEditor
             }
           })
-          form.addLabeledComponent(
-            option.name,
-            checkBox)
+          form.addLabeledComponent(option.name, checkBox)
         case _ =>
       }
     })
@@ -193,6 +194,10 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
 
   }
 
+  def toIPInstances: Seq[IPInstance] = {
+    for (i <- 0 until listModel.size()) yield listModel.get(i)
+  }
+
   private class MyCellRenderer extends ColoredListCellRenderer[IPInstance] {
     override def customizeCellRenderer(
         list: JList[_ <: IPInstance],
@@ -202,6 +207,14 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
         hasFocus: Boolean
     ): Unit = {
       append(value.module)
+      append(
+        " [" + ipList
+          .filter(_.config.exports.get.id == value.typeId)
+          .headOption
+          .map(_.config.exports.get.name)
+          .getOrElse("unknown") + "]",
+        SimpleTextAttributes.GRAYED_ATTRIBUTES
+      )
     }
   }
 }
@@ -209,9 +222,10 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
 object ScaledaIPManagerPanel {
   //copied from CodeStyleAbstractPanel
   private def createConfigEditor: EditorEx = {
-    val editorFactory = EditorFactory.getInstance
+    val editorFactory  = EditorFactory.getInstance
     val editorDocument = editorFactory.createDocument("")
-    val editor = editorFactory.createViewer(editorDocument)
+    val editor = editorFactory
+      .createViewer(editorDocument)
       .asInstanceOf[EditorEx]
 
     val verilogLanguage = Language.findLanguageByID("Verilog")
@@ -228,8 +242,7 @@ object ScaledaIPManagerPanel {
     editor
   }
 
-  private[this] def fillEditorSettings(settings: EditorSettings,
-                                       language: Language): Unit = {
+  private[this] def fillEditorSettings(settings: EditorSettings, language: Language): Unit = {
     settings.setLanguageSupplier(() => language)
     settings.setWhitespacesShown(true)
     settings.setLineMarkerAreaShown(false)
