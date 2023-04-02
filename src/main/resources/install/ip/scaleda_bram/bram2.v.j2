@@ -8,7 +8,7 @@
 module {{module}} #(
     parameter RAM_WIDTH = {{width}},
     parameter RAM_DEPTH = {{depth}},
-    parameter RAM_ADDR_WIDTH = {{addr_width}}
+    parameter RAM_ADDR_WIDTH = $clog2({{depth}})
 ) (
     input                     clk,
     input                     en,
