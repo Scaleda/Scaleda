@@ -119,10 +119,12 @@ object IVerilog extends ToolchainPresetProvider {
     val testbench = simExecutor.topModule
     // val testbenchFile = KernelFileUtils.getProjectModuleFile(testbench, testbench = true).get
     val sourceTestbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = testbench)
-    val testbenchFile: File = sourceTestbenchFile.getOrElse({
-      val targetTop = parseSourceSetTopModules(rt.task.getTestSet()).headOption
-      KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = targetTop.head).get
-    })
+    // val testbenchFile: File = sourceTestbenchFile.getOrElse({
+    //   val targetTop = parseSourceSetTopModules(rt.task.getTestSet()).headOption
+    //   KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = targetTop.head).get
+    // })
+    // ignore detection
+    val testbenchFile: File = sourceTestbenchFile.get
 
     // generate new testbench file
     val newTestbench     = testbench + "_generated"
