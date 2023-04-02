@@ -132,7 +132,7 @@ object ProjectConfig {
   def projectIpPaths(projectBase: Option[String] = ProjectConfig.projectBase): Set[File] =
     Set(".ip", "ip", "ips")
       .map(p => new File(projectBase.getOrElse(ProjectConfig.projectBase.get), p))
-      .filter(_.exists()) ++ Set(Paths.getIpDir)
+      .filter(_.exists())
 
   def libraryIps: Map[String, ProjectConfig] =
     libraryIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap

@@ -24,8 +24,8 @@ import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelect
 import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
-  private val projIP = ProjectConfig.projectBasicIps().map(s => IP(s._1, false, s._2))
-  private val libIP  = ProjectConfig.libraryIps.map(s => IP(s._1, true, s._2))
+  private val projIP = ProjectConfig.projectBasicIps().map(s => IP(s._1, library = false, s._2))
+  private val libIP  = ProjectConfig.libraryIps.map(s => IP(s._1, library = true, s._2))
   private val ipList = projIP ++ libIP
   // Left side, list
   private val listModel      = new DefaultListModel[IPInstance]

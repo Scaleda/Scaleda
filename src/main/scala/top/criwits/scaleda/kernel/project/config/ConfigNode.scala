@@ -100,7 +100,7 @@ abstract class ConfigNode() {
   @JsonIgnore
   def getIpPaths(projectBase: Option[String] = None): Set[String] = {
     val base = if (projectBase.isEmpty) ProjectConfig.projectBase else projectBase
-    val basicPaths = ProjectConfig.projectIpPaths(projectBase = base)
+    val basicPaths = ProjectConfig.projectIpPaths(projectBase = base) ++ ProjectConfig.libraryIpPaths
     basicPaths.map(_.getAbsolutePath) ++ (parentNode match {
       case Some(parent) => parent.getIpPaths(projectBase = base)
       case None         => Set()
