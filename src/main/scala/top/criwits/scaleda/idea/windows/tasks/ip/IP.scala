@@ -3,4 +3,4 @@ package idea.windows.tasks.ip
 
 import kernel.project.config.ProjectConfig;
 
-case class IP(path: String, config: ProjectConfig)
+case class IP(path: String, library: Boolean, config: ProjectConfig)

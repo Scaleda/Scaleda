@@ -4,11 +4,18 @@ package idea.windows.tasks.ip
 import idea.ScaledaBundle
 import kernel.project.config.ProjectConfig
 
+import com.intellij.lang.Language
+import com.intellij.openapi.editor.colors.impl.DefaultColorsScheme
+import com.intellij.openapi.editor.{EditorFactory, EditorSettings}
+import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.util.LayeredLexerEditorHighlighter
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory.getSyntaxHighlighter
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.components.{JBList, JBPanelWithEmptyText, JBTextField}
 import com.intellij.ui.{AnActionButton, ColoredListCellRenderer, DocumentAdapter, ToolbarDecorator}
 import com.intellij.util.ui.{FormBuilder, JBUI, UIUtil}
+import top.criwits.scaleda.idea.windows.tasks.ip.ScaledaIPManagerPanel.createConfigEditor
 
 import java.awt.BorderLayout
 import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelectionEvent}
@@ -16,9 +23,9 @@ import javax.swing.{DefaultListModel, JCheckBox, JList, JPanel, JSpinner, Spinne
 import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayout) {
-  private val projIP = ProjectConfig.projectBasicIps()
-  private val libIP  = ProjectConfig.libraryIps
-  private val ipList = (projIP ++ libIP).map(s => IP(s._1, s._2))
+  private val projIP = ProjectConfig.projectBasicIps().map(s => IP(s._1, false, s._2))
+  private val libIP  = ProjectConfig.libraryIps.map(s => IP(s._1, true, s._2))
+  private val ipList = projIP ++ libIP
   // Left side, list
   private val listModel      = new DefaultListModel[IPInstance]
   private val ipInstanceList = new JBList[IPInstance](listModel)
@@ -43,6 +50,9 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
     .withEmptyText(ScaledaBundle.message("windows.ip.no.ip.selected"))
     .withBorder(JBUI.Borders.emptyLeft(6))
   splitter.setSecondComponent(emptyPanel)
+
+  // Editor ...
+  var editor: EditorEx = _
 
   private def addIP(e: AnActionButton): Unit = {
 
@@ -70,23 +80,53 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
   }
 
   private def loadItem(item: IPInstance): Unit = {
+    // First remove previous
+    if (editor != null) {
+      EditorFactory.getInstance().releaseEditor(editor)
+      editor = null
+    }
     // check IP model
     val ips = ipList.filter(_.config.exports.get.id == item.typeId)
     if (ips.isEmpty) return // TODO: shall never reach here...
     val ip = ips.head
 
+    // Prepare right panel
+    val rpanel = new ScaledaIPEditPanel
+
+    editor = createConfigEditor
+    rpanel.previewPanel.setLayout(new BorderLayout)
+    rpanel.previewPanel.add(editor.getComponent)
+    def renderEditor: Unit = {
+      editor.getDocument.setText(
+        ip.config.exports.get.renderStub(item.options.toMap)
+      )
+    }
+
+    rpanel.nameField.setText(item.module)
+    rpanel.nameField.getDocument.addDocumentListener(new DocumentAdapter {
+      override def textChanged(e: DocumentEvent): Unit = {
+        item.module = rpanel.nameField.getText
+        renderEditor
+        ipInstanceList.repaint() // wow!
+      }
+    })
+
+
+
     // Build UI
     val form = FormBuilder
       .createFormBuilder()
       .setAlignLabelOnRight(false)
-      .setHorizontalGap(UIUtil.DEFAULT_HGAP)
-      .setVerticalGap(UIUtil.DEFAULT_VGAP)
+
     ip.config.exports.get.options.foreach(option => {
       option.`type` match {
         case "string" =>
           val field = new JBTextField(item.options(option.name).asInstanceOf[String])
           field.getDocument.addDocumentListener(new DocumentAdapter {
-            override def textChanged(e: DocumentEvent): Unit = item.options.put(option.name, field.getText)
+            override def textChanged(e: DocumentEvent): Unit = {
+              item.options.put(option.name, field.getText)
+              renderEditor
+            }
           })
           form.addLabeledComponent(option.name, field) // FIXME: Nls
 
@@ -100,6 +140,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
           spinnerModel.addChangeListener(new ChangeListener {
             override def stateChanged(e: ChangeEvent): Unit = {
               item.options.put(option.name, spinnerModel.getValue.asInstanceOf[Int])
+              renderEditor
             }
           })
           val spinner = new JSpinner(spinnerModel)
@@ -118,6 +159,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
           spinnerModel.addChangeListener(new ChangeListener {
             override def stateChanged(e: ChangeEvent): Unit = {
               item.options.put(option.name, spinnerModel.getValue.asInstanceOf[Double])
+              renderEditor
             }
           })
           val spinner = new JSpinner(spinnerModel)
@@ -132,6 +174,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
           checkBox.addChangeListener(new ChangeListener {
             override def stateChanged(e: ChangeEvent): Unit = {
               item.options.put(option.name, checkBox.isSelected)
+              renderEditor
             }
           })
           form.addLabeledComponent(
@@ -141,7 +184,12 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
       }
     })
 
-    splitter.setSecondComponent(form.getPanel)
+    rpanel.configPanel.setLayout(new BorderLayout)
+    rpanel.configPanel.add(form.getPanel, BorderLayout.NORTH)
+
+    renderEditor
+
+    splitter.setSecondComponent(rpanel.mainPanel)
 
   }
 
@@ -155,5 +203,41 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
     ): Unit = {
       append(value.module)
     }
+  }
+}
+
+object ScaledaIPManagerPanel {
+  //copied from CodeStyleAbstractPanel
+  private def createConfigEditor: EditorEx = {
+    val editorFactory = EditorFactory.getInstance
+    val editorDocument = editorFactory.createDocument("")
+    val editor = editorFactory.createViewer(editorDocument)
+      .asInstanceOf[EditorEx]
+
+    val verilogLanguage = Language.findLanguageByID("Verilog")
+    fillEditorSettings(editor.getSettings, verilogLanguage)
+
+    if (verilogLanguage != null) {
+      val highlighter = new LayeredLexerEditorHighlighter(
+        getSyntaxHighlighter(verilogLanguage, null, null),
+        new DefaultColorsScheme
+      )
+      editor.setHighlighter(highlighter)
+    }
+
+    editor
+  }
+
+  private[this] def fillEditorSettings(settings: EditorSettings,
+                                       language: Language): Unit = {
+    settings.setLanguageSupplier(() => language)
+    settings.setWhitespacesShown(true)
+    settings.setLineMarkerAreaShown(false)
+    settings.setIndentGuidesShown(false)
+    settings.setLineNumbersShown(false)
+    settings.setFoldingOutlineShown(false)
+    settings.setAdditionalColumnsCount(0)
+    settings.setAdditionalLinesCount(1)
+    settings.setUseSoftWraps(false)
   }
 }
