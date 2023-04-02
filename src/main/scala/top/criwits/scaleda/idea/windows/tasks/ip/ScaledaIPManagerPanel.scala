@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks.ip
 
 import idea.ScaledaBundle
+import idea.utils.inWriteAction
 import idea.windows.tasks.ip.ScaledaIPManagerPanel.createConfigEditor
 import kernel.project.config.ProjectConfig
 
@@ -13,17 +14,16 @@ import com.intellij.openapi.editor.{EditorFactory, EditorSettings}
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory.getSyntaxHighlighter
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
-import com.intellij.ui.components.{JBList, JBPanelWithEmptyText, JBTextField}
 import com.intellij.ui._
+import com.intellij.ui.components.{JBList, JBPanelWithEmptyText, JBTextField}
 import com.intellij.util.ui.{FormBuilder, JBUI}
-import top.criwits.scaleda.idea.utils.inWriteAction
 
 import java.awt.BorderLayout
-import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelectionEvent}
 import javax.swing._
+import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelectionEvent}
 import scala.collection.mutable
 
-class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayout) {
+class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
   private val projIP = ProjectConfig.projectBasicIps().map(s => IP(s._1, false, s._2))
   private val libIP  = ProjectConfig.libraryIps.map(s => IP(s._1, true, s._2))
   private val ipList = projIP ++ libIP
@@ -40,7 +40,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
   val listPanel: JPanel = ToolbarDecorator
     .createDecorator(ipInstanceList)
     .setAddAction((e: AnActionButton) => addIP(e))
-    .setRemoveAction((_: AnActionButton) => {})
+    .setRemoveAction((e: AnActionButton) => {removeIP(e)})
     .disableUpDownActions()
     .createPanel()
 
@@ -69,7 +69,18 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
           ip.config.exports.get.options.map(e => (e.name, e.default)).to(mutable.Map)
         )
       )
+      ipInstanceList.setSelectedIndex(listModel.size() - 1) // is this ok?
     })
+  }
+
+  private def removeIP(e: AnActionButton): Unit = {
+    val index = ipInstanceList.getSelectedIndex
+    if (index >= 0 && index < listModel.size()) {
+      listModel.remove(index)
+      ipInstanceList.setSelectedIndex(if (index < listModel.size()) index else index - 1)
+      if (index == 0)
+        splitter.setSecondComponent(emptyPanel)
+    }
   }
 
   private def onItemSelected(e: ListSelectionEvent): Unit = {
@@ -107,14 +118,23 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
       }
     }
 
-    rpanel.nameField.setText(item.module)
     rpanel.nameField.getDocument.addDocumentListener(new DocumentAdapter {
       override def textChanged(e: DocumentEvent): Unit = {
         item.module = rpanel.nameField.getText
         renderEditor
-        ipInstanceList.repaint() // wow!
+        ipInstanceList.repaint()
+        val instances = toIPInstances
+        // Check duplicate name!!!!!!!!
+        if (instances.filter(_ != item).exists(_.module == item.module)) {
+          rpanel.nameField.setForeground(JBColor.RED)
+        } else {
+          rpanel.nameField.setForeground(new JBTextField().getForeground)
+        }
+        setValid(instances.map(_.module).toSet.size == instances.size)
       }
     })
+
+    rpanel.nameField.setText(item.module)
 
     // Build UI
     val form = FormBuilder
