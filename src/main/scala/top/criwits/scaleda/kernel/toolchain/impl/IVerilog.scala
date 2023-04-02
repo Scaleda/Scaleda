@@ -36,13 +36,23 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
     val ipSources = KernelFileUtils.handleIpInstances(task, workingDir, Set("all", "simulation"))
 
+    val taskSourceSet = task.getSourceSet()
+
     // val sources = KernelFileUtils.getAllProjectSourceFiles()
-    val sources = KernelFileUtils.getAllSourceFiles(task.getSourceSet()) ++ ipSources
+    val sources = KernelFileUtils.getAllSourceFiles(taskSourceSet) ++ ipSources
 
     val sourceTestbenchFile =
-      KernelFileUtils.getModuleFileFromSet(task.getSourceSet(), module = testbench)
+      KernelFileUtils.getModuleFileFromSet(taskSourceSet, module = testbench)
 
     val simExecutorName = testbench + "_iverilog_executor"
+
+    val sourcesUse = sources
+      .filter(s => {
+        if (sourceTestbenchFile.nonEmpty) {
+          // remove original top file, use generated one
+          sourceTestbenchFile.get.getAbsolutePath != s.getAbsolutePath
+        } else true
+      })
 
     Seq(
       CommandDeps(
@@ -54,14 +64,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
           simExecutorName,
           newTestbenchFile.getAbsolutePath
         )
-          ++ sources
-            .filter(s => {
-              if (sourceTestbenchFile.nonEmpty) {
-                // remove original top file, use generated one
-                sourceTestbenchFile.get.getAbsolutePath == s.getAbsolutePath
-              } else true
-            })
-            .map(_.getAbsolutePath),
+          ++ sourcesUse.map(_.getAbsolutePath),
         path = workingDir.getAbsolutePath,
         description = "Compiling designs"
       ),
