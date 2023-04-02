@@ -2,21 +2,18 @@ package top.criwits.scaleda
 package kernel.utils
 
 import idea.utils.MainLogger
+import idea.windows.tasks.ip.IPInstance
 import kernel.project.config.ProjectConfig
 import kernel.utils.serialise.YAMLHelper
 import verilog.parser.{VerilogParser, VerilogParserBaseVisitor}
 import verilog.utils.ModuleUtils
 
-import jtermios.JTermios.JTermiosLogging.log
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.file.DeletingPathVisitor
 
 import java.io._
-import java.net.URI
 import java.nio.file.{Files, Path}
-import java.util
-import java.util.jar.JarFile
-import java.util.zip.{ZipEntry, ZipInputStream}
+import java.util.zip.ZipInputStream
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -425,13 +422,13 @@ object KernelFileUtils {
     */
   def doUpdateIpStubsCache(
       ips: Map[String, ProjectConfig],
-      instances: Map[String, Map[String, Any]],
+      instances: Seq[IPInstance],
       stubsCacheDir: File
   ) = {
     synchronized {
-      val contextHashes = instances.map { case (name, context) =>
-        (name, DigestUtils.sha256Hex(context.toString()))
-      }
+      // ("id-module", hash)
+      val contextHashes: Map[String, String] =
+        instances.map(p => (s"${p.typeId}-${p.module}", DigestUtils.sha256Hex(p.options.toMap.toString()))).toMap
       if (stubsCacheDir.exists() && stubsCacheDir.isFile) stubsCacheDir.delete()
       if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
       val list = stubsCacheDir.listFiles()
@@ -444,9 +441,9 @@ object KernelFileUtils {
             .map(_.getName)
             .toSet
         else Set[String]()
-      // (name, hash)
-      val needUpdates = contextHashes.filter { case (name, hash) =>
-        !(existHashes.contains(name) || existHashes.contains(hash))
+      // ("id-module", hash)
+      val needUpdates = contextHashes.filter { case (idAndModule, hash) =>
+        !(existHashes.contains(idAndModule) || existHashes.contains(hash))
       }
       val needRemove = existHashes.filter(h => !contextHashes.exists(_._2 == h))
       // remove some cache
@@ -457,13 +454,15 @@ object KernelFileUtils {
           else if (f.isDirectory) KernelFileUtils.deleteDirectory(f.toPath)
         }
       })
-      // name -> (hash, stub)
-      val stubsUpdates: Map[String, (String, String)] = ips.flatMap { case (_, ip) =>
+      // name(id-module) -> (hash, stub)
+      val stubsUpdates: Map[String, (String, String)] = ips.flatMap(ip =>
         instances
-          .filter(i => needUpdates.contains(i._1))
-          .get(ip.exports.get.name)
-          .map(context => (ip.exports.get.name, (needUpdates(ip.exports.get.name), ip.exports.get.renderStub(context))))
-      }
+          .filter(i => needUpdates.contains(s"${i.typeId}-${i.module}"))
+          .map(i => {
+            val idAndModule = s"${i.typeId}-${i.module}"
+            (idAndModule, (needUpdates(idAndModule), ip._2.exports.get.renderStub(i.options.toMap)))
+          })
+      )
       // write to files: (.cache)/stubs/hash/name.v
       if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
       stubsUpdates.foreach { case (name, (hash, stub)) =>

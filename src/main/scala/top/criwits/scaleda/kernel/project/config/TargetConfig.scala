@@ -5,6 +5,7 @@ import kernel.utils.HasDefault
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import top.criwits.scaleda.idea.windows.tasks.ip.IPInstance
 
 /** Case class for config of a target
   * @param name Config name
@@ -27,7 +28,7 @@ case class TargetConfig(
     override val tests: Seq[String] = Seq(),
     override val ipFiles: Seq[String] = Seq(),
     override val ipPaths: Seq[String] = Seq(),
-    override val ips: Map[String, Map[String, Any]] = Map()
+    override val ips: Seq[IPInstance] = Seq()
 ) extends ConfigNode()
 
 object TargetConfig extends HasDefault[TargetConfig] {

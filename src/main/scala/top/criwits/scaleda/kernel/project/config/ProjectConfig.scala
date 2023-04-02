@@ -7,6 +7,7 @@ import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import top.criwits.scaleda.idea.windows.tasks.ip.IPInstance
 
 import java.io.File
 
@@ -36,7 +37,7 @@ case class ProjectConfig(
     override val ipFiles: Seq[String] = Seq(),
     override val ipPaths: Seq[String] = Seq(),
     exports: Option[ExportConfig] = None,
-    override val ips: Map[String, Map[String, Any]] = Map()
+    override val ips: Seq[IPInstance] = Seq()
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))

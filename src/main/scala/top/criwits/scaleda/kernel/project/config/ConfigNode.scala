@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.config
 
+import idea.windows.tasks.ip.IPInstance
 import kernel.utils.KernelFileUtils
 import kernel.utils.KernelFileUtils.parseAsAbsolutePath
 
@@ -30,7 +31,7 @@ abstract class ConfigNode() {
   @JsonIgnore
   val ipPaths: Seq[String] = Seq()
   @JsonIgnore
-  val ips: Map[String, Map[String, Any]] = Map()
+  val ips: Seq[IPInstance] = Seq()
 
   /** Get top module name
     * @return top module name, may not exist
@@ -146,11 +147,17 @@ abstract class ConfigNode() {
     * @return name and context
     */
   @JsonIgnore
-  def getIpInstances(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Map[String, Map[String, Any]] = {
-    ((parentNode match {
+  def getIpInstances(@JsonIgnore projectBase: Option[String] = ProjectConfig.projectBase): Seq[IPInstance] = {
+    (parentNode match {
       case Some(parent) => parent.getIpInstances(projectBase = projectBase)
-      case None         => Map()
-    }) ++ ips).toMap
+      case None         => Seq()
+    }) ++ ips.map(i =>
+      new IPInstance(
+        module = i.module,
+        typeId = i.typeId,
+        options = if (i.options.nonEmpty) i.options else mutable.Map()
+      )
+    )
   }
 
   // TODO: get ip instances recursively

@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel.toolchain.impl
 
 import idea.runner.ScaledaRuntime
+import idea.windows.tasks.ip.IPInstance
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.project.config.TaskType.{Implement, Simulation, Synthesis}
@@ -322,7 +323,7 @@ object Vivado
     val ips         = rt.task.getAllIps()
     val ipInstances = rt.task.getIpInstances()
     val unsupportedIpInstances = ipInstances.filterNot(i => {
-      val ipFound = ips.find(_._2.exports.get.name == i._1)
+      val ipFound = ips.find(_._2.exports.get.id == i.typeId)
       val targetSupports: Map[String, Seq[String]] =
         ipFound.map(ip => ip._2.exports.get.getSupports).getOrElse(Map())
       val targetAction = Set("all") ++ (rt.executor match {
@@ -350,23 +351,25 @@ object Vivado
     if (unsupportedIpInstances.nonEmpty) {
       KernelLogger.warn(
         "unsupported IP instances:",
-        unsupportedIpInstances.keys.mkString(", ")
+        unsupportedIpInstances.map(i => i.typeId).mkString(", ")
       )
     }
-    val supportedIpInstances = ipInstances.filter(i => !unsupportedIpInstances.contains(i._1))
+    val supportedIpInstances: Seq[IPInstance] =
+      ipInstances.filter(i => !unsupportedIpInstances.exists(_.module == i.module))
     // render template file
     val targetTemplateFiles: Seq[File] = supportedIpInstances
-      .flatMap(p => {
-        val (name, context) = p
+      .map(p => {
+        val (id, context) = (p.typeId, p.options.toMap)
         ips
-          .find(_._2.exports.get.name == name)
-          .flatMap(ip => {
+          .find(_._2.exports.get.id == id)
+          .map(ip => {
             val (path, ipExports) = ip
-            ipExports.exports.map(e => {
-              val targetData =
-                e.renderTemplate(context = if (context != null) context else Map(), projectBase = Some(path))
-              // write target file to workDir/targetFile
-              targetData.map(t => {
+            val e                 = ipExports.exports.get
+            val targetData =
+              e.renderTemplate(context = if (context != null) context else Map(), projectBase = Some(path))
+            // write target file to workDir/targetFile
+            val renderedFile: Seq[File] = targetData.toSeq
+              .map(t => {
                 val targetFile = new File(rt.executor.workingDir, t._1)
                 if (!targetFile.exists()) {
                   targetFile.getParentFile.mkdirs()
@@ -377,11 +380,12 @@ object Vivado
                 writer.close()
                 targetFile
               })
-            })
+              .toSeq
+            renderedFile
           })
+          .foldLeft(Seq[File]())((a, b) => a ++ b)
       })
       .flatten
-      .toSeq
     if (rt.profile.isRemoteProfile) {
       // remove old vivado project if exists and only for remote
       val top = rt.task.findTopModule.getOrElse("NONE")
@@ -408,7 +412,7 @@ object Vivado
       case TaskType.Implement   => "run_impl.tcl"
       case TaskType.Programming => "run_program.tcl"
     })))
-    val useContext = Serialization.getCCParams(templateContext)
+    val useContext       = Serialization.getCCParams(templateContext)
     val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
     templateRenderer.render(useContext = useContext)
     Some(rt)

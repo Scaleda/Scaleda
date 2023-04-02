@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package verilog.utils
 
 import idea.runner.configuration.ScaledaRunConfiguration
+import idea.windows.tasks.ip.IPInstance
 import kernel.project.config.ProjectConfig
 import kernel.utils.KernelFileUtils
 import verilog.VerilogPSIFileRoot
@@ -51,9 +52,9 @@ object FileUtils {
       //   ips.map(p => p._2.getIpFiles(projectBase = Some(p._1))).foldLeft(Set[String]())(_ ++ _)
       // KernelFileUtils.doUpdateIpFilesCache(singleFileIps)
       // collect Scaleda IPs and make stubs from ip instances
-      val ipInstances: Map[String, Map[String, Any]] = rt
-        .map(rt => rt.task.getIpInstances().map(t => (t._1, if (t._2 == null) Map[String, Any]() else t._2)))
-        .getOrElse(Map())
+      val ipInstances: Seq[IPInstance] = rt
+        .map(rt => rt.task.getIpInstances())
+        .getOrElse(Seq())
       // val stubs: Map[String, String] = ips.flatMap { case (_, ip) =>
       //   ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
       // }
