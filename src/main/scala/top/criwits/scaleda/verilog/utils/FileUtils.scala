@@ -2,7 +2,6 @@ package top.criwits.scaleda
 package verilog.utils
 
 import idea.runner.configuration.ScaledaRunConfiguration
-import idea.windows.tasks.ip.IPInstance
 import kernel.project.config.ProjectConfig
 import kernel.utils.KernelFileUtils
 import verilog.VerilogPSIFileRoot
@@ -45,28 +44,8 @@ object FileUtils {
       val ips: Map[String, ProjectConfig] = rt
         .map(_.task.getAllIps().filter(_._2.exports.nonEmpty))
         .getOrElse(Map())
-      // collects single file ip, in this project and every Scaleda IP
-      // val singleFileIps = rt
-      //   .map(rt => rt.task.getIpFiles())
-      //   .getOrElse(Set()) ++
-      //   ips.map(p => p._2.getIpFiles(projectBase = Some(p._1))).foldLeft(Set[String]())(_ ++ _)
-      // KernelFileUtils.doUpdateIpFilesCache(singleFileIps)
-      // collect Scaleda IPs and make stubs from ip instances
-      val ipInstances: Seq[IPInstance] = rt
-        .map(rt => rt.task.getIpInstances())
-        .getOrElse(Seq())
-      // val stubs: Map[String, String] = ips.flatMap { case (_, ip) =>
-      //   ipInstances.get(ip.exports.get.name).map(context => (ip.exports.get.name, ip.exports.get.renderStub(context)))
-      // }
-      // save these stubs to .cache/stubs/hash/id-module.v
-      val stubsCacheDir = new File(KernelFileUtils.ipCacheDirectory, "stubs")
-      KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
       val ipStubsSources: Set[String] =
-        // KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir).map(_.getAbsolutePath)
-        KernelFileUtils
-          .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
-          .map(_.getAbsolutePath)
-          .toSet
+        rt.map(rt => KernelFileUtils.doUpdateStubCacheFromRuntime(rt).map(_.getAbsolutePath).toSet).getOrElse(Set())
       // source set of this project
       val sources: Set[String] = rt match {
         // has runtime, get sources
@@ -80,11 +59,6 @@ object FileUtils {
           c._2.getSourceSet(projectBase = Some(c._1)) ++ c._2.getTestSet(projectBase = Some(c._1))
         })
         .toSet
-      // search cache directory to get all source files
-      // val ipStubsSources: Set[String] = KernelFileUtils
-      //   .getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
-      //   .map(_.getAbsolutePath)
-      //   .toSet
       sources ++ ipSources ++ ipStubsSources
     }
     // may reach `pwd`

@@ -5,7 +5,6 @@ import idea.runner.ScaledaRuntime
 import idea.utils.MainLogger
 import idea.windows.tasks.ip.IPInstance
 import kernel.project.config.{ProjectConfig, TaskConfig}
-import kernel.toolchain.executor.{ImplementExecutor, ProgrammingExecutor, SimulationExecutor, SynthesisExecutor}
 import kernel.toolchain.impl.Vivado
 import kernel.utils.serialise.YAMLHelper
 import verilog.parser.{VerilogParser, VerilogParserBaseVisitor}
@@ -522,7 +521,7 @@ object KernelFileUtils {
         .find(_._2.exports.get.id == id)
         .map(ip => {
           val (path, ipExports) = ip
-          val e = ipExports.exports.get
+          val e                 = ipExports.exports.get
           val targetData =
             e.renderTemplate(context = context, projectBase = Some(path))
           // write target file to workDir/targetFile
@@ -544,5 +543,33 @@ object KernelFileUtils {
         .foldLeft(Seq[File]())((a, b) => a ++ b)
     })
     targetTemplateFiles
+  }
+
+  /** Update stubs cache from runtime
+    * @param rt runtime
+    */
+  def doUpdateStubCacheFromRuntime(rt: ScaledaRuntime): Seq[File] = {
+    // get ALL Scaleda IPs
+    val ips: Map[String, ProjectConfig] = rt.task.getAllIps().filter(_._2.exports.nonEmpty)
+    // collect Scaleda IPs and make stubs from ip instances
+    val ipInstances: Seq[IPInstance] = rt.task.getIpInstances()
+    // save these stubs to .cache/stubs/hash/id-module.v
+    val stubsCacheDir = new File(KernelFileUtils.ipCacheDirectory, "stubs")
+    KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
+    val ipStubsSources: Seq[File] = KernelFileUtils.getAllSourceFiles(Set(stubsCacheDir.getAbsolutePath))
+    ipStubsSources
+  }
+
+  /** Update stubs in ProjectConfig
+    */
+  def doUpdateStubCacheFromProject(): Unit = {
+    ProjectConfig
+      .getConfig()
+      .foreach(c => {
+        val ips: Map[String, ProjectConfig] = c.getAllIps().filter(_._2.exports.nonEmpty)
+        val ipInstances: Seq[IPInstance]    = c.getIpInstances()
+        val stubsCacheDir                   = new File(KernelFileUtils.ipCacheDirectory, "stubs")
+        KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
+      })
   }
 }
