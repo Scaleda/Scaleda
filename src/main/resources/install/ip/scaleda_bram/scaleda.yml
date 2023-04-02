@@ -1,0 +1,30 @@
+name: scaleda-ip-project-generic-bram
+exports:
+  name: Scaleda BRAM
+  module: bram
+  id: scaleda_bram
+  options:
+    - name: read_first
+      default: false
+      type: boolean
+    - name: width
+      default: 32
+      type: int
+    - name: depth
+      default: 32
+      type: int
+    - name: addr_width
+      default: 5
+      type: int
+  stub: |
+    module {{module}} (
+        input                     clk,
+        input                     en,
+        input                     we,
+        input  [RAM_ADDR_WIDTH-1:0] addr,
+        input  [   RAM_WIDTH-1:0] din,
+        output [   RAM_WIDTH-1:0] dout
+    );
+    endmodule
+  templates:
+    - bram2.v.j2

@@ -135,12 +135,12 @@ abstract class ConfigNode() {
     val q = mutable.Queue.empty[(String, ProjectConfig)]
     q ++= localIps
     // identifier is IP name, to avoid ring dependence
-    val resultIpNames = new mutable.HashSet[String]()
+    val resultIpIds = new mutable.HashSet[String]()
     val results       = ArrayBuffer[(String, ProjectConfig)]()
     while (q.nonEmpty) {
       val top = q.dequeue()
-      if (!resultIpNames.contains(top._2.exports.get.name)) {
-        resultIpNames += top._2.exports.get.name
+      if (!resultIpIds.contains(top._2.exports.get.id)) {
+        resultIpIds += top._2.exports.get.id
         results += top
         // only search more ips in ProjectConfig
         q ++= top._2.getLocalIps(projectBase = Some(top._1))

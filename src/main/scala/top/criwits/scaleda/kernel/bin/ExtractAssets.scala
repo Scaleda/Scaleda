@@ -28,6 +28,9 @@ object ExtractAssets {
     oldVersion.close()
     if (version < ASSET_VERSION) return false
 
+    // TODO: copy or extract files from resource
+    install()
+
     // check integrity
     binaryList.forall(binary => Path.of(targetDirectory.getAbsolutePath, binary.split('/'): _*).toFile.exists())
   }
@@ -35,7 +38,12 @@ object ExtractAssets {
   // install resources in resources/install -> .scaleda/*
   def install() = {
     val parent = Paths.getGlobalConfigDir
-    val files  = Seq("scripts/vivado_call.tcl")
+    val files = Seq(
+      "scripts/vivado_call.tcl",
+      "ip/scaleda_bram/bram2.v.j2",
+      "ip/scaleda_bram/scaleda.yml",
+      "ip/clocking-wizard/scaleda.yml"
+    )
     files.foreach(f => {
       val file = new File(parent, f)
       file.getParentFile.mkdirs()
