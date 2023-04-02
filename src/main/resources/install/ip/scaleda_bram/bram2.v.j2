@@ -1,0 +1,60 @@
+/* Scaleda Generic Block RAM IP (inner)
+ * This is a stub for Block RAM-like IPs, written in standard Verilog.
+ * This module should never be directly initialised by user.
+ */
+
+`timescale 1ps / 1ps
+
+module {{module}} #(
+    parameter RAM_WIDTH = {{width}},
+    parameter RAM_DEPTH = {{depth}},
+    parameter RAM_ADDR_WIDTH = {{addr_width}}
+) (
+    input                     clk,
+    input                     en,
+    input                     we,
+    input  [RAM_ADDR_WIDTH-1:0] addr,
+    input  [   RAM_WIDTH-1:0] din,
+    output [   RAM_WIDTH-1:0] dout
+);
+    // the memory itself
+    reg [RAM_WIDTH-1:0] mem[0:RAM_DEPTH];
+
+    wire [RAM_ADDR_WIDTH-1:0] mem_addr;
+    reg [RAM_ADDR_WIDTH-1:0] addr_pipe;
+    assign mem_addr = addr_pipe;
+
+{% if read_first %}
+    reg [RAM_WIDTH-1:0] output_buf;
+    assign dout = output_buf;
+{% else %}
+    assign dout = mem[mem_addr];
+{% endif %}
+
+    always @(posedge clk) begin
+        if (en) begin
+{% if read_first %}
+            #100 output_buf <= mem[addr];
+{% endif %}
+            // The #100 here simulates the latency in original Block RAM
+            #100 addr_pipe <= addr;
+        end
+
+        if (en & we) begin
+            mem[addr] <= din;
+        end
+    end
+
+    integer i;
+    initial begin
+        addr_pipe = 'h0;
+{% if read_first %}
+            output_buf = 'h0;
+{% endif %}
+
+        for (i = 0; i < RAM_DEPTH; i = i + 1) begin
+            mem[i] = 'h0;
+        end
+    end
+
+endmodule
