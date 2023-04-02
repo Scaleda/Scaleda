@@ -18,17 +18,17 @@ import top.criwits.scaleda.idea.windows.tasks.ip.IPInstance
 case class TargetConfig(
     name: String = "",
     toolchain: String = "iverilog", // tricky
-    topModule: Option[String] = None,
-    constraints: Option[String] = None,
+    override val topModule: Option[String] = None,
+    override val constraints: Option[String] = None,
     options: Option[Map[String, String]] = None,
     tasks: Array[TaskConfig] = Array(),
-    override val source: String = "",
-    override val sources: Seq[String] = Seq(),
-    override val test: String = "",
-    override val tests: Seq[String] = Seq(),
-    override val ipFiles: Seq[String] = Seq(),
-    override val ipPaths: Seq[String] = Seq(),
-    override val ips: Seq[IPInstance] = Seq()
+    // override val source: String = "",
+    // override val sources: Seq[String] = Seq(),
+    // override val test: String = "",
+    // override val tests: Seq[String] = Seq(),
+    // override val ipFiles: Seq[String] = Seq(),
+    // override val ipPaths: Seq[String] = Seq(),
+    // override val ips: Seq[IPInstance] = Seq()
 ) extends ConfigNode()
 
 object TargetConfig extends HasDefault[TargetConfig] {

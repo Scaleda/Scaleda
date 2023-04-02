@@ -35,13 +35,9 @@ class ScaledaRunTaskNode(val task: TaskConfig) extends ScaledaRunTreeNode(task.n
   var `type`: String                       = task.`type`
 
   def toTaskConfig: TaskConfig = TaskConfig(
-    name,
-    `type`,
-    topModule,
-    true,
-    None,
-    None,
-    None // Scheduled to be removed
+    name = name,
+    `type` = `type`,
+    topModule = topModule
   )
 
   override def validate: Boolean = {

@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.importer
 
-import kernel.project.config.{TargetConfig, TaskConfig}
+import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
 import kernel.project.detect.VivadoProjectConfig
 import kernel.toolchain.impl.Vivado
 import kernel.utils.serialise.XMLHelper
@@ -11,7 +11,7 @@ import verilog.utils.ModuleUtils
 import java.io.File
 
 trait VivadoTargetParser extends BasicTargetParser {
-  override def parseAsTarget(path: File): TargetConfig = {
+  override def parseAsProject(path: File): ProjectConfig = {
     val projectFile    = path.listFiles((file, s) => s.endsWith(".xpr")).head
     val projectName    = projectFile.getName.split("\\.").head
     val o              = XMLHelper(projectFile, classOf[VivadoProjectConfig])
@@ -65,16 +65,20 @@ trait VivadoTargetParser extends BasicTargetParser {
     val target = TargetConfig(
       name = "Vivado",
       toolchain = Vivado.internalID,
+      topModule = if (top.nonEmpty) Some(top) else None,
+      tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask),
+      options = Some(Map("part" -> part))
+    )
+    val project = ProjectConfig(
+      name = projectName,
       // add sources; use relative path; if path is single dir, set to source/test
       sources = if (relativeSources.size > 1) relativeSources else Seq(),
       source = if (relativeSources.size == 1) relativeSources.head else "",
       tests = if (relativeTests.size > 1) relativeTests else Seq(),
       test = if (relativeTests.size == 1) relativeTests.head else "",
-      topModule = if (top.nonEmpty) Some(top) else None,
-      tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask),
-      options = Some(Map("part" -> part)),
-      ipFiles = simpleIPFiles
+      ipFiles = simpleIPFiles,
+      targets = Array(target)
     )
-    target
+    project
   }
 }

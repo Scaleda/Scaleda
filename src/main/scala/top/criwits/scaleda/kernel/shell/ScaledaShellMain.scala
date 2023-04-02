@@ -356,12 +356,17 @@ object ScaledaShellMain {
                   .filter(t => t._2.detect(workingDir))
                   .map(t => t._1)
               else Seq()
-            val targets = validToolchains.map(id => {
+            // val targets = validToolchains.map(id => {
+            //   KernelLogger.info(s"Detected toolchain: $id")
+            //   val parser = Toolchain.targetParser(id)
+            //   parser.parseAsProject(workingDir)
+            // })
+            val projects = validToolchains.map(id => {
               KernelLogger.info(s"Detected toolchain: $id")
               val parser = Toolchain.targetParser(id)
-              parser.parseAsTarget(workingDir)
+              parser.parseAsProject(workingDir)
             })
-            val project = new ProjectConfig(name = shellConfig.createProjectName, targets = targets.toArray)
+            val project = projects.head.copy(name = shellConfig.createProjectName)
             ProjectConfig.saveConfig(project, targetFile = new File(workingDir, "scaleda.yml"))
           case _ =>
             KernelLogger.error("not implemented.")
