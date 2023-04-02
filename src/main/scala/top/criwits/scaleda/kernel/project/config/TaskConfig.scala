@@ -20,12 +20,12 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 case class TaskConfig(
     name: String = "",
     `type`: String = "simulation", //tricky
-    override val topModule: Option[String] = None,
-    override val constraints: Option[String] = None,
+    topModule: Option[String] = None,
+    constraints: Option[String] = None,
     custom: Boolean = false,
     tcl: Option[String] = None,
     // force to use remote host
-    host: Option[String] = None,
+    host: Option[String] = None
     // override val source: String = "",
     // override val sources: Seq[String] = Seq(),
     // override val test: String = "",
@@ -34,6 +34,13 @@ case class TaskConfig(
     // override val ipPaths: Seq[String] = Seq(),
     // override val ips: Seq[IPInstance] = Seq()
 ) extends ConfigNode() {
+  override val source: String       = ""
+  override val sources: Seq[String] = Seq()
+  override val test: String         = ""
+  override val tests: Seq[String]   = Seq()
+  override val ipFiles: Seq[String] = Seq()
+  override val ipPaths: Seq[String] = Seq()
+  override val ips: Seq[IPInstance] = Seq()
 
   def taskType = taskTypeList(`type`)._2
 

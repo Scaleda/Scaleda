@@ -1,11 +1,11 @@
 package top.criwits.scaleda
 package kernel.project.config
 
+import idea.windows.tasks.ip.IPInstance
 import kernel.utils.HasDefault
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import top.criwits.scaleda.idea.windows.tasks.ip.IPInstance
 
 /** Case class for config of a target
   * @param name Config name
@@ -18,10 +18,10 @@ import top.criwits.scaleda.idea.windows.tasks.ip.IPInstance
 case class TargetConfig(
     name: String = "",
     toolchain: String = "iverilog", // tricky
-    override val topModule: Option[String] = None,
-    override val constraints: Option[String] = None,
+    topModule: Option[String] = None,
+    constraints: Option[String] = None,
     options: Option[Map[String, String]] = None,
-    tasks: Array[TaskConfig] = Array(),
+    tasks: Array[TaskConfig] = Array()
     // override val source: String = "",
     // override val sources: Seq[String] = Seq(),
     // override val test: String = "",
@@ -29,7 +29,15 @@ case class TargetConfig(
     // override val ipFiles: Seq[String] = Seq(),
     // override val ipPaths: Seq[String] = Seq(),
     // override val ips: Seq[IPInstance] = Seq()
-) extends ConfigNode()
+) extends ConfigNode() {
+  override val source: String       = ""
+  override val sources: Seq[String] = Seq()
+  override val test: String         = ""
+  override val tests: Seq[String]   = Seq()
+  override val ipFiles: Seq[String] = Seq()
+  override val ipPaths: Seq[String] = Seq()
+  override val ips: Seq[IPInstance] = Seq()
+}
 
 object TargetConfig extends HasDefault[TargetConfig] {
   override def getDefault: TargetConfig = TargetConfig()

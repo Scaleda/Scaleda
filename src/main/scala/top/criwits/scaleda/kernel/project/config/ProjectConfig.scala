@@ -27,17 +27,17 @@ case class ProjectConfig(
     version: String = "0.1",
     author: String = "",
     `type`: String = "rtl",
-    override val source: String = "src/",
-    override val sources: Seq[String] = Seq(),
-    override val test: String = "test/",
-    override val tests: Seq[String] = Seq(),
-    override val topModule: Option[String] = None,
-    override val constraints: Option[String] = None,
+    source: String = "src/",
+    sources: Seq[String] = Seq(),
+    test: String = "test/",
+    tests: Seq[String] = Seq(),
+    topModule: Option[String] = None,
+    constraints: Option[String] = None,
     targets: Array[TargetConfig] = Array(),
-    override val ipFiles: Seq[String] = Seq(),
-    override val ipPaths: Seq[String] = Seq(),
+    ipFiles: Seq[String] = Seq(),
+    ipPaths: Seq[String] = Seq(),
     exports: Option[ExportConfig] = None,
-    override val ips: Seq[IPInstance] = Seq()
+    ips: Seq[IPInstance] = Seq()
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))
