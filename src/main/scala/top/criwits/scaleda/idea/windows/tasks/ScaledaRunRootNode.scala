@@ -31,12 +31,11 @@ class ScaledaRunRootNode(val projectConfig: ProjectConfig) extends ScaledaRunTre
   var targets: mutable.Buffer[ScaledaRunTargetNode] = projectConfig.targets.map(new ScaledaRunTargetNode(_)).toBuffer
   targets.foreach(_.parent = Some(this))
 
-  /**
-   * Re-generate project configuration
-   * TODO: IP passthrough
-   * @return
-   */
-  def toProjectConfig: ProjectConfig = ProjectConfig(
+  /** Re-generate project configuration
+    * TODO: IP passthrough
+    * @return
+    */
+  def toProjectConfig: ProjectConfig = projectConfig.copy(
     name = name,
     `type` = `type`,
     source = source,
@@ -48,6 +47,6 @@ class ScaledaRunRootNode(val projectConfig: ProjectConfig) extends ScaledaRunTre
 
   override def validate: Boolean = {
     KernelFileUtils.isLegalName(name) && !source.isBlank && !test.isBlank &&
-      (targets.isEmpty || targets.forall(_.validate))
+    (targets.isEmpty || targets.forall(_.validate))
   }
 }

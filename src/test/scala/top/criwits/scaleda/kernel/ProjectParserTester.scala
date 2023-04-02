@@ -1,9 +1,10 @@
 package top.criwits.scaleda
 package kernel
 
+import kernel.project.config.ProjectConfig
 import kernel.project.detect.VivadoProjectConfig
 import kernel.project.importer.VivadoTargetParser
-import kernel.utils.serialise.XMLHelper
+import kernel.utils.serialise.{XMLHelper, YAMLHelper}
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
@@ -30,10 +31,18 @@ class ProjectParserTester extends AnyFlatSpec with should.Matchers {
     val path = "/home/chiro/Vivado/Tests/ip_tests/"
     val file = new File(path)
     if (file.exists()) {
-      val parser = new VivadoTargetParser {}
+      val parser  = new VivadoTargetParser {}
       val project = parser.parseAsProject(file)
       println(project)
       println(project.targets.toList)
+    }
+  }
+
+  it should "load and save project" in {
+    val path = new File("/home/chiro/Vivado/Tests/ip_tests/scaleda.yml")
+    if (path.exists()) {
+      val project = YAMLHelper(path, classOf[ProjectConfig])
+      ProjectConfig.saveConfig(project, targetFile = new File("target", "test.yml"))
     }
   }
 }
