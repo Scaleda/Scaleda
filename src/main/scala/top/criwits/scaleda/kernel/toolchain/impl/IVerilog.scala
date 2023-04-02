@@ -8,6 +8,7 @@ import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile}
 import kernel.utils.{FileReplaceContext, KernelFileUtils}
+import verilog.utils.ModuleUtils.parseSourceSetTopModules
 
 import java.io.File
 
@@ -96,11 +97,13 @@ object IVerilog extends ToolchainPresetProvider {
       * @return
       */
     override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
-      if (Seq(
+      if (
+        Seq(
           outputs.exists(_.contains("Icarus Verilog version")),
           outputs.exists(_.contains("iverilog-vpi")),
           outputs.exists(_.contains("Icarus Verilog runtime version")) // FIXME: some kind of tricks
-        ).forall(a => a)) {
+        ).forall(a => a)
+      ) {
         (true, Some(outputs.filter(_.contains("Icarus Verilog version")).head))
       } else {
         (false, None)
@@ -115,7 +118,11 @@ object IVerilog extends ToolchainPresetProvider {
     // get testbench info
     val testbench = simExecutor.topModule
     // val testbenchFile = KernelFileUtils.getProjectModuleFile(testbench, testbench = true).get
-    val testbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = testbench).get
+    val sourceTestbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = testbench)
+    val testbenchFile: File = sourceTestbenchFile.getOrElse({
+      val targetTop = parseSourceSetTopModules(rt.task.getTestSet()).headOption
+      KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = targetTop.head).get
+    })
 
     // generate new testbench file
     val newTestbench     = testbench + "_generated"
