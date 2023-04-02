@@ -1,0 +1,33 @@
+name: scaleda-ip-project-clk_wiz
+exports:
+  name: Xilinx PLL IP
+  module: clk_wiz_6
+  id: vivado_clk_wiz
+  stub: |
+    module {{module}} (
+      input wire clk_in1,
+      {% if lock %}output wire lock,
+      {% endif %}input wire reset,
+      output wire clk_out1
+    );
+    endmodule
+  vendor: vivado
+  options:
+    - name: clk_in_freq
+      type: float
+      default: 50.0
+    - name: clk_out_1_freq
+      type: float
+      default: 100.0
+    - name: lock
+      type: boolean
+      default: true
+  actions:
+    all:
+      tcl:
+        - 'create_ip -name clk_wiz -vendor xilinx.com -library ip -version 6.0 -module_name {{module}}'
+        - 'set_property -dict
+        [list
+        CONFIG.PRIM_IN_FREQ { {{clk_in_freq}} }
+        CONFIG.CLKOUT1_REQUESTED_OUT_FREQ { {{clk_out_1_freq}} }]
+        [get_ips {{module}}]'
