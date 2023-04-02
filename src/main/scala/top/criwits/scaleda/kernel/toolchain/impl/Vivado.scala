@@ -174,13 +174,19 @@ object Vivado
                                       else if (synth) Set("synthesis")
                                       else if (impl) Set("implementation")
                                       else Set())
-    val ipTclSections = ips
-      .map(ip => {
+    val ipInstances: Seq[IPInstance] = rt.task.getIpInstances().filter(i => ips.exists(_._2.exports.get.id == i.typeId))
+    val ipTclSections: String = ipInstances
+      .map(instance => {
+        val ip      = ips.find(_._2.exports.get.id == instance.typeId).get
         val actions = ip._2.exports.get.actions
-        val tclSections = actions
+        val tclSections: String = actions
           .filter(a => targetAction.contains(a._1))
           .map(_._2.tcl)
-          .flatMap(tcl => tcl.map(t => Template.render(t, ip._2.exports.get.getContextMap())(TemplateContextReplace)))
+          .flatMap(tcl =>
+            tcl.map(t =>
+              Template.render(t, ip._2.exports.get.getContextMap(instance.getOptions))(TemplateContextReplace)
+            )
+          )
           .mkString("\n")
         tclSections
       })
@@ -238,7 +244,8 @@ object Vivado
       )(replace) {
 
     override def context: Map[String, Any] =
-      Serialization.getCCParams(generateContext(rt))
+      // Serialization.getCCParams(generateContext(rt))
+      ???
   }
 
   override def detectProfiles = async {
@@ -359,14 +366,14 @@ object Vivado
     // render template file
     val targetTemplateFiles: Seq[File] = supportedIpInstances
       .map(p => {
-        val (id, context) = (p.typeId, p.options.toMap)
+        val (id, context) = (p.typeId, p.getOptions)
         ips
           .find(_._2.exports.get.id == id)
           .map(ip => {
             val (path, ipExports) = ip
             val e                 = ipExports.exports.get
             val targetData =
-              e.renderTemplate(context = if (context != null) context else Map(), projectBase = Some(path))
+              e.renderTemplate(context = context, projectBase = Some(path))
             // write target file to workDir/targetFile
             val renderedFile: Seq[File] = targetData.toSeq
               .map(t => {
