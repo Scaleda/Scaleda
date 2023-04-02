@@ -31,7 +31,8 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
   private val listModel      = new DefaultListModel[IPInstance]
   private val ipInstanceList = new JBList[IPInstance](listModel)
   ipInstanceList.setCellRenderer(new MyCellRenderer)
-  ipInstanceList.addListSelectionListener(onItemSelected) // TODO
+  ipInstanceList.addListSelectionListener(onItemSelected)
+  ProjectConfig.config.ips.foreach(listModel.addElement)
 
   // Splitter
   val splitter = new Splitter(false, 0.3f)
