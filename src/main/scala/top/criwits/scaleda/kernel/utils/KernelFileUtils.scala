@@ -215,7 +215,6 @@ object KernelFileUtils {
     * @return line where content inserts
     */
   def insertAfterModuleHead(original: File, output: File, moduleName: String, insert: String): Int = {
-    KernelLogger.info(s"insertAfterModuleHead $original -> $output")
     val tree = ModuleUtils.parseVerilogFileAST(original)
 
     class ModuleHeadVisitor(val moduleName: String) extends VerilogParserBaseVisitor[Int] {
@@ -248,6 +247,7 @@ object KernelFileUtils {
     val sourceText = source.mkString
     val lineStart  = sourceText.slice(0, visitor.headerEndAt).count(_ == '\n')
     val newText    = new mutable.StringBuilder(sourceText).insert(visitor.headerEndAt + 1, insert).toString()
+    KernelLogger.info(s"insertAfterModuleHead $original -> $output, insert in index ${visitor.headerEndAt + 1}")
     source.close()
 
     val outputStream = new FileOutputStream(output)
