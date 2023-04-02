@@ -35,14 +35,16 @@ object ExtractAssets {
   // install resources in resources/install -> .scaleda/*
   def install() = {
     val parent = Paths.getGlobalConfigDir
-    val files = Seq("scripts/vivado_call.tcl")
+    val files  = Seq("scripts/vivado_call.tcl")
     files.foreach(f => {
       val file = new File(parent, f)
       file.getParentFile.mkdirs()
-      if (!(file.exists() && file.length() > 1)) {
-        val resourceStream   = getClass.getClassLoader.getResourceAsStream("install/" + f)
+      val resourceStream = getClass.getClassLoader.getResourceAsStream("install/" + f)
+      val data           = resourceStream.readAllBytes()
+      // tricky: check if file exists and has the same length
+      if (!(file.exists() && file.length() == data.length)) {
         val fileOutputStream = new FileOutputStream(file)
-        fileOutputStream.write(resourceStream.readAllBytes())
+        fileOutputStream.write(data)
         fileOutputStream.close()
         resourceStream.close()
       }

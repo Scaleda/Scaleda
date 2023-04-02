@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.runner.SimpleCommandRunner
-import idea.utils.MainLogger
+import idea.utils.{MainLogger, runInEdt}
 import idea.windows.tasks.ScaledaRunWindowFactory.{vivadoModel, vivadoProject}
 import kernel.project.detect.{VivadoProjectConfig, VivadoRun}
 import kernel.toolchain.Toolchain
@@ -82,6 +82,7 @@ object VivadoRunManager {
               .find(_.toolchainType == Vivado.internalID)
               .map(_.path)
               .map(vivadoPath => {
+                // FIXME: java.lang.Throwable: Assert: must be called on EDT
                 SimpleCommandRunner.runCommand(
                   project,
                   VirtualFileManager.getInstance().findFileByNioPath(new File(project.getBasePath).toPath),
