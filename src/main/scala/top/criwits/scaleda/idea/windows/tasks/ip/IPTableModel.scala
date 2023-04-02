@@ -29,7 +29,10 @@ final class IPTableModel
         Toolchain.toolchains
           .map(toolchain => {
             new IPTableModel.BooleanColumnInfo(toolchain._2._1) {
-              override def valueOf(item: IP): JBoolean = item.config.exports.get.getSupports.contains(toolchain._1)
+              override def valueOf(item: IP): JBoolean = {
+                val supports = item.config.exports.get.getSupports
+                supports.contains(toolchain._1) || supports.contains("generic")
+              }
             }
           })
           .toArray: _*
