@@ -184,7 +184,7 @@ object Vivado
           .map(_._2.tcl)
           .flatMap(tcl =>
             tcl.map(t =>
-              Template.render(t, ip._2.exports.get.getContextMap(instance.getOptions))(TemplateContextReplace)
+              Template.render(t, ip._2.exports.get.getContextMap(instance.getRenderOptions))(TemplateContextReplace)
             )
           )
           .mkString("\n")
@@ -366,7 +366,7 @@ object Vivado
     // render template file
     val targetTemplateFiles: Seq[File] = supportedIpInstances
       .map(p => {
-        val (id, context) = (p.typeId, p.getOptions)
+        val (id, context) = (p.typeId, p.getRenderOptions)
         ips
           .find(_._2.exports.get.id == id)
           .map(ip => {

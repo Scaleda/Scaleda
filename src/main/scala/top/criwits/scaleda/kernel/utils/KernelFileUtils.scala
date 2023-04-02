@@ -428,7 +428,7 @@ object KernelFileUtils {
     synchronized {
       // ("id-module", hash)
       val contextHashes: Map[String, String] =
-        instances.map(p => (s"${p.typeId}-${p.module}", DigestUtils.sha256Hex(p.getOptions.toString()))).toMap
+        instances.map(p => (s"${p.typeId}-${p.module}", DigestUtils.sha256Hex(p.getRenderOptions.toString()))).toMap
       if (stubsCacheDir.exists() && stubsCacheDir.isFile) stubsCacheDir.delete()
       if (!stubsCacheDir.exists()) stubsCacheDir.mkdirs()
       val list: Array[File] = stubsCacheDir.listFiles()
@@ -460,7 +460,7 @@ object KernelFileUtils {
           .filter(i => needUpdates.contains(s"${i.typeId}-${i.module}") && i.typeId == ip._2.exports.get.id)
           .map(i => {
             val idAndModule = s"${i.typeId}-${i.module}"
-            (idAndModule, (needUpdates(idAndModule), ip._2.exports.get.renderStub(i.getOptions)))
+            (idAndModule, (needUpdates(idAndModule), ip._2.exports.get.renderStub(i.getRenderOptions)))
           })
       )
       // write to files: (.cache)/stubs/hash/name.v
