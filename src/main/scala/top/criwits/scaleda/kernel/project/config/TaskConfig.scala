@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
   * @param name Task name, shown in right panel & config menu
   * @param `type` 'simulation', 'synthesis', 'implementation' or 'programming'
   * @param topModule Top module, if [[None]] then inherited
-  * @param custom Use built-in execution policy
+  * @param custom Use custom execution policy (tcl)
   * @param tcl Path to Tcl script
   * @param constraints Path to constraints file or directory, if [[None]] then inherited
   */
@@ -22,6 +22,7 @@ case class TaskConfig(
     `type`: String = "simulation", //tricky
     topModule: Option[String] = None,
     constraints: Option[String] = None,
+    // FIXME: this field always dumped...
     custom: Boolean = false,
     tcl: Option[String] = None,
     // force to use remote host
