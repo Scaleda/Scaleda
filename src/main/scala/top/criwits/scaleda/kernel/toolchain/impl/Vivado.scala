@@ -18,7 +18,7 @@ import kernel.utils._
 
 import org.apache.commons.codec.digest.DigestUtils
 
-import java.io.{File, FilenameFilter, PrintWriter}
+import java.io.{File, FilenameFilter}
 import scala.async.Async.{async, await}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -327,72 +327,14 @@ object Vivado
           .foreach(executorNew => rt = rt.copy(executor = executorNew))
       case _ =>
     }
-    val ips         = rt.task.getAllIps()
-    val ipInstances = rt.task.getIpInstances()
-    val unsupportedIpInstances = ipInstances.filterNot(i => {
-      val ipFound = ips.find(_._2.exports.get.id == i.typeId)
-      val targetSupports: Map[String, Seq[String]] =
-        ipFound.map(ip => ip._2.exports.get.getSupports).getOrElse(Map())
-      val targetAction = Set("all") ++ (rt.executor match {
-        case _: SimulationExecutor  => Set("simulation")
-        case _: SynthesisExecutor   => Set("synthesis")
-        case _: ImplementExecutor   => Set("implement")
-        case _: ProgrammingExecutor => Set("programming")
-        case _                      => Set()
-      })
-      def doTestVendor(vendor: String): Boolean = {
-        if (!targetSupports.contains(vendor)) {
-          false
-        } else {
-          if (targetSupports(vendor).contains("all")) {
-            true
-          } else {
-            targetAction.intersect(targetSupports(vendor).toSet).nonEmpty
-          }
-        }
-      }
-      if (doTestVendor(Vivado.internalID) || doTestVendor("generic")) {
-        true
-      } else ipFound.nonEmpty
+    val targetAction = Set("all") ++ (rt.executor match {
+      case _: SimulationExecutor  => Set("simulation")
+      case _: SynthesisExecutor   => Set("synthesis")
+      case _: ImplementExecutor   => Set("implement")
+      case _: ProgrammingExecutor => Set("programming")
+      case _                      => Set()
     })
-    if (unsupportedIpInstances.nonEmpty) {
-      KernelLogger.warn(
-        "unsupported IP instances:",
-        unsupportedIpInstances.map(i => i.typeId).mkString(", ")
-      )
-    }
-    val supportedIpInstances: Seq[IPInstance] =
-      ipInstances.filter(i => !unsupportedIpInstances.exists(_.module == i.module))
-    // render template file
-    val targetTemplateFiles: Seq[File] = supportedIpInstances
-      .map(p => {
-        val (id, context) = (p.typeId, p.getRenderOptions)
-        ips
-          .find(_._2.exports.get.id == id)
-          .map(ip => {
-            val (path, ipExports) = ip
-            val e                 = ipExports.exports.get
-            val targetData =
-              e.renderTemplate(context = context, projectBase = Some(path))
-            // write target file to workDir/targetFile
-            val renderedFile: Seq[File] = targetData.toSeq
-              .map(t => {
-                val targetFile = new File(rt.executor.workingDir, t._1)
-                if (!targetFile.exists()) {
-                  targetFile.getParentFile.mkdirs()
-                  targetFile.createNewFile()
-                }
-                val writer = new PrintWriter(targetFile)
-                writer.write(t._2)
-                writer.close()
-                targetFile
-              })
-              .toSeq
-            renderedFile
-          })
-          .foldLeft(Seq[File]())((a, b) => a ++ b)
-      })
-      .flatten
+    val targetTemplateFiles = KernelFileUtils.handleIpInstances(rt.task, rt.executor.workingDir, targetAction)
     if (rt.profile.isRemoteProfile) {
       // remove old vivado project if exists and only for remote
       val top = rt.task.findTopModule.getOrElse("NONE")
@@ -411,7 +353,7 @@ object Vivado
       })
     }
     // add sources
-    val templateContext = generateContext(rt, ipsData = ips, targetTemplateFiles = targetTemplateFiles)
+    val templateContext = generateContext(rt, ipsData = Map(), targetTemplateFiles = targetTemplateFiles)
     rt = rt.copy(context = rt.context ++ Map("sourceFiles" -> templateContext.sourceList.map(new File(_))))
     rt = rt.copy(task = rt.task.copy(tcl = Some(rt.task.taskType match {
       case TaskType.Simulation  => "run_sim.tcl"

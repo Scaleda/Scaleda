@@ -8,7 +8,6 @@ import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
 import kernel.toolchain.{Toolchain, ToolchainPresetProvider, ToolchainProfile}
 import kernel.utils.{FileReplaceContext, KernelFileUtils}
-import verilog.utils.ModuleUtils.parseSourceSetTopModules
 
 import java.io.File
 
@@ -35,8 +34,10 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     val newTestbench     = testbench + "_generated"
     val newTestbenchFile = new File(workingDir, newTestbench + ".v")
 
+    val ipSources = KernelFileUtils.handleIpInstances(task, workingDir, Set("all", "simulation"))
+
     // val sources = KernelFileUtils.getAllProjectSourceFiles()
-    val sources = KernelFileUtils.getAllSourceFiles(task.getSourceSet())
+    val sources = KernelFileUtils.getAllSourceFiles(task.getSourceSet()) ++ ipSources
 
     val simExecutorName = testbench + "_iverilog_executor"
 
@@ -133,6 +134,8 @@ object IVerilog extends ToolchainPresetProvider {
     // vcd file
     val vcdFile = simExecutor.vcdFile
 
+    val targetTemplateFiles = KernelFileUtils.handleIpInstances(rt.task, rt.executor.workingDir, Set("all", "simulation"))
+
     val insertContent =
       s"""
          |initial begin
@@ -160,7 +163,9 @@ object IVerilog extends ToolchainPresetProvider {
     )
     val rtWithContext = rt.copy(context =
       rt.context ++ Map("replaceFiles" -> replaceFiles) ++ Map(
-        "sourceFiles" -> (KernelFileUtils.getAllSourceFiles(rt.task.getSourceSet()) :+ testbenchFile)
+        "sourceFiles" -> ((KernelFileUtils.getAllSourceFiles(rt.task.getSourceSet()) ++ Seq(
+          testbenchFile
+        )) ++ targetTemplateFiles)
       )
     )
     Some(rtWithContext)

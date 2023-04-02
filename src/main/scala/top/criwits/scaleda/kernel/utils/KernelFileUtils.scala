@@ -1,9 +1,12 @@
 package top.criwits.scaleda
 package kernel.utils
 
+import idea.runner.ScaledaRuntime
 import idea.utils.MainLogger
 import idea.windows.tasks.ip.IPInstance
-import kernel.project.config.ProjectConfig
+import kernel.project.config.{ProjectConfig, TaskConfig}
+import kernel.toolchain.executor.{ImplementExecutor, ProgrammingExecutor, SimulationExecutor, SynthesisExecutor}
+import kernel.toolchain.impl.Vivado
 import kernel.utils.serialise.YAMLHelper
 import verilog.parser.{VerilogParser, VerilogParserBaseVisitor}
 import verilog.utils.ModuleUtils
@@ -474,5 +477,74 @@ object KernelFileUtils {
         writer.close()
       }
     }
+  }
+
+  /** Handle IP instances, filter, do renders
+    * @param rt runtime
+    * @return generated sources
+    */
+  def handleIpInstances(task: TaskConfig, targetDirectory: File, targetAction: Set[String]): Seq[File] = {
+    val ips         = task.getAllIps()
+    val ipInstances = task.getIpInstances()
+    val unsupportedIpInstances = ipInstances.filterNot(i => {
+      val ipFound = ips.find(_._2.exports.get.id == i.typeId)
+      val targetSupports: Map[String, Seq[String]] =
+        ipFound.map(ip => ip._2.exports.get.getSupports).getOrElse(Map())
+
+      def doTestVendor(vendor: String): Boolean = {
+        if (!targetSupports.contains(vendor)) {
+          false
+        } else {
+          if (targetSupports(vendor).contains("all")) {
+            true
+          } else {
+            targetAction.intersect(targetSupports(vendor).toSet).nonEmpty
+          }
+        }
+      }
+
+      if (doTestVendor(Vivado.internalID) || doTestVendor("generic")) {
+        true
+      } else ipFound.nonEmpty
+    })
+    if (unsupportedIpInstances.nonEmpty) {
+      KernelLogger.warn(
+        "unsupported IP instances:",
+        unsupportedIpInstances.map(i => i.typeId).mkString(", ")
+      )
+    }
+    val supportedIpInstances: Seq[IPInstance] =
+      ipInstances.filter(i => !unsupportedIpInstances.exists(_.module == i.module))
+    // render template file
+    val targetTemplateFiles: Seq[File] = supportedIpInstances
+      .map(p => {
+        val (id, context) = (p.typeId, p.getRenderOptions)
+        ips
+          .find(_._2.exports.get.id == id)
+          .map(ip => {
+            val (path, ipExports) = ip
+            val e                 = ipExports.exports.get
+            val targetData =
+              e.renderTemplate(context = context, projectBase = Some(path))
+            // write target file to workDir/targetFile
+            val renderedFile: Seq[File] = targetData.toSeq
+              .map(t => {
+                val targetFile = new File(targetDirectory, t._1)
+                if (!targetFile.exists()) {
+                  targetFile.getParentFile.mkdirs()
+                  targetFile.createNewFile()
+                }
+                val writer = new PrintWriter(targetFile)
+                writer.write(t._2)
+                writer.close()
+                targetFile
+              })
+              .toSeq
+            renderedFile
+          })
+          .foldLeft(Seq[File]())((a, b) => a ++ b)
+      })
+      .flatten
+    targetTemplateFiles
   }
 }
