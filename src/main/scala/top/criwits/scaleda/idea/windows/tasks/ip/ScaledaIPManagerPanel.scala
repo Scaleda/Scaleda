@@ -98,7 +98,7 @@ class ScaledaIPManagerPanel(val project: Project) extends JPanel(new BorderLayou
     rpanel.previewPanel.add(editor.getComponent)
     def renderEditor: Unit = {
       editor.getDocument.setText(
-        ip.config.exports.get.renderStub(item.options.toMap)
+        ip.config.exports.get.renderStub(item.getOptions)
       )
     }
 
