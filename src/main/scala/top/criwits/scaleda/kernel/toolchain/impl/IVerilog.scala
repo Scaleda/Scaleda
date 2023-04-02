@@ -39,6 +39,9 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
     // val sources = KernelFileUtils.getAllProjectSourceFiles()
     val sources = KernelFileUtils.getAllSourceFiles(task.getSourceSet()) ++ ipSources
 
+    val sourceTestbenchFile =
+      KernelFileUtils.getModuleFileFromSet(task.getSourceSet(), module = testbench)
+
     val simExecutorName = testbench + "_iverilog_executor"
 
     Seq(
@@ -50,7 +53,15 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
           "-o",
           simExecutorName,
           newTestbenchFile.getAbsolutePath
-        ) ++ sources.map(_.getAbsolutePath),
+        )
+          ++ sources
+            .filter(s => {
+              if (sourceTestbenchFile.nonEmpty) {
+                // remove original top file, use generated one
+                sourceTestbenchFile.get.getAbsolutePath == s.getAbsolutePath
+              } else true
+            })
+            .map(_.getAbsolutePath),
         path = workingDir.getAbsolutePath,
         description = "Compiling designs"
       ),
@@ -134,7 +145,8 @@ object IVerilog extends ToolchainPresetProvider {
     // vcd file
     val vcdFile = simExecutor.vcdFile
 
-    val targetTemplateFiles = KernelFileUtils.handleIpInstances(rt.task, rt.executor.workingDir, Set("all", "simulation"))
+    val targetTemplateFiles =
+      KernelFileUtils.handleIpInstances(rt.task, rt.executor.workingDir, Set("all", "simulation"))
 
     val insertContent =
       s"""
