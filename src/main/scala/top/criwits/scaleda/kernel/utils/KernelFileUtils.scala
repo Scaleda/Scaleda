@@ -524,6 +524,8 @@ object KernelFileUtils {
           val e                 = ipExports.exports.get
           val targetData =
             e.renderTemplate(context = context, projectBase = Some(path))
+              // append id-module to filepath
+              .map(t => (s"${id}-${p.module}-${t._1}", t._2))
           // write target file to workDir/targetFile
           val renderedFile: Seq[File] = targetData.toSeq
             .map(t => {
