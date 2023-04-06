@@ -16,7 +16,11 @@ class AmbiguousClockAnnotator extends Annotator {
     if (!element.asInstanceOf[DelayOrEventControlPsiNode].isEventControl) return
     val events = element.asInstanceOf[DelayOrEventControlPsiNode].getEvents.map(_.getExpression)
 
-    val sensitiveSiganls = events.map(_.getUsedSignals).foldLeft(Iterable[SignalIdentifierPsiNode]())(_ ++ _)
+    val sensitiveSiganls = try {
+      events.map(_.getUsedSignals).foldLeft(Iterable[SignalIdentifierPsiNode]())(_ ++ _)
+    } catch {
+      case _: Throwable => return
+    }
     val usedSiganls = always.getUsedSignals
 
     val remainingSiganls = sensitiveSiganls.filter(sensitiveSignal => !usedSiganls.exists(sensitiveSignal == _))

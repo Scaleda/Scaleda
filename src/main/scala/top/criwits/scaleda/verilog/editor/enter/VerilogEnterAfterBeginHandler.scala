@@ -55,29 +55,6 @@ class VerilogEnterAfterBeginHandler extends EnterHandlerDelegateAdapter {
       }
 
     }
-
-//
-//    // Update PSI First
-//    PsiDocumentManager.getInstance(file.getProject).commitDocument(editor.getDocument);
-//
-//    val offset  = caretOffset.get.intValue
-//    val element = file.findElementAt(offset).getPrevSibling
-//
-//    if (
-//      PsiTreeUtil.getParentOfType(element, classOf[ModuleDeclarationPsiNode]) != null && element
-//        .isInstanceOf[PsiElement] && element.textMatches("begin")
-//    ) {
-//      // now we need to check environment!
-//      if (getUnmatchedBeginsCount(editor, offset, file.getFileType) > 0) {
-//        // should insert `end`
-//        val document = editor.getDocument
-//        document.insertString(offset, "\nend")
-//
-//        // TODO: format!
-//        return Result.DefaultForceIndent
-//      } else return Result.Continue
-//    }
-
     Result.Continue
   }
 

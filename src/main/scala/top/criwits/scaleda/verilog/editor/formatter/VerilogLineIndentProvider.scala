@@ -1,7 +1,10 @@
 package top.criwits.scaleda
 package verilog.editor.formatter
 
+import verilog.editor.formatter.VerilogLineIndentProvider.getIndentString
 import verilog.parser.VerilogLexer
+import verilog.psi.nodes.block.ConditionalStatementPsiNode
+import verilog.psi.nodes.module.ModuleHeadPsiNode
 import verilog.{VerilogFileType, VerilogLanguage}
 
 import com.intellij.application.options.CodeStyle
@@ -9,17 +12,15 @@ import com.intellij.formatting.IndentInfo
 import com.intellij.lang.Language
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
-import com.intellij.util.text.CharArrayUtil
-import VerilogLineIndentProvider.getIndentString
 import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.psi.util.PsiTreeUtil
-import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleHeadPsiNode
+import com.intellij.util.text.CharArrayUtil
 
+/** Verilog line indent provider. This provider is used for quick, real-time indent complementation.
+ * Block (formatter) based line indent provider is not this one.
+  */
 class VerilogLineIndentProvider extends LineIndentProvider {
-
   //noinspection DuplicatedCode
   override def getLineIndent(project: Project, editor: Editor, language: Language, offset: Int): String = {
     if (offset > 0) {
@@ -28,23 +29,29 @@ class VerilogLineIndentProvider extends LineIndentProvider {
         pos.moveAtEndOfPreviousLine()
 
         // Semantic-based check
-        if (pos.isAtAnyOf(
-          VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter]
-          VerilogLanguage.getTokenType(VerilogLexer.Left_parenthes), // (<caret> [Enter])
-          VerilogLanguage.getTokenType(VerilogLexer.K_else) // else <carent> [Enter] // TODO
-        )) {
+        if (
+          pos.isAtAnyOf(
+            VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter]
+            VerilogLanguage.getTokenType(VerilogLexer.Left_parenthes),  // (<caret> [Enter])
+            VerilogLanguage.getTokenType(VerilogLexer.K_else)           // else <carent> [Enter] // TODO
+          )
+        ) {
           return getIndentString(editor, pos.getStartOffset, 1)
         }
 
-        if (pos.isAtAnyOf(
-          VerilogLanguage.getTokenType(VerilogLexer.K_begin)
-        )) {
+        if (
+          pos.isAtAnyOf(
+            VerilogLanguage.getTokenType(VerilogLexer.K_begin)
+          )
+        ) {
           return getIndentString(editor, pos.getStartOffset, 1)
         }
 
-        if (pos.isAtAnyOf(
-          VerilogLanguage.getTokenType(VerilogLexer.K_end)
-        )) {
+        if (
+          pos.isAtAnyOf(
+            VerilogLanguage.getTokenType(VerilogLexer.K_end)
+          )
+        ) {
           return getIndentString(editor, pos.getStartOffset, 0)
         }
 
@@ -52,13 +59,13 @@ class VerilogLineIndentProvider extends LineIndentProvider {
         PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
         val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument)
 
-        val currentElement = psiFile.findElementAt(offset)
+        val currentElement  = psiFile.findElementAt(offset)
         val posStartElement = psiFile.findElementAt(pos.getStartOffset)
 
         // module head indent
         if (posStartElement != null) {
           if (currentElement != null) {
-            val currentParent = PsiTreeUtil.getParentOfType(currentElement, classOf[ModuleHeadPsiNode])
+            val currentParent  = PsiTreeUtil.getParentOfType(currentElement, classOf[ModuleHeadPsiNode])
             val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ModuleHeadPsiNode])
             if (currentParent == null && posStartParent != null)
               return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 1)
@@ -77,15 +84,12 @@ class VerilogLineIndentProvider extends LineIndentProvider {
         ///       foobar()
         ///     | <= here
         if (currentElement != null && posStartElement != null) {
-          val currentParent = PsiTreeUtil.getParentOfType(currentElement, classOf[ConditionalStatementPsiNode])
+          val currentParent  = PsiTreeUtil.getParentOfType(currentElement, classOf[ConditionalStatementPsiNode])
           val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ConditionalStatementPsiNode])
           if ((currentParent == null && posStartParent != null) || (currentParent != posStartParent)) {
             return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 0)
           }
         }
-
-
-
 
         return getIndentString(editor, pos.getStartOffset, 0)
       }
@@ -99,27 +103,28 @@ class VerilogLineIndentProvider extends LineIndentProvider {
 }
 
 object VerilogLineIndentProvider {
-  /**
-   * Magic?
-   * @param editor
-   * @param offset
-   * @param policy -1: shrink 0: hold 1: expand
-   * @return
-   */
+
+  /** Calculate the indent and get the indent string for the current line
+    * @param editor current [[Editor]]
+    * @param offset offset to caret
+    * @param policy -1: shrink 0: hold 1: expand
+    * @return
+    */
   def getIndentString(editor: Editor, offset: Int, policy: Int): String = {
-    val docChars = editor.getDocument.getCharsSequence
-    val settings = CodeStyle.getSettings(editor)
+    val docChars      = editor.getDocument.getCharsSequence
+    val settings      = CodeStyle.getSettings(editor)
     val indentOptions = settings.getIndentOptions(VerilogFileType.instance)
-    val indentLength = indentOptions.INDENT_SIZE
-    var baseIndent = ""
+    val indentLength  = indentOptions.INDENT_SIZE
+    var baseIndent    = ""
     if (offset > 0) {
       val indentStart = CharArrayUtil.shiftBackwardUntil(docChars, offset, "\n") + 1
       if (indentStart >= 0) {
         val indentEnd = CharArrayUtil.shiftForward(docChars, indentStart, " \t")
-        val diff = indentEnd - indentStart
+        val diff      = indentEnd - indentStart
         if (diff > 0) {
           if (policy >= 0) baseIndent = docChars.subSequence(indentStart, indentEnd).toString
-          else if (diff >= indentLength) baseIndent = docChars.subSequence(indentStart, indentEnd - indentLength).toString
+          else if (diff >= indentLength)
+            baseIndent = docChars.subSequence(indentStart, indentEnd - indentLength).toString
         }
       }
     }

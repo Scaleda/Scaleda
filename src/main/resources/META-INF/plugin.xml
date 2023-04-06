@@ -113,6 +113,7 @@
         <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
         <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
         <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
+        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder" />
         <internalFileTemplate name="Verilog Module" />
 
     </extensions>
