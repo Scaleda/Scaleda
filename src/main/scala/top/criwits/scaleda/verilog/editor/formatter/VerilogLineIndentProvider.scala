@@ -30,86 +30,19 @@ class VerilogLineIndentProvider extends LineIndentProvider {
       val pos = VerilogSemanticEditorPosition.createEditorPosition(editor, offset - 1)
       if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.White_space))) { // This seems is needed to check if it is enter event
         pos.moveAtEndOfPreviousLine()
-
-        // Semantic-based check
         if (
           pos.isAtAnyOf(
-//            VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter]
-            VerilogLanguage.getTokenType(VerilogLexer.Left_parenthes),  // (<caret> [Enter])
-            VerilogLanguage.getTokenType(VerilogLexer.K_else)           // else <carent> [Enter] // TODO
+            VerilogLanguage.getTokenType(VerilogLexer.K_else) // TODO: add IF
           )
         ) {
           return getIndentString(editor, pos.getStartOffset, 1)
         }
-
-        if (
-          pos.isAtAnyOf(
-            VerilogLanguage.getTokenType(VerilogLexer.K_begin)
-          )
-        ) {
-          return getIndentString(editor, pos.getStartOffset, 1)
-        }
-
-        if (
-          pos.isAtAnyOf(
-            VerilogLanguage.getTokenType(VerilogLexer.K_end) // hold
-          )
-        ) {
-          return getIndentString(editor, pos.getStartOffset, 0)
-        }
-
-        // PSI-based check, update PSI
-        PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
-        val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument)
-
-        val currentElement  = psiFile.findElementAt(offset)
-        val posStartElement = psiFile.findElementAt(pos.getStartOffset)
-
-        // Non instantiation parenthesis
-        if (currentElement != null) {
-          val parent = PsiTreeUtil.getParentOfType(currentElement, classOf[ModuleInstantiationPsiNode])
-          if (parent == null && pos.isAtAnyOf(VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes))) {
-            return getIndentString(editor, pos.getStartOffset, 1)
-          }
-        }
-
-        // module head indent
-        if (posStartElement != null) {
-          if (currentElement != null) {
-            val currentParent  = PsiTreeUtil.getParentOfType(currentElement, classOf[ModuleHeadPsiNode])
-            val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ModuleHeadPsiNode])
-            if (currentParent == null && posStartParent != null)
-              return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 1)
-          } else {
-            val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ModuleHeadPsiNode])
-            if (posStartParent != null)
-              return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 1)
-          }
-        }
-
-        // if () shrink indent
-        /// TODO: cannot shrink for
-        /// if ()
-        ///   if ()
-        ///     if ()
-        ///       foobar()
-        ///     | <= here
-        if (currentElement != null && posStartElement != null) {
-          val currentParent  = PsiTreeUtil.getParentOfType(currentElement, classOf[ConditionalStatementPsiNode])
-          val posStartParent = PsiTreeUtil.getParentOfType(posStartElement, classOf[ConditionalStatementPsiNode])
-          if ((currentParent == null && posStartParent != null) || (currentParent != posStartParent)) {
-            return getIndentString(editor, posStartParent.getTextRange.getStartOffset, 0)
-          }
-        }
-
-        return getIndentString(editor, pos.getStartOffset, 0)
       }
-
     }
     null
   }
 
-  override def isSuitableFor(language: Language): Boolean = language.isInstanceOf[VerilogLanguage.type] // ?
+  override def isSuitableFor(language: Language): Boolean = language.isInstanceOf[VerilogLanguage.type]
 
 }
 

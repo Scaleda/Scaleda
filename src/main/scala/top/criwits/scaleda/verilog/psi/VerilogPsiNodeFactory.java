@@ -211,6 +211,11 @@ public class VerilogPsiNodeFactory {
     );
 
     ruleIElementTypeClassMap.put(
+        getRuleIElementType(VerilogParser.RULE_module_instance),
+        ModuleInstancePsiNode.class
+    );
+
+    ruleIElementTypeClassMap.put(
         getRuleIElementType(VerilogParser.RULE_name_of_instance),
         NameOfInstancePsiNode.class
     );

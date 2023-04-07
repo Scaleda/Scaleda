@@ -32,10 +32,11 @@
                 text="Waveform">
             <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
         </action>
-      <action id="top.criwits.scaleda.idea.project.NewVerilogFileAction" class="top.criwits.scaleda.idea.project.NewVerilogFileAction"
-              text="Verilog File" description="Create new Verilog file">
-          <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
-      </action>
+        <action id="top.criwits.scaleda.idea.project.NewVerilogFileAction"
+                class="top.criwits.scaleda.idea.project.NewVerilogFileAction"
+                text="Verilog File" description="Create new Verilog file">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
 
     </actions>
 
@@ -109,12 +110,11 @@
                              implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder"/>
         <lang.findUsagesProvider language="Verilog"
                                  implementationClass="top.criwits.scaleda.verilog.references.VerilogFindUsagesProvider"/>
-        <!--        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.formatter.VerilogFormattingBuilderModel" />-->
         <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
-        <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
         <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
-        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder" />
-        <internalFileTemplate name="Verilog Module" />
+        <lang.formatter language="Verilog"
+                        implementationClass="top.criwits.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder"/>
+        <internalFileTemplate name="Verilog Module"/>
 
     </extensions>
 
@@ -161,7 +161,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
         <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType"/>
-        <newProjectWizard.language id="scaleda" implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+        <newProjectWizard.language id="scaleda"
+                                   implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
         <!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
     </extensions>

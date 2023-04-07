@@ -19,7 +19,7 @@ class VerilogFormattingModelBuilder extends FormattingModelBuilder {
         formattingContext.getNode,
         null,
         null,
-        Indent.getSmartIndent(Indent.Type.CONTINUATION),
+        Indent.getNoneIndent,
         settings,
         spacingBuilder
       ),
