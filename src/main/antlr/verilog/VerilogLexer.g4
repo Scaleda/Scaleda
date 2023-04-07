@@ -26,6 +26,7 @@ K_cmos : 'cmos' ;
 K_deassign : 'deassign' ;
 K_default : 'default' ;
 K_default_nettype : 'default_nettype' ;
+K_define : 'define' ;
 K_defparam : 'defparam' ;
 K_design : 'design' ;
 K_disable : 'disable' ;
@@ -301,9 +302,9 @@ Time_identifier
    : [0-9] + [mnpf] 's'
    ;
 
-Filepath
-   : '"' (~ [\n\r])+ '"'
-   ;
+//Filepath
+//   : '"' (~ [\n\r])+ '"'
+//   ;
 
 
 String

@@ -53,6 +53,12 @@ library_declaration :
 
 */
 
+// 1.3 Module and primitive source text
+// START SYMBOL
+source_text
+   : (directive | description)* EOF
+   ;
+
 //timing_spec
 //   : '`' 'timescale' Time_identifier '/' Time_identifier
 //   ;
@@ -66,7 +72,7 @@ timescale_directive
    ;
 
 include_directive
-   : 'include' Filepath
+   : 'include' String
    ;
 
 default_nettype_directive
@@ -113,12 +119,6 @@ cell_clause
 
 use_clause
    : 'use' (library_identifier '.')? cell_identifier (':' 'config')?
-   ;
-
-// 1.3 Module and primitive source text
-// START SYMBOL
-source_text
-   : (directive | description)* EOF
    ;
 
 description

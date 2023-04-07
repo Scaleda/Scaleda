@@ -8,6 +8,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface VerilogParserListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#source_text}.
+	 * @param ctx the parse tree
+	 */
+	void enterSource_text(VerilogParser.Source_textContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#source_text}.
+	 * @param ctx the parse tree
+	 */
+	void exitSource_text(VerilogParser.Source_textContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#directive}.
 	 * @param ctx the parse tree
 	 */
@@ -137,16 +147,6 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitUse_clause(VerilogParser.Use_clauseContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link VerilogParser#source_text}.
-	 * @param ctx the parse tree
-	 */
-	void enterSource_text(VerilogParser.Source_textContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link VerilogParser#source_text}.
-	 * @param ctx the parse tree
-	 */
-	void exitSource_text(VerilogParser.Source_textContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link VerilogParser#description}.
 	 * @param ctx the parse tree

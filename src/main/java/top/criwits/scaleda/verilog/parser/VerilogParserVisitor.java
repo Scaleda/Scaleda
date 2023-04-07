@@ -11,6 +11,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#source_text}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSource_text(VerilogParser.Source_textContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#directive}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -88,12 +94,6 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitUse_clause(VerilogParser.Use_clauseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link VerilogParser#source_text}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSource_text(VerilogParser.Source_textContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#description}.
 	 * @param ctx the parse tree
