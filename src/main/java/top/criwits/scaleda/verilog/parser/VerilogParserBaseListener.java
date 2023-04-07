@@ -113,6 +113,18 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterIfndef_directive(VerilogParser.Ifndef_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIfndef_directive(VerilogParser.Ifndef_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterElse_directive(VerilogParser.Else_directiveContext ctx) { }
 	/**
 	 * {@inheritDoc}

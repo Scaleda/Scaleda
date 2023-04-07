@@ -304,7 +304,7 @@ Dollar_identifier
    ;
 
 Time_identifier
-   : [0-9] + [mnpf] 's'
+   : [0-9] + White_space* [mnpf] 's'
    ;
 
 //Filepath

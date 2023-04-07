@@ -59,6 +59,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIfdef_directive(VerilogParser.Ifdef_directiveContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#ifndef_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfndef_directive(VerilogParser.Ifndef_directiveContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#else_directive}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

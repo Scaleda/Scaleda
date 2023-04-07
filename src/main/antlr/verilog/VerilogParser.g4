@@ -70,6 +70,7 @@ directive
    | define_directive
    | define_flag_directive
    | ifdef_directive
+   | ifndef_directive
    | else_directive
    | elsif_directive
    | endif_directive
@@ -94,6 +95,10 @@ define_flag_directive
 
 ifdef_directive
    : 'ifdef' defined_flag
+   ;
+
+ifndef_directive
+   : 'ifndef' defined_flag
    ;
 
 else_directive

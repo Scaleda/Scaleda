@@ -88,6 +88,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitIfdef_directive(VerilogParser.Ifdef_directiveContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#ifndef_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterIfndef_directive(VerilogParser.Ifndef_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#ifndef_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitIfndef_directive(VerilogParser.Ifndef_directiveContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#else_directive}.
 	 * @param ctx the parse tree
 	 */
