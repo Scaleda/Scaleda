@@ -38,6 +38,96 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitTimescale_directive(VerilogParser.Timescale_directiveContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#defined_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefined_flag(VerilogParser.Defined_flagContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#defined_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefined_flag(VerilogParser.Defined_flagContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#using_defined_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterUsing_defined_flag(VerilogParser.Using_defined_flagContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#using_defined_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitUsing_defined_flag(VerilogParser.Using_defined_flagContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#define_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefine_directive(VerilogParser.Define_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#define_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefine_directive(VerilogParser.Define_directiveContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#define_flag_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefine_flag_directive(VerilogParser.Define_flag_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#define_flag_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefine_flag_directive(VerilogParser.Define_flag_directiveContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#ifdef_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterIfdef_directive(VerilogParser.Ifdef_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#ifdef_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitIfdef_directive(VerilogParser.Ifdef_directiveContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#else_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterElse_directive(VerilogParser.Else_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#else_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitElse_directive(VerilogParser.Else_directiveContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#elsif_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterElsif_directive(VerilogParser.Elsif_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#elsif_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitElsif_directive(VerilogParser.Elsif_directiveContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#endif_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterEndif_directive(VerilogParser.Endif_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#endif_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitEndif_directive(VerilogParser.Endif_directiveContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#undef_directive}.
+	 * @param ctx the parse tree
+	 */
+	void enterUndef_directive(VerilogParser.Undef_directiveContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#undef_directive}.
+	 * @param ctx the parse tree
+	 */
+	void exitUndef_directive(VerilogParser.Undef_directiveContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#include_directive}.
 	 * @param ctx the parse tree
 	 */

@@ -64,11 +64,52 @@ source_text
 //   ;
 
 directive
-   : '`' (timescale_directive | include_directive | default_nettype_directive)
+   : '`' (timescale_directive
+   | include_directive
+   | default_nettype_directive
+   | define_directive
+   | define_flag_directive
+   | ifdef_directive
+   | else_directive
+   | elsif_directive
+   | endif_directive
+   | undef_directive)
    ;
 
 timescale_directive
    : 'timescale' Time_identifier '/' Time_identifier
+   ;
+
+defined_flag: Simple_identifier ;
+
+using_defined_flag: '`' defined_flag ;
+
+define_directive
+   : 'define' defined_flag term
+   ;
+
+define_flag_directive
+   : 'define' defined_flag
+   ;
+
+ifdef_directive
+   : 'ifdef' defined_flag
+   ;
+
+else_directive
+   : 'else'
+   ;
+
+elsif_directive
+   : 'elsif' defined_flag
+   ;
+
+endif_directive
+   : 'endif'
+   ;
+
+undef_directive
+   : 'undef' defined_flag
    ;
 
 include_directive
@@ -1519,6 +1560,7 @@ term
    : unary_operator attribute_instance* primary
    | primary
    | String
+   | using_defined_flag
    ;
 
 lsb_constant_expression
