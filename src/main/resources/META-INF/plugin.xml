@@ -97,6 +97,8 @@
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.AmbiguousAssignInAlways"/>
         <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.AssignmentsMixedUse"/>
+        <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.HierarchicalReferenceAnnotator"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
