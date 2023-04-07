@@ -28,8 +28,6 @@ class VerilogFormattingModelBuilder extends FormattingModelBuilder {
   }
 
   def createSpacingBuilder(settings: CodeStyleSettings): SpacingBuilder = {
-
     new SpacingBuilder(settings, VerilogLanguage)
-
   }
 }

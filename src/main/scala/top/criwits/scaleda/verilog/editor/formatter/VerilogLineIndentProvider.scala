@@ -16,9 +16,12 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.text.CharArrayUtil
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
 
 /** Verilog line indent provider. This provider is used for quick, real-time indent complementation.
  * Block (formatter) based line indent provider is not this one.
+ *
+ * @todo Shall never treat PSI here.
   */
 class VerilogLineIndentProvider extends LineIndentProvider {
   //noinspection DuplicatedCode
@@ -31,7 +34,7 @@ class VerilogLineIndentProvider extends LineIndentProvider {
         // Semantic-based check
         if (
           pos.isAtAnyOf(
-            VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter]
+//            VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes), // ) <caret> [Enter]
             VerilogLanguage.getTokenType(VerilogLexer.Left_parenthes),  // (<caret> [Enter])
             VerilogLanguage.getTokenType(VerilogLexer.K_else)           // else <carent> [Enter] // TODO
           )
@@ -49,7 +52,7 @@ class VerilogLineIndentProvider extends LineIndentProvider {
 
         if (
           pos.isAtAnyOf(
-            VerilogLanguage.getTokenType(VerilogLexer.K_end)
+            VerilogLanguage.getTokenType(VerilogLexer.K_end) // hold
           )
         ) {
           return getIndentString(editor, pos.getStartOffset, 0)
@@ -61,6 +64,14 @@ class VerilogLineIndentProvider extends LineIndentProvider {
 
         val currentElement  = psiFile.findElementAt(offset)
         val posStartElement = psiFile.findElementAt(pos.getStartOffset)
+
+        // Non instantiation parenthesis
+        if (currentElement != null) {
+          val parent = PsiTreeUtil.getParentOfType(currentElement, classOf[ModuleInstantiationPsiNode])
+          if (parent == null && pos.isAtAnyOf(VerilogLanguage.getTokenType(VerilogLexer.Right_parenthes))) {
+            return getIndentString(editor, pos.getStartOffset, 1)
+          }
+        }
 
         // module head indent
         if (posStartElement != null) {
