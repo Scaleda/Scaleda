@@ -55,4 +55,18 @@ class AlwaysConstructPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with Stru
       }
     s"($eventText) → " + getDrivenSignals.map(_.getName).mkString(", ")
   }
+
+  /**
+    * Will judge simply by posedge/negedge (events) or delay (delay)
+    */
+  def isCombinationLogic: Boolean = {
+    val delayOrEventControlPsiNode = getControl
+    if (delayOrEventControlPsiNode == null) return true
+    if (delayOrEventControlPsiNode.isEventControl) {
+      val events = delayOrEventControlPsiNode.getEvents
+      events.forall(event => event.getType == EventPrimaryPsiNode.LEVEL)
+    } else {
+      true
+    }
+  }
 }
