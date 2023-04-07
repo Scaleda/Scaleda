@@ -53,20 +53,68 @@ library_declaration :
 
 */
 
+// 1.3 Module and primitive source text
+// START SYMBOL
+source_text
+   : (directive | description)* EOF
+   ;
+
 //timing_spec
 //   : '`' 'timescale' Time_identifier '/' Time_identifier
 //   ;
 
 directive
-   : '`' (timescale_directive | include_directive | default_nettype_directive)
+   : '`' (timescale_directive
+   | include_directive
+   | default_nettype_directive
+   | define_directive
+   | ifdef_directive
+   | ifndef_directive
+   | else_directive
+   | elsif_directive
+   | endif_directive
+   | undef_directive)
    ;
 
 timescale_directive
    : 'timescale' Time_identifier '/' Time_identifier
    ;
 
+defined_flag: Simple_identifier ;
+
+create_defined_flag: defined_flag ;
+create_defined_term: (term)? ;
+
+using_defined_flag: '`' defined_flag ;
+
+define_directive: 'define' create_defined_flag create_defined_term ;
+
+ifdef_directive
+   : 'ifdef' defined_flag
+   ;
+
+ifndef_directive
+   : 'ifndef' defined_flag
+   ;
+
+else_directive
+   : 'else'
+   ;
+
+elsif_directive
+   : 'elsif' defined_flag
+   ;
+
+endif_directive
+   : 'endif'
+   ;
+
+undef_directive
+   : 'undef' defined_flag
+   ;
+
 include_directive
-   : 'include' Filepath
+   : 'include' String
    ;
 
 default_nettype_directive
@@ -113,12 +161,6 @@ cell_clause
 
 use_clause
    : 'use' (library_identifier '.')? cell_identifier (':' 'config')?
-   ;
-
-// 1.3 Module and primitive source text
-// START SYMBOL
-source_text
-   : (directive | description)* EOF
    ;
 
 description
@@ -1519,6 +1561,7 @@ term
    : unary_operator attribute_instance* primary
    | primary
    | String
+   | using_defined_flag
    ;
 
 lsb_constant_expression

@@ -11,6 +11,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#source_text}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSource_text(VerilogParser.Source_textContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#directive}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -22,6 +28,72 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTimescale_directive(VerilogParser.Timescale_directiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#defined_flag}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDefined_flag(VerilogParser.Defined_flagContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#create_defined_flag}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreate_defined_flag(VerilogParser.Create_defined_flagContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#create_defined_term}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreate_defined_term(VerilogParser.Create_defined_termContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#using_defined_flag}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUsing_defined_flag(VerilogParser.Using_defined_flagContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#define_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDefine_directive(VerilogParser.Define_directiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#ifdef_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfdef_directive(VerilogParser.Ifdef_directiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#ifndef_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfndef_directive(VerilogParser.Ifndef_directiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#else_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElse_directive(VerilogParser.Else_directiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#elsif_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElsif_directive(VerilogParser.Elsif_directiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#endif_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEndif_directive(VerilogParser.Endif_directiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#undef_directive}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUndef_directive(VerilogParser.Undef_directiveContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#include_directive}.
 	 * @param ctx the parse tree
@@ -88,12 +160,6 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitUse_clause(VerilogParser.Use_clauseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link VerilogParser#source_text}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSource_text(VerilogParser.Source_textContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#description}.
 	 * @param ctx the parse tree

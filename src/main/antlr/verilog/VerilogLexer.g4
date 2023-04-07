@@ -26,16 +26,19 @@ K_cmos : 'cmos' ;
 K_deassign : 'deassign' ;
 K_default : 'default' ;
 K_default_nettype : 'default_nettype' ;
+K_define : 'define' ;
 K_defparam : 'defparam' ;
 K_design : 'design' ;
 K_disable : 'disable' ;
 K_edge : 'edge' ;
 K_else : 'else' ;
+K_elsif : 'elsif' ;
 K_end : 'end' ;
 K_endcase : 'endcase' ;
 K_endconfig : 'endconfig' ;
 K_endfunction : 'endfunction' ;
 K_endgenerate : 'endgenerate' ;
+K_endif : 'endif' ;
 K_endprimitive : 'endprimitive' ;
 K_endspecify : 'endspecify' ;
 K_endtable : 'endtable' ;
@@ -51,6 +54,8 @@ K_function : 'function' ;
 K_generate : 'generate' ;
 K_genvar : 'genvar' ;
 K_if : 'if' ;
+K_ifdef : 'ifdef' ;
+K_ifndef : 'ifndef' ;
 K_ifnone : 'ifnone' ;
 K_include : 'include' ;
 K_initial : 'initial' ;
@@ -119,6 +124,7 @@ K_triand : 'triand' ;
 K_trior : 'trior' ;
 K_trireg : 'trireg' ;
 K_use : 'use' ;
+K_undef : 'undef' ;
 K_vectored : 'vectored' ;
 K_wait : 'wait' ;
 K_wand : 'wand' ;
@@ -298,12 +304,12 @@ Dollar_identifier
    ;
 
 Time_identifier
-   : [0-9] + [mnpf] 's'
+   : [0-9] + White_space* [mnpf] 's'
    ;
 
-Filepath
-   : '"' (~ [\n\r])+ '"'
-   ;
+//Filepath
+//   : '"' (~ [\n\r])+ '"'
+//   ;
 
 
 String
