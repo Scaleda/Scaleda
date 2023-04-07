@@ -48,6 +48,26 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitDefined_flag(VerilogParser.Defined_flagContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#create_defined_flag}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreate_defined_flag(VerilogParser.Create_defined_flagContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#create_defined_flag}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreate_defined_flag(VerilogParser.Create_defined_flagContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#create_defined_term}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreate_defined_term(VerilogParser.Create_defined_termContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#create_defined_term}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreate_defined_term(VerilogParser.Create_defined_termContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#using_defined_flag}.
 	 * @param ctx the parse tree
 	 */
@@ -67,16 +87,6 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDefine_directive(VerilogParser.Define_directiveContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link VerilogParser#define_flag_directive}.
-	 * @param ctx the parse tree
-	 */
-	void enterDefine_flag_directive(VerilogParser.Define_flag_directiveContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link VerilogParser#define_flag_directive}.
-	 * @param ctx the parse tree
-	 */
-	void exitDefine_flag_directive(VerilogParser.Define_flag_directiveContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link VerilogParser#ifdef_directive}.
 	 * @param ctx the parse tree

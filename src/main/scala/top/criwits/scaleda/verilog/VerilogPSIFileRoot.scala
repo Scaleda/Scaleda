@@ -7,8 +7,9 @@ import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
-import com.intellij.psi.{FileViewProvider, ResolveResult}
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.{FileViewProvider, ResolveResult}
+import top.criwits.scaleda.verilog.psi.nodes.`macro`.MacroDeclarationPsiNode
 
 import javax.swing.Icon
 import scala.jdk.CollectionConverters._
@@ -39,10 +40,18 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
       .map(_.getElement)
       .filter(_.isInstanceOf[ModuleDeclarationPsiNode])
       .map(_.asInstanceOf[ModuleDeclarationPsiNode])
-      .foldLeft(Array.empty[ModuleDeclarationPsiNode]){
-        (seen, current) => if (seen.map(_.getName).contains(current.getName)) seen else seen :+ current
+      .foldLeft(Array.empty[ModuleDeclarationPsiNode]) { (seen, current) =>
+        if (seen.map(_.getName).contains(current.getName)) seen else seen :+ current
       }
   }
+
+  def getMacroDeclarations: Array[MacroDeclarationPsiNode] = {
+    PsiTreeUtil
+      .findChildrenOfType(this, classOf[MacroDeclarationPsiNode])
+      .toArray
+      .map(x => x.asInstanceOf[MacroDeclarationPsiNode])
+  }
+
 //  override def getAvailableNamedElements =
 //    PsiTreeUtil.findChildrenOfType(this, classOf[ModuleDeclarationPsiNode])
 }

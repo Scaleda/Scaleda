@@ -35,6 +35,18 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDefined_flag(VerilogParser.Defined_flagContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#create_defined_flag}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreate_defined_flag(VerilogParser.Create_defined_flagContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#create_defined_term}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreate_defined_term(VerilogParser.Create_defined_termContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#using_defined_flag}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -46,12 +58,6 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitDefine_directive(VerilogParser.Define_directiveContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link VerilogParser#define_flag_directive}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDefine_flag_directive(VerilogParser.Define_flag_directiveContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#ifdef_directive}.
 	 * @param ctx the parse tree

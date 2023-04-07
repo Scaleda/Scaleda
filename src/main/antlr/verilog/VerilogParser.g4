@@ -68,7 +68,6 @@ directive
    | include_directive
    | default_nettype_directive
    | define_directive
-   | define_flag_directive
    | ifdef_directive
    | ifndef_directive
    | else_directive
@@ -83,15 +82,12 @@ timescale_directive
 
 defined_flag: Simple_identifier ;
 
+create_defined_flag: defined_flag ;
+create_defined_term: (term)? ;
+
 using_defined_flag: '`' defined_flag ;
 
-define_directive
-   : 'define' defined_flag term
-   ;
-
-define_flag_directive
-   : 'define' defined_flag
-   ;
+define_directive: 'define' create_defined_flag create_defined_term ;
 
 ifdef_directive
    : 'ifdef' defined_flag
