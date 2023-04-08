@@ -32,9 +32,8 @@ abstract class SignalIdentifierPsiNode(node: ASTNode)
   }
 
   override def getDocument: String = {
-    def getFullDefinition = s"${getTypeText} ${getRange.map(_.toString + " ").getOrElse("")}${getName}${getDimension.map(" " + _.toString).getOrElse("")}"
+    def getFullDefinition = s"${getTypeText} ${getRange.map(_.generateText + " ").getOrElse("")}${getName}${getDimension.map(" " + _.generateText).getOrElse("")}"
     s"${DEFINITION_START}${getFullDefinition}${DEFINITION_END}"
-
   }
 
 

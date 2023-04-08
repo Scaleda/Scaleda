@@ -19,7 +19,7 @@ abstract class RangeDimensionPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
     )
   }
 
-  override def toString: String = {
+  def generateText: String = {
     getPair match {
       case Some(v) => s"[${v._1.getText}:${v._2.getText}]"
       case _ => "[??:??]"

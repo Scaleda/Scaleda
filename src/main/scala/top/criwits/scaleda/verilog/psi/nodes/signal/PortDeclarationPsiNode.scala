@@ -7,7 +7,7 @@ import com.intellij.lang.ASTNode
 
 class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(node) {
   def getPortType: PortDeclarationPsiNode.PortType = {
-    val children = this.getFirstChild.getChildren //TODO better
+    val children = this.getChildren //TODO better
 
     if (children.exists(_.textMatches("input"))) return INPUT
 

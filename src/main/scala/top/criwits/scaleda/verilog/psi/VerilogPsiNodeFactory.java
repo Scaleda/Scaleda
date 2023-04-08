@@ -83,6 +83,18 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_output_declaration),
         OutputDeclarationPsiNode.class
     );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_port),
+        PortPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_port_expression),
+        PortExpressionPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_port_reference),
+        PortReferencePsiNode.class
+    );
     /// Port identifier
     map.put(
         getRuleIElementType(VerilogParser.RULE_port_identifier),
@@ -99,6 +111,10 @@ public class VerilogPsiNodeFactory {
         IdentifierPsiNode.class
     );
     /// Inside module, module or generate item
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_module_item),
+        ModuleItemPsiNode.class
+    );
     map.put(
         getRuleIElementType(VerilogParser.RULE_module_or_generate_item_declaration),
         ModuleOrGenerateItemDeclarationPsiNode.class
@@ -229,6 +245,10 @@ public class VerilogPsiNodeFactory {
 
     // Expression
     map.put(
+        getRuleIElementType(VerilogParser.RULE_constant_expression),
+        ConstantExpressionPsiNode.class
+    );
+    map.put(
         getRuleIElementType(VerilogParser.RULE_expression),
         ExpressionPsiNode.class
     );
@@ -271,6 +291,10 @@ public class VerilogPsiNodeFactory {
     map.put(
         getRuleIElementType(VerilogParser.RULE_parameter_identifier),
         ParameterIdentifierPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_param_assignment),
+        ParameterAssignmentPsiNode.class
     );
 
     map.put(

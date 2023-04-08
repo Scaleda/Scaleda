@@ -103,6 +103,8 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.HierarchicalReferenceAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.IncompleteSeqBlockAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.UnmatchedVerilog1995PortAnnotator" />
         <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>

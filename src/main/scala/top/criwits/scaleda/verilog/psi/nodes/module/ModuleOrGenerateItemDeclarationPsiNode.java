@@ -1,9 +1,10 @@
-package top.criwits.scaleda.verilog.psi.nodes;
+package top.criwits.scaleda.verilog.psi.nodes.module;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
+import top.criwits.scaleda.verilog.psi.nodes.TypedDeclaration;
 import top.criwits.scaleda.verilog.psi.nodes.signal.VariableDeclarationPsiNode;
 
 public class ModuleOrGenerateItemDeclarationPsiNode
