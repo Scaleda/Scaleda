@@ -25,6 +25,10 @@ import top.criwits.scaleda.verilog.psi.nodes.macro.MacroDeclarationPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.macro.MacroIdentifierPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.module.*;
 import top.criwits.scaleda.verilog.psi.nodes.signal.*;
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ListOfParamAssignmentsPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterAssignmentPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterDeclarationPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,11 +87,27 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_port_declaration),
         PortDeclarationPsiNode.class
     );
-    /// Output
     map.put(
         getRuleIElementType(VerilogParser.RULE_output_declaration),
         OutputDeclarationPsiNode.class
     );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_input_declaration),
+        InputDeclarationPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_inout_declaration),
+        InoutDeclarationPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_list_of_port_identifiers),
+        ListOfPortIdentifiersPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_list_of_variable_port_identifiers),
+        ListOfVariablePortIdentifiersPsiNode.class
+    );
+
     map.put(
         getRuleIElementType(VerilogParser.RULE_port),
         PortPsiNode.class
@@ -110,11 +130,20 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_parameter_declaration_), // this without ';'
         ParameterDeclarationPsiNode.class
     );
-    /// Parameter identifier
+
     map.put(
-        getRuleIElementType(VerilogParser.RULE_identifier),
-        IdentifierPsiNode.class
+        getRuleIElementType(VerilogParser.RULE_parameter_identifier),
+        ParameterIdentifierPsiNode.class
     );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_param_assignment),
+        ParameterAssignmentPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_list_of_param_assignments),
+        ListOfParamAssignmentsPsiNode.class
+    );
+
     /// Inside module, module or generate item
     map.put(
         getRuleIElementType(VerilogParser.RULE_module_item),
@@ -188,6 +217,12 @@ public class VerilogPsiNodeFactory {
         NetIdentifierPsiNode.class
     );
     /// Variables (reg, integer, etc.)
+    /// Identifier
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_identifier),
+        IdentifierPsiNode.class
+    );
+
     map.put(getRuleIElementType(VerilogParser.RULE_reg_declaration), VariableDeclarationPsiNode.class);
     map.put(getRuleIElementType(VerilogParser.RULE_integer_declaration), VariableDeclarationPsiNode.class);
     map.put(getRuleIElementType(VerilogParser.RULE_real_declaration), VariableDeclarationPsiNode.class);
@@ -334,16 +369,6 @@ public class VerilogPsiNodeFactory {
     map.put(
         getRuleIElementType(VerilogParser.RULE_name_of_instance),
         NameOfInstancePsiNode.class
-    );
-
-
-    map.put(
-        getRuleIElementType(VerilogParser.RULE_parameter_identifier),
-        ParameterIdentifierPsiNode.class
-    );
-    map.put(
-        getRuleIElementType(VerilogParser.RULE_param_assignment),
-        ParameterAssignmentPsiNode.class
     );
 
     map.put(

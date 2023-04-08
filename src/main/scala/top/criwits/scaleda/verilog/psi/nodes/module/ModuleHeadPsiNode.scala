@@ -11,4 +11,8 @@ class ModuleHeadPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
     val listOfPorts = PsiTreeUtil.findChildOfType(this, classOf[AbstractListOfPortsPsiNode])
     if (listOfPorts == null) Seq[PortIdentifierPsiNode]() else listOfPorts.getPortIdentifiers
   }
+
+  def getModuleParameterPortList: Option[ModuleParameterPortListPsiNode] = {
+    Option(PsiTreeUtil.getChildOfType(this, classOf[ModuleParameterPortListPsiNode]))
+  }
 }

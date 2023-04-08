@@ -4,8 +4,13 @@ package verilog.psi.nodes.signal
 import verilog.psi.nodes.signal.PortDeclarationPsiNode.{INOUT, INPUT, OUTPUT, OUTPUT_REG}
 
 import com.intellij.lang.ASTNode
+import com.intellij.psi.util.PsiTreeUtil
 
 class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(node) {
+  def getDeclaration: Option[AbstractDeclarationPsiNode] = {
+    Option(PsiTreeUtil.getChildOfType(this, classOf[AbstractDeclarationPsiNode]))
+  }
+
   def getPortType: PortDeclarationPsiNode.PortType = {
     val children = this.getChildren //TODO better
 

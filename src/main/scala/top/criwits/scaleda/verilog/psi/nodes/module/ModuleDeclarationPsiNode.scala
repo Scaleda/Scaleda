@@ -12,6 +12,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import org.jetbrains.annotations.Nls
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode
 
 import scala.jdk.CollectionConverters._
 
@@ -62,10 +63,13 @@ class ModuleDeclarationPsiNode(node: ASTNode)
   }
 
   def getModuleItems: Seq[ModuleItemPsiNode] = {
-    PsiTreeUtil.getChildrenOfType(this, classOf[ModuleItemPsiNode]).toSeq
+    val result = PsiTreeUtil.getChildrenOfType(this, classOf[ModuleItemPsiNode])
+    if (result == null) Seq[ModuleItemPsiNode]() else result.toSeq
   }
 
   def getChildrenInModuleBody[T <: PsiElement](clazz: Class[T]): Seq[T] = {
     getModuleItems.map(item => PsiTreeUtil.findChildrenOfType(item, clazz).asScala.toSeq).foldLeft(Seq[T]())(_ ++ _)
   }
+
+  def getParameters: Seq[ParameterIdentifierPsiNode] = getModuleHead.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
 }

@@ -8,6 +8,14 @@ import top.criwits.scaleda.verilog.psi.nodes.signal.{PortDeclarationPsiNode, Por
 
 class ListOfPortDeclarationsPsiNode(node: ASTNode) extends AbstractListOfPortsPsiNode(node) {
   override def getPortIdentifiers: Seq[PortIdentifierPsiNode] = {
-    PsiTreeUtil.getChildrenOfType(this, classOf[PortIdentifierPsiNode]).toSeq
+    getPortDeclarations
+      .flatMap(_.getDeclaration)
+      .flatMap(_.getListOfPortIdentifiers)
+      .flatMap(_.getPortIdentifiers)
+  }
+
+  def getPortDeclarations: Seq[PortDeclarationPsiNode] = {
+    val result = PsiTreeUtil.getChildrenOfType(this, classOf[PortDeclarationPsiNode])
+    if (result == null) Seq[PortDeclarationPsiNode]() else result.toSeq
   }
 }

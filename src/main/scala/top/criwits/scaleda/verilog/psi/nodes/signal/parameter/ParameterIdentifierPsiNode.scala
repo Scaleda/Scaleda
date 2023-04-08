@@ -1,12 +1,12 @@
 package top.criwits.scaleda
-package verilog.psi.nodes.signal
+package verilog.psi.nodes.signal.parameter
 
 import verilog.psi.nodes.expression.{ConstantExpressionPsiNode, ExpressionPsiNode}
+import verilog.psi.nodes.signal.SignalIdentifierPsiNode
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.util.PsiTreeUtil
-
 import com.intellij.lang.documentation.DocumentationMarkup._
+import com.intellij.psi.util.PsiTreeUtil
 
 class ParameterIdentifierPsiNode(node: ASTNode) extends SignalIdentifierPsiNode(node) {
   override def getDocument: String = {

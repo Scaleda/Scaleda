@@ -1,10 +1,9 @@
 package top.criwits.scaleda
 package verilog.completion.keywords
 
-import verilog.psi.nodes.signal.ParameterIdentifierPsiNode
-
 import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.{PsiComment, PsiElement}
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode
 
 class ParameterAttributeFilter extends ElementFilter {
   override def isAcceptable(element: Any, context: PsiElement): Boolean = {
