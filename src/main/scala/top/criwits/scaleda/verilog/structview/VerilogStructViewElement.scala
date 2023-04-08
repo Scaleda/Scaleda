@@ -2,9 +2,10 @@ package top.criwits.scaleda
 package verilog.structview
 
 import verilog.VerilogPSIFileRoot
-import top.criwits.scaleda.verilog.psi.nodes.always.AlwaysConstructPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.{
+import verilog.psi.nodes.always.AlwaysConstructPsiNode
+import verilog.psi.nodes.condition.ConditionalStatementInnerPsiNode
+import verilog.psi.nodes.module.ModuleDeclarationPsiNode
+import verilog.psi.nodes.signal.{
   NetDeclarationPsiNode,
   NetIdentifierPsiNode,
   VariableDeclarationPsiNode,
@@ -52,7 +53,7 @@ class VerilogStructViewElement(val element: PsiElement) extends StructureViewTre
 
         // reg
         val regDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[VariableDeclarationPsiNode]).asScala
-        val regs = new ListBuffer[VariableIdentifierPsiNode]
+        val regs            = new ListBuffer[VariableIdentifierPsiNode]
         regDeclarations
           .map(r => {
             regs.addAll(PsiTreeUtil.findChildrenOfAnyType(r, classOf[VariableIdentifierPsiNode]).asScala)
@@ -60,13 +61,20 @@ class VerilogStructViewElement(val element: PsiElement) extends StructureViewTre
 
         // net
         val netDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[NetDeclarationPsiNode]).asScala
-        val nets = new ListBuffer[NetIdentifierPsiNode]
+        val nets            = new ListBuffer[NetIdentifierPsiNode]
         netDeclarations
           .foreach(r => {
             nets.addAll(PsiTreeUtil.findChildrenOfAnyType(r, classOf[NetIdentifierPsiNode]).asScala)
           })
 
         alwaysBlocks ++ regs ++ nets
+
+      // FIXME: not work belows
+      case always: AlwaysConstructPsiNode => // Always node
+        always.getChildren.filter(_.isInstanceOf[ConditionalStatementInnerPsiNode]).toSeq
+
+      case conditionalStatement: ConditionalStatementInnerPsiNode => // if...
+        conditionalStatement.getChildren.filter(_.isInstanceOf[ConditionalStatementInnerPsiNode]).toSeq
 
       case _ => Seq.empty
     }

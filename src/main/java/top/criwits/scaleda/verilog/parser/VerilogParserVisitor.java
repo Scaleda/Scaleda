@@ -1043,17 +1043,41 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitWait_statement(VerilogParser.Wait_statementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_body}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_body(VerilogParser.Conditional_statement_bodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_head}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_head(VerilogParser.Conditional_statement_headContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_chain}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_chain(VerilogParser.Conditional_statement_chainContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_else_tail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_else_tail(VerilogParser.Conditional_statement_else_tailContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_else_chain}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_else_chain(VerilogParser.Conditional_statement_else_chainContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitConditional_statement(VerilogParser.Conditional_statementContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link VerilogParser#if_else_if_statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIf_else_if_statement(VerilogParser.If_else_if_statementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#function_conditional_statement}.
 	 * @param ctx the parse tree
@@ -1078,6 +1102,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCase_body(VerilogParser.Case_bodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#case_default_item}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCase_default_item(VerilogParser.Case_default_itemContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#case_item}.
 	 * @param ctx the parse tree
@@ -1649,6 +1679,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnary_operator(VerilogParser.Unary_operatorContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#binary_operator_or}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBinary_operator_or(VerilogParser.Binary_operator_orContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#binary_operator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1966,4 +2002,16 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitEscaped_hierarchical_branch(VerilogParser.Escaped_hierarchical_branchContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#incomplete_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncomplete_statement(VerilogParser.Incomplete_statementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#incomplete_condition_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx);
 }

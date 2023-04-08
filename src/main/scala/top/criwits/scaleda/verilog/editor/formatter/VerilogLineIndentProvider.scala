@@ -3,7 +3,6 @@ package verilog.editor.formatter
 
 import verilog.editor.formatter.VerilogLineIndentProvider.getIndentString
 import verilog.parser.VerilogLexer
-import verilog.psi.nodes.block.ConditionalStatementPsiNode
 import verilog.psi.nodes.module.ModuleHeadPsiNode
 import verilog.{VerilogFileType, VerilogLanguage}
 
@@ -17,6 +16,7 @@ import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile, PsiWhiteSpace}
 import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.text.CharArrayUtil
+import top.criwits.scaleda.verilog.psi.nodes.condition.ConditionalStatementPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
 
 /** Verilog line indent provider. This provider is used for quick, real-time indent complementation.

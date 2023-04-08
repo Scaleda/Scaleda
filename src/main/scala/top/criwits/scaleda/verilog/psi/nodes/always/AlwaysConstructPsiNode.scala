@@ -61,12 +61,13 @@ class AlwaysConstructPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with Stru
     */
   def isCombinationLogic: Boolean = {
     val delayOrEventControlPsiNode = getControl
-    if (delayOrEventControlPsiNode == null) return true
+    // default to time logic, example: `always #1`
+    if (delayOrEventControlPsiNode == null) return false
     if (delayOrEventControlPsiNode.isEventControl) {
       val events = delayOrEventControlPsiNode.getEvents
       events.forall(event => event.getType == EventPrimaryPsiNode.LEVEL)
     } else {
-      true
+      false
     }
   }
 }

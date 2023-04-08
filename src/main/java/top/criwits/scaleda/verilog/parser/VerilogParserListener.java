@@ -1728,6 +1728,56 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitWait_statement(VerilogParser.Wait_statementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#conditional_statement_body}.
+	 * @param ctx the parse tree
+	 */
+	void enterConditional_statement_body(VerilogParser.Conditional_statement_bodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#conditional_statement_body}.
+	 * @param ctx the parse tree
+	 */
+	void exitConditional_statement_body(VerilogParser.Conditional_statement_bodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#conditional_statement_head}.
+	 * @param ctx the parse tree
+	 */
+	void enterConditional_statement_head(VerilogParser.Conditional_statement_headContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#conditional_statement_head}.
+	 * @param ctx the parse tree
+	 */
+	void exitConditional_statement_head(VerilogParser.Conditional_statement_headContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#conditional_statement_chain}.
+	 * @param ctx the parse tree
+	 */
+	void enterConditional_statement_chain(VerilogParser.Conditional_statement_chainContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#conditional_statement_chain}.
+	 * @param ctx the parse tree
+	 */
+	void exitConditional_statement_chain(VerilogParser.Conditional_statement_chainContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#conditional_statement_else_tail}.
+	 * @param ctx the parse tree
+	 */
+	void enterConditional_statement_else_tail(VerilogParser.Conditional_statement_else_tailContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#conditional_statement_else_tail}.
+	 * @param ctx the parse tree
+	 */
+	void exitConditional_statement_else_tail(VerilogParser.Conditional_statement_else_tailContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#conditional_statement_else_chain}.
+	 * @param ctx the parse tree
+	 */
+	void enterConditional_statement_else_chain(VerilogParser.Conditional_statement_else_chainContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#conditional_statement_else_chain}.
+	 * @param ctx the parse tree
+	 */
+	void exitConditional_statement_else_chain(VerilogParser.Conditional_statement_else_chainContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#conditional_statement}.
 	 * @param ctx the parse tree
 	 */
@@ -1737,16 +1787,6 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitConditional_statement(VerilogParser.Conditional_statementContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link VerilogParser#if_else_if_statement}.
-	 * @param ctx the parse tree
-	 */
-	void enterIf_else_if_statement(VerilogParser.If_else_if_statementContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link VerilogParser#if_else_if_statement}.
-	 * @param ctx the parse tree
-	 */
-	void exitIf_else_if_statement(VerilogParser.If_else_if_statementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link VerilogParser#function_conditional_statement}.
 	 * @param ctx the parse tree
@@ -1787,6 +1827,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCase_body(VerilogParser.Case_bodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#case_default_item}.
+	 * @param ctx the parse tree
+	 */
+	void enterCase_default_item(VerilogParser.Case_default_itemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#case_default_item}.
+	 * @param ctx the parse tree
+	 */
+	void exitCase_default_item(VerilogParser.Case_default_itemContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link VerilogParser#case_item}.
 	 * @param ctx the parse tree
@@ -2738,6 +2788,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitUnary_operator(VerilogParser.Unary_operatorContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#binary_operator_or}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinary_operator_or(VerilogParser.Binary_operator_orContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#binary_operator_or}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinary_operator_or(VerilogParser.Binary_operator_orContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#binary_operator}.
 	 * @param ctx the parse tree
 	 */
@@ -3267,4 +3327,24 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitEscaped_hierarchical_branch(VerilogParser.Escaped_hierarchical_branchContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#incomplete_statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterIncomplete_statement(VerilogParser.Incomplete_statementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#incomplete_statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitIncomplete_statement(VerilogParser.Incomplete_statementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#incomplete_condition_statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#incomplete_condition_statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx);
 }

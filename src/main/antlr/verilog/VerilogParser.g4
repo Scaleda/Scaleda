@@ -974,6 +974,7 @@ statement
    | attribute_instance* system_task_enable
    | attribute_instance* task_enable
    | attribute_instance* wait_statement
+   | attribute_instance* incomplete_statement
    ;
 
 statement_or_null
@@ -1036,14 +1037,21 @@ wait_statement
    ;
 
 // 6.6 Conditional statements
-conditional_statement
-   : 'if' '(' expression ')' statement_or_null ('else' statement_or_null)?
-   | if_else_if_statement
-   ;
-
-if_else_if_statement
-   : 'if' '(' expression ')' statement_or_null ('else' 'if' '(' expression ')' statement_or_null)* ('else' statement_or_null)?
-   ;
+// if `conditional_statement_head` no paired `conditional_statement_else_tail`, may let to latch
+conditional_statement_body: 'if' '(' expression ')' statement_or_null ;
+conditional_statement_head: conditional_statement_body ;
+conditional_statement_chain: conditional_statement_body ;
+conditional_statement_else_tail: 'else' statement_or_null ;
+conditional_statement_else_chain: 'else' conditional_statement_chain ;
+//conditional_statement:
+//   : conditional_statement_head conditional_statement_else_tail?
+//   | if_else_if_statement
+//   ;
+//
+//if_else_if_statement
+//   : conditional_statement_head conditional_statement_else_chain* conditional_statement_else_tail?
+//   ;
+conditional_statement: conditional_statement_head conditional_statement_else_chain* conditional_statement_else_tail? ;
 
 function_conditional_statement
    : 'if' '(' expression ')' function_statement_or_null ('else' function_statement_or_null)?
@@ -1065,9 +1073,11 @@ case_body
    : (case_item)*
    ;
 
+case_default_item: 'default' (':')? statement_or_null ;
+
 case_item
    : expression (',' expression)* ':' statement_or_null
-   | 'default' (':')? statement_or_null
+   | case_default_item
    ;
 
 function_case_statement
@@ -1668,6 +1678,8 @@ unary_operator
    | '^' '~'
    ;
 
+binary_operator_or: '|' '|' ;
+
 binary_operator
    : '+'
    | '-'
@@ -1679,7 +1691,7 @@ binary_operator
    | '==='
    | '!=='
    | '&' '&'
-   | '|' '|'
+   | binary_operator_or
    | '*' '*'
    | '<'
    | '<='
@@ -1934,3 +1946,8 @@ simple_hierarchical_branch
 escaped_hierarchical_branch
    : Escaped_identifier ('[' Decimal_number ']')? ('.' Escaped_identifier ('[' Decimal_number ']')?)*
    ;
+
+// extra: acceptable incompelited things
+incomplete_statement: incomplete_condition_statement ;
+
+incomplete_condition_statement: 'if' '(' expression ')' ;
