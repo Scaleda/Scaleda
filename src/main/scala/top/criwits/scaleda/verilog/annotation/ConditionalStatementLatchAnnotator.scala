@@ -13,7 +13,7 @@ import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSever
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 
-class LatchAnnotator extends Annotator {
+class ConditionalStatementLatchAnnotator extends Annotator {
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {
     if (!element.isInstanceOf[ConditionalStatementHeadPsiNode]) return
     val always = PsiTreeUtil.getParentOfType(element, classOf[AlwaysConstructPsiNode])
@@ -27,7 +27,6 @@ class LatchAnnotator extends Annotator {
           HighlightSeverity.WARNING,
           ScaledaBundle.message("annotation.latch.conditional")
         )
-        // .range(cond)
         .create()
     }
   }

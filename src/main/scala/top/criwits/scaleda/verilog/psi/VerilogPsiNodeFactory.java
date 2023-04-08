@@ -11,6 +11,7 @@ import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.nodes.*;
 import top.criwits.scaleda.verilog.psi.nodes.always.*;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseBodyPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.block.CaseDefaultPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.condition.ConditionalStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.SeqBlockPsiNode;
@@ -231,6 +232,8 @@ public class VerilogPsiNodeFactory {
         SeqBlockPsiNode.class
     );
 
+    // case statement
+    /// case body
     map.put(
         getRuleIElementType(VerilogParser.RULE_case_body),
         CaseBodyPsiNode.class
@@ -245,7 +248,7 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_function_case_body),
         CaseBodyPsiNode.class
     );
-
+    /// case statement
     map.put(
         getRuleIElementType(VerilogParser.RULE_case_statement),
         CaseStatementPsiNode.class
@@ -260,6 +263,12 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_function_case_statement),
         CaseStatementPsiNode.class
     );
+    /// case body default
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_case_default_item),
+        CaseDefaultPsiNode.class
+    );
+
 
 
     // Expression

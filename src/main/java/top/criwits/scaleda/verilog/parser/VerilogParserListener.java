@@ -1828,6 +1828,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitCase_body(VerilogParser.Case_bodyContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#case_default_item}.
+	 * @param ctx the parse tree
+	 */
+	void enterCase_default_item(VerilogParser.Case_default_itemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#case_default_item}.
+	 * @param ctx the parse tree
+	 */
+	void exitCase_default_item(VerilogParser.Case_default_itemContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#case_item}.
 	 * @param ctx the parse tree
 	 */

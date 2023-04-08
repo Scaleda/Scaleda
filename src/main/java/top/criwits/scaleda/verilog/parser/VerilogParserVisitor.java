@@ -1103,6 +1103,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCase_body(VerilogParser.Case_bodyContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#case_default_item}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCase_default_item(VerilogParser.Case_default_itemContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#case_item}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -1073,9 +1073,11 @@ case_body
    : (case_item)*
    ;
 
+case_default_item: 'default' (':')? statement_or_null ;
+
 case_item
    : expression (',' expression)* ':' statement_or_null
-   | 'default' (':')? statement_or_null
+   | case_default_item
    ;
 
 function_case_statement
