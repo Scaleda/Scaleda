@@ -16,26 +16,19 @@ import java.util
   * @param node The [[ASTNode]]
   */
 abstract class SignalDeclarationPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with TypedDeclaration {
-  def getSignalType: SignalType = {
-    // get type field (reg, wire, tri, integer, ...)
-    val children = this.getChildren
-    val typeField = children.head.getText
-
-    // get width
-    ???
-  }
 
   /** Get type text for a signal.
     *
-    * For example, for `reg signed [7:0] foo [32:0]`, type text is `reg signed [7:0] [32:0]`
+    * For example, for `reg signed [7:0] foo [32:0]`, type text is `reg signed`
     * @return type string
     */
   override def getTypeText: String = {
-//    this.getChildren.filter(!_.isInstanceOf[IdentifierPsiNode])
-//      .map(_.getText).reduce(_ + " " + _).replace(";", "")
-    val typeChildren: Array[PsiElement] = util.Arrays.copyOf(this.getChildren, this.getChildren.length - 2)
-    typeChildren.map(_.getText).foldLeft("")(_ + " " + _) // TODO: array error // may fix
+    val typeChildren: Array[PsiElement] =
+      util.Arrays.copyOf(this.getChildren, this.getChildren.length - 2).filterNot(_.isInstanceOf[RangePsiNode])
+    typeChildren.map(_.getText).foldLeft("")(_ + " " + _).trim
   }
+
+  def getRange: Option[RangePsiNode] = Option(PsiTreeUtil.getChildOfType(this, classOf[RangePsiNode]))
 
   def getIdentifier: SignalIdentifierPsiNode =
     PsiTreeUtil.findChildOfAnyType(this, classOf[SignalIdentifierPsiNode])

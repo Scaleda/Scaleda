@@ -3,7 +3,7 @@ package verilog.psi.nodes.module
 
 import verilog.parser.VerilogLexer
 
-import top.criwits.scaleda.verilog.psi.nodes.{SimpleIdentifierPsiLeafNode, StructureViewNode}
+import top.criwits.scaleda.verilog.psi.nodes.{DocumentHolder, SimpleIdentifierPsiLeafNode, StructureViewNode}
 import com.intellij.lang.ASTNode
 import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import com.intellij.psi.util.PsiTreeUtil
@@ -19,43 +19,8 @@ class ModuleDeclarationPsiNode(node: ASTNode)
   extends ANTLRPsiNode(node)
     with PsiNameIdentifierOwner
     with StructureViewNode
-    /* with ScopeNode */ {
-//
-//    override fun getNameIdentifier(): ModuleIdentifierPsiNode? {
-//        return PsiTreeUtil
-//            .findChildOfType(this, ModuleIdentifierPsiNode::class.java)
-//    }
-//
-//    override fun getName(): String? {
-//        return nameIdentifier?.text
-//    }
-//
-//    override fun getTextOffset(): Int {
-//        return nameIdentifier?.startOffsetInParent ?: 0
-//    }
-//
-//    @Throws(IncorrectOperationException::class)
-//    override fun setName(s: String): PsiElement? {
-//        return PsiTreeUtil
-//            .findChildOfType(this.nameIdentifier, SimpleIdentifierPsiLeafNode::class.java)
-//            ?.replace(VerilogPsiLeafNodeFactory.create(VerilogLexer.Simple_identifier, s))
-//    }
-
-//    override fun getAvailableNamedElements(): Collection<PsiNamedElement> {
-//        return listOf(
-//            PsiTreeUtil.findChildrenOfType(this, NetIdentifierPsiNode::class.java),
-//            PsiTreeUtil.findChildrenOfType(this, ParameterIdentifierPsiNode::class.java),
-//            PsiTreeUtil.findChildrenOfType(this, PortIdentifierPsiNode::class.java)
-//                .filter {
-//                    PsiTreeUtil.getParentOfType(it, ModuleInstantiationPsiNode::class.java) == null
-//                },
-//            PsiTreeUtil.findChildrenOfType(this, VariableIdentifierPsiNode::class.java)
-//        )
-//            .flatten()
-//            .filterIsInstance(PsiNamedElement::class.java)
-//    }
-
-
+    with DocumentHolder
+{
   override def getNameIdentifier: PsiElement = {
     val identifier = PsiTreeUtil.findChildOfAnyType(this, classOf[ModuleIdentifierPsiNode])
     identifier // FIXME: if null?
@@ -90,4 +55,6 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     val file = PsiTreeUtil.getParentOfType(this, classOf[VerilogPSIFileRoot])
     file
   }
+
+  override def getDocument: String = ???
 }

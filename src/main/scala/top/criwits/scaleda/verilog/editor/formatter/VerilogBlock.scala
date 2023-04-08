@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package verilog.editor.formatter
 
-import verilog.psi.nodes.block.SeqBlockPsiNode
+import verilog.psi.nodes.block.{CaseBodyPsiNode, CaseStatementPsiNode, SeqBlockPsiNode}
 import verilog.psi.nodes.module.{ListOfPortDeclarationsPsiNode, ModuleDeclarationPsiNode, ModuleParameterPortListPsiNode}
 
 import com.intellij.formatting._
@@ -40,6 +40,11 @@ class VerilogBlock(
     case _                  => null
   }
 
+  /**
+   * Calculate indent for child
+   * @param newChildIndex index of child
+   * @return
+   */
   private def childIndent(newChildIndex: Int): Indent = {
     val indent = currentPsi match {
       // Ignore head and tail
@@ -47,9 +52,16 @@ class VerilogBlock(
         if (newChildIndex == 0 || newChildIndex == node.getChildren(null).length - 1) Indent.getNoneIndent
         else Indent.getNormalIndent
       }
-      // Ignore head two and tail
+
+      // Ignore head two and tail, seems not working...
       case _: ModuleParameterPortListPsiNode | _: ModuleInstancePsiNode => {
-        if (newChildIndex == 0 || newChildIndex == 1 || newChildIndex == node.getChildren(null).length - 1)
+        if (newChildIndex < 1 || newChildIndex == node.getChildren(null).length - 1)
+          Indent.getNoneIndent
+        else Indent.getNormalIndent
+      }
+
+      case _: CaseStatementPsiNode => {
+        if (newChildIndex < 4 || newChildIndex == node.getChildren(null).length - 1)
           Indent.getNoneIndent
         else Indent.getNormalIndent
       }

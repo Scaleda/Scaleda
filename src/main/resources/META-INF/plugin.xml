@@ -101,6 +101,9 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.AssignmentsMixedUse"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.HierarchicalReferenceAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.IncompleteSeqBlockAnnotator"/>
+        <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
 
@@ -110,6 +113,7 @@
         <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler"/>
         <enterHandlerDelegate
                 implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler"/>
+        <typedHandler implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogTypedHandler" />
         <lang.foldingBuilder language="Verilog"
                              implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder"/>
         <lang.findUsagesProvider language="Verilog"

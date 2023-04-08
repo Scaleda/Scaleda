@@ -1,8 +1,9 @@
 package top.criwits.scaleda
 package verilog.psi.nodes.signal
 
+import verilog.psi.nodes.signal.PortDeclarationPsiNode.{INOUT, INPUT, OUTPUT, OUTPUT_REG}
+
 import com.intellij.lang.ASTNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode.{INPUT, OUTPUT, INOUT, OUTPUT_REG}
 
 class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(node) {
   def getPortType: PortDeclarationPsiNode.PortType = {
@@ -18,8 +19,15 @@ class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(nod
     }
 
     // TODO: In this case, should search source code!!!
+    // TODO: signed?
+    INPUT
+  }
 
-    INPUT // FIXME: ?
+  override def getTypeText: String = getPortType match {
+    case INPUT      => "input"
+    case INOUT      => "inout"
+    case OUTPUT     => "output"
+    case OUTPUT_REG => "output reg"
   }
 }
 

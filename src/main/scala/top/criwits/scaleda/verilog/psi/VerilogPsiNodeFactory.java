@@ -14,8 +14,7 @@ import top.criwits.scaleda.verilog.psi.nodes.block.CaseBodyPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.SeqBlockPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.expression.ExpressionPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.expression.*;
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.*;
 import top.criwits.scaleda.verilog.psi.nodes.macro.MacroDeclarationPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.macro.MacroIdentifierPsiNode;
@@ -29,243 +28,272 @@ public class VerilogPsiNodeFactory {
 
   private static final Language LANGUAGE = VerilogLanguage$.MODULE$;
 
-  private static final Map<IElementType, Class<? extends ANTLRPsiNode>> ruleIElementTypeClassMap =
+  private static final Map<IElementType, Class<? extends ANTLRPsiNode>> map =
       new HashMap<>();
 
   static {
     // Source file (start symbol)
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_source_text),
         SourceTextPsiNode.class
     );
 
     // Module
     /// Module keywords
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_keyword),
         ModuleKeywordPsiNode.class
     );
     /// Module declaration
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_declaration),
         ModuleDeclarationPsiNode.class
     );
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_head),
         ModuleHeadPsiNode.class
     );
 
     /// Module identifier
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_identifier),
         ModuleIdentifierPsiNode.class
     );
     /// Module parameter
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_parameter_port_list),
         ModuleParameterPortListPsiNode.class
     );
     /// Port declarations list
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_list_of_port_declarations),
         ListOfPortDeclarationsPsiNode.class
     );
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_list_of_ports),
         ListOfPortsPsiNode.class
     );
     /// Port declaration
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_port_declaration),
         PortDeclarationPsiNode.class
     );
     /// Output
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_output_declaration),
         OutputDeclarationPsiNode.class
     );
     /// Port identifier
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_port_identifier),
         PortIdentifierPsiNode.class
     );
     /// Parameter declaration
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_parameter_declaration_), // this without ';'
         ParameterDeclarationPsiNode.class
     );
     /// Parameter identifier
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_identifier),
         IdentifierPsiNode.class
     );
     /// Inside module, module or generate item
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_or_generate_item_declaration),
         ModuleOrGenerateItemDeclarationPsiNode.class
     );
 
     // Always construct
     /// Always block
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_always_construct),
         AlwaysConstructPsiNode.class
     );
     /// Delay or event control
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_delay_or_event_control),
         DelayOrEventControlPsiNode.class
     );
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_delay_value),
         DelayValuePsiNode.class
     );
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_event_primary),
         EventPrimaryPsiNode.class
     );
     /// Assignment
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_nonblocking_assignment),
         NonblockingAssignmentPsiNode.class
     );
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_blocking_assignment),
         BlockingAssignmentPsiNode.class
     );
 
     // Signals
     /// Net (wire, tri, etc.)
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_net_declaration),
         NetDeclarationPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_net_identifier),
         NetIdentifierPsiNode.class
     );
     /// Variables (reg, integer, etc.)
-    ruleIElementTypeClassMap.put(getRuleIElementType(VerilogParser.RULE_reg_declaration), VariableDeclarationPsiNode.class);
-    ruleIElementTypeClassMap.put(getRuleIElementType(VerilogParser.RULE_integer_declaration), VariableDeclarationPsiNode.class);
-    ruleIElementTypeClassMap.put(getRuleIElementType(VerilogParser.RULE_real_declaration), VariableDeclarationPsiNode.class);
-    ruleIElementTypeClassMap.put(getRuleIElementType(VerilogParser.RULE_time_declaration), VariableDeclarationPsiNode.class);
-    ruleIElementTypeClassMap.put(getRuleIElementType(VerilogParser.RULE_realtime_declaration), VariableDeclarationPsiNode.class);
-    ruleIElementTypeClassMap.put(
+    map.put(getRuleIElementType(VerilogParser.RULE_reg_declaration), VariableDeclarationPsiNode.class);
+    map.put(getRuleIElementType(VerilogParser.RULE_integer_declaration), VariableDeclarationPsiNode.class);
+    map.put(getRuleIElementType(VerilogParser.RULE_real_declaration), VariableDeclarationPsiNode.class);
+    map.put(getRuleIElementType(VerilogParser.RULE_time_declaration), VariableDeclarationPsiNode.class);
+    map.put(getRuleIElementType(VerilogParser.RULE_realtime_declaration), VariableDeclarationPsiNode.class);
+    map.put(
         getRuleIElementType(VerilogParser.RULE_variable_identifier),
         VariableIdentifierPsiNode.class
     );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_variable_type),
+        VariableTypePsiNode.class
+    );
+    /// Range & Dimension
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_range_),
+        RangePsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_dimension),
+        DimensionPsiNode.class
+    );
+
 
     // Macros
     /// define_directive
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_define_directive),
         MacroDeclarationPsiNode.class
     );
     /// defined_flag
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_defined_flag),
         MacroIdentifierPsiNode.class
     );
     /// using_defined_flag
-    ruleIElementTypeClassMap.put(
+    map.put(
       getRuleIElementType(VerilogParser.RULE_using_defined_flag),
       MacroUsePsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_seq_block),
         SeqBlockPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_case_body),
         CaseBodyPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_generate_case_body),
         CaseBodyPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_function_case_body),
         CaseBodyPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_case_statement),
         CaseStatementPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_generate_case_statement),
         CaseStatementPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_function_case_statement),
         CaseStatementPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_conditional_statement),
         ConditionalStatementPsiNode.class
     );
 
 
-    ruleIElementTypeClassMap.put(
+    // Expression
+    map.put(
         getRuleIElementType(VerilogParser.RULE_expression),
         ExpressionPsiNode.class
     );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_term),
+        TermPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_primary),
+        PrimaryPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_number),
+        NumberPsiNode.class
+    );
 
-    ruleIElementTypeClassMap.put(
+
+
+    map.put(
         getRuleIElementType(VerilogParser.RULE_hierarchical_identifier),
         HierarchicalIdentifierPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_instantiation),
         ModuleInstantiationPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_module_instance),
         ModuleInstancePsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_name_of_instance),
         NameOfInstancePsiNode.class
     );
 
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_parameter_identifier),
         ParameterIdentifierPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_statement),
         StatementPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_list_of_port_connections),
         ListOfPortConnectionsPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_named_port_connection),
         NamedPortConnectionPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_ordered_port_connection),
         OrderedPortConnectionPsiNode.class
     );
 
-    ruleIElementTypeClassMap.put(
+    map.put(
         getRuleIElementType(VerilogParser.RULE_directive),
         DirectivePsiNode.class
     );
@@ -278,9 +306,9 @@ public class VerilogPsiNodeFactory {
   }
 
   public static ANTLRPsiNode create(ASTNode astNode) {
-    if (ruleIElementTypeClassMap.containsKey(astNode.getElementType())) {
+    if (map.containsKey(astNode.getElementType())) {
       try {
-        return ruleIElementTypeClassMap.get(astNode.getElementType())
+        return map.get(astNode.getElementType())
             .getConstructor(ASTNode.class).newInstance(astNode);
       } catch (ReflectiveOperationException ignored) {
       }

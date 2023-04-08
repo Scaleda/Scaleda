@@ -10,9 +10,10 @@ import verilog.{VerilogFileType, VerilogLanguage}
 import com.intellij.application.options.CodeStyle
 import com.intellij.formatting.IndentInfo
 import com.intellij.lang.Language
-import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.{Document, Editor}
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile, PsiWhiteSpace}
 import com.intellij.psi.codeStyle.lineIndent.LineIndentProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.text.CharArrayUtil
@@ -77,5 +78,19 @@ object VerilogLineIndentProvider {
       baseIndent += new IndentInfo(0, indentLength, 0).generateNewWhiteSpace(indentOptions)
     }
     baseIndent
+  }
+
+
+  def indentElement(file: PsiFile, checkVisibleOnly: Boolean = true)
+                                   (document: Document, project: Project, element: PsiElement, offset: Int)
+                                   (prevCondition: PsiElement => Boolean,
+                                    condition: PsiElement => Boolean = _.isInstanceOf[PsiWhiteSpace]): Unit = {
+    if (condition(element)) {
+      val prev = if (checkVisibleOnly) PsiTreeUtil.prevVisibleLeaf(element) else PsiTreeUtil.prevLeaf(element)
+      if (prevCondition(prev)) {
+        PsiDocumentManager.getInstance(project).commitDocument(document)
+        CodeStyleManager.getInstance(project).adjustLineIndent(file, prev.getTextRange)
+      }
+    }
   }
 }

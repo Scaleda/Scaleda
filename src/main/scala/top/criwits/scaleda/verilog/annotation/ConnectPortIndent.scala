@@ -9,7 +9,7 @@ import verilog.psi.nodes.signal.PortDeclarationPsiNode
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiFile
+import com.intellij.psi.{PsiDocumentManager, PsiFile}
 import com.intellij.psi.codeStyle.CodeStyleManager
 
 abstract class ConnectPortIndent(
@@ -57,6 +57,7 @@ abstract class ConnectPortIndent(
       portConnectionList.getTextRange.getEndOffset,
       original + (if (originalTrim.isEmpty || originalTrim.endsWith(",")) "" else ",") + newPortList
     )
-    CodeStyleManager.getInstance(project).reformat(portConnectionList)
+    PsiDocumentManager.getInstance(project).commitDocument(doc)
+    CodeStyleManager.getInstance(project).adjustLineIndent(file, portConnectionList.getTextRange)
   }
 }

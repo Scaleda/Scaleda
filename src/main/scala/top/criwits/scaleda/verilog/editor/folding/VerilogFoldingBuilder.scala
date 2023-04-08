@@ -105,7 +105,9 @@ object VerilogFoldingBuilder {
       document: Document
   ): Unit = {
     elements.foreach(element => {
-      descriptors.add(new FoldingDescriptor(element, element.getTextRange))
+      if (element != null && element.getTextLength > 0) {
+        descriptors.add(new FoldingDescriptor(element, element.getTextRange))
+      }
     })
   }
 }
