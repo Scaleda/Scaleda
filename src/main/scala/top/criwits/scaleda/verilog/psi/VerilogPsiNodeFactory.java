@@ -194,6 +194,13 @@ public class VerilogPsiNodeFactory {
       IncompleteConditionPsiNode.class
     );
 
+    // binary operator
+    /// or
+    map.put(
+      getRuleIElementType(VerilogParser.RULE_binary_operator_or),
+      BinaryOperatorOrPsiNode.class
+    );
+
     map.put(
         getRuleIElementType(VerilogParser.RULE_seq_block),
         SeqBlockPsiNode.class

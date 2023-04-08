@@ -1669,6 +1669,8 @@ unary_operator
    | '^' '~'
    ;
 
+binary_operator_or: '|' '|' ;
+
 binary_operator
    : '+'
    | '-'
@@ -1680,7 +1682,7 @@ binary_operator
    | '==='
    | '!=='
    | '&' '&'
-   | '|' '|'
+   | binary_operator_or
    | '*' '*'
    | '<'
    | '<='

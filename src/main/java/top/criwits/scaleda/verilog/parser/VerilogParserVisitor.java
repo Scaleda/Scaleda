@@ -1649,6 +1649,12 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnary_operator(VerilogParser.Unary_operatorContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#binary_operator_or}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBinary_operator_or(VerilogParser.Binary_operator_orContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#binary_operator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

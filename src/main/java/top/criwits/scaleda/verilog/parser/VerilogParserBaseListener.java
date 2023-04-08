@@ -3293,6 +3293,18 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBinary_operator_or(VerilogParser.Binary_operator_orContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinary_operator_or(VerilogParser.Binary_operator_orContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBinary_operator(VerilogParser.Binary_operatorContext ctx) { }
 	/**
 	 * {@inheritDoc}

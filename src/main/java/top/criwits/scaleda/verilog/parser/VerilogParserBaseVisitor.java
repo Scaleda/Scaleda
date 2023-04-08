@@ -1929,6 +1929,13 @@ public class VerilogParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitBinary_operator_or(VerilogParser.Binary_operator_orContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitBinary_operator(VerilogParser.Binary_operatorContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

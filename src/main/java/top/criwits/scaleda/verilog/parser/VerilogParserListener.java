@@ -2738,6 +2738,16 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 */
 	void exitUnary_operator(VerilogParser.Unary_operatorContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link VerilogParser#binary_operator_or}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinary_operator_or(VerilogParser.Binary_operator_orContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#binary_operator_or}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinary_operator_or(VerilogParser.Binary_operator_orContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VerilogParser#binary_operator}.
 	 * @param ctx the parse tree
 	 */
