@@ -288,6 +288,11 @@ public class VerilogPsiNodeFactory {
         getRuleIElementType(VerilogParser.RULE_number),
         NumberPsiNode.class
     );
+    /// concat
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_concatenation),
+        ConcatPsiNode.class
+    );
 
 
 
