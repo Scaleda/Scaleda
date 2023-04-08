@@ -974,6 +974,7 @@ statement
    | attribute_instance* system_task_enable
    | attribute_instance* task_enable
    | attribute_instance* wait_statement
+   | attribute_instance* incomplete_statement
    ;
 
 statement_or_null
@@ -1934,3 +1935,8 @@ simple_hierarchical_branch
 escaped_hierarchical_branch
    : Escaped_identifier ('[' Decimal_number ']')? ('.' Escaped_identifier ('[' Decimal_number ']')?)*
    ;
+
+// extra: acceptable incompelited things
+incomplete_statement: incomplete_condition_statement ;
+
+incomplete_condition_statement: 'if' '(' expression ')' ;

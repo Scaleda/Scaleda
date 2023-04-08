@@ -3924,6 +3924,30 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitEscaped_hierarchical_branch(VerilogParser.Escaped_hierarchical_branchContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIncomplete_statement(VerilogParser.Incomplete_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIncomplete_statement(VerilogParser.Incomplete_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

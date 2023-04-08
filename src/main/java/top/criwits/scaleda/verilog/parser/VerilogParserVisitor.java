@@ -1966,4 +1966,16 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitEscaped_hierarchical_branch(VerilogParser.Escaped_hierarchical_branchContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#incomplete_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncomplete_statement(VerilogParser.Incomplete_statementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#incomplete_condition_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx);
 }

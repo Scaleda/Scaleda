@@ -15,6 +15,7 @@ import top.criwits.scaleda.verilog.psi.nodes.block.CaseStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.ConditionalStatementPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.SeqBlockPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.expression.*;
+import top.criwits.scaleda.verilog.psi.nodes.incompleted.IncompleteConditionPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.*;
 import top.criwits.scaleda.verilog.psi.nodes.macro.MacroDeclarationPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.macro.MacroIdentifierPsiNode;
@@ -184,6 +185,13 @@ public class VerilogPsiNodeFactory {
     map.put(
       getRuleIElementType(VerilogParser.RULE_using_defined_flag),
       MacroUsePsiNode.class
+    );
+
+    // incomplete statements
+    /// incomplete condition statements
+    map.put(
+      getRuleIElementType(VerilogParser.RULE_incomplete_condition_statement),
+      IncompleteConditionPsiNode.class
     );
 
     map.put(

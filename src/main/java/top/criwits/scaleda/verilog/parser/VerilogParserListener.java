@@ -3267,4 +3267,24 @@ public interface VerilogParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitEscaped_hierarchical_branch(VerilogParser.Escaped_hierarchical_branchContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#incomplete_statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterIncomplete_statement(VerilogParser.Incomplete_statementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#incomplete_statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitIncomplete_statement(VerilogParser.Incomplete_statementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link VerilogParser#incomplete_condition_statement}.
+	 * @param ctx the parse tree
+	 */
+	void enterIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VerilogParser#incomplete_condition_statement}.
+	 * @param ctx the parse tree
+	 */
+	void exitIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx);
 }
