@@ -1037,14 +1037,21 @@ wait_statement
    ;
 
 // 6.6 Conditional statements
-conditional_statement
-   : 'if' '(' expression ')' statement_or_null ('else' statement_or_null)?
-   | if_else_if_statement
-   ;
-
-if_else_if_statement
-   : 'if' '(' expression ')' statement_or_null ('else' 'if' '(' expression ')' statement_or_null)* ('else' statement_or_null)?
-   ;
+// if `conditional_statement_head` no paired `conditional_statement_else_tail`, may let to latch
+conditional_statement_body: 'if' '(' expression ')' statement_or_null ;
+conditional_statement_head: conditional_statement_body ;
+conditional_statement_chain: conditional_statement_body ;
+conditional_statement_else_tail: 'else' statement_or_null ;
+conditional_statement_else_chain: 'else' conditional_statement_chain ;
+//conditional_statement:
+//   : conditional_statement_head conditional_statement_else_tail?
+//   | if_else_if_statement
+//   ;
+//
+//if_else_if_statement
+//   : conditional_statement_head conditional_statement_else_chain* conditional_statement_else_tail?
+//   ;
+conditional_statement: conditional_statement_head conditional_statement_else_chain* conditional_statement_else_tail? ;
 
 function_conditional_statement
    : 'if' '(' expression ')' function_statement_or_null ('else' function_statement_or_null)?

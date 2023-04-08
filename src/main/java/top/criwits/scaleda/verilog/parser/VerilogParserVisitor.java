@@ -1043,17 +1043,41 @@ public interface VerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitWait_statement(VerilogParser.Wait_statementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_body}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_body(VerilogParser.Conditional_statement_bodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_head}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_head(VerilogParser.Conditional_statement_headContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_chain}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_chain(VerilogParser.Conditional_statement_chainContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_else_tail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_else_tail(VerilogParser.Conditional_statement_else_tailContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement_else_chain}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_else_chain(VerilogParser.Conditional_statement_else_chainContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link VerilogParser#conditional_statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitConditional_statement(VerilogParser.Conditional_statementContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link VerilogParser#if_else_if_statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIf_else_if_statement(VerilogParser.If_else_if_statementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link VerilogParser#function_conditional_statement}.
 	 * @param ctx the parse tree

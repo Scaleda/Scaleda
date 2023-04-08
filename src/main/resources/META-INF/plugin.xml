@@ -107,6 +107,8 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.IncompleteConditionAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.OrOperatorInSensitiveList"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.LatchAnnotator"/>
         <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
