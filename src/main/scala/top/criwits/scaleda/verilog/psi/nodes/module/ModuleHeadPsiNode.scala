@@ -1,10 +1,11 @@
 package top.criwits.scaleda
 package verilog.psi.nodes.module
 
+import verilog.psi.nodes.signal.PortIdentifierPsiNode
+
 import com.intellij.lang.ASTNode
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.PortIdentifierPsiNode
 
 class ModuleHeadPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
   def getPorts: Seq[PortIdentifierPsiNode] = {
@@ -15,4 +16,8 @@ class ModuleHeadPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
   def getModuleParameterPortList: Option[ModuleParameterPortListPsiNode] = {
     Option(PsiTreeUtil.getChildOfType(this, classOf[ModuleParameterPortListPsiNode]))
   }
+
+  def getModuleIdentifier: Option[ModuleIdentifierPsiNode] = Option(
+    PsiTreeUtil.getChildOfType(this, classOf[ModuleIdentifierPsiNode])
+  )
 }

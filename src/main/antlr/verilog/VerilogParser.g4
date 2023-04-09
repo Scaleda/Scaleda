@@ -737,7 +737,7 @@ module_instantiation
    ;
 
 parameter_value_assignment
-   : '#' '(' list_of_parameter_assignments ')'
+   : '#' '(' (list_of_parameter_assignments)? ')'
    ;
 
 list_of_parameter_assignments

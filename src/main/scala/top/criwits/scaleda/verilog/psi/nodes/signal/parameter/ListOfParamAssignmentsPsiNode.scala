@@ -6,8 +6,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 
 class ListOfParamAssignmentsPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
-  def getParamAssignments: Seq[ParameterAssignmentPsiNode] = {
-    val result = PsiTreeUtil.getChildrenOfType(this, classOf[ParameterAssignmentPsiNode])
-    if (result == null) Seq[ParameterAssignmentPsiNode]() else result.toSeq
+  def getParamAssignments: Seq[ParamAssignmentPsiNode] = {
+    val result = PsiTreeUtil.getChildrenOfType(this, classOf[ParamAssignmentPsiNode])
+    if (result == null) Seq[ParamAssignmentPsiNode]() else result.toSeq
   }
 }

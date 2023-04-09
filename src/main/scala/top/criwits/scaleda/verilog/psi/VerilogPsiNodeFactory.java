@@ -26,7 +26,7 @@ import top.criwits.scaleda.verilog.psi.nodes.macro.MacroIdentifierPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.module.*;
 import top.criwits.scaleda.verilog.psi.nodes.signal.*;
 import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ListOfParamAssignmentsPsiNode;
-import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterAssignmentPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParamAssignmentPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterDeclarationPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode;
 
@@ -137,7 +137,7 @@ public class VerilogPsiNodeFactory {
     );
     map.put(
         getRuleIElementType(VerilogParser.RULE_param_assignment),
-        ParameterAssignmentPsiNode.class
+        ParamAssignmentPsiNode.class
     );
     map.put(
         getRuleIElementType(VerilogParser.RULE_list_of_param_assignments),
@@ -356,10 +356,28 @@ public class VerilogPsiNodeFactory {
         HierarchicalIdentifierPsiNode.class
     );
 
+    /// Module Instantiation
     map.put(
         getRuleIElementType(VerilogParser.RULE_module_instantiation),
         ModuleInstantiationPsiNode.class
     );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_parameter_value_assignment),
+        ParameterValueAssignmentPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_list_of_parameter_assignments),
+        ListOfParameterAssignmentsPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_ordered_parameter_assignment),
+        OrderedParameterAssignmentPsiNode.class
+    );
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_named_parameter_assignment),
+        NamedParameterAssignmentPsiNode.class
+    );
+
 
     map.put(
         getRuleIElementType(VerilogParser.RULE_module_instance),

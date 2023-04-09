@@ -22,8 +22,7 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     with StructureViewNode
     with DocumentHolder {
   override def getNameIdentifier: PsiElement = {
-    val identifier = PsiTreeUtil.findChildOfAnyType(this, classOf[ModuleIdentifierPsiNode])
-    identifier // FIXME: if null?
+    getModuleHead.getModuleIdentifier.orNull
   }
 
   @Nls

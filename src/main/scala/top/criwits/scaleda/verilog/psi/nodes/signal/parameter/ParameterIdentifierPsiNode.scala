@@ -16,7 +16,7 @@ class ParameterIdentifierPsiNode(node: ASTNode) extends SignalIdentifierPsiNode(
   }
 
   def getInitialValue: Option[ExpressionPsiNode] = {
-    val paramAssign = PsiTreeUtil.getParentOfType(this, classOf[ParameterAssignmentPsiNode])
+    val paramAssign = PsiTreeUtil.getParentOfType(this, classOf[ParamAssignmentPsiNode])
     if (paramAssign == null) return None
 
     val ce = PsiTreeUtil.getChildOfType(paramAssign, classOf[ConstantExpressionPsiNode])

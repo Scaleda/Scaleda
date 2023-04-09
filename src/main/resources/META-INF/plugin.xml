@@ -115,6 +115,8 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.CaseStatementLatchAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.WidthConcatAmbiguousAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.ModuleParameterAssignmentsAnnotator" />
         <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>

@@ -2,14 +2,14 @@ package top.criwits.scaleda
 package verilog.editor.formatter
 
 import verilog.psi.nodes.block.{CaseBodyPsiNode, CaseStatementPsiNode, SeqBlockPsiNode}
-import verilog.psi.nodes.module.{ListOfPortDeclarationsPsiNode, ModuleDeclarationPsiNode, ModuleParameterPortListPsiNode}
+import verilog.psi.nodes.module.{ListOfPortDeclarationsPsiNode, ListOfPortsPsiNode, ModuleDeclarationPsiNode, ModuleParameterPortListPsiNode}
 
 import com.intellij.formatting._
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.codeStyle.CodeStyleSettings
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.ModuleInstancePsiNode
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ListOfParameterAssignmentsPsiNode, ModuleInstancePsiNode, ParameterValueAssignmentPsiNode}
 
 import java.util
 import scala.collection.mutable.ListBuffer
@@ -47,14 +47,17 @@ class VerilogBlock(
    */
   private def childIndent(newChildIndex: Int): Indent = {
     val indent = currentPsi match {
+      case _: ListOfParameterAssignmentsPsiNode =>
+        Indent.getNormalIndent
+
       // Ignore head and tail
-      case _: SeqBlockPsiNode | _: ListOfPortDeclarationsPsiNode | _: ModuleDeclarationPsiNode => {
+      case _: SeqBlockPsiNode | _: ListOfPortDeclarationsPsiNode | _: ListOfPortsPsiNode | _: ModuleDeclarationPsiNode => {
         if (newChildIndex == 0 || newChildIndex == node.getChildren(null).length - 1) Indent.getNoneIndent
         else Indent.getNormalIndent
       }
 
       // Ignore head two and tail, seems not working...
-      case _: ModuleParameterPortListPsiNode | _: ModuleInstancePsiNode => {
+      case _: ModuleParameterPortListPsiNode | _: ModuleInstancePsiNode | _: ParameterValueAssignmentPsiNode => {
         if (newChildIndex < 1 || newChildIndex == node.getChildren(null).length - 1)
           Indent.getNoneIndent
         else Indent.getNormalIndent
