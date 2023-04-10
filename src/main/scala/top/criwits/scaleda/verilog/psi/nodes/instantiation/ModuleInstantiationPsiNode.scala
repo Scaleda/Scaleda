@@ -5,7 +5,7 @@ import verilog.psi.nodes.ReferenceHolder
 import verilog.psi.nodes.expression.ExpressionPsiNode
 import verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode.{NAMED, NONE, ORDERED}
 import verilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
-import verilog.psi.nodes.signal.PortDeclarationPsiNode
+import verilog.psi.nodes.signal.{PortDeclarationPsiNode, PortIdentifierPsiNode}
 import verilog.references.ModuleInstantiationReference
 
 import com.intellij.lang.ASTNode
@@ -27,7 +27,7 @@ class ModuleInstantiationPsiNode(node: ASTNode)
   def getPortConnectionList: ListOfPortConnectionsPsiNode =
     PsiTreeUtil.findChildOfType(this, classOf[ListOfPortConnectionsPsiNode])
 
-  def getConnectionType: (ModuleInstantiationPsiNode.Value, Option[IndexedSeq[AnyRef]]) = {
+  def getConnectionType: (ModuleInstantiationPsiNode.Value, Option[Seq[AnyRef]]) = {
     val list = getPortConnectionList
     if (list == null) return (NONE, None)
 
@@ -42,12 +42,22 @@ class ModuleInstantiationPsiNode(node: ASTNode)
     (NONE, None)
   }
 
-  def getConnectMap: Array[(PortDeclarationPsiNode, Option[ExpressionPsiNode])] = {
+  /**
+   * Render the connect map for this instance.
+   * @return the connect map. like:
+   * <code>
+   *   Seq(
+   *     (Identifier(a), None),
+   *     (Identifier(b), Some(expression))
+   *   )
+   * </code>
+   */
+  def getConnectMap: Seq[(PortIdentifierPsiNode, Option[ExpressionPsiNode])] = {
     val reference = getReference
     val result    = reference.multiResolve(true)
     if (result.isEmpty) return Array.empty
     val module = result.head.getElement.asInstanceOf[ModuleDeclarationPsiNode]
-    val ports  = module.getPorts
+    val ports  = module.getModuleHead.getPorts
 
     val connType = getConnectionType
     connType._1 match {

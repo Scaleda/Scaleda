@@ -1,13 +1,8 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.instantiation
 
 import idea.{ScaledaBundle => SB}
-import verilog.psi.nodes.instantiation.{
-  ModuleInstantiationPsiNode,
-  NameOfInstancePsiNode,
-  NamedPortConnectionPsiNode,
-  OrderedPortConnectionPsiNode
-}
+import verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NameOfInstancePsiNode, NamedPortConnectionPsiNode, OrderedPortConnectionPsiNode}
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 import verilog.psi.nodes.signal.PortDeclarationPsiNode
 
@@ -41,7 +36,6 @@ class ModulePortConnectionAnnotator extends Annotator {
         *    In this case we suggest completing the latter one;
         *  - User had typed (), with ordered connection. We can suggest converting those connections to named connection
         */
-
       val typeAndConnection = instance.getConnectionType
       typeAndConnection._1 match {
         case ModuleInstantiationPsiNode.NAMED =>
@@ -62,10 +56,10 @@ class ModulePortConnectionAnnotator extends Annotator {
                   mp.filter(_._2.isEmpty).map(_._1.getIdentifier.getName).mkString(", ")
                 )
               )
-              .withFix(new ConnectPortIndent(instance, mp) {
+              .withFix(new AbstractModulePortConnectionIntent(instance, mp) {
                 override def getText: String = SB.message("annotation.not.connected.port.fix.input")
               })
-              .withFix(new ConnectPortIndent(instance, connectMap) {
+              .withFix(new AbstractModulePortConnectionIntent(instance, connectMap) {
                 override def getText: String = SB.message("annotation.not.connected.port.fix.all")
               })
               .range(annotateRange)
@@ -83,7 +77,7 @@ class ModulePortConnectionAnnotator extends Annotator {
                   module.getPorts.map(_.getIdentifier.getName).mkString(", ")
                 )
               )
-              .withFix(new ConnectPortIndent(instance, connectMap) {
+              .withFix(new AbstractModulePortConnectionIntent(instance, connectMap) {
                 override def getText: String = SB.message("annotation.not.connected.port.fix.all")
               })
               .range(annotateRange)
@@ -101,7 +95,7 @@ class ModulePortConnectionAnnotator extends Annotator {
                   connectMap.filter(_._2.isEmpty).map(_._1.getIdentifier.getName).mkString(", ")
                 )
               )
-              .withFix(new ConnectPortIndent(instance, connectMap) {
+              .withFix(new AbstractModulePortConnectionIntent(instance, connectMap) {
                 override def getText: String = SB.message("annotation.not.connected.port.fix.all")
               })
               .range(annotateRange)

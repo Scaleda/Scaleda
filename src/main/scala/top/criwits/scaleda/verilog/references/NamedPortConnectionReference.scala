@@ -2,21 +2,20 @@ package top.criwits.scaleda
 package verilog.references
 
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{PsiElementResolveResult, PsiReferenceBase, ResolveResult}
+import com.intellij.psi.{PsiElement, PsiElementResolveResult, PsiReferenceBase, ResolveResult}
 import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NamedPortConnectionPsiNode}
 import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.signal.{PortDeclarationPsiNode, PortIdentifierPsiNode}
 
 class NamedPortConnectionReference(element: NamedPortConnectionPsiNode)
-  extends PsiReferenceBase.Poly[NamedPortConnectionPsiNode](
+  extends PsiReferenceBase[NamedPortConnectionPsiNode](
     element,
-    element.getHoldPsiNodeRelativeTextRange,
-    true
+    element.getHoldPsiNodeRelativeTextRange
   ) {
-  override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] = {
+  override def resolve: PsiElement = {
     // first: find which module
     val moduleInstantiationPsiNode = PsiTreeUtil.getParentOfType(myElement, classOf[ModuleInstantiationPsiNode])
-    if (moduleInstantiationPsiNode == null) return Array.empty
+    if (moduleInstantiationPsiNode == null) return null
 
     moduleInstantiationPsiNode.getReference.multiResolve(incompleteCode)
       .map(it => it.getElement)
@@ -28,6 +27,4 @@ class NamedPortConnectionReference(element: NamedPortConnectionPsiNode)
       .map(new PsiElementResolveResult((_)))
       .toArray
   }
-
-  override def getVariants = Array()
 }

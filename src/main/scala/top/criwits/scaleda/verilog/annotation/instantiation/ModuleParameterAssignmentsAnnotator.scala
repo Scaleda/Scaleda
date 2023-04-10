@@ -1,5 +1,9 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.instantiation
+
+import idea.ScaledaBundle
+import verilog.psi.nodes.instantiation.{ListOfParameterAssignmentsPsiNode, ModuleInstantiationPsiNode, OrderedParameterAssignmentPsiNode, ParameterValueAssignmentPsiNode}
+import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
@@ -7,9 +11,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiFile}
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ListOfParameterAssignmentsPsiNode, ModuleInstantiationPsiNode, OrderedParameterAssignmentPsiNode, ParameterValueAssignmentPsiNode}
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 class ModuleParameterAssignmentsAnnotator extends Annotator {
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {

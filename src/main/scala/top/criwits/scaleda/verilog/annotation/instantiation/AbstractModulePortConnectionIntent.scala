@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.instantiation
 
 import idea.ScaledaBundle
 import verilog.psi.nodes.expression.ExpressionPsiNode
@@ -9,10 +9,10 @@ import verilog.psi.nodes.signal.PortDeclarationPsiNode
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.psi.{PsiDocumentManager, PsiFile}
 import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.psi.{PsiDocumentManager, PsiFile}
 
-abstract class ConnectPortIndent(
+abstract class AbstractModulePortConnectionIntent(
     val instant: ModuleInstantiationPsiNode,
     val connectionMap: Array[(PortDeclarationPsiNode, Option[ExpressionPsiNode])]
 ) extends BaseIntentionAction {

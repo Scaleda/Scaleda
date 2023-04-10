@@ -1,9 +1,8 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.instantiation
 
 import idea.ScaledaBundle
 import verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NameOfInstancePsiNode}
-import verilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}

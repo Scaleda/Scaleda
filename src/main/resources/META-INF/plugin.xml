@@ -88,9 +88,9 @@
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.ModuleInstantiationAnnotator"/>
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModuleInstantiationAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.ModulePortConnectionAnnotator"/>
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModulePortConnectionAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.MultiDrivenAnnotator"/>
         <annotator language="Verilog"
@@ -116,7 +116,7 @@
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.WidthConcatAmbiguousAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.ModuleParameterAssignmentsAnnotator" />
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModuleParameterAssignmentsAnnotator" />
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.NamedParameterAssignmentAnnotator" />
         <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>

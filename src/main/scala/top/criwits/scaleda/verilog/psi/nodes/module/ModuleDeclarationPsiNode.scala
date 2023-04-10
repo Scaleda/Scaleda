@@ -42,14 +42,14 @@ class ModuleDeclarationPsiNode(node: ASTNode)
 
   override def getElementName: String = getName
 
-  def getPorts: Array[PortDeclarationPsiNode] = {
-    import scala.jdk.CollectionConverters._
-    val list = PsiTreeUtil.findChildrenOfType(this, classOf[ListOfPortDeclarationsPsiNode]).asScala
-    if (list.isEmpty) return Array.empty[PortDeclarationPsiNode]
-
-    val result = PsiTreeUtil.getChildrenOfType(list.head, classOf[PortDeclarationPsiNode])
-    if (result == null) Array.empty[PortDeclarationPsiNode] else result
-  }
+//  def getPorts: Array[PortDeclarationPsiNode] = {
+//    import scala.jdk.CollectionConverters._
+//    val list = PsiTreeUtil.findChildrenOfType(this, classOf[ListOfPortDeclarationsPsiNode]).asScala
+//    if (list.isEmpty) return Array.empty[PortDeclarationPsiNode]
+//
+//    val result = PsiTreeUtil.getChildrenOfType(list.head, classOf[PortDeclarationPsiNode])
+//    if (result == null) Array.empty[PortDeclarationPsiNode] else result
+//  }
 
   def getFile: VerilogPSIFileRoot = {
     val file = PsiTreeUtil.getParentOfType(this, classOf[VerilogPSIFileRoot])
@@ -67,7 +67,6 @@ class ModuleDeclarationPsiNode(node: ASTNode)
       else {
         val portList = ports
           .map(port =>
-            //              input   [31:0]                                                        a
             s"${port.getTypeText}${port.getRange.map(r => " " + r.generateText).getOrElse("")} ${port.getName}"
           )
           .mkString(",\n  ")
