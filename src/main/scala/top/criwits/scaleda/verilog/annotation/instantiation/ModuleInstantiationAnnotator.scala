@@ -20,22 +20,21 @@ class ModuleInstantiationAnnotator extends Annotator {
     if (instance == null) return
 
     val reference = instance.getReference
-    val result    = reference.multiResolve(true)
+    val result    = reference.resolve
     val instantName = PsiTreeUtil.findChildOfType(instance, classOf[NameOfInstancePsiNode])
     if (instantName == null) return
     if (instantName.getTextRange == null) return
     val annotateRange = new TextRange(instance.getTextRange.getStartOffset, instantName.getTextRange.getEndOffset) // FIXME
 
-    if (result.isEmpty) {
+    if (result == null) {
       holder.newAnnotation(
         HighlightSeverity.ERROR,
         ScaledaBundle.message(
-          "annotation.unresolved.module",
-          instance.getHoldPsiNode.getNameIdentifier.getText
+          "annotation.unresolved.module"
         )
       )
         .range(annotateRange)
-        .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL) // good?
+        .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
         .create()
     }
   }

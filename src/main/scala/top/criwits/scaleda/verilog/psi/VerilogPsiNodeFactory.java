@@ -10,6 +10,9 @@ import top.criwits.scaleda.verilog.VerilogLanguage$;
 import top.criwits.scaleda.verilog.parser.VerilogParser;
 import top.criwits.scaleda.verilog.psi.nodes.*;
 import top.criwits.scaleda.verilog.psi.nodes.always.*;
+import top.criwits.scaleda.verilog.psi.nodes.assignments.BlockingAssignmentPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.assignments.NetAssignmentPsiNode;
+import top.criwits.scaleda.verilog.psi.nodes.assignments.NonblockingAssignmentPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseBodyPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseDefaultPsiNode;
 import top.criwits.scaleda.verilog.psi.nodes.block.CaseStatementPsiNode;
@@ -181,6 +184,11 @@ public class VerilogPsiNodeFactory {
     map.put(
         getRuleIElementType(VerilogParser.RULE_blocking_assignment),
         BlockingAssignmentPsiNode.class
+    );
+    /// Assign
+    map.put(
+        getRuleIElementType(VerilogParser.RULE_net_assignment),
+        NetAssignmentPsiNode.class
     );
 
     // Signals

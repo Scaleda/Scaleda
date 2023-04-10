@@ -21,7 +21,4 @@ class NamedPortConnectionPsiNode(node: ASTNode)
 
   override def getReference = new NamedPortConnectionReference(this)
 
-  def getSignal: ExpressionPsiNode = {
-    PsiTreeUtil.getChildOfType(this, classOf[ExpressionPsiNode])
-  }
 }

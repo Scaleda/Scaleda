@@ -6,6 +6,7 @@ import verilog.psi.nodes.instantiation.{ListOfParameterAssignmentsPsiNode, Modul
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
+import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -23,6 +24,7 @@ class ModuleParameterAssignmentsAnnotator extends Annotator {
       // Suggest remove...
       holder.newAnnotation(HighlightSeverity.WEAK_WARNING, ScaledaBundle.message("annotation.empty.parameter.list"))
         .withFix(new RemoveEmptyParameterAssignmentsIntent(e))
+        .highlightType(ProblemHighlightType.WEAK_WARNING)
         .create()
       return
     }
@@ -30,9 +32,9 @@ class ModuleParameterAssignmentsAnnotator extends Annotator {
     // Step 2: resolve module
     val instance = PsiTreeUtil.getParentOfType(element, classOf[ModuleInstantiationPsiNode])
     if (instance == null) return
-    val references = instance.getReference.multiResolve(false)
-    if (references == null || references.length == 0) return
-    val module = references.head.getElement.asInstanceOf[ModuleDeclarationPsiNode]
+    val reference = instance.getReference.resolve
+    if (reference == null) return
+    val module = reference.asInstanceOf[ModuleDeclarationPsiNode]
 
     val named = listOfParameterAssignmentsPsiNode.get.getNamedParameterAssignments
     val ordered = listOfParameterAssignmentsPsiNode.get.getOrderedParameterAssignments
@@ -44,6 +46,7 @@ class ModuleParameterAssignmentsAnnotator extends Annotator {
         holder.newAnnotation(HighlightSeverity.ERROR,
           ScaledaBundle.message("annotation.redundant.parameters", module.getName, paramSlots.length, ordered.length))
           .withFix(new RemoveRedundantAssignments(listOfParameterAssignmentsPsiNode.get, ordered, paramSlots.length))
+          .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
           .create()
       }
     }

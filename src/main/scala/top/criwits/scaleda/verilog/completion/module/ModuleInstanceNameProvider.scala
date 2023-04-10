@@ -15,14 +15,11 @@ class ModuleInstanceNameProvider extends CompletionProvider[CompletionParameters
 
     // get the module declaration
     val resolve = instantiatedModule.getReference
-      .multiResolve(false)
+      .resolve
 
-    if (resolve.length == 0) return
+    if (resolve == null) return
 
-    val moduleDeclaration = resolve
-      .head
-      .getElement
-      .asInstanceOf[ModuleDeclarationPsiNode]
+    val moduleDeclaration = resolve.asInstanceOf[ModuleDeclarationPsiNode]
 
     result.addElement(LookupElementBuilder.create("u_" + moduleDeclaration.getName))
 

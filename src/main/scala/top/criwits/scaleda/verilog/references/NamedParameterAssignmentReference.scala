@@ -11,16 +11,13 @@ import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterIdentifie
 class NamedParameterAssignmentReference(element: NamedParameterAssignmentPsiNode)
   extends PsiReferenceBase[NamedParameterAssignmentPsiNode](element, element.getHoldPsiNodeRelativeTextRange) {
   override def resolve(): PsiElement = {
-    // first: find which module
     val moduleInstantiationPsiNode = PsiTreeUtil.getParentOfType(myElement, classOf[ModuleInstantiationPsiNode])
     if (moduleInstantiationPsiNode == null) return null
 
-    moduleInstantiationPsiNode.getReference.multiResolve(false)
-      .map(it => it.getElement)
-      .filter(it => it.isInstanceOf[ModuleDeclarationPsiNode])
-      .map(it => it.asInstanceOf[ModuleDeclarationPsiNode])
-      .map(it => it.getParameters)
-      .foldLeft(Seq[ParameterIdentifierPsiNode]())(_ ++ _)
+    val ref = moduleInstantiationPsiNode.getReference.resolve
+    if (!ref.isInstanceOf[ModuleDeclarationPsiNode]) return null
+    ref.asInstanceOf[ModuleDeclarationPsiNode]
+      .getParameters
       .find(element.getHoldPsiNode != null &&  _.getName == element.getHoldPsiNode.getName) // fix NPE
       .orNull
   }

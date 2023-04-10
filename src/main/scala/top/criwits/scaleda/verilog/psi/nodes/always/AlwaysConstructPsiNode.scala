@@ -8,11 +8,12 @@ import verilog.psi.nodes.signal.SignalIdentifierPsiNode
 import com.intellij.lang.ASTNode
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
 
 import scala.jdk.CollectionConverters._
 
 class AlwaysConstructPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with StructureViewNode {
-  def getAssignments = PsiTreeUtil.findChildrenOfType(this, classOf[AssignmentPsiNode]).asScala
+  def getAssignments = PsiTreeUtil.findChildrenOfType(this, classOf[AlwaysAssignmentPsiNode]).asScala
 
   def getDrivenSignals: Iterable[SignalIdentifierPsiNode] = {
     val assignments = getAssignments

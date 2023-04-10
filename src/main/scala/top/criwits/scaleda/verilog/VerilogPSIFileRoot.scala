@@ -31,19 +31,19 @@ class VerilogPSIFileRoot(viewProvider: FileViewProvider)
       .toArray
       .map(x => x.asInstanceOf[ModuleDeclarationPsiNode])
 
-  def getInstantiatedModules: Array[ModuleDeclarationPsiNode] = {
-    val instantiations = PsiTreeUtil.findChildrenOfType(this, classOf[ModuleInstantiationPsiNode]).asScala
-    instantiations
-      .map(_.getReference.multiResolve(false))
-      .foldLeft(Seq[ResolveResult]())(_ ++ _)
-      .filter(_.isValidResult)
-      .map(_.getElement)
-      .filter(_.isInstanceOf[ModuleDeclarationPsiNode])
-      .map(_.asInstanceOf[ModuleDeclarationPsiNode])
-      .foldLeft(Array.empty[ModuleDeclarationPsiNode]) { (seen, current) =>
-        if (seen.map(_.getName).contains(current.getName)) seen else seen :+ current
-      }
-  }
+//  def getInstantiatedModules: Array[ModuleDeclarationPsiNode] = {
+//    val instantiations = PsiTreeUtil.findChildrenOfType(this, classOf[ModuleInstantiationPsiNode]).asScala
+//    instantiations
+//      .map(_.getReference.multiResolve(false))
+//      .foldLeft(Seq[ResolveResult]())(_ ++ _)
+//      .filter(_.isValidResult)
+//      .map(_.getElement)
+//      .filter(_.isInstanceOf[ModuleDeclarationPsiNode])
+//      .map(_.asInstanceOf[ModuleDeclarationPsiNode])
+//      .foldLeft(Array.empty[ModuleDeclarationPsiNode]) { (seen, current) =>
+//        if (seen.map(_.getName).contains(current.getName)) seen else seen :+ current
+//      }
+//  }
 
   def getMacroDeclarations: Array[MacroDeclarationPsiNode] = {
     PsiTreeUtil

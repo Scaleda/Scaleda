@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package verilog.psi.nodes.always
+package verilog.psi.nodes.assignments
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.util.PsiTreeUtil
@@ -9,16 +9,14 @@ import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
 
 import scala.jdk.CollectionConverters._
 
-abstract class AssignmentPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
-  def getLValues: Iterable[SignalIdentifierPsiNode] = {
+class NetAssignmentPsiNode(node: ASTNode) extends AbstractAssignmentPsiNode(node){
+  override def getLValues: Iterable[SignalIdentifierPsiNode] = {
     val children = this.getChildren
     val LValue = children.head
     if (LValue == null || !LValue.isInstanceOf[ANTLRPsiNode]) return Iterable.empty
 
     val signals = PsiTreeUtil.findChildrenOfType(LValue, classOf[HierarchicalIdentifierPsiNode]).asScala
     signals.map(_.getReference.resolve).filter(_.isInstanceOf[SignalIdentifierPsiNode]).map(_.asInstanceOf[SignalIdentifierPsiNode])
+    // TODO: rare case: LValue is a concatenation where parameters are used to indicate the width ...
   }
 }
-
-class NonblockingAssignmentPsiNode(node: ASTNode) extends AssignmentPsiNode(node)
-class BlockingAssignmentPsiNode(node: ASTNode) extends AssignmentPsiNode(node)

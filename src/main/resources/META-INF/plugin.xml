@@ -119,6 +119,10 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModuleParameterAssignmentsAnnotator" />
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.NamedParameterAssignmentAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.UnresolvedPortConnectionAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.assign.IllegalAssignAnnotator" />
         <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>

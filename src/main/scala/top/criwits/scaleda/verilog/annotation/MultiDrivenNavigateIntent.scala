@@ -6,10 +6,10 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.verilog.psi.nodes.always.AssignmentPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
 
-class MultiDrivenNavigateIntent(val anotherAssign: AssignmentPsiNode) extends BaseIntentionAction{
+class MultiDrivenNavigateIntent(val anotherAssign: AlwaysAssignmentPsiNode) extends BaseIntentionAction{
   override def getFamilyName: String = ScaledaBundle.message("annotation.multidriven.navigate")
 
   override def getText: String = ScaledaBundle.message("annotation.multidriven.navigate")

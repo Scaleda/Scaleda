@@ -19,36 +19,10 @@ class NamedParameterAssignmentAnnotator extends Annotator {
     if (e.getReference.resolve() == null)  {
         holder.newAnnotation(HighlightSeverity.ERROR, ScaledaBundle.message("annotation.unresolved.parameter"))
           .range(e.getTextRange)
-          .withFix(new RemoveUnresolvedAssignmentIntent(e))
+          .withFix(new RemoveItemWithCommasIntent[NamedParameterAssignmentPsiNode](e, ScaledaBundle.message("annotation.unresolved.parameter.fix")))
           .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
           .create()
     }
   }
 }
 
-class RemoveUnresolvedAssignmentIntent(element: NamedParameterAssignmentPsiNode) extends BaseIntentionAction {
-  override def getFamilyName: String = ScaledaBundle.message("annotation.unresolved.parameter.fix")
-
-  override def getText: String = getFamilyName
-
-  override def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = true
-
-  override def invoke(project: Project, editor: Editor, file: PsiFile): Unit = {
-    val prev = PsiTreeUtil.prevVisibleLeaf(element)
-    val next = PsiTreeUtil.nextVisibleLeaf(element)
-    val prevHas = !(prev == null || !prev.textMatches(","))
-    val nextHas = !(next == null || !next.textMatches(","))
-
-    val doc = editor.getDocument
-
-    if (!prevHas && !nextHas) {
-      doc.replaceString(element.getTextRange.getStartOffset, element.getTextRange.getEndOffset, "")
-    } else if (prevHas && nextHas) {
-        doc.replaceString(prev.getTextRange.getStartOffset, element.getTextRange.getEndOffset, "") // remove previous comma
-    } else if (prevHas) {
-      doc.replaceString(prev.getTextRange.getStartOffset, element.getTextRange.getEndOffset, "")
-    } else if (nextHas) {
-        doc.replaceString(element.getTextRange.getStartOffset, next.getTextRange.getEndOffset, "")
-    }
-  }
-}

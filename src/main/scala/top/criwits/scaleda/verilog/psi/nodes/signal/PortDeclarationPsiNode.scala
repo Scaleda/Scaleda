@@ -15,8 +15,8 @@ class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(nod
     val typeText = getTypeText
     if (typeText.contains("input")) INPUT
     else if (typeText.contains("inout")) INOUT
-    else if (typeText.contains("output")) OUTPUT
     else if (typeText.contains("output") && (typeText.contains("reg") || typeText.contains("integer") || typeText.contains("time"))) OUTPUT_REG
+    else if (typeText.contains("output")) OUTPUT
     else INPUT // default
   }
 

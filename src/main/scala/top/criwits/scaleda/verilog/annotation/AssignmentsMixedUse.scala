@@ -2,11 +2,12 @@ package top.criwits.scaleda
 package verilog.annotation
 
 import idea.ScaledaBundle
-import verilog.psi.nodes.always.{AlwaysConstructPsiNode, BlockingAssignmentPsiNode, NonblockingAssignmentPsiNode}
+import verilog.psi.nodes.always.AlwaysConstructPsiNode
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import top.criwits.scaleda.verilog.psi.nodes.assignments.{BlockingAssignmentPsiNode, NonblockingAssignmentPsiNode}
 
 /** Example:
   * <code>
