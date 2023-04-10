@@ -32,7 +32,7 @@ class PortReferencePsiNode(node: ASTNode) extends ANTLRPsiNode(node) with Refere
 
   override def getHoldPsiNode: PortIdentifierPsiNode = getPortIdentifier.orNull
 
-  override def getHoldPsiNodeRelativeTextRange: TextRange = getPortIdentifier.map(_.getTextRange).orNull
+  override def getHoldPsiNodeRelativeTextRange: TextRange = getPortIdentifier.map(_.getTextRange.shiftLeft(this.getTextOffset)).orNull
 
   override def getReference = new OldStylePortIdentifierReference(this)
 }

@@ -47,6 +47,11 @@ class ModuleParameterAssignmentsAnnotator extends Annotator {
       }
     }
 
+    if (named.nonEmpty) {
+      // Step 4: For named we check repeat
+      //TODO
+    }
+
   }
 }
 

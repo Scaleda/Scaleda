@@ -7,7 +7,7 @@ import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode.PortT
 class PortIdentifierPsiNode(node: ASTNode) extends SignalIdentifierPsiNode(node) {
   def getPortType: PortType = {
     val parent = getDeclaration.asInstanceOf[PortDeclarationPsiNode]
-    if (parent == null) return null
+    if (parent == null) return null // todo: ?
     parent.getPortType
   }
 }

@@ -38,13 +38,6 @@ class ModuleInstantiationAnnotator extends Annotator {
         .range(annotateRange)
         .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL) // good?
         .create()
-    } else {
-      holder.newAnnotation(
-        HighlightSeverity.INFORMATION,
-        ScaledaBundle.message("annotation.resolved.module",
-          instance.getHoldPsiNode.getNameIdentifier.getText,
-          result.head.getElement.asInstanceOf[ModuleDeclarationPsiNode].getFile.getVirtualFile.getName)
-      ).create()
     }
   }
 }

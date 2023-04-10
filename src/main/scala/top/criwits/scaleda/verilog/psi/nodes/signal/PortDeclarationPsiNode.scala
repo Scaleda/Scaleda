@@ -12,28 +12,20 @@ class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(nod
   }
 
   def getPortType: PortDeclarationPsiNode.PortType = {
-    val children = this.getChildren //TODO better
-
-    if (children.exists(_.textMatches("input"))) return INPUT
-
-    if (children.exists(_.textMatches("inout"))) return INOUT
-
-    if (children.exists(_.textMatches("output"))) {
-      if (children.exists(_.textMatches("reg"))) return OUTPUT_REG
-      else return OUTPUT
-    }
-
-    // TODO: In this case, should search source code!!!
-    // TODO: signed?
-    INPUT
+    val typeText = getTypeText
+    if (typeText.contains("input")) INPUT
+    else if (typeText.contains("inout")) INOUT
+    else if (typeText.contains("output")) OUTPUT
+    else if (typeText.contains("output") && (typeText.contains("reg") || typeText.contains("integer") || typeText.contains("time"))) OUTPUT_REG
+    else INPUT // default
   }
 
-  override def getTypeText: String = getPortType match {
-    case INPUT      => "input"
-    case INOUT      => "inout"
-    case OUTPUT     => "output"
-    case OUTPUT_REG => "output reg"
+  override def getTypeText: String = {
+    val declaration = PsiTreeUtil.getChildOfType(this, classOf[AbstractDeclarationPsiNode])
+    if (declaration == null) "unknown" else declaration.getTypeText
   }
+
+  override def getRange: Option[RangePsiNode] = getDeclaration.flatMap(d => Option(PsiTreeUtil.getChildOfType(d, classOf[RangePsiNode])))
 }
 
 object PortDeclarationPsiNode extends Enumeration {

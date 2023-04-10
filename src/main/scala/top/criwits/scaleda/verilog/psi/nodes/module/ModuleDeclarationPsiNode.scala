@@ -5,14 +5,15 @@ import verilog.VerilogPSIFileRoot
 import verilog.parser.VerilogLexer
 import verilog.psi.VerilogPsiLeafNodeFactory
 import verilog.psi.nodes.signal.PortDeclarationPsiNode
+import verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode
 import verilog.psi.nodes.{DocumentHolder, SimpleIdentifierPsiLeafNode, StructureViewNode}
 
 import com.intellij.lang.ASTNode
+import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import org.jetbrains.annotations.Nls
-import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode
 
 import scala.jdk.CollectionConverters._
 
@@ -55,7 +56,43 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     file
   }
 
-  override def getDocument: String = ???
+  override def getDocument: String = {
+    s"${DocumentationMarkup.DEFINITION_START}${generateModulePreview}${DocumentationMarkup.DEFINITION_END}"
+  }
+
+  private def generateModulePreview: String = {
+    def generatePorts: String = {
+      val ports = getModuleHead.getPorts
+      if (ports.isEmpty) "()"
+      else {
+        val portList = ports
+          .map(port =>
+            //              input   [31:0]                                                        a
+            s"${port.getTypeText}${port.getRange.map(r => " " + r.generateText).getOrElse("")} ${port.getName}"
+          )
+          .mkString(",\n  ")
+        s"""(
+           |  ${portList}
+           |)""".stripMargin
+      }
+    }
+    def generateParams: String = {
+      val params = getParameters
+      if (params.isEmpty) ""
+      else {
+        val paramList = params
+          .map(param =>
+            s"${param.getDeclaration.getTypeText} ${param.getName}${param.getInitialValue.map(value => s" = ${value.getText}").getOrElse("")}"
+          )
+          .mkString(",\n  ")
+        s""" #(
+             |  ${paramList}
+             |)""".stripMargin
+      }
+    }
+
+    s"module ${getName}${generateParams} ${generatePorts}"
+  }
 
   def getModuleHead: ModuleHeadPsiNode = {
     PsiTreeUtil.getChildOfType(this, classOf[ModuleHeadPsiNode])
@@ -70,5 +107,6 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     getModuleItems.map(item => PsiTreeUtil.findChildrenOfType(item, clazz).asScala.toSeq).foldLeft(Seq[T]())(_ ++ _)
   }
 
-  def getParameters: Seq[ParameterIdentifierPsiNode] = getModuleHead.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
+  def getParameters: Seq[ParameterIdentifierPsiNode] =
+    getModuleHead.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
 }
