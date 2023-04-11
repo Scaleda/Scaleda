@@ -1,7 +1,6 @@
 package top.criwits.scaleda
 package idea.utils
 
-import idea.project.IdeaManifestManager
 import kernel.net.RpcPatch
 import kernel.utils.Paths
 
@@ -34,14 +33,15 @@ class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.Scaled
 }
 
 class RpcService extends Disposable {
+  import RpcService.server
   private final val DEFAULT_PORT = 4151
 
   private var myProject: Option[Project] = None
 
   def setProject(project: Project): Unit = myProject = Some(project)
 
-  var stop                   = false
-  var server: Option[Server] = None
+  var stop = false
+  // var server: Option[Server] = None
   val thread = new Thread(
     () => {
       while (!stop) {
@@ -50,37 +50,42 @@ class RpcService extends Disposable {
         // if a server instance was created before, reuse it
         require(myProject.nonEmpty)
         implicit val project = myProject.get
-        server = IdeaManifestManager.getObject[Server](getClass.getName)
+        // server = IdeaManifestManager.getObject[Server](getClass.getName)
         if (server.isEmpty) {
           try {
             // TODO: Add all IDEA grpc services here
-            server = Some(
-              RpcPatch.getStartServer(
-                Seq(
-                  // IDEA interaction
-                  ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject.get), executionContext)
-                  // Fuse as data provider: use transfer now
-                  // RemoteFuseGrpc.bindService(
-                  //   new FuseDataProvider(sourcePath),
-                  //   executionContext
-                  // )
-                ),
-                DEFAULT_PORT
+            RpcService.synchronized {
+              server = Some(
+                RpcPatch.getStartServer(
+                  Seq(
+                    // IDEA interaction
+                    ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject.get), executionContext)
+                    // Fuse as data provider: use transfer now
+                    // RemoteFuseGrpc.bindService(
+                    //   new FuseDataProvider(sourcePath),
+                    //   executionContext
+                    // )
+                  ),
+                  DEFAULT_PORT
+                )
               )
-            )
-            IdeaManifestManager.putObject(getClass.getName, server.get)
+            }
+            // IdeaManifestManager.putObject(getClass.getName, server.get)
             server.get.awaitTermination()
           } catch {
             case _: InterruptedException =>
-              MainLogger.warn("gRPC Service stopped")
-            case _: IOException =>
-              MainLogger.warn("gRPC Service may has started")
+              MainLogger.info("gRPC Service stopped, ", if (stop) "will not restart" else "will restart")
+            case e: IOException =>
+              MainLogger.warn("gRPC Service io err:", e, "will exit")
               stop = true
             case _e: Throwable =>
               MainLogger.warn("trying", _e)
               _e.printStackTrace()
               Thread.sleep(3000)
           }
+        } else {
+          MainLogger.debug("gRPC Service has started, waiting...")
+          Thread.sleep(1500)
         }
       }
     },
@@ -90,13 +95,16 @@ class RpcService extends Disposable {
 
   override def dispose() = {
     stop = true
-    server.foreach(s => s.shutdown())
-    server = None
+    RpcService.synchronized {
+      server.foreach(s => s.shutdown())
+      server = None
+    }
     thread.interrupt()
   }
 }
 
 object RpcService {
+  var server: Option[Server] = None
   case class RpcGotoInfo(filepath: String, line: Int, column: Int)
   private val gotoInfoQueue           = new LinkedBlockingQueue[RpcGotoInfo]()
   def pushGotoInfo(info: RpcGotoInfo) = gotoInfoQueue.put(info)
