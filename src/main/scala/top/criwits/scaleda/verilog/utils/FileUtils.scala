@@ -11,11 +11,9 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
-import com.intellij.psi.util.PsiTreeUtil
 
-import java.io.File
+import java.io.{File, FilenameFilter}
 import scala.collection.mutable.ArrayBuffer
-import scala.jdk.CollectionConverters._
 import scala.jdk.javaapi.CollectionConverters
 
 object FileUtils {
@@ -70,7 +68,7 @@ object FileUtils {
 
     // append files from sourceRegularFiles
     val psiManager = PsiManager.getInstance(project)
-    sourceRegularFiles.foreach(f => {
+    def doParseFile(f: File) = {
       if (f != null) {
         val d = LocalFileSystem.getInstance().findFileByIoFile(f)
         if (d != null) {
@@ -81,19 +79,35 @@ object FileUtils {
           }
         }
       }
-    })
-    def doParseDir(dirs: Set[File]) = {
+    }
+    sourceRegularFiles.foreach(f => doParseFile(f))
+    def doParseDir(dirs: Set[File]): Unit = {
       // search and append files from sourceDirectories
+      // for dirs in `ip/` including `*_stub.v`，, just accept `*_stub.v` and ignore others
       dirs.foreach(f => {
-        val d = LocalFileSystem.getInstance().findFileByIoFile(f)
-        if (d != null) {
-          val v = PsiTreeUtil
-            .findChildrenOfAnyType(
-              psiManager.findDirectory(d),
-              classOf[VerilogPSIFileRoot]
-            )
-            .asScala
-          result ++= v
+        val fileList = f.listFiles(new FilenameFilter {
+          override def accept(file: File, s: String) = s.endsWith("_stub.v")
+        })
+        if (fileList.isEmpty) {
+          // no stub files, just accept all files
+          val allFiles = f.listFiles()
+          allFiles.foreach(file => {
+            if (file == null || !file.exists()) return
+            if (file.isFile) doParseFile(file)
+            else if (file.isDirectory) doParseDir(Set(file))
+          })
+          // val d = LocalFileSystem.getInstance().findFileByIoFile(f)
+          // if (d != null) {
+          //   val v = PsiTreeUtil
+          //     .findChildrenOfAnyType(
+          //       psiManager.findDirectory(d),
+          //       classOf[VerilogPSIFileRoot]
+          //     )
+          //     .asScala
+          //   result ++= v
+          // }
+        } else {
+          fileList.foreach(doParseFile)
         }
       })
     }
