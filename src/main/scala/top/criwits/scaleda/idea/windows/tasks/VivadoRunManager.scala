@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.runner.SimpleCommandRunner
+import idea.settings.toolchains.ProfileDetectAction
 import idea.utils.MainLogger
 import kernel.project.detect.{VivadoProjectConfig, VivadoRun}
 import kernel.toolchain.Toolchain
@@ -96,7 +97,11 @@ object VivadoRunManager {
                   )
                 })
                 .getOrElse({
-                  MainLogger.warn("cannot find vivado path")
+                  if (Toolchain.profiles().nonEmpty) {
+                    MainLogger.warn("cannot find vivado path")
+                  } else {
+                    ActionManager.getInstance().tryToExecute(new ProfileDetectAction(project), null, null, null, true)
+                  }
                 })
             }
           }
