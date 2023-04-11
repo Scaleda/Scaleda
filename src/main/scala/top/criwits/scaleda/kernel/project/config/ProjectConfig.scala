@@ -90,7 +90,6 @@ case class ProjectConfig(
       .map(f => (f._1, f._2.get))
 }
 
-// FIXME: multi-projects support
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"
 

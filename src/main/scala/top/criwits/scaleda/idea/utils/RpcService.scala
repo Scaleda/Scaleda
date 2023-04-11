@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package idea.utils
 
+import idea.project.IdeaManifestManager
 import kernel.net.RpcPatch
 import kernel.utils.Paths
 
@@ -11,7 +12,7 @@ import com.intellij.openapi.vcs.LocalFilePath
 import io.grpc.Server
 import scaleda.scaleda.{ScaledaEmpty, ScaledaGotoSource, ScaledaRpcGrpc}
 
-import java.io.File
+import java.io.{File, IOException}
 import java.util.concurrent.LinkedBlockingQueue
 import scala.async.Async.async
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,9 +36,9 @@ class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.Scaled
 class RpcService extends Disposable {
   private final val DEFAULT_PORT = 4151
 
-  private var myProject: Project = _
+  private var myProject: Option[Project] = None
 
-  def setProject(project: Project): Unit = myProject = project
+  def setProject(project: Project): Unit = myProject = Some(project)
 
   var stop                   = false
   var server: Option[Server] = None
@@ -46,30 +47,40 @@ class RpcService extends Disposable {
       while (!stop) {
         val sourcePath       = Paths.pwd.getAbsolutePath
         val executionContext = ExecutionContext.global
-        try {
-          // TODO: Add all IDEA grpc services here
-          server = Some(
-            RpcPatch.getStartServer(
-              Seq(
-                // IDEA interaction
-                ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject), executionContext)
-                // Fuse as data provider: use transfer now
-                // RemoteFuseGrpc.bindService(
-                //   new FuseDataProvider(sourcePath),
-                //   executionContext
-                // )
-              ),
-              DEFAULT_PORT
+        // if a server instance was created before, reuse it
+        require(myProject.nonEmpty)
+        implicit val project = myProject.get
+        server = IdeaManifestManager.getObject[Server](getClass.getName)
+        if (server.isEmpty) {
+          try {
+            // TODO: Add all IDEA grpc services here
+            server = Some(
+              RpcPatch.getStartServer(
+                Seq(
+                  // IDEA interaction
+                  ScaledaRpcGrpc.bindService(new ScaledaRpcServerImpl(() => myProject.get), executionContext)
+                  // Fuse as data provider: use transfer now
+                  // RemoteFuseGrpc.bindService(
+                  //   new FuseDataProvider(sourcePath),
+                  //   executionContext
+                  // )
+                ),
+                DEFAULT_PORT
+              )
             )
-          )
-          server.get.awaitTermination()
-        } catch {
-          case _: InterruptedException =>
-            MainLogger.warn("gRPC Service stopped")
-          case _e: Throwable =>
-            MainLogger.warn("trying", _e)
-            _e.printStackTrace()
-            Thread.sleep(3000)
+            IdeaManifestManager.putObject(getClass.getName, server.get)
+            server.get.awaitTermination()
+          } catch {
+            case _: InterruptedException =>
+              MainLogger.warn("gRPC Service stopped")
+            case _: IOException =>
+              MainLogger.warn("gRPC Service may has started")
+              stop = true
+            case _e: Throwable =>
+              MainLogger.warn("trying", _e)
+              _e.printStackTrace()
+              Thread.sleep(3000)
+          }
         }
       }
     },

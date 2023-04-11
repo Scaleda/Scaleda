@@ -2,13 +2,12 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.runner.task.{ScaledaReloadTasksAction, ScaledaRunToolWindowTaskAction, ScaledaTaskPopupMenuAction}
-import idea.utils.{MainLogger, ProjectNow, invokeLater}
-import idea.windows.tasks.ScaledaRunWindowFactory.model
+import idea.utils.{MainLogger, invokeLater}
 import idea.windows.tasks.ip.ScaledaIPManageAction
 import kernel.project.ProjectManifest
 import kernel.project.config.ProjectConfig
-import kernel.project.detect.{VivadoProjectConfig, VivadoRun}
 
 import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.ide.{CommonActionsManager, DefaultTreeExpander}
@@ -25,7 +24,7 @@ import com.intellij.util.ui.tree.TreeUtil
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
 import javax.swing.tree.DefaultTreeModel
-import javax.swing.{DefaultListModel, JPanel, SwingUtilities}
+import javax.swing.{JPanel, SwingUtilities}
 
 class ScaledaRunWindowFactory extends ToolWindowFactory {
   private var created = false
@@ -34,7 +33,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
     super.init(toolWindow)
     MainLogger.info("ScaledaRunWindowFactory#init")
     invokeLater {
-      ProjectNow().foreach(p => createToolWindowContent(p, toolWindow))
+      // ProjectNow().foreach(p => createToolWindowContent(p, toolWindow))
     }
   }
 
@@ -42,6 +41,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
       project: Project,
       toolWindow: ToolWindow
   ): Unit = {
+    implicit val projectUsing = project
     if (created) return
     else created = true
     MainLogger.info("ScaledaRunWindowFactory#createToolWindowContent")
@@ -52,10 +52,11 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
     DumbService
       .getInstance(project)
       .runWhenSmart(() => {
-        model = Some(new DefaultTreeModel(null))
+        val model: DefaultTreeModel = new DefaultTreeModel(null)
+        IdeaManifestManager.putObject(ScaledaRunWindowFactory.WINDOW_ID, model)
 
         val panel = new SimpleToolWindowPanel(true)
-        val tree  = new Tree(model.get)
+        val tree  = new Tree(model)
 
         tree.setCellRenderer(new ScaledaRunTreeCellRenderer)
         TreeUtil.installActions(tree)
@@ -99,11 +100,12 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         group.addSeparator()
 
         val treeExpander = new DefaultTreeExpander(tree)
-        val expandAll = CommonActionsManager
+        val expandAll: AnAction = CommonActionsManager
           .getInstance()
           .createExpandAllAction(treeExpander, tree)
         group.add(expandAll)
-        ScaledaRunWindowFactory.expandAll = Some(expandAll)
+        // ScaledaRunWindowFactory.expandAll = Some(expandAll)
+        IdeaManifestManager.putObject(ScaledaRunWindowFactory.WINDOW_ID + ".expandAll", expandAll)
         // auto expand all after creation
         ActionManager.getInstance().tryToExecute(expandAll, null, null, null, false)
         group.add(
@@ -139,12 +141,12 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
 // FIXME: multi-projects support
 object ScaledaRunWindowFactory {
-  val WINDOW_ID                       = ScaledaBundle.message("tasks.configuration.name")
-  var model: Option[DefaultTreeModel] = None
-  var expandAll: Option[AnAction]     = None
+  val WINDOW_ID = ScaledaBundle.message("tasks.configuration.name")
+  // var model: Option[DefaultTreeModel] = None
+  // var expandAll: Option[AnAction]     = None
 
-  var vivadoProject: Option[VivadoProjectConfig]       = None
-  var vivadoModel: Option[DefaultListModel[VivadoRun]] = None
+  // var vivadoProject: Option[VivadoProjectConfig]       = None
+  // var vivadoModel: Option[DefaultListModel[VivadoRun]] = None
 
   def getRootNode(implicit manifest: ProjectManifest): ScaledaRunRootNode = {
     ProjectConfig.getConfig

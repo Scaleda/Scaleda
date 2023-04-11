@@ -2,9 +2,9 @@ package top.criwits.scaleda
 package idea.runner.task
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.utils.{MainLogger, inReadAction, invokeLater}
 import idea.windows.tasks.ScaledaRunWindowFactory
-import kernel.project.ManifestManager
 import kernel.project.config.ProjectConfig
 
 import com.intellij.icons.AllIcons
@@ -12,9 +12,9 @@ import com.intellij.ide.SaveAndSyncHandler
 import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent}
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
-import top.criwits.scaleda.idea.project.IdeaManifestManager
 
 import java.io.File
+import javax.swing.tree.DefaultTreeModel
 
 /** Action: Load Scaleda project config, with all its targets and tasks.
   * This action should be performed when
@@ -31,6 +31,7 @@ class ScaledaReloadTasksAction
       AllIcons.Actions.Refresh
     ) {
   override def actionPerformed(e: AnActionEvent): Unit = {
+    implicit val project = e.getProject
     // Detect config file
     var searchedFile: Option[VirtualFile] = None
     inReadAction {
@@ -55,10 +56,12 @@ class ScaledaReloadTasksAction
       )
 
       // clear the model
-      ScaledaRunWindowFactory.model.foreach(m => {
-        m.setRoot(null) // legal
-        m.reload()
-      })
+      IdeaManifestManager
+        .getObject[DefaultTreeModel](ScaledaRunWindowFactory.getClass.getName)
+        .foreach(m => {
+          m.setRoot(null) // legal
+          m.reload()
+        })
     } else {
       val f = searchedFile.get
       // refill
@@ -81,17 +84,20 @@ class ScaledaReloadTasksAction
         try {
           var done = false
           while (!done) {
-            ScaledaRunWindowFactory.model
+            IdeaManifestManager
+              .getObject[DefaultTreeModel](ScaledaRunWindowFactory.WINDOW_ID)
               .map(m => {
                 invokeLater {
                   m.setRoot(ScaledaRunWindowFactory.getRootNode)
                   m.reload()
                   // then expand all
-                  ScaledaRunWindowFactory.expandAll.foreach(expandAll =>
-                    ActionManager
-                      .getInstance()
-                      .tryToExecute(expandAll, null, null, null, false)
-                  )
+                  IdeaManifestManager
+                    .getObject[AnAction](ScaledaRunWindowFactory.WINDOW_ID + ".expandAll")
+                    .foreach(expandAll =>
+                      ActionManager
+                        .getInstance()
+                        .tryToExecute(expandAll, null, null, null, false)
+                    )
                 }
                 done = true
                 MainLogger.info("refresh scaleda tree done")

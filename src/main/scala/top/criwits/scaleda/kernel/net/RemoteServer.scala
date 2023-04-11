@@ -60,7 +60,8 @@ object RemoteServer {
       ).getAbsolutePath.replace('\\', '/')
       val sourcePath = request.projectBase
       val replacer = new ImplicitPathReplace(sourcePath, targetPath) {
-        override def doCharReplace(src: String, skipInner: Boolean = false) = super.doCharReplace(src.replace('\\', '/'))
+        override def doCharReplace(src: String, skipInner: Boolean = false) =
+          super.doCharReplace(src.replace('\\', '/'))
       }
       val commandDeps = CommandDeps(
         args = request.commands.map(c => replacer.doCharReplace(c)),
@@ -170,6 +171,9 @@ object RemoteServer {
     }
   }
 
+  /** Start the server, using in kernel, not in IDEA
+    * @param port port
+    */
   def serve(port: Int = DEFAULT_PORT): Unit = {
     val executionContext = ExecutionContext.global
     val server = RpcPatch.getStartServer(
