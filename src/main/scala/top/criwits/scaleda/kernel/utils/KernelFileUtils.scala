@@ -211,7 +211,7 @@ object KernelFileUtils {
         return Some(f)
       } else None
     })
-    KernelLogger.warn("cannot get module file!")
+    KernelLogger.warn(s"cannot get module file! module=$module, sources=${sources.mkString(", ")}")
     None
   }
 
