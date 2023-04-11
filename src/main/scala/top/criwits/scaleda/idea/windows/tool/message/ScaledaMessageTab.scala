@@ -314,6 +314,8 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
     messageHandleThread.interrupt()
     val service = project.getService(classOf[ScaledaLoggingService])
     service.removeListener(msgSourceId)
+    // ManifestManager.disposeProject(project)
+    IdeaManifestManager.removeObject(ScaledaMessageTab.MESSAGE_ID)(project = project)
   }
 }
 

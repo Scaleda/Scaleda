@@ -7,7 +7,7 @@ import scala.language.implicitConversions
 
 case class AbstractProject(p: AnyRef) {
   def getBasePath: String = p match {
-    case p: AnyRef if (p != null && RunningPlatform.isInIdea) =>
+    case p: AnyRef if p != null && RunningPlatform.isInIdea =>
       p.getClass.getMethod("getBasePath").invoke(p).asInstanceOf[String]
     case _ => ""
   }

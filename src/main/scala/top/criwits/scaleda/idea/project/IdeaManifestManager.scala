@@ -16,4 +16,8 @@ object IdeaManifestManager {
   def putObject[T](key: String, value: T)(implicit @Nullable project: Project): Unit = {
     ManifestManager.putObject(key, value)(project = project)
   }
+
+  def removeObject(key: String)(implicit @Nullable project: Project): Unit = {
+    ManifestManager.removeObject(key)(project = project)
+  }
 }
