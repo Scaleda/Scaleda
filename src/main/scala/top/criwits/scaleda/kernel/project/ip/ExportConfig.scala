@@ -1,7 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.ip
 
-import kernel.project.config.ProjectConfig
+import kernel.project.ManifestManager
 import kernel.template.Template
 import kernel.utils.{ImplicitPathReplace, NoPathReplace, RegexReplace}
 
@@ -10,19 +10,18 @@ import org.apache.commons.io.IOUtils
 
 import java.io.{File, FileInputStream}
 
-/**
- * The following is an example
- * @param id "xilinx.pll"
- * @param name "Xilinx PLL"
- * @param module "clk_wiz"
- * @param stub .<...>
- * @param vendor "vivado"
- * @param supports (empty), only vendor is supported
- * @param options
- * @param actions
- * @param defines
- * @param templates
- */
+/** The following is an example
+  * @param id "xilinx.pll"
+  * @param name "Xilinx PLL"
+  * @param module "clk_wiz"
+  * @param stub .<...>
+  * @param vendor "vivado"
+  * @param supports (empty), only vendor is supported
+  * @param options
+  * @param actions
+  * @param defines
+  * @param templates
+  */
 case class ExportConfig(
     // identifier
     id: String,
@@ -87,7 +86,7 @@ case class ExportConfig(
   def renderTemplate(context: Map[String, Any] = Map(), projectBase: Option[String] = None)(implicit
       replace: ImplicitPathReplace = NoPathReplace
   ): Map[String, String] = {
-    val base = if (projectBase.nonEmpty) projectBase.get else ProjectConfig.projectBase.get
+    val base = if (projectBase.nonEmpty) projectBase.get else ManifestManager.getManifest().projectBase.get
     // relative path from project base
     templates
       .map(name => (name, new File(base, name)))
@@ -110,5 +109,6 @@ case class ExportConfig(
     *         }
     */
   @JsonIgnore
-  def getSupports: Map[String, Seq[String]] = Map((if (vendor.nonEmpty) vendor else "generic") -> Seq("all")) ++ supports
+  def getSupports: Map[String, Seq[String]] =
+    Map((if (vendor.nonEmpty) vendor else "generic") -> Seq("all")) ++ supports
 }

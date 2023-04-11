@@ -6,6 +6,7 @@ import idea.runner.task.{ScaledaReloadTasksAction, ScaledaRunToolWindowTaskActio
 import idea.utils.{MainLogger, ProjectNow, invokeLater}
 import idea.windows.tasks.ScaledaRunWindowFactory.model
 import idea.windows.tasks.ip.ScaledaIPManageAction
+import kernel.project.ProjectManifest
 import kernel.project.config.ProjectConfig
 import kernel.project.detect.{VivadoProjectConfig, VivadoRun}
 
@@ -136,6 +137,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
   }
 }
 
+// FIXME: multi-projects support
 object ScaledaRunWindowFactory {
   val WINDOW_ID                       = ScaledaBundle.message("tasks.configuration.name")
   var model: Option[DefaultTreeModel] = None
@@ -144,9 +146,8 @@ object ScaledaRunWindowFactory {
   var vivadoProject: Option[VivadoProjectConfig]       = None
   var vivadoModel: Option[DefaultListModel[VivadoRun]] = None
 
-  def getRootNode: ScaledaRunRootNode = {
-    ProjectConfig
-      .getConfig()
+  def getRootNode(implicit manifest: ProjectManifest): ScaledaRunRootNode = {
+    ProjectConfig.getConfig
       .map(c => {
         new ScaledaRunRootNode(c)
       })

@@ -3,6 +3,7 @@ package kernel.toolchain
 
 import idea.runner.ScaledaRuntime
 import kernel.net.remote.RemoteInfo
+import kernel.project.ProjectManifest
 
 trait ToolchainPresetProvider {
 

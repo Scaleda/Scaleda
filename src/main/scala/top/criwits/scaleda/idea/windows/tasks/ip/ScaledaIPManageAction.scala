@@ -2,10 +2,11 @@ package top.criwits.scaleda
 package idea.windows.tasks.ip
 
 import idea.ScaledaBundle
-import kernel.project.config.ProjectConfig
+import kernel.project.ManifestManager
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+import top.criwits.scaleda.idea.project.IdeaManifestManager
 
 class ScaledaIPManageAction
     extends AnAction(
@@ -15,7 +16,8 @@ class ScaledaIPManageAction
     ) {
   override def update(e: AnActionEvent): Unit = {
     val presentation = e.getPresentation
-    presentation.setEnabled(ProjectConfig.projectBase.isDefined)
+    val manifest     = IdeaManifestManager.getImplicitManifest(project = e.getProject)
+    presentation.setEnabled(manifest.projectBase.isDefined)
   }
   override def actionPerformed(e: AnActionEvent): Unit = {
     val _r = new ScaledaIPManagerDialog(e.getProject).showAndGet()

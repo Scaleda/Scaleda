@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package verilog.utils
 
+import kernel.project.ProjectManifest
 import kernel.utils.KernelFileUtils
 import verilog.parser.{VerilogLexer, VerilogParser, VerilogParserBaseListener}
 
@@ -92,7 +93,7 @@ object ModuleUtils {
     * @param sources source set
     * @return optional top module
     */
-  def parseSourceSetTopModules(sources: Set[String]): Set[String] = {
+  def parseSourceSetTopModules(sources: Set[String])(implicit manifest: ProjectManifest): Set[String] = {
     val files = KernelFileUtils.getAllSourceFiles(sources)
     val fileModuleInfo: Map[String, Seq[String]] =
       files.map(parseVerilogFileModules).reduceOption(_ ++ _).getOrElse(Map())

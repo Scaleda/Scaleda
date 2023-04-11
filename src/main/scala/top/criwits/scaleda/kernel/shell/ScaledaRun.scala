@@ -4,6 +4,7 @@ package kernel.shell
 import idea.runner.{ScaledaRunStage, ScaledaRuntime}
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
+import kernel.project.ProjectManifest
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor._
@@ -25,7 +26,9 @@ object ScaledaRun {
     * @return new runtime
     */
   def preprocess(rt: ScaledaRuntime): ScaledaRuntime = {
-    if (!rt.executor.workingDir.exists() && !rt.executor.workingDir.mkdirs()) KernelLogger.warn("Cannot create working directory!")
+    implicit val manifest: ProjectManifest = rt.manifest
+    if (!rt.executor.workingDir.exists() && !rt.executor.workingDir.mkdirs())
+      KernelLogger.warn("Cannot create working directory!")
     if (!rt.task.custom && rt.stage == ScaledaRunStage.Prepare) {
       // fetch remote system info
       val remoteInfo =
@@ -53,8 +56,8 @@ object ScaledaRun {
   ): Unit = {
     require(rt.profile.profileName.nonEmpty, "must provide profile before runTask")
     val remoteDeps =
-      if (rt.profile.isRemoteProfile && ProjectConfig.projectBase.nonEmpty)
-        Some(RemoteCommandDeps(new File(ProjectConfig.projectBase.get), host = rt.profile.host, runId = rt.id))
+      if (rt.profile.isRemoteProfile && rt.manifest.projectBase.nonEmpty)
+        Some(RemoteCommandDeps(new File(rt.manifest.projectBase.get), host = rt.profile.host, runId = rt.id))
       else None
     KernelLogger.info(s"runTask workingDir=${rt.projectBase.getAbsoluteFile}")
 
@@ -63,7 +66,7 @@ object ScaledaRun {
 
     if (!EnvironmentUtils.Backup.env.contains("SKIP_EXECUTION")) {
       // generic commands and apply envs
-      val commands = toolchain.commands(rt.task).map(c => c.copy(envs = rt.extraEnvs.toSeq))
+      val commands = toolchain.commands(rt.task)(manifest = rt.manifest).map(c => c.copy(envs = rt.extraEnvs.toSeq))
       try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
       catch {
         case e: Throwable =>
@@ -150,8 +153,8 @@ object ScaledaRun {
       taskName: String,
       profileName: String,
       profileHost: String
-  ): Option[ScaledaRuntime] = {
-    val configOptional = ProjectConfig.getConfig()
+  )(implicit manifest: ProjectManifest): Option[ScaledaRuntime] = {
+    val configOptional = ProjectConfig.getConfig
     if (configOptional.isEmpty) {
       KernelLogger.warn("no configure found")
       return None
@@ -200,7 +203,7 @@ object ScaledaRun {
             s"${target.toolchain}-${target.name}-${task.name}-${new Date()}"
           // )
 
-          val projectBase = new File(ProjectConfig.projectBase.get)
+          val projectBase = new File(manifest.projectBase.get)
           val executor    = ScaledaRun.generateExecutor(target, task, profile.get, projectBase)
           val runtime = ScaledaRuntime(
             id = runtimeId,
@@ -208,7 +211,8 @@ object ScaledaRun {
             task = task,
             profile = profile.get,
             executor = executor,
-            projectBase = projectBase
+            projectBase = projectBase,
+            manifest = manifest
           )
 
           Some(runtime)

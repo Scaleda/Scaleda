@@ -1,7 +1,8 @@
 package top.criwits.scaleda
 package idea.runner
 
-import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
+import kernel.project.ProjectManifest
+import kernel.project.config.{TargetConfig, TaskConfig}
 import kernel.toolchain.ToolchainProfile
 import kernel.toolchain.executor.Executor
 
@@ -22,12 +23,13 @@ case class ScaledaRuntime(
     task: TaskConfig,
     profile: ToolchainProfile,
     executor: Executor,
-    projectBase: File = new File(ProjectConfig.projectBase.get),
+    projectBase: File, // = new File(ProjectConfig.projectBase.get),
     extraEnvs: Map[String, String] = Map(),
     // used in preset and message handler
     context: Map[String, Any] = Map(),
     // mark, only run preset once
-    stage: ScaledaRunStage.Value = ScaledaRunStage.Prepare
+    stage: ScaledaRunStage.Value = ScaledaRunStage.Prepare,
+    manifest: ProjectManifest
 )
 
 object ScaledaRunStage extends Enumeration {

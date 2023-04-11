@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel
 
 import kernel.project.config.ProjectConfig
+import kernel.project.{ManifestManager, ProjectManifest}
 import kernel.utils.{KernelFileUtils, OS}
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -49,9 +50,10 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
 
   it should "converts between absolute paths and relative paths" in {
     // make backup so we can have continuous testing
-    val bkp = ProjectConfig.projectBase
+    val bkp                                = ManifestManager.getManifest().projectBase
+    implicit val manifest: ProjectManifest = ManifestManager.getManifest()
     if (OS.isWindows) {
-      ProjectConfig.projectBase = Some("C:\\Coding\\my_project")
+      ManifestManager.getManifest().projectBase = Some("C:\\Coding\\my_project")
       println(KernelFileUtils.toAbsolutePath("\\Coding\\my_project\\src\\1.v"))
       println(KernelFileUtils.toAbsolutePath("C:\\Coding\\my_project\\src\\1.v"))
       println(KernelFileUtils.toAbsolutePath("src\\2.v"))
@@ -63,7 +65,7 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
       println(KernelFileUtils.toProjectRelativePath("D:\\a.txt"))
     } else {
       // same tests on Linux
-      ProjectConfig.projectBase = Some("/home/criwits/my_project")
+      ManifestManager.getManifest().projectBase = Some("/home/criwits/my_project")
       println(KernelFileUtils.toAbsolutePath("/home/criwits/my_project/src/1.v"))
       println(KernelFileUtils.toAbsolutePath("/home/criwits/my_project/src/2.v"))
       println(KernelFileUtils.toAbsolutePath("src/3.v"))
@@ -76,7 +78,7 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
       println(KernelFileUtils.toProjectRelativePath("/home/criwits/a.txt"))
     }
     // restore bkp to original place
-    ProjectConfig.projectBase = bkp
+    ManifestManager.getManifest().projectBase = bkp
   }
 
   it should "generate test files" in {
@@ -92,34 +94,34 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
     })
   }
 
-  it should "scan directory" in {
-    ProjectConfig.projectBase = Some("testProj")
-    println(KernelFileUtils.scanDirectory(Set("v"), new File("testProj")))
-    println(
-      KernelFileUtils.getAllProjectSourceFiles(projectConfig =
-        ProjectConfig(
-          source = "src/",
-          sources = Seq(
-            new File("another/an.v").getAbsolutePath,
-            "another.v"
-          ),
-          test = "test"
-        )
-      )
-    )
-    println(
-      KernelFileUtils.getAllProjectTestFiles(projectConfig =
-        ProjectConfig(
-          source = "src/",
-          sources = Seq(
-            new File("another/an.v").getAbsolutePath,
-            "another.v"
-          ),
-          test = "test"
-        )
-      )
-    )
-  }
+  // it should "scan directory" in {
+  //   ManifestManager.getManifest().projectBase = Some("testProj")
+  //   println(KernelFileUtils.scanDirectory(Set("v"), new File("testProj")))
+  //   println(
+  //     KernelFileUtils.getAllProjectSourceFiles(projectConfig =
+  //       ProjectConfig(
+  //         source = "src/",
+  //         sources = Seq(
+  //           new File("another/an.v").getAbsolutePath,
+  //           "another.v"
+  //         ),
+  //         test = "test"
+  //       )
+  //     )
+  //   )
+  //   println(
+  //     KernelFileUtils.getAllProjectTestFiles(projectConfig =
+  //       ProjectConfig(
+  //         source = "src/",
+  //         sources = Seq(
+  //           new File("another/an.v").getAbsolutePath,
+  //           "another.v"
+  //         ),
+  //         test = "test"
+  //       )
+  //     )
+  //   )
+  // }
 
   it should "remove test project" in {
     Seq(

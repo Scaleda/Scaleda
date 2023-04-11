@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package kernel
 
 import kernel.project.config.ProjectConfig
+import kernel.project.{ManifestManager, ProjectManifest}
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
@@ -33,7 +34,7 @@ class ConfigLoaderTester extends AnyFlatSpec with should.Matchers {
       |""".stripMargin
 
   val testFileName = "test-config.yml"
-  val testFile = new File(testFileName)
+  val testFile     = new File(testFileName)
 
   behavior of "ConfigLoader"
 
@@ -44,10 +45,11 @@ class ConfigLoaderTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "load config and parse successfully" in {
-    ProjectConfig.configFile = Some(testFile.getAbsolutePath)
-    ProjectConfig.projectBase = Some(testFile.getParent)
+    implicit val manifest: ProjectManifest = ManifestManager.getManifest()
+    manifest.configFile = Some(testFile.getAbsolutePath)
+    manifest.projectBase = Some(testFile.getParent)
 
-    val config = ProjectConfig.getConfig().get
+    val config = ProjectConfig.getConfig.get
     assert(config.targets(0).tasks(0).findTopModule.get == "icarusOneModule")
     assert(config.targets(0).tasks(1).findTopModule.get == "icarusRootModule")
     assert(config.targets(1).tasks(0).findTopModule.get == "rootTopModule")

@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.runner.task.ScaledaReloadTasksAction
 import kernel.project.config.ProjectConfig
 
@@ -22,13 +23,14 @@ class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
   override def createCenterPanel(): JComponent = {
     // get root node
     // TODO: if there're no project config?
-    ProjectConfig
-      .getConfig()
+    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+    ProjectConfig.getConfig
       .map(c => {
         val rootNode = new ScaledaRunRootNode(c)
         if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(rootNode, setValid)
         mainPanel
-      }).orNull
+      })
+      .orNull
   }
   override def doOKAction(): Unit = {
     ProjectConfig.saveConfig(mainPanel.scaledaRunRootNode.toProjectConfig)

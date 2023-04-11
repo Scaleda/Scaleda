@@ -3,6 +3,7 @@ package kernel.project.config
 
 import idea.windows.tasks.ip.IPInstance
 import kernel.project.ip.ExportConfig
+import kernel.project.{ManifestManager, ProjectManifest}
 import kernel.utils.serialise.{JSONHelper, YAMLHelper}
 import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 
 import java.io.File
+import scala.language.implicitConversions
 
 /** Case class for project-level config, i.e. `scaleda.yml`
   * @param name Project name
@@ -88,55 +90,60 @@ case class ProjectConfig(
       .map(f => (f._1, f._2.get))
 }
 
+// FIXME: multi-projects support
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"
 
   // NOTICE: These two variables are global flag to indicated if a project is loaded
   // they should be always updated simultaneously
-  var projectBase: Option[String] = None
-  var configFile: Option[String]  = None
+  // var projectBase: Option[String] = None
+  // var configFile: Option[String]  = None
 
-  def getConfig(path: Option[String] = configFile): Option[ProjectConfig] = {
-    path match {
-      case Some(p) =>
-        try {
-          val config = YAMLHelper(new File(p), classOf[ProjectConfig])
-          KernelLogger.debug(s"Loaded project config ${JSONHelper(config)}")
-          // generate node relationship
-          config.targets.foreach(target => {
-            target.parentNode = Some(config)
-            target.tasks.foreach(task => task.parentNode = Some(target))
-          })
-          Some(config)
-        } catch {
-          case e: com.fasterxml.jackson.databind.exc.MismatchedInputException =>
-            KernelLogger.warn(s"Failed to parse project config file $p")
-            None
-        }
-      case None => None
-    }
+  // def getConfig(path: Option[String] = ManifestManager.getManifest().configFile): Option[ProjectConfig] = {
+  def getConfig(implicit manifest: ProjectManifest): Option[ProjectConfig] = {
+    manifest.configFile.flatMap(p => {
+      try {
+        val config = YAMLHelper(new File(p), classOf[ProjectConfig])
+        KernelLogger.debug(s"Loaded project config ${JSONHelper(config)}")
+        // generate node relationship
+        config.targets.foreach(target => {
+          target.parentNode = Some(config)
+          target.tasks.foreach(task => task.parentNode = Some(target))
+        })
+        Some(config)
+      } catch {
+        case e: com.fasterxml.jackson.databind.exc.MismatchedInputException =>
+          KernelLogger.warn(s"Failed to parse project config file $p")
+          None
+      }
+    })
   }
 
-  def config = getConfig().get
+  def config(implicit manifest: ProjectManifest) = getConfig.get
 
-  def headTarget = getConfig().flatMap(c => c.headTarget)
+  def headTarget(implicit manifest: ProjectManifest) = getConfig.flatMap(c => c.headTarget)
 
-  def headTask = getConfig().flatMap(c => c.headTask)
+  def headTask(implicit manifest: ProjectManifest) = getConfig.flatMap(c => c.headTask)
 
-  def saveConfig(projectConfig: ProjectConfig, targetFile: File = new File(configFile.get)): Unit = {
+  def saveConfig(
+      projectConfig: ProjectConfig,
+      targetFile: File = new File(ManifestManager.getManifest().configFile.get)
+  ): Unit = {
     YAMLHelper(projectConfig, targetFile)
   }
 
   def libraryIpPaths: Set[File] = Set(Paths.getIpDir)
 
-  def projectIpPaths(projectBase: Option[String] = ProjectConfig.projectBase): Set[File] =
+  def projectIpPaths(implicit manifest: ProjectManifest): Set[File] =
     Set(".ip", "ip", "ips")
-      .map(p => new File(projectBase.getOrElse(ProjectConfig.projectBase.get), p))
+      .map(p => new File(manifest.projectBase.get, p))
       .filter(_.exists())
 
   def libraryIps: Map[String, ProjectConfig] =
     libraryIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
 
-  def projectBasicIps(projectBase: Option[String] = ProjectConfig.projectBase): Map[String, ProjectConfig] =
-    projectIpPaths(projectBase = projectBase).flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
+  def projectBasicIps(implicit
+      manifest: ProjectManifest
+  ): Map[String, ProjectConfig] =
+    projectIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
 }

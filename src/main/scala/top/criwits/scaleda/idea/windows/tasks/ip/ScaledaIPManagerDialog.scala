@@ -2,12 +2,13 @@ package top.criwits.scaleda
 package idea.windows.tasks.ip
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
+import kernel.project.config.ProjectConfig
 import kernel.utils.KernelFileUtils
 
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
 import java.awt.AWTEvent
 import javax.swing.JComponent
@@ -35,12 +36,13 @@ class ScaledaIPManagerDialog(project: Project) extends DialogWrapper(project) {
     if (mainPanel.editor != null) EditorFactory.getInstance.releaseEditor(mainPanel.editor)
 
     // Export IP information
-    val ips = mainPanel.toIPInstances
-    val newProjectConfig = ProjectConfig.config.copy(ips = ips)
+    val ips               = mainPanel.toIPInstances
+    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+    val newProjectConfig  = ProjectConfig.config.copy(ips = ips)
     ProjectConfig.saveConfig(newProjectConfig)
 
     // Re-generate, only update caches from ProjectConfig layer, and before this `ips` in ProjectConfig should be updated
-    KernelFileUtils.doUpdateStubCacheFromProject()
+    KernelFileUtils.doUpdateStubCacheFromProject
 
     super.doOKAction()
   }

@@ -1,7 +1,9 @@
 package top.criwits.scaleda
 package verilog.utils
 
+import idea.project.IdeaManifestManager
 import idea.runner.configuration.ScaledaRunConfiguration
+import kernel.project.ProjectManifest
 import kernel.project.config.ProjectConfig
 import kernel.utils.KernelFileUtils
 import verilog.VerilogPSIFileRoot
@@ -21,6 +23,7 @@ object FileUtils {
   /** Get Verilog sources for IDEA Editor, will search sources by task selected in IDEA
     */
   def getAllVerilogFiles(project: Project): List[VerilogPSIFileRoot] = {
+    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
     // process long tasks in this function will not block IDEA main thread, just do it
     // get configuration selected now
     // this can be null! check first plz!
@@ -31,30 +34,31 @@ object FileUtils {
         val configuration: RunConfiguration = selectedConfiguration.getConfiguration
         configuration match {
           // if it's a valid ScaledaRunProcessHandler
-          case configuration: ScaledaRunConfiguration => configuration.generateRuntime
+          case configuration: ScaledaRunConfiguration => configuration.generateRuntime(project = project)
           case _                                      => None
         }
       }
-    val defaultSources = ProjectConfig.getConfig().map(c => c.getSourceSet() ++ c.getTestSet()).getOrElse(Set())
+    val defaultSources = ProjectConfig.getConfig.map(c => c.getSourceSet ++ c.getTestSet).getOrElse(Set())
     // into synchronized block, only one thread to operate ip cache
     val sources = synchronized {
-      // get ALL Scaleda IPs
+      // get ALL Scaleda IPs, (absPath, ProjectConfig)
       val ips: Map[String, ProjectConfig] = rt
-        .map(_.task.getAllIps().filter(_._2.exports.nonEmpty))
+        .map(_.task.getAllIps.filter(_._2.exports.nonEmpty))
         .getOrElse(Map())
       val ipStubsSources: Set[String] =
         rt.map(rt => KernelFileUtils.doUpdateStubCacheFromRuntime(rt).map(_.getAbsolutePath).toSet).getOrElse(Set())
       // source set of this project
       val sources: Set[String] = rt match {
         // has runtime, get sources
-        case Some(rt) => rt.task.getSourceSet() ++ rt.task.getTestSet()
+        case Some(rt) => rt.task.getSourceSet ++ rt.task.getTestSet
         // otherwise, get default sources from ProjectConfig
         case None => defaultSources
       }
       // source set from ips
       val ipSources: Set[String] = ips
         .flatMap(c => {
-          c._2.getSourceSet(projectBase = Some(c._1)) ++ c._2.getTestSet(projectBase = Some(c._1))
+          c._2.getSourceSet(manifest = ProjectManifest.getTemporalManifest(c._1)) ++ c._2
+            .getTestSet(manifest = ProjectManifest.getTemporalManifest(c._1))
         })
         .toSet
       sources ++ ipSources ++ ipStubsSources

@@ -8,6 +8,7 @@ import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.net.user.ScaledaRegisterLogin
 import kernel.project.config.ProjectConfig
+import kernel.project.{AbstractProject, ManifestManager, ProjectManifest}
 import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
@@ -39,17 +40,17 @@ case class ShellArgs(
 )
 
 object ScaledaShellMain {
-  private def loadConfig(projectRootPath: String): Unit = {
+  private def loadConfig(projectRootPath: String)(implicit manifest: ProjectManifest): Unit = {
     KernelLogger.debug(s"loadConfig($projectRootPath)")
     val rootDir = new File(projectRootPath)
     if (rootDir.exists() && rootDir.isDirectory) {
-      ProjectConfig.projectBase = Some(rootDir.getAbsolutePath)
+      manifest.projectBase = Some(rootDir.getAbsolutePath)
     }
     val projectConfigFile =
       new File(projectRootPath, ProjectConfig.defaultConfigFile)
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
-      ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
-      val config = ProjectConfig.getConfig()
+      manifest.configFile = Some(projectConfigFile.getAbsolutePath)
+      val config = ProjectConfig.getConfig
       KernelLogger.debug(s"project config: $config")
     }
   }
@@ -71,6 +72,9 @@ object ScaledaShellMain {
   def main(args: Array[String]): Unit = {
     KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
 
+    // default manifest
+    implicit val manifest: ProjectManifest = ManifestManager.getManifest(project = AbstractProject.default)
+
     // set exception handler
     Thread.currentThread().setUncaughtExceptionHandler(new ShellExceptionHandler)
 
@@ -88,11 +92,11 @@ object ScaledaShellMain {
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(a))
     // preparse server host
     // val host = preParseArgs(args, Seq("-h", "--host"))
-    if (ProjectConfig.configFile.isEmpty) {
+    if (manifest.configFile.isEmpty) {
       // try loading config in pwd
       loadConfig(Paths.pwd.getAbsolutePath)
     }
-    if (ProjectConfig.configFile.isEmpty)
+    if (manifest.configFile.isEmpty)
       KernelLogger.info("No project config detected!")
 
     def requireHost(shellConfig: ShellArgs): Unit = {
@@ -206,7 +210,7 @@ object ScaledaShellMain {
               .text("Specify profile name, otherwise will auto fill"),
             opt[String]('e', "environment")
               .action((x, c) =>
-                c.copy(extraEnvs = c.extraEnvs ++ x.split(';').map(m => (m.split('=').head -> m.split('=')(1))).toMap)
+                c.copy(extraEnvs = c.extraEnvs ++ x.split(';').map(m => m.split('=').head -> m.split('=')(1)).toMap)
               )
               .text("Specify environment, example ENV_A=a;ENV_B=b")
           )
@@ -220,7 +224,7 @@ object ScaledaShellMain {
             Some(RemoteClient(shellConfig.serverHost))
           else None
         val workingDir = shellConfig.workingDir
-        val config     = ProjectConfig.getConfig()
+        val config     = ProjectConfig.getConfig
         KernelLogger.debug(s"shell config: $shellConfig")
         shellConfig.runMode match {
           case ShellRunMode.ListProfiles =>
@@ -241,8 +245,7 @@ object ScaledaShellMain {
             }
           case ShellRunMode.ListTasks =>
             KernelLogger.info("task list:")
-            ProjectConfig
-              .getConfig()
+            ProjectConfig.getConfig
               .map(config =>
                 for (p <- config.targets.flatMap(_.tasks)) {
                   KernelLogger.info(s"${JSONHelper(p)}")
@@ -253,8 +256,7 @@ object ScaledaShellMain {
             KernelLogger.info("configurations:")
             KernelLogger.info(ScaledaKernelConfiguration.configurations)
           case ShellRunMode.Run =>
-            ProjectConfig
-              .getConfig()
+            ProjectConfig.getConfig
               .foreach(c => {
                 var profileHost = shellConfig.serverHost
                 var taskName    = shellConfig.taskName

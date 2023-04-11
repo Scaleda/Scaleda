@@ -5,6 +5,7 @@ import idea.runner.ScaledaRuntime
 import idea.windows.tasks.ip.IPInstance
 import kernel.net.remote.RemoteInfo
 import kernel.net.user.ScaledaAuthorizationProvider
+import kernel.project.ProjectManifest
 import kernel.project.config.TaskType.{Implement, Simulation, Synthesis}
 import kernel.project.config.{ProjectConfig, TaskConfig, TaskType}
 import kernel.project.detect.BasicProjectDetector
@@ -53,22 +54,22 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
     )
   )
 
-  override def simulate(task: TaskConfig) = {
+  override def simulate(task: TaskConfig)(implicit manifest: ProjectManifest) = {
     val tclUse = getTclFromTask(task, "run_sim.tcl")
     commandDepsForSingleTcl(tclUse)
   }
 
-  override def synthesise(task: TaskConfig) = {
+  override def synthesise(task: TaskConfig)(implicit manifest: ProjectManifest) = {
     val tclUse = getTclFromTask(task, "run_synth.tcl")
     commandDepsForSingleTcl(tclUse)
   }
 
-  override def implement(task: TaskConfig) = {
+  override def implement(task: TaskConfig)(implicit manifest: ProjectManifest) = {
     val tclUse = getTclFromTask(task, "run_impl.tcl")
     commandDepsForSingleTcl(tclUse)
   }
 
-  override def programming(task: TaskConfig) = {
+  override def programming(task: TaskConfig)(implicit manifest: ProjectManifest) = {
     val tclUse = getTclFromTask(task, "run_program.tcl")
     // TODO: Vivado programming
     commandDepsForSingleTcl(tclUse)
@@ -146,6 +147,7 @@ object Vivado
       targetTemplateFiles: Seq[File] = Seq(),
       ipsData: Map[String, ProjectConfig] = Map()
   ): TemplateContext = {
+    implicit val manifest                       = rt.manifest
     def doSeparatorReplace(src: String): String = src.replace('\\', '/')
     val (taskConfig, targetConfig, executor)    = (rt.task, rt.target, rt.executor)
 
@@ -169,12 +171,14 @@ object Vivado
         executor
       )
     }
-    val ips: Map[String, ProjectConfig] = if (ipsData.nonEmpty) ipsData else taskConfig.getAllIps()
+    val ips: Map[String, ProjectConfig] =
+      if (ipsData.nonEmpty) ipsData else taskConfig.getAllIps
     val targetAction = Set("all") ++ (if (sim) Set("simulation")
                                       else if (synth) Set("synthesis")
                                       else if (impl) Set("implementation")
                                       else Set())
-    val ipInstances: Seq[IPInstance] = rt.task.getIpInstances().filter(i => ips.exists(_._2.exports.get.id == i.typeId))
+    val ipInstances: Seq[IPInstance] =
+      rt.task.getIpInstances.filter(i => ips.exists(_._2.exports.get.id == i.typeId))
     val ipTclSections: String = ipInstances
       .map(instance => {
         val ip      = ips.find(_._2.exports.get.id == instance.typeId).get
@@ -196,17 +200,21 @@ object Vivado
     val top = topOptional.get
     val sources =
       if (sim)
-        taskConfig.getTestSet() ++ ips.flatMap(c => c._2.getTestSet(projectBase = Some(c._1)))
+        taskConfig.getTestSet ++ ips.flatMap(c => c._2.getTestSet(manifest = ProjectManifest.getTemporalManifest(c._1)))
       else
-        taskConfig.getSourceSet() ++ ips.flatMap(c => c._2.getSourceSet(projectBase = Some(c._1)))
-    val topFile         = KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
+        taskConfig.getSourceSet ++ ips.flatMap(c =>
+          c._2.getSourceSet(manifest = ProjectManifest.getTemporalManifest(c._1))
+        )
+    val topFile =
+      KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
     val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
     val ipList = KernelFileUtils
       .getAllSourceFiles(
-        taskConfig.getIpFiles() ++ taskConfig.getAllIps().flatMap(c => c._2.getIpFiles(projectBase = Some(c._1))),
+        taskConfig.getIpFiles ++ taskConfig.getAllIps
+          .flatMap(c => c._2.getIpFiles(manifest = ProjectManifest.getTemporalManifest(c._1))),
         suffixing = Set("xcix", "xci")
       )
       .filter(_.exists())
@@ -281,8 +289,9 @@ object Vivado
   ToolchainProfileDetector.registerDetector(this)
 
   override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntime] = {
-    var rt            = rtOld
-    val userTokenBean = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
+    var rt                = rtOld
+    implicit val manifest = rt.manifest
+    val userTokenBean     = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
     // A local username is required...
     // TODO: Move preset process to server side?
     if (rt.profile.isRemoteProfile) {

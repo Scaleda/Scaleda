@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package kernel
 
 import kernel.configuration.ScaledaKernelConfiguration
-import kernel.project.config.ProjectConfig
+import kernel.project.ManifestManager
 import kernel.utils.serialise.XMLHelper
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -31,7 +31,8 @@ class ConfigurationTest extends AnyFlatSpec with should.Matchers {
     val createData = XMLHelper(create)
     println(createData)
 
-    ProjectConfig.projectBase = Some("/home/chiro/programs/scaleda-sample-project/")
-    println(ScaledaKernelConfiguration.configurations)
+    val manifest = ManifestManager.getManifest()
+    manifest.projectBase = Some("/home/chiro/programs/scaleda-sample-project/")
+    println(ScaledaKernelConfiguration.configurations(manifest = manifest))
   }
 }

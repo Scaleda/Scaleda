@@ -4,6 +4,7 @@ package idea.runner.task
 import idea.ScaledaBundle
 import idea.utils.{MainLogger, inReadAction, invokeLater}
 import idea.windows.tasks.ScaledaRunWindowFactory
+import kernel.project.ManifestManager
 import kernel.project.config.ProjectConfig
 
 import com.intellij.icons.AllIcons
@@ -11,8 +12,7 @@ import com.intellij.ide.SaveAndSyncHandler
 import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent}
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
-import top.criwits.scaleda.idea.settings.toolchains.ProfileDetectAction
-import top.criwits.scaleda.kernel.toolchain.Toolchain
+import top.criwits.scaleda.idea.project.IdeaManifestManager
 
 import java.io.File
 
@@ -44,9 +44,12 @@ class ScaledaReloadTasksAction
         })
     }
 
+    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = e.getProject)
     if (searchedFile.isEmpty) {
-      ProjectConfig.configFile = None
-      ProjectConfig.projectBase = None
+      manifest.synchronized {
+        manifest.configFile = None
+        manifest.projectBase = None
+      }
       MainLogger.info(
         "No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project"
       )
@@ -59,15 +62,17 @@ class ScaledaReloadTasksAction
     } else {
       val f = searchedFile.get
       // refill
-      ProjectConfig.configFile = Some(f.getPath)
-      ProjectConfig.projectBase = Some(f.getParent.getPath)
+      manifest.synchronized {
+        manifest.configFile = Some(f.getPath)
+        manifest.projectBase = Some(f.getParent.getPath)
+      }
       MainLogger.info(s"Scaleda config file $f detected")
 
       // Refresh `scaleda.yml`
       LocalFileSystem
         .getInstance()
         .refreshAndFindFileByIoFile(
-          new File(ProjectConfig.configFile.get)
+          new File(manifest.configFile.get)
         )
       SaveAndSyncHandler.getInstance().scheduleRefresh()
 

@@ -4,6 +4,7 @@ package kernel.utils
 import idea.runner.ScaledaRuntime
 import idea.utils.MainLogger
 import idea.windows.tasks.ip.IPInstance
+import kernel.project.ProjectManifest
 import kernel.project.config.{ProjectConfig, TaskConfig}
 import kernel.toolchain.impl.Vivado
 import kernel.utils.serialise.YAMLHelper
@@ -41,10 +42,12 @@ object KernelFileUtils {
     * @param projectBase project base
     * @return [[None]] iff no project base AND relative path; Otherwise an abspath will be returned
     */
-  def toAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
+  def toAbsolutePath(
+      path: String
+  )(implicit manifest: ProjectManifest): Option[String] = {
     val file = new File(path)
     if (!file.isAbsolute) {
-      projectBase match {
+      manifest.projectBase match {
         case Some(base) =>
           Some(new File(new File(base), path).getAbsolutePath.replace('\\', '/'))
         case None => None
@@ -60,12 +63,14 @@ object KernelFileUtils {
     * @param projectBase project base
     * @return [[None]] iff no project base OR path can not be relativised; Otherwise a relative path will be returned
     */
-  def toProjectRelativePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase): Option[String] = {
-    if (projectBase.isEmpty) return None
+  def toProjectRelativePath(
+      path: String
+  )(implicit manifest: ProjectManifest): Option[String] = {
+    if (manifest.projectBase.isEmpty) return None
     val file = new File(path)
     if (file.isAbsolute) {
       val pathAbs  = java.nio.file.Paths.get(file.getAbsolutePath)
-      val pathBase = java.nio.file.Paths.get(projectBase.get) // should work
+      val pathBase = java.nio.file.Paths.get(manifest.projectBase.get) // should work
       try {
         Some(pathBase.relativize(pathAbs).toString.replace('\\', '/'))
       } catch {
@@ -109,7 +114,9 @@ object KernelFileUtils {
     * @param suffixing filter by file type
     * @return list of files
     */
-  def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v")): Seq[File] = {
+  def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v"))(implicit
+      manifest: ProjectManifest
+  ): Seq[File] = {
     sources
       .filter(_.nonEmpty)
       .map(toAbsolutePath(_))
@@ -132,23 +139,22 @@ object KernelFileUtils {
     */
   @Deprecated
   def getAllProjectSourceFiles(
-      suffixing: Set[String] = Set("v"),
-      projectConfig: ProjectConfig = ProjectConfig.config
-  ): Seq[File] = {
-    val sourceDir: File = new File(toAbsolutePath(projectConfig.source).get)
-    val sources         = projectConfig.sources.toSet
+      suffixing: Set[String] = Set("v")
+  )(implicit manifest: ProjectManifest): Seq[File] = {
+    val sourceDir: File = new File(toAbsolutePath(ProjectConfig.config.source).get)
+    val sources         = ProjectConfig.config.sources.toSet
     getAllSourceFiles(sources + sourceDir.getAbsolutePath, suffixing = suffixing)
   }
 
-  /** Get all test files. That is:
-    *  - files under `test`
-    * @return
-    */
-  @Deprecated
-  def getAllProjectTestFiles(projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
-    val testDir = new File(toAbsolutePath(projectConfig.test).get)
-    scanDirectory(Set("v"), testDir)
-  }
+  // /** Get all test files. That is:
+  //   *  - files under `test`
+  //   * @return
+  //   */
+  // @Deprecated
+  // def getAllProjectTestFiles(projectConfig: ProjectConfig = ProjectConfig.config): Seq[File] = {
+  //   val testDir = new File(toAbsolutePath(projectConfig.test).get)
+  //   scanDirectory(Set("v"), testDir)
+  // }
 
   /** Get module titles inside a file.
     * @param verilogFile the file
@@ -178,23 +184,23 @@ object KernelFileUtils {
     visitor.title.toSeq
   }
 
-  /** Get the verilog file containing specific module
-    * @param module module title name
-    * @param testbench is testbench? (will search from test sources, instead of sources)
-    * @return
-    */
-  @Deprecated
-  def getProjectModuleFile(module: String, testbench: Boolean = false): Option[File] = {
-    val sources = if (testbench) getAllProjectTestFiles() else getAllProjectSourceFiles()
-    getModuleFileFromSet(sources.map(_.getAbsolutePath).toSet, module)
-  }
+  // /** Get the verilog file containing specific module
+  //   * @param module module title name
+  //   * @param testbench is testbench? (will search from test sources, instead of sources)
+  //   * @return
+  //   */
+  // @Deprecated
+  // def getProjectModuleFile(module: String, testbench: Boolean = false): Option[File] = {
+  //   val sources = if (testbench) getAllProjectTestFiles() else getAllProjectSourceFiles()
+  //   getModuleFileFromSet(sources.map(_.getAbsolutePath).toSet, module)
+  // }
 
   /** Get the verilog file containing specific module from one file set
     * @param sources file set
     * @param module module name
     * @return optional file
     */
-  def getModuleFileFromSet(sources: Set[String], module: String): Option[File] = {
+  def getModuleFileFromSet(sources: Set[String], module: String)(implicit manifest: ProjectManifest): Option[File] = {
     getAllSourceFiles(sources).foreach(f => {
       val readModule = getModuleTitle(f)
       val matched    = readModule.filter(_ == module)
@@ -324,12 +330,12 @@ object KernelFileUtils {
     * @param projectBase base
     * @return
     */
-  def parseAsAbsolutePath(path: String, projectBase: Option[String] = ProjectConfig.projectBase) =
-    toAbsolutePath(path, projectBase = projectBase).getOrElse(path)
+  def parseAsAbsolutePath(path: String)(implicit manifest: ProjectManifest) =
+    toAbsolutePath(path).getOrElse(path)
 
-  def ipCacheDirectory = new File(ProjectConfig.projectBase.getOrElse(""), ".cache")
+  def ipCacheDirectory(implicit manifest: ProjectManifest) = new File(manifest.projectBase.getOrElse(""), ".cache")
 
-  def getAllCachedIpHash: Set[String] = {
+  def getAllCachedIpHash(implicit manifest: ProjectManifest): Set[String] = {
     val list = ipCacheDirectory.listFiles()
     if (list != null)
       list.filter(_.isDirectory).map(_.getName).toSet
@@ -339,7 +345,7 @@ object KernelFileUtils {
   /** Remove an ip cache by hash
     * @param hash ip file hash
     */
-  def removeIpFileCache(hash: String): Unit = {
+  def removeIpFileCache(hash: String)(implicit manifest: ProjectManifest): Unit = {
     val parent = ipCacheDirectory
     if (parent.exists()) {
       val f = new File(parent, hash)
@@ -351,7 +357,7 @@ object KernelFileUtils {
     * @param ipFile ip file, simple target ip
     * @param hash optional hash, if not provided, will calculate hash from file
     */
-  def createIpFileCache(ipFile: File, hash: Option[String] = None): Unit = {
+  def createIpFileCache(ipFile: File, hash: Option[String] = None)(implicit manifest: ProjectManifest): Unit = {
     val hashUse         = hash.getOrElse(DigestUtils.sha256Hex(new FileInputStream(ipFile)))
     val parent          = ipCacheDirectory
     val targetDirectory = new File(parent, hashUse)
@@ -402,9 +408,11 @@ object KernelFileUtils {
     * @param ipFiles ip files field in [[top.criwits.scaleda.kernel.project.config.ConfigNode]] (from `getIpFiles`)
     * @param projectBase optional project base
     */
-  def doUpdateIpFilesCache(ipFiles: Set[String], projectBase: Option[String] = ProjectConfig.projectBase): Unit = {
+  def doUpdateIpFilesCache(
+      ipFiles: Set[String]
+  )(implicit manifest: ProjectManifest): Unit = {
     val ipRealFiles = ipFiles
-      .map(parseAsAbsolutePath(_, projectBase = projectBase))
+      .map(parseAsAbsolutePath(_))
       .map(new File(_))
       .filter(f => f.exists() && f.isFile)
     // get ip files hashes using commons-codec
@@ -482,9 +490,11 @@ object KernelFileUtils {
     * @param rt runtime
     * @return generated sources
     */
-  def handleIpInstances(task: TaskConfig, targetDirectory: File, targetAction: Set[String]): Seq[File] = {
-    val ips         = task.getAllIps()
-    val ipInstances = task.getIpInstances()
+  def handleIpInstances(task: TaskConfig, targetDirectory: File, targetAction: Set[String])(implicit
+      manifest: ProjectManifest
+  ): Seq[File] = {
+    val ips         = task.getAllIps
+    val ipInstances = task.getIpInstances
     val unsupportedIpInstances = ipInstances.filterNot(i => {
       val ipFound = ips.find(_._2.exports.get.id == i.typeId)
       val targetSupports: Map[String, Seq[String]] =
@@ -550,11 +560,11 @@ object KernelFileUtils {
   /** Update stubs cache from runtime
     * @param rt runtime
     */
-  def doUpdateStubCacheFromRuntime(rt: ScaledaRuntime): Seq[File] = {
+  def doUpdateStubCacheFromRuntime(rt: ScaledaRuntime)(implicit manifest: ProjectManifest): Seq[File] = {
     // get ALL Scaleda IPs
-    val ips: Map[String, ProjectConfig] = rt.task.getAllIps().filter(_._2.exports.nonEmpty)
+    val ips: Map[String, ProjectConfig] = rt.task.getAllIps.filter(_._2.exports.nonEmpty)
     // collect Scaleda IPs and make stubs from ip instances
-    val ipInstances: Seq[IPInstance] = rt.task.getIpInstances()
+    val ipInstances: Seq[IPInstance] = rt.task.getIpInstances
     // save these stubs to .cache/stubs/hash/id-module.v
     val stubsCacheDir = new File(KernelFileUtils.ipCacheDirectory, "stubs")
     KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
@@ -564,12 +574,11 @@ object KernelFileUtils {
 
   /** Update stubs in ProjectConfig
     */
-  def doUpdateStubCacheFromProject(): Unit = {
-    ProjectConfig
-      .getConfig()
+  def doUpdateStubCacheFromProject(implicit manifest: ProjectManifest): Unit = {
+    ProjectConfig.getConfig
       .foreach(c => {
-        val ips: Map[String, ProjectConfig] = c.getAllIps().filter(_._2.exports.nonEmpty)
-        val ipInstances: Seq[IPInstance]    = c.getIpInstances()
+        val ips: Map[String, ProjectConfig] = c.getAllIps.filter(_._2.exports.nonEmpty)
+        val ipInstances: Seq[IPInstance]    = c.getIpInstances
         val stubsCacheDir                   = new File(KernelFileUtils.ipCacheDirectory, "stubs")
         KernelFileUtils.doUpdateIpStubsCache(ips, ipInstances, stubsCacheDir)
       })

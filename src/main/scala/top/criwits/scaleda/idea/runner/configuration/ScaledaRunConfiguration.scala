@@ -3,6 +3,7 @@ package idea.runner.configuration
 
 import idea.ScaledaBundle
 import idea.application.config.ScaledaIdeaConfig
+import idea.project.IdeaManifestManager
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntime}
 import idea.rvcd.RvcdService
 import idea.utils.notification.CreateTypicalNotification
@@ -111,9 +112,11 @@ class ScaledaRunConfiguration(
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScaledaRunConfigurationEditor(project)
 
-  def generateRuntime: Option[ScaledaRuntime] =
+  def generateRuntime(project: Project): Option[ScaledaRuntime] =
     ScaledaRun
-      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
+      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)(manifest =
+        IdeaManifestManager.getImplicitManifest(project = project)
+      )
       .map(_.copy(extraEnvs = extraEnvs.toMap))
 
   /** Returns a [[RunProfileState]], which is actually used to run
@@ -136,7 +139,7 @@ class ScaledaRunConfiguration(
 
     val console = myConsoleBuilder.getConsole
 
-    val runtimeOptional = generateRuntime
+    val runtimeOptional = generateRuntime(project = project)
     if (runtimeOptional.isEmpty) {
       MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
       CreateTypicalNotification.makeAuthorizationNotification(

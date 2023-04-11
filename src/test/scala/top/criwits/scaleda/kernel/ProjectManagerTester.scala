@@ -1,0 +1,17 @@
+package top.criwits.scaleda
+package kernel
+
+import idea.project.IdeaManifestManager
+
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
+
+class ProjectManagerTester extends AnyFlatSpec with should.Matchers {
+  behavior of "ProjectManager"
+  it should "test manager" in {
+    val v = Map("1" -> "2")
+    IdeaManifestManager.putObject("v", v)
+    val v2: Map[String, String] = IdeaManifestManager.getObject("v").get
+    println(v2)
+  }
+}

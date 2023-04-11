@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.project.importer
 
+import kernel.project.ProjectManifest
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
 import kernel.project.detect.VivadoProjectConfig
 import kernel.toolchain.impl.Vivado
@@ -17,6 +18,8 @@ trait VivadoTargetParser extends BasicTargetParser {
     val o              = XMLHelper(projectFile, classOf[VivadoProjectConfig])
     val projectXprFile = new File(o.Path)
     val projectBase    = projectFile.getParentFile.getAbsolutePath
+    // implicit val manifest = ManifestManager.getManifest()
+    implicit val manifest = ProjectManifest.getTemporalManifest(projectBase)
     // $PSRCDIR/sim_1 => <projectBase>/<projectName>.srcs/sim_1
     val replace = new RegexReplace(
       regexPatten = "(\\$PSRCDIR[/\\\\]?)",
@@ -28,7 +31,7 @@ trait VivadoTargetParser extends BasicTargetParser {
       (srcSets.flatMap(_.files.map(_.Path)) ++ srcSets.map(_.RelSrcDir))
         .filter(_.nonEmpty)
         .map(c => replace.doRegexReplace(c))
-        .map(p => KernelFileUtils.toAbsolutePath(p, projectBase = Some(projectBase)).getOrElse(p))
+        .map(p => KernelFileUtils.toAbsolutePath(p).getOrElse(p))
     val tests = o.fileSets.filter(_.Type == "SimulationSrcs").map(_.RelSrcDir).map(c => replace.doRegexReplace(c))
     // options in xpr usually have TopModule item
     val top = srcSets
@@ -53,15 +56,15 @@ trait VivadoTargetParser extends BasicTargetParser {
       custom = false
     )
     val relativeSources =
-      sources.map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
+      sources.map(p => KernelFileUtils.toProjectRelativePath(p).getOrElse(p))
     val relativeTests =
-      tests.map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
+      tests.map(p => KernelFileUtils.toProjectRelativePath(p).getOrElse(p))
 
     val simpleIPFiles = KernelFileUtils
       // search from source set, just from directories
       .getAllSourceFiles(sources.toSet, suffixing = Set("xci", "xcix"))
       .map(_.getAbsolutePath)
-      .map(p => KernelFileUtils.toProjectRelativePath(p, projectBase = Some(projectBase)).getOrElse(p))
+      .map(p => KernelFileUtils.toProjectRelativePath(p).getOrElse(p))
     val target = TargetConfig(
       name = "Vivado",
       toolchain = Vivado.internalID,

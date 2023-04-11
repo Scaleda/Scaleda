@@ -3,6 +3,7 @@ package kernel.toolchain.impl
 
 import idea.runner.ScaledaRuntime
 import kernel.net.remote.RemoteInfo
+import kernel.project.ProjectManifest
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
@@ -19,7 +20,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
   override def getName: String = userFriendlyName
 
-  override def simulate(task: TaskConfig) = {
+  override def simulate(task: TaskConfig)(implicit manifest: ProjectManifest) = {
     val simExecutor = executor.asInstanceOf[SimulationExecutor]
     // create working directory
     val workingDir = simExecutor.workingDir
@@ -36,7 +37,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
     val ipSources = KernelFileUtils.handleIpInstances(task, workingDir, Set("all", "simulation"))
 
-    val taskSourceSet = task.getSourceSet()
+    val taskSourceSet = task.getSourceSet
 
     // val sources = KernelFileUtils.getAllProjectSourceFiles()
     val sources = KernelFileUtils.getAllSourceFiles(taskSourceSet) ++ ipSources
@@ -129,11 +130,12 @@ object IVerilog extends ToolchainPresetProvider {
 
   override def handlePreset(rt: ScaledaRuntime, remoteInfo: Option[RemoteInfo]) = {
     require(rt.task.taskType == TaskType.Simulation)
-    val simExecutor = rt.executor.asInstanceOf[SimulationExecutor]
+    implicit val manifest = rt.manifest
+    val simExecutor       = rt.executor.asInstanceOf[SimulationExecutor]
     // get testbench info
     val testbench = simExecutor.topModule
     // val testbenchFile = KernelFileUtils.getProjectModuleFile(testbench, testbench = true).get
-    val sourceTestbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = testbench)
+    val sourceTestbenchFile = KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet, module = testbench)
     // val testbenchFile: File = sourceTestbenchFile.getOrElse({
     //   val targetTop = parseSourceSetTopModules(rt.task.getTestSet()).headOption
     //   KernelFileUtils.getModuleFileFromSet(rt.task.getTestSet(), module = targetTop.head).get
@@ -178,7 +180,7 @@ object IVerilog extends ToolchainPresetProvider {
     )
     val rtWithContext = rt.copy(context =
       rt.context ++ Map("replaceFiles" -> replaceFiles) ++ Map(
-        "sourceFiles" -> ((KernelFileUtils.getAllSourceFiles(rt.task.getSourceSet()) ++ Seq(
+        "sourceFiles" -> ((KernelFileUtils.getAllSourceFiles(rt.task.getSourceSet) ++ Seq(
           testbenchFile
         )) ++ targetTemplateFiles)
       )

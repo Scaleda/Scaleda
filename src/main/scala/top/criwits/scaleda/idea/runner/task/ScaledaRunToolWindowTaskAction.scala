@@ -2,31 +2,25 @@ package top.criwits.scaleda
 package idea.runner.task
 
 import idea.ScaledaBundle
-import idea.runner.configuration.{
-  ScaledaRunConfigurationFactory,
-  ScaledaRunConfigurationType
-}
+import idea.project.IdeaManifestManager
+import idea.runner.configuration.{ScaledaRunConfigurationFactory, ScaledaRunConfigurationType}
 import idea.windows.tasks.ScaledaRunTaskNode
 import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.Executor
-import com.intellij.execution.impl.{
-  RunManagerImpl,
-  RunnerAndConfigurationSettingsImpl
-}
+import com.intellij.execution.impl.{RunManagerImpl, RunnerAndConfigurationSettingsImpl}
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 
-/**
- * Action: run task in right panel
- *
- * @param tree Tree in the right panel, used to detect whether task is picked
- * @param project the project
- * @param runManager IJ [[RunManager]]
- */
+/** Action: run task in right panel
+  *
+  * @param tree Tree in the right panel, used to detect whether task is picked
+  * @param project the project
+  * @param runManager IJ [[RunManager]]
+  */
 class ScaledaRunToolWindowTaskAction(
     tree: Tree,
     project: Project,
@@ -37,14 +31,14 @@ class ScaledaRunToolWindowTaskAction(
       AllIcons.RunConfigurations.TestState.Run
     ) {
   override def update(e: AnActionEvent): Unit = {
-    val presentation = e.getPresentation
+    val presentation  = e.getPresentation
     val selectedNodes = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
     presentation.setEnabled(selectedNodes.nonEmpty)
   }
 
   override def actionPerformed(e: AnActionEvent): Unit = {
-    ProjectConfig
-      .getConfig()
+    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = e.getProject)
+    ProjectConfig.getConfig
       .foreach(c => {
         val selectedNodes =
           tree.getSelectedNodes(

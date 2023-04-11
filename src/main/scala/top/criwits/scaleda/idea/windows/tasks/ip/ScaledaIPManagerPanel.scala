@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks.ip
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.utils.inWriteAction
 import idea.windows.tasks.ip.ScaledaIPManagerPanel.createConfigEditor
 import kernel.project.config.ProjectConfig
@@ -24,9 +25,10 @@ import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelect
 import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
-  private val projIP = ProjectConfig.projectBasicIps().map(s => IP(s._1, library = false, s._2))
-  private val libIP  = ProjectConfig.libraryIps.map(s => IP(s._1, library = true, s._2))
-  private val ipList = projIP ++ libIP
+  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  private val projIP    = ProjectConfig.projectBasicIps.map(s => IP(s._1, library = false, s._2))
+  private val libIP     = ProjectConfig.libraryIps.map(s => IP(s._1, library = true, s._2))
+  private val ipList    = projIP ++ libIP
   // Left side, list
   private val listModel      = new DefaultListModel[IPInstance]
   private val ipInstanceList = new JBList[IPInstance](listModel)
@@ -251,6 +253,7 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
   }
 }
 
+// FIXME: multi-projects support
 object ScaledaIPManagerPanel {
   //copied from CodeStyleAbstractPanel
   private def createConfigEditor: EditorEx = {

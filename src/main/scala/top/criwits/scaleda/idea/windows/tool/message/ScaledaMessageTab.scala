@@ -316,6 +316,7 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   }
 }
 
+// FIXME: multi-projects support
 object ScaledaMessageTab {
   val MESSAGE_ID = "scaleda-message"
 
