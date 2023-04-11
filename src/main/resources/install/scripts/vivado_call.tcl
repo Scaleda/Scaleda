@@ -7,5 +7,6 @@ if {$argc > 1} {
 }
 
 open_project $project_file
+reset_runs $run_id
 launch_runs $run_id
 wait_on_run $run_id
