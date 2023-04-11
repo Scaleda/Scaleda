@@ -34,7 +34,7 @@ object FileUtils {
         val configuration: RunConfiguration = selectedConfiguration.getConfiguration
         configuration match {
           // if it's a valid ScaledaRunProcessHandler
-          case configuration: ScaledaRunConfiguration => configuration.generateRuntime(project = project)
+          case configuration: ScaledaRunConfiguration => configuration.generateRuntime
           case _                                      => None
         }
       }

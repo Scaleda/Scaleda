@@ -51,6 +51,8 @@ class ScaledaRunConfiguration(
     name: String
 ) extends LocatableConfigurationBase[RunProfileState](project, factory, name) {
 
+  implicit val projectUsing = project
+
   var targetName = ""
   var taskName   = ""
   // set empty to auto select
@@ -112,10 +114,10 @@ class ScaledaRunConfiguration(
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScaledaRunConfigurationEditor(project)
 
-  def generateRuntime(project: Project): Option[ScaledaRuntime] =
+  def generateRuntime: Option[ScaledaRuntime] =
     ScaledaRun
       .generateRuntimeFromName(targetName, taskName, profileName, profileHost)(manifest =
-        IdeaManifestManager.getImplicitManifest(project = project)
+        IdeaManifestManager.getImplicitManifest
       )
       .map(_.copy(extraEnvs = extraEnvs.toMap))
 
@@ -139,7 +141,7 @@ class ScaledaRunConfiguration(
 
     val console = myConsoleBuilder.getConsole
 
-    val runtimeOptional = generateRuntime(project = project)
+    val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
       MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
       CreateTypicalNotification.makeAuthorizationNotification(
@@ -169,7 +171,7 @@ class ScaledaRunConfiguration(
       val thread = ScaledaRun.runTaskBackground(handler, runtime)
 
       // attach message parser listener
-      ScaledaMessageTab.instance.attach(runtime)
+      ScaledaMessageTab.instance.foreach(_.attach(runtime))
       Toolchain.toolchainMessageParser
         .get(runtime.target.toolchain)
         .foreach(parserProvider => ScaledaMessageParser.registerParser(runtime.id, parserProvider.messageParser))
@@ -177,7 +179,7 @@ class ScaledaRunConfiguration(
       // setup exception handler
       thread.setUncaughtExceptionHandler((_thread: Thread, throwable: Throwable) => {
         // detach message parser listener
-        ScaledaMessageTab.instance.detachFromLogger(runtime.id)
+        ScaledaMessageTab.instance.foreach(_.detachFromLogger(runtime.id))
         ScaledaMessageParser.removeParser(runtime.id)
         throwable match {
           case e: UserException =>
@@ -221,7 +223,7 @@ class ScaledaRunConfiguration(
         // ScaledaMessageTab.instance.requestFocusInWindow()
         // ToolWindowManager.getInstance(project).
         // not working
-        ScaledaMessageTab.instance.switchToTab()
+        ScaledaMessageTab.instance.foreach(_.switchToTab())
       }
       // DumbService
       //   .getInstance(project)
@@ -232,8 +234,8 @@ class ScaledaRunConfiguration(
       // ToolWindowManager.getInstance(project).getFocusManager
       // ScaledaMessageTab.instance.switchToTab()
 
-      val causeMessage     = ScaledaMessageTab.instance.getCauseMessage(rt.id)
-      val causeCodeMessage = ScaledaMessageTab.instance.getCauseCode(rt.id)
+      val causeMessage     = ScaledaMessageTab.instance.flatMap(_.getCauseMessage(rt.id))
+      val causeCodeMessage = ScaledaMessageTab.instance.flatMap(_.getCauseCode(rt.id))
 
       // create notification
       val notification = Notification.NOTIFICATION_GROUP.createNotification(
@@ -264,7 +266,7 @@ class ScaledaRunConfiguration(
           new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
             override def actionPerformed(e: AnActionEvent) = {
               // TODO: goto message window
-              ScaledaMessageTab.instance.switchToTab()
+              ScaledaMessageTab.instance.foreach(_.switchToTab())
             }
           }
         )
@@ -289,7 +291,7 @@ class ScaledaRunConfiguration(
       notification.notify(project)
     }
     // remove message listeners
-    ScaledaMessageTab.instance.detachFromLogger(rt.id)
+    ScaledaMessageTab.instance.foreach(_.detachFromLogger(rt.id))
     ScaledaMessageParser.removeParser(rt.id)
     if (!meetErrors) {
       rt.task.taskType match {

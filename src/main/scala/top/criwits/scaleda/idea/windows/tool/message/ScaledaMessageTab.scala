@@ -2,14 +2,15 @@ package top.criwits.scaleda
 package idea.windows.tool.message
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.runner.ScaledaRuntime
-import idea.utils.{MainLogger, RpcService}
+import idea.utils.MainLogger
 import idea.windows.tool.logging.{ConsoleTabManager, ScaledaLoggingService}
 import kernel.utils.LogLevel
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.{ActionManager, AnAction, AnActionEvent, DefaultActionGroup, ToggleAction}
+import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, SimpleToolWindowPanel}
 import com.intellij.ui.components.{JBList, JBScrollPane}
@@ -305,10 +306,10 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
   outerPanel.add(panel, BorderLayout.CENTER)
   setContent(outerPanel)
 
-  ScaledaMessageTab.INSTANCE = this
+  ScaledaMessageTab.setInstance(this)(project = project)
 
   override def dispose() = {
-    ScaledaMessageTab.INSTANCE = null
+    // ScaledaMessageTab.INSTANCE = null
     tabManager = None
     messageHandleThread.interrupt()
     val service = project.getService(classOf[ScaledaLoggingService])
@@ -320,12 +321,15 @@ class ScaledaMessageTab(project: Project) extends SimpleToolWindowPanel(false, t
 object ScaledaMessageTab {
   val MESSAGE_ID = "scaleda-message"
 
-  private var INSTANCE: ScaledaMessageTab = _
+  def instance(implicit project: Project): Option[ScaledaMessageTab] = IdeaManifestManager.getObject(MESSAGE_ID)
 
-  def instance = INSTANCE
+  private def setInstance(instance: ScaledaMessageTab)(implicit project: Project): Unit = {
+    IdeaManifestManager.putObject(MESSAGE_ID, instance)
+  }
 
   def apply(project: Project, tabManager: Option[ConsoleTabManager] = None) = {
-    val ret = if (instance != null) instance else new ScaledaMessageTab(project)
+    val searchInstance = instance(project = project)
+    val ret            = searchInstance.getOrElse(new ScaledaMessageTab(project))
     if (tabManager.nonEmpty) ret.setTabManager(tabManager)
     ret
   }
