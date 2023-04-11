@@ -83,17 +83,28 @@ object FileUtils {
     sourceRegularFiles.foreach(f => doParseFile(f))
     def doParseDir(dirs: Set[File]): Unit = {
       // search and append files from sourceDirectories
-      // for dirs in `ip/` including `*_stub.v`，, just accept `*_stub.v` and ignore others
+      // for dirs (`ip/<ip_name>/*.v`) including `*_stub.v`，, just accept `*_stub.v` and ignore others
       dirs.foreach(f => {
-        val fileList = f.listFiles(new FilenameFilter {
-          override def accept(file: File, s: String) = s.endsWith("_stub.v")
-        })
+        val parent = f.getParentFile
+        val isVivadoIp = parent != null && parent.getName == "ip" && f
+          .listFiles(new FilenameFilter {
+            override def accept(file: File, s: String) = s.endsWith(".xci")
+          })
+          .nonEmpty
+
+        val fileList: Array[File] =
+          if (isVivadoIp)
+            f.listFiles(new FilenameFilter {
+              override def accept(file: File, s: String) = s.endsWith("_stub.v")
+            })
+          else Array()
         if (fileList.isEmpty) {
           // no stub files, just accept all files
           val allFiles = f.listFiles()
           allFiles.foreach(file => {
             if (file == null || !file.exists()) return
             if (file.isFile) doParseFile(file)
+            // do search recursively, DFS
             else if (file.isDirectory) doParseDir(Set(file))
           })
           // val d = LocalFileSystem.getInstance().findFileByIoFile(f)
