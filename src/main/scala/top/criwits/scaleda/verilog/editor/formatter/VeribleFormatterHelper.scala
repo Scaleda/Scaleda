@@ -12,7 +12,7 @@ object VeribleFormatterHelper {
   private val FORMATTER = "verible-verilog-format"
 
   def allVeribleAssets = Seq(
-    VERIBLE + "/" + WIN64 + "/" + FORMATTER,
+    VERIBLE + "/" + WIN64 + "/" + FORMATTER + ".exe",
     VERIBLE + "/" + LINUX64 + "/" + FORMATTER,
   )
 

@@ -1,71 +1,108 @@
 package top.criwits.scaleda
 package verilog.editor.formatter
 
-import verilog.VerilogLanguage.getRuleType
-import verilog.parser.{VerilogLexer, VerilogParser}
+import verilog.psi.nodes.block.{CaseBodyPsiNode, CaseStatementPsiNode, SeqBlockPsiNode}
+import verilog.psi.nodes.module.{ListOfPortDeclarationsPsiNode, ListOfPortsPsiNode, ModuleDeclarationPsiNode, ModuleParameterPortListPsiNode}
 
 import com.intellij.formatting._
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiWhiteSpace
-import com.intellij.psi.formatter.common.AbstractBlock
-import top.criwits.scaleda.verilog.VerilogLanguage
-import top.criwits.scaleda.verilog.psi.nodes.block.SeqBlockPsiNode
+import com.intellij.psi.codeStyle.CodeStyleSettings
+import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ListOfParameterAssignmentsPsiNode, ModuleInstancePsiNode, ParameterValueAssignmentPsiNode}
 
 import java.util
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-/**
- * [[Block]] for [[VerilogLanguage]]
- * @param parent Parent of this Block
- * @param node [[ASTNode]] representing this Block
- * @param wrap A [[Wrap]]
- * @param alignment An [[Alignment]]
- * @param indent An [[Indent]]
- * @param spacingBuilder A [[SpacingBuilder]]
- */
+/** Verilog AST Block
+  * @param parentBlock parent of current block
+  * @param node corresponding AST node
+  * @param alignment alignment
+  * @param wrap wrap
+  * @param indent indent
+  * @param settings code style settings
+  * @param spacingBuilder spacing builder
+  */
 class VerilogBlock(
-    val parent: VerilogBlock,
+    val parentBlock: Block,
     val node: ASTNode,
-    val wrap: Wrap,
     val alignment: Alignment,
+    val wrap: Wrap,
     val indent: Indent,
+    val settings: CodeStyleSettings,
     val spacingBuilder: SpacingBuilder
 ) extends ASTBlock {
-  private val psi = node.getPsi
-  private val childWrap: Wrap = psi match {
-    case _ => null
-  }
-  private val childIndent: Indent = psi match {
-    case _: SeqBlockPsiNode => Indent.getNormalIndent
-    case _ => Indent.getNoneIndent
+  private var subBlocks: ListBuffer[Block] = _
+  private val currentPsi                   = node.getPsi
+  private val childWrap = currentPsi match {
+    case _: SeqBlockPsiNode => Wrap.createWrap(WrapType.ALWAYS, false)
+    case _                  => null
   }
 
-  private var subBlocks: ListBuffer[Block] = null
+  /**
+   * Calculate indent for child
+   * @param newChildIndex index of child
+   * @return
+   */
+  private def childIndent(newChildIndex: Int): Indent = {
+    val indent = currentPsi match {
+      case _: ListOfParameterAssignmentsPsiNode =>
+        Indent.getNormalIndent
 
+      // Ignore head and tail
+      case _: SeqBlockPsiNode | _: ListOfPortDeclarationsPsiNode | _: ListOfPortsPsiNode | _: ModuleDeclarationPsiNode => {
+        if (newChildIndex == 0 || newChildIndex == node.getChildren(null).length - 1) Indent.getNoneIndent
+        else Indent.getNormalIndent
+      }
 
-  override def getSpacing(child1: Block, child2: Block): Spacing = spacingBuilder.getSpacing(this, child1, child2)
-  override def isLeaf: Boolean = node.getFirstChildNode == null
+      // Ignore head two and tail, seems not working...
+      case _: ModuleParameterPortListPsiNode | _: ModuleInstancePsiNode | _: ParameterValueAssignmentPsiNode => {
+        if (newChildIndex < 1 || newChildIndex == node.getChildren(null).length - 1)
+          Indent.getNoneIndent
+        else Indent.getNormalIndent
+      }
+
+      case _: CaseStatementPsiNode => {
+        if (newChildIndex < 4 || newChildIndex == node.getChildren(null).length - 1)
+          Indent.getNoneIndent
+        else Indent.getNormalIndent
+      }
+
+      // For other block (unknown cases) use no indent
+      case _ => Indent.getNoneIndent
+    }
+    indent
+  }
+
   override def getNode: ASTNode = node
+
   override def getTextRange: TextRange = node.getTextRange
 
   override def getSubBlocks: util.List[Block] = {
     if (subBlocks == null) {
-      subBlocks = ListBuffer.empty
+      subBlocks = new ListBuffer[Block]
       val children = node.getChildren(null)
-      children.filter(!isWhiteSpaceOrEmpty(_)).foreach(child => subBlocks.addOne(makeSubBlock(child)))
+      children.zipWithIndex.foreach { case (child, index) =>
+        if (child.getPsi != null && !child.getPsi.isInstanceOf[PsiWhiteSpace] && child.getTextLength > 0) {
+          subBlocks += makeSubBlock(child, index)
+        }
+      }
     }
-    subBlocks.asJava
+
+    subBlocks.toList.asJava
   }
 
-  private def isWhiteSpaceOrEmpty(node: ASTNode): Boolean = {
-    node.getPsi.isInstanceOf[PsiWhiteSpace] || node.getElementType == VerilogLanguage.getTokenType(VerilogLexer.White_space) || node.getTextLength == 0
-  }
-
-  private def makeSubBlock(childNode: ASTNode): Block = {
-    var childAlignment: Alignment = null
-    new VerilogBlock(this, childNode, childWrap, childAlignment, childIndent, spacingBuilder)
+  private def makeSubBlock(childNode: ASTNode, index: Int): Block = {
+    new VerilogBlock(
+      this,
+      childNode,
+      null,
+      childWrap,
+      childIndent(index),
+      settings,
+      spacingBuilder
+    )
   }
 
   override def getWrap: Wrap = wrap
@@ -74,7 +111,17 @@ class VerilogBlock(
 
   override def getAlignment: Alignment = alignment
 
-  override def getChildAttributes(newChildIndex: Int): ChildAttributes = new ChildAttributes(childIndent, null)
+  override def getSpacing(child1: Block, child2: Block): Spacing = {
+    spacingBuilder.getSpacing(this, child1, child2)
+  }
+
+  override def getChildAttributes(newChildIndex: Int): ChildAttributes = {
+    new ChildAttributes(childIndent(newChildIndex), null)
+  }
 
   override def isIncomplete: Boolean = false
+
+  override def isLeaf: Boolean = {
+    node.getFirstChildNode == null
+  }
 }

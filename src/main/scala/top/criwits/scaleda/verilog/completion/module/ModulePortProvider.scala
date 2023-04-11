@@ -23,18 +23,14 @@ class ModulePortProvider extends CompletionProvider[CompletionParameters] {
     val instantiatedModule = PsiTreeUtil.getParentOfType(element, classOf[ModuleInstantiationPsiNode])
 
     // get the module declaration
-    val resolve = instantiatedModule.getReference
-      .multiResolve(false)
+    val resolve = instantiatedModule.getReference.resolve
 
-    if (resolve.length == 0) return
+    if (resolve == null) return
 
-    val moduleDeclaration = resolve
-      .head
-      .getElement
-      .asInstanceOf[ModuleDeclarationPsiNode]
+    val moduleDeclaration = resolve.asInstanceOf[ModuleDeclarationPsiNode]
 
-    moduleDeclaration.getPorts.foreach(port => {result.addElement(
-      LookupElementBuilder.create(port.getIdentifier.getName)
+    moduleDeclaration.getModuleHead.getPorts.foreach(port => {result.addElement(
+      LookupElementBuilder.create(port.getName)
         .withIcon(port.getPortType match {
           case PortDeclarationPsiNode.INPUT => Icons.verilogInput
           case PortDeclarationPsiNode.INOUT => Icons.verilogInout
@@ -42,8 +38,6 @@ class ModulePortProvider extends CompletionProvider[CompletionParameters] {
           case PortDeclarationPsiNode.OUTPUT_REG => Icons.verilogOutputReg
           case _ => AllIcons.General.TodoQuestion // should never reach
         })
-//        .withTypeText(port.getTypeText)
-        .withTailText(s" (in module \"${moduleDeclaration.getName}\")")
         .withInsertHandler(ParenthesesInsertHandler.WITH_PARAMETERS))
     })
 

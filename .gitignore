@@ -1,6 +1,9 @@
-target/
+/target/
 .idea/
 .bsp/
 null/
 /.env
 /.tmp/
+/docs/
+/project/target/
+/project/project/target/

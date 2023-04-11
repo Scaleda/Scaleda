@@ -17,6 +17,18 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSource_text(VerilogParser.Source_textContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSource_text(VerilogParser.Source_textContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterDirective(VerilogParser.DirectiveContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -36,6 +48,138 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTimescale_directive(VerilogParser.Timescale_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDefined_flag(VerilogParser.Defined_flagContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDefined_flag(VerilogParser.Defined_flagContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCreate_defined_flag(VerilogParser.Create_defined_flagContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCreate_defined_flag(VerilogParser.Create_defined_flagContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCreate_defined_term(VerilogParser.Create_defined_termContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCreate_defined_term(VerilogParser.Create_defined_termContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUsing_defined_flag(VerilogParser.Using_defined_flagContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUsing_defined_flag(VerilogParser.Using_defined_flagContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDefine_directive(VerilogParser.Define_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDefine_directive(VerilogParser.Define_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIfdef_directive(VerilogParser.Ifdef_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIfdef_directive(VerilogParser.Ifdef_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIfndef_directive(VerilogParser.Ifndef_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIfndef_directive(VerilogParser.Ifndef_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterElse_directive(VerilogParser.Else_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitElse_directive(VerilogParser.Else_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterElsif_directive(VerilogParser.Elsif_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitElsif_directive(VerilogParser.Elsif_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEndif_directive(VerilogParser.Endif_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEndif_directive(VerilogParser.Endif_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUndef_directive(VerilogParser.Undef_directiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUndef_directive(VerilogParser.Undef_directiveContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -168,18 +312,6 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitUse_clause(VerilogParser.Use_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterSource_text(VerilogParser.Source_textContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSource_text(VerilogParser.Source_textContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1949,6 +2081,66 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterConditional_statement_body(VerilogParser.Conditional_statement_bodyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConditional_statement_body(VerilogParser.Conditional_statement_bodyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterConditional_statement_head(VerilogParser.Conditional_statement_headContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConditional_statement_head(VerilogParser.Conditional_statement_headContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterConditional_statement_chain(VerilogParser.Conditional_statement_chainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConditional_statement_chain(VerilogParser.Conditional_statement_chainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterConditional_statement_else_tail(VerilogParser.Conditional_statement_else_tailContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConditional_statement_else_tail(VerilogParser.Conditional_statement_else_tailContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterConditional_statement_else_chain(VerilogParser.Conditional_statement_else_chainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConditional_statement_else_chain(VerilogParser.Conditional_statement_else_chainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterConditional_statement(VerilogParser.Conditional_statementContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1956,18 +2148,6 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitConditional_statement(VerilogParser.Conditional_statementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterIf_else_if_statement(VerilogParser.If_else_if_statementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitIf_else_if_statement(VerilogParser.If_else_if_statementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -2016,6 +2196,18 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCase_body(VerilogParser.Case_bodyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCase_default_item(VerilogParser.Case_default_itemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCase_default_item(VerilogParser.Case_default_itemContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -3161,6 +3353,18 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBinary_operator_or(VerilogParser.Binary_operator_orContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinary_operator_or(VerilogParser.Binary_operator_orContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBinary_operator(VerilogParser.Binary_operatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -3792,6 +3996,30 @@ public class VerilogParserBaseListener implements VerilogParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitEscaped_hierarchical_branch(VerilogParser.Escaped_hierarchical_branchContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIncomplete_statement(VerilogParser.Incomplete_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIncomplete_statement(VerilogParser.Incomplete_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIncomplete_condition_statement(VerilogParser.Incomplete_condition_statementContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

@@ -6,6 +6,7 @@ service Remote {
   rpc Run(RunRequest) returns (stream RunReply) {}
   rpc GetProfiles(Empty) returns (ProfilesReply) {}
   rpc GetRemoteInfo(Empty) returns (RemoteInfo) {}
+  rpc StopCommand(StopCommandRequest) returns (StopCommandReply) {}
 }
 
 service RemoteRegisterLogin {
@@ -54,6 +55,7 @@ message RunRequest {
   string path = 2;
   repeated StringTriple envs = 3;
   string projectBase = 4;
+  string runId = 5;
 }
 
 enum RunReplyType {
@@ -61,6 +63,7 @@ enum RunReplyType {
   RUN_REPLY_TYPE_STDOUT = 1;
   RUN_REPLY_TYPE_STDERR = 2;
   RUN_REPLY_TYPE_ERR_AUTH = 3;
+  RUN_REPLY_TYPE_COMMAND_ID = 4;
 }
 
 message RunReply {
@@ -69,6 +72,15 @@ message RunReply {
   int32 int_value = 3;
   bool finishedAll = 4;
   bool meetErrors = 5;
+}
+
+message StopCommandRequest {
+  string commandId = 1;
+  uint64 timeoutMs = 2;
+}
+message StopCommandReply {
+  bool ok = 1;
+  string reason = 2;
 }
 
 // Note that these value cannot be null!!!

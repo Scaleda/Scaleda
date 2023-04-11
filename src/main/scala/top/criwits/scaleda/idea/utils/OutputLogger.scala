@@ -39,7 +39,7 @@ class OutputLogger(project: Project) extends BasicLogger {
 object OutputLogger {
   final val LOGGER_ID                       = "scaleda-output"
   def apply(project: Project): OutputLogger = new OutputLogger(project)
-  def apply(): OutputLogger                 = new OutputLogger(ProjectNow.apply().get)
+  // def apply(): OutputLogger                 = new OutputLogger(ProjectNow.apply().get)
 
   class Handler(project: Project) extends ScaledaRunHandler {
     override def onStdout(data: String): Unit = OutputLogger(project).info(data)

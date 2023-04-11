@@ -3,9 +3,10 @@ package idea.runner.configuration
 
 import idea.ScaledaBundle
 import idea.application.config.ScaledaIdeaConfig
+import idea.project.IdeaManifestManager
 import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntime}
 import idea.rvcd.RvcdService
-import idea.settings.auth.AuthorizationEditor
+import idea.utils.notification.CreateTypicalNotification
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
 import idea.waveform.{RvcdHandler, WaveformHandler}
 import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
@@ -24,7 +25,6 @@ import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.{ExecutionResult, Executor}
 import com.intellij.icons.AllIcons
-import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
@@ -50,6 +50,8 @@ class ScaledaRunConfiguration(
     factory: ScaledaRunConfigurationFactory,
     name: String
 ) extends LocatableConfigurationBase[RunProfileState](project, factory, name) {
+
+  implicit val projectUsing = project
 
   var targetName = ""
   var taskName   = ""
@@ -112,6 +114,13 @@ class ScaledaRunConfiguration(
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScaledaRunConfigurationEditor(project)
 
+  def generateRuntime: Option[ScaledaRuntime] =
+    ScaledaRun
+      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)(manifest =
+        IdeaManifestManager.getImplicitManifest
+      )
+      .map(_.copy(extraEnvs = extraEnvs.toMap))
+
   /** Returns a [[RunProfileState]], which is actually used to run
     * @param ideaExecutor
     * @param environment
@@ -132,11 +141,14 @@ class ScaledaRunConfiguration(
 
     val console = myConsoleBuilder.getConsole
 
-    val runtimeOptional = ScaledaRun
-      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
-      .map(_.copy(extraEnvs = extraEnvs.toMap))
+    val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
       MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
+      CreateTypicalNotification.makeAuthorizationNotification(
+        project,
+        ScaledaBundle.message("tasks.configuration.profile.state.auth", profileHost),
+        NotificationType.WARNING
+      )
       return null
     }
 
@@ -159,7 +171,7 @@ class ScaledaRunConfiguration(
       val thread = ScaledaRun.runTaskBackground(handler, runtime)
 
       // attach message parser listener
-      ScaledaMessageTab.instance.attach(runtime)
+      ScaledaMessageTab.instance.foreach(_.attach(runtime))
       Toolchain.toolchainMessageParser
         .get(runtime.target.toolchain)
         .foreach(parserProvider => ScaledaMessageParser.registerParser(runtime.id, parserProvider.messageParser))
@@ -167,24 +179,16 @@ class ScaledaRunConfiguration(
       // setup exception handler
       thread.setUncaughtExceptionHandler((_thread: Thread, throwable: Throwable) => {
         // detach message parser listener
-        ScaledaMessageTab.instance.detachFromLogger(runtime.id)
+        ScaledaMessageTab.instance.foreach(_.detachFromLogger(runtime.id))
         ScaledaMessageParser.removeParser(runtime.id)
         throwable match {
           case e: UserException =>
-            val notification = Notification.NOTIFICATION_GROUP
-              .createNotification(
-                ScaledaBundle.message("notification.runner.error.auth.title"),
-                e.getMessage,
-                Notification.levelMatch(LogLevel.Error)
-              )
-            notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.auth.action")) {
-              override def actionPerformed(e: AnActionEvent) = {
-                ShowSettingsUtilImpl.showSettingsDialog(project, AuthorizationEditor.SETTINGS_ID, "")
-              }
-            })
+            CreateTypicalNotification.makeAuthorizationNotification(project, e.getMessage, NotificationType.ERROR)
           case e: TimeoutException =>
-            Notification().error("Timeout", e.getMessage, ", check your connections")
-          case e: Throwable => throw e
+            Notification(project).error("Timeout", e.getMessage, ", check your connections")
+          case e: Throwable =>
+            e.printStackTrace()
+            throw e
         }
         handler.destroyProcess()
       })
@@ -219,7 +223,7 @@ class ScaledaRunConfiguration(
         // ScaledaMessageTab.instance.requestFocusInWindow()
         // ToolWindowManager.getInstance(project).
         // not working
-        ScaledaMessageTab.instance.switchToTab()
+        ScaledaMessageTab.instance.foreach(_.switchToTab())
       }
       // DumbService
       //   .getInstance(project)
@@ -230,8 +234,8 @@ class ScaledaRunConfiguration(
       // ToolWindowManager.getInstance(project).getFocusManager
       // ScaledaMessageTab.instance.switchToTab()
 
-      val causeMessage     = ScaledaMessageTab.instance.getCauseMessage(rt.id)
-      val causeCodeMessage = ScaledaMessageTab.instance.getCauseCode(rt.id)
+      val causeMessage     = ScaledaMessageTab.instance.flatMap(_.getCauseMessage(rt.id))
+      val causeCodeMessage = ScaledaMessageTab.instance.flatMap(_.getCauseCode(rt.id))
 
       // create notification
       val notification = Notification.NOTIFICATION_GROUP.createNotification(
@@ -262,29 +266,32 @@ class ScaledaRunConfiguration(
           new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
             override def actionPerformed(e: AnActionEvent) = {
               // TODO: goto message window
-              ScaledaMessageTab.instance.switchToTab()
+              ScaledaMessageTab.instance.foreach(_.switchToTab())
             }
           }
         )
       })
       causeCodeMessage.foreach(m => {
-        notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
-          override def actionPerformed(e: AnActionEvent) = {
-            require(m.file.nonEmpty, "causeCodeMessage.file isEmpty")
-            val descriptor = new OpenFileDescriptor(
-              project,
-              new LocalFilePath(m.file.get, false).getVirtualFile,
-              m.line.getOrElse(0),
-              0
-            )
-            descriptor.navigate(true)
-          }
-        })
+        val file = new LocalFilePath(m.file.get, false).getVirtualFile
+        if (file != null) {
+          notification.addAction(new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.code")) {
+            override def actionPerformed(e: AnActionEvent) = {
+              require(m.file.nonEmpty, "causeCodeMessage.file isEmpty")
+              val descriptor = new OpenFileDescriptor(
+                project,
+                file,
+                m.line.getOrElse(0),
+                0
+              )
+              descriptor.navigate(true)
+            }
+          })
+        }
       })
       notification.notify(project)
     }
     // remove message listeners
-    ScaledaMessageTab.instance.detachFromLogger(rt.id)
+    ScaledaMessageTab.instance.foreach(_.detachFromLogger(rt.id))
     ScaledaMessageParser.removeParser(rt.id)
     if (!meetErrors) {
       rt.task.taskType match {

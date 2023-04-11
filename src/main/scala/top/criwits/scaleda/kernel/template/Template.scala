@@ -26,21 +26,25 @@ object Template {
 
   def getJin = jin
 
-  def render(template: String, context: Map[String, Any]): String = {
+  def render(template: String, context: Map[String, Any])(implicit
+      replace: ImplicitPathReplace = NoPathReplace
+  ): String = {
+    if (jin.isEmpty) initJinja()
     val c              = CollectionConverters.asJava(context)
     val curClassLoader = Thread.currentThread.getContextClassLoader
     try {
       Thread.currentThread.setContextClassLoader(this.getClass.getClassLoader)
-      jin.get.render(template, c)
+      replace.doAllReplace(jin.get.render(template, c))
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         KernelLogger.error(e)
         throw e
-      }
     } finally Thread.currentThread.setContextClassLoader(curClassLoader)
   }
 
-  def renderResource(resourcePath: String, context: Map[String, Any]): String = {
+  def renderResource(resourcePath: String, context: Map[String, Any])(implicit
+      replace: ImplicitPathReplace = NoPathReplace
+  ): String = {
     val stream = getClass.getClassLoader.getResourceAsStream(s"templates/${resourcePath}")
     val s      = IOUtils.toString(stream, "UTF-8")
     render(s, context)
@@ -53,17 +57,15 @@ object Template {
     val f = new File(targetPath)
     // if (f.exists()) return
     FileUtils.touch(f)
-    val printer           = new PrintWriter(f)
-    val renderResult      = renderResource(resourcePath, context)
-    val textReplaceResult = replace.doReplace(renderResult)
-    val regexResult       = replace.doRegexReplace(textReplaceResult)
-    printer.write(regexResult)
+    val printer      = new PrintWriter(f)
+    val renderResult = renderResource(resourcePath, context)
+    printer.write(renderResult)
     printer.close()
   }
 }
 
 trait TemplateRenderer {
-  def render(): Unit
+  def render(useContext: Map[String, Any] = Map()): Unit
 }
 
 abstract class ResourceTemplateRender(resourceBase: String, targetBase: String, resources: Map[String, String])(implicit
@@ -71,9 +73,9 @@ abstract class ResourceTemplateRender(resourceBase: String, targetBase: String, 
 ) extends TemplateRenderer {
   def context: Map[String, Any]
 
-  override def render(): Unit =
+  override def render(useContext: Map[String, Any] = Map()): Unit =
     resources
       .map(f => (s"${resourceBase}/${f._1}", s"${targetBase}/${f._2}"))
-      .foreach(f => Template.renderResourceTo(f._1, context, f._2)(replace))
+      .foreach(f => Template.renderResourceTo(f._1, (if (useContext.isEmpty) context else useContext), f._2)(replace))
 
 }

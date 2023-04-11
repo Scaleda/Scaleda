@@ -1,31 +1,45 @@
 package top.criwits.scaleda
 package kernel.project.config
 
-import kernel.utils.KernelLogger
+import idea.windows.tasks.ip.IPInstance
+import kernel.project.ip.ExportConfig
+import kernel.project.{ManifestManager, ProjectManifest}
 import kernel.utils.serialise.{JSONHelper, YAMLHelper}
+import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 
 import java.io.File
+import scala.language.implicitConversions
 
 /** Case class for project-level config, i.e. `scaleda.yml`
   * @param name Project name
   * @param `type` Project type, should be 'rtl'
   * @param source Project source folder
+  * @param sources Project sources, items can be one file or directory
   * @param test Project test folder
-  * @param topModule Top module name, can be overriden by [[TargetConfig]] or [[TaskConfig]]
+  * @param topModule Top module name, can be overridden by [[TargetConfig]] or [[TaskConfig]]
   * @param targets List of [[TargetConfig]]
   */
 @JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
+    description: String = "",
+    version: String = "0.1",
+    author: String = "",
     `type`: String = "rtl",
     source: String = "src/",
+    sources: Seq[String] = Seq(),
     test: String = "test/",
+    tests: Seq[String] = Seq(),
     topModule: Option[String] = None,
     constraints: Option[String] = None,
-    targets: Array[TargetConfig] = Array()
+    targets: Array[TargetConfig] = Array(),
+    ipFiles: Seq[String] = Seq(),
+    ipPaths: Seq[String] = Seq(),
+    exports: Option[ExportConfig] = None,
+    ips: Seq[IPInstance] = Seq()
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))
@@ -70,7 +84,8 @@ case class ProjectConfig(
   def headTask = targets.headOption.flatMap(t => t.tasks.headOption)
 
   def headTargetTask =
-    targets.headOption.map(target => (target, target.tasks.headOption))
+    targets.headOption
+      .map(target => (target, target.tasks.headOption))
       .filter(_._2.nonEmpty)
       .map(f => (f._1, f._2.get))
 }
@@ -80,12 +95,13 @@ object ProjectConfig {
 
   // NOTICE: These two variables are global flag to indicated if a project is loaded
   // they should be always updated simultaneously
-  var projectBase: Option[String] = None
-  var configFile: Option[String]  = None
+  // var projectBase: Option[String] = None
+  // var configFile: Option[String]  = None
 
-  def getConfig(path: Option[String] = configFile): Option[ProjectConfig] = {
-    path match {
-      case Some(p) =>
+  // def getConfig(path: Option[String] = ManifestManager.getManifest().configFile): Option[ProjectConfig] = {
+  def getConfig(implicit manifest: ProjectManifest): Option[ProjectConfig] = {
+    manifest.configFile.flatMap(p => {
+      try {
         val config = YAMLHelper(new File(p), classOf[ProjectConfig])
         KernelLogger.debug(s"Loaded project config ${JSONHelper(config)}")
         // generate node relationship
@@ -94,69 +110,39 @@ object ProjectConfig {
           target.tasks.foreach(task => task.parentNode = Some(target))
         })
         Some(config)
-      case None => None
-    }
+      } catch {
+        case e: com.fasterxml.jackson.databind.exc.MismatchedInputException =>
+          KernelLogger.warn(s"Failed to parse project config file $p")
+          None
+      }
+    })
   }
 
-  def config = getConfig().get
+  def config(implicit manifest: ProjectManifest) = getConfig.get
 
-  def headTarget = getConfig().flatMap(c => c.headTarget)
+  def headTarget(implicit manifest: ProjectManifest) = getConfig.flatMap(c => c.headTarget)
 
-  def headTask = getConfig().flatMap(c => c.headTask)
+  def headTask(implicit manifest: ProjectManifest) = getConfig.flatMap(c => c.headTask)
 
-  private def saveConfig(projectConfig: ProjectConfig): Unit = {
-    YAMLHelper(projectConfig, new File(configFile.get))
+  def saveConfig(
+      projectConfig: ProjectConfig,
+      targetFile: File = new File(ManifestManager.getManifest().configFile.get)
+  ): Unit = {
+    YAMLHelper(projectConfig, targetFile)
   }
 
-  def insertOrReplaceTarget(oldTargetName: String, target: TargetConfig): ProjectConfig = {
-    ProjectConfig
-      .getConfig()
-      .map(c => {
-        val projectConfig = if (c.targets.exists(_.name == oldTargetName)) {
-          val newTargets = c.targets.filter(_.name != oldTargetName) :+ target
-          c.copy(targets = newTargets)
-        } else {
-          c.copy(targets = c.targets :+ target)
-        }
-        saveConfig(projectConfig)
-        projectConfig
-      })
-      .orNull
-  }
+  def libraryIpPaths: Set[File] = Set(Paths.getIpDir)
 
-  def insertOrReplaceTask(
-      targetName: String,
-      oldTaskName: String,
-      task: TaskConfig
-  ): ProjectConfig = {
-    ProjectConfig
-      .getConfig()
-      .map(projectConfig => {
-        if (!projectConfig.targets.exists(_.name == targetName)) {
-          KernelLogger.error(
-            s"Cannot apply task ${task.name}: no target named ${targetName}"
-          )
-          null
-        } else {
-          val target = projectConfig.targets.find(_.name == targetName).get
-          val r = if (target.tasks.exists(_.name == oldTaskName)) {
-            // replace exist task in target and replace target in config
-            val newTasks  = target.tasks.filter(_.name != oldTaskName) :+ task
-            val newTarget = target.copy(tasks = newTasks)
-            projectConfig.copy(targets = projectConfig.targets.map(t => if (t.name == newTarget.name) newTarget else t))
-          } else {
-            // append task to target, and replace target in config
-            val targets = projectConfig.targets.map(t =>
-              if (t.name == target.name)
-                target.copy(tasks = target.tasks :+ task)
-              else t
-            )
-            projectConfig.copy(targets = targets)
-          }
-          saveConfig(r)
-          r
-        }
-      })
-      .orNull
-  }
+  def projectIpPaths(implicit manifest: ProjectManifest): Set[File] =
+    Set(".ip", "ip", "ips")
+      .map(p => new File(manifest.projectBase.get, p))
+      .filter(_.exists())
+
+  def libraryIps: Map[String, ProjectConfig] =
+    libraryIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
+
+  def projectBasicIps(implicit
+      manifest: ProjectManifest
+  ): Map[String, ProjectConfig] =
+    projectIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
 }

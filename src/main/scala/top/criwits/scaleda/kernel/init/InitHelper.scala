@@ -13,17 +13,19 @@ object InitHelper {
     * @param projectType Project type identifier, here only "rtl"
     * @param sourceRoot Source root, usually "src"
     */
-  def createProjectStructure(root: File, projectName: String, projectType: String, sourceRoot: String): Boolean = {
+  def createProjectStructure(root: File, projectName: String, projectType: String, sourceRoot: String, testRoot: String): Boolean = {
     val configFile = new File(root, "scaleda.yml")
     val sourceDir  = new File(root, sourceRoot)
+    val testDir = new File(root, testRoot)
 
-    if (configFile.createNewFile() && sourceDir.mkdir()) {
+    if (configFile.createNewFile() && sourceDir.mkdir() && testDir.mkdir()) {
       // write scaleda.yml
       val configContent =
         s"""---
           |name: $projectName
           |type: $projectType
           |source: $sourceRoot
+          |test: $testRoot
           |""".stripMargin
       val stream = new FileOutputStream(configFile, false)
       stream.write(configContent.getBytes)

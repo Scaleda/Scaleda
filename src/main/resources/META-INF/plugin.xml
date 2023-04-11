@@ -32,6 +32,12 @@
                 text="Waveform">
             <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
         </action>
+        <action id="top.criwits.scaleda.idea.project.NewVerilogFileAction"
+                class="top.criwits.scaleda.idea.project.NewVerilogFileAction"
+                text="Verilog File" description="Create new Verilog file">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
+
     </actions>
 
     <!-- Listeners -->
@@ -82,15 +88,42 @@
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.ModuleInstantiationAnnotator"/>
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModuleInstantiationAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.ModulePortConnectionAnnotator"/>
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModulePortConnectionAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.MultiDrivenAnnotator"/>
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.AmbiguousClockAnnotator"/>
         <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.AmbiguousAssignInAlways"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.AssignmentsMixedUse"/>
+        <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.HierarchicalReferenceAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.IncompleteSeqBlockAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.UnmatchedVerilog1995PortAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.IncompleteConditionAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.OrOperatorInSensitiveList"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.ConditionalStatementLatchAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.CaseStatementLatchAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.WidthConcatAmbiguousAnnotator"/>
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModuleParameterAssignmentsAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.NamedParameterAssignmentAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.UnresolvedPortConnectionAnnotator" />
+        <annotator language="Verilog"
+                   implementationClass="top.criwits.scaleda.verilog.annotation.assign.IllegalAssignAnnotator" />
+        <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
 
@@ -100,14 +133,16 @@
         <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler"/>
         <enterHandlerDelegate
                 implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler"/>
+        <typedHandler implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogTypedHandler"/>
         <lang.foldingBuilder language="Verilog"
                              implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder"/>
         <lang.findUsagesProvider language="Verilog"
                                  implementationClass="top.criwits.scaleda.verilog.references.VerilogFindUsagesProvider"/>
-        <!--        <lang.formatter language="Verilog" implementationClass="top.criwits.scaleda.verilog.formatter.VerilogFormattingBuilderModel" />-->
         <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
-        <!--        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.smart.VerilogEnterAfterUnmatchedBraceHandler" />-->
         <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
+        <lang.formatter language="Verilog"
+                        implementationClass="top.criwits.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder"/>
+        <internalFileTemplate name="Verilog Module"/>
 
     </extensions>
 
@@ -154,7 +189,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
         <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType"/>
-        <newProjectWizard.language implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+        <newProjectWizard.language id="scaleda"
+                                   implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
         <!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
     </extensions>

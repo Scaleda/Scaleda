@@ -16,7 +16,7 @@ class ScaledaToolWindowFactory extends ToolWindowFactory {
     super.init(toolWindow)
     MainLogger.info("ScaledaToolWindowFactory#init")
     invokeLater {
-      ProjectNow().foreach(p => createToolWindowContent(p, toolWindow))
+      // ProjectNow().foreach(p => createToolWindowContent(p, toolWindow))
     }
   }
 

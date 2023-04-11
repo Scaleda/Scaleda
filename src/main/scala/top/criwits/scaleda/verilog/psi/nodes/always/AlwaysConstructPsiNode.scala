@@ -8,11 +8,12 @@ import verilog.psi.nodes.signal.SignalIdentifierPsiNode
 import com.intellij.lang.ASTNode
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
 
 import scala.jdk.CollectionConverters._
 
 class AlwaysConstructPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with StructureViewNode {
-  def getAssignments = PsiTreeUtil.findChildrenOfType(this, classOf[AssignmentPsiNode]).asScala
+  def getAssignments = PsiTreeUtil.findChildrenOfType(this, classOf[AlwaysAssignmentPsiNode]).asScala
 
   def getDrivenSignals: Iterable[SignalIdentifierPsiNode] = {
     val assignments = getAssignments
@@ -54,5 +55,20 @@ class AlwaysConstructPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with Stru
         }
       }
     s"($eventText) → " + getDrivenSignals.map(_.getName).mkString(", ")
+  }
+
+  /**
+    * Will judge simply by posedge/negedge (events) or delay (delay)
+    */
+  def isCombinationLogic: Boolean = {
+    val delayOrEventControlPsiNode = getControl
+    // default to time logic, example: `always #1`
+    if (delayOrEventControlPsiNode == null) return false
+    if (delayOrEventControlPsiNode.isEventControl) {
+      val events = delayOrEventControlPsiNode.getEvents
+      events.forall(event => event.getType == EventPrimaryPsiNode.LEVEL)
+    } else {
+      false
+    }
   }
 }

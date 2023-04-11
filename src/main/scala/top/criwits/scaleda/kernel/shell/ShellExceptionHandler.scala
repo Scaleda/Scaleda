@@ -15,8 +15,8 @@ class ShellExceptionHandler extends UncaughtExceptionHandler {
       case e: UserException =>
         KernelLogger.error(s"User Authorization check failed(${e.getMessage}). Register or re-login.")
       case e: Throwable =>
-        throw e
     }
     throwable.printStackTrace()
+    throw throwable
   }
 }

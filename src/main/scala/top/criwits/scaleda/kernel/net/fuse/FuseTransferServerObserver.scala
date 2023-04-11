@@ -1,6 +1,7 @@
 package top.criwits.scaleda
 package kernel.net.fuse
 
+import kernel.auth.AuthorizationHasher
 import kernel.net.fuse.FuseTransferServer.{fsProxies, observers, recvData, recvWait}
 import kernel.net.fuse.fs.FuseTransferMessage
 import kernel.net.user.JwtAuthorizationInterceptor
@@ -8,21 +9,34 @@ import kernel.utils.serialise.BinarySerializeHelper
 import kernel.utils.{KernelLogger, Paths}
 
 import io.grpc.stub.StreamObserver
+import org.apache.commons.codec.digest.DigestUtils
 
 import java.io.File
 
 class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
     extends StreamObserver[FuseTransferMessage] {
   private var identifier: Option[String] = None
+  private var runId: Option[String]      = None
   override def onNext(msg: FuseTransferMessage) = {
     KernelLogger.debug("server onNext: ", msg.toProtoString)
     val user = JwtAuthorizationInterceptor.USERNAME_CONTEXT_KEY.get()
     if (user == null) KernelLogger.warn("Fuse Transfer Server recv null user")
-    val key = if (user == null || (user != null && user.getUsername == null)) "test" else user.getUsername
     msg.function match {
       case "login" =>
-        KernelLogger.info("visit from user:", user, "key", key)
+        val runIdHashed: String =
+          try {
+            AuthorizationHasher.encodeString(BinarySerializeHelper.fromGrpcBytes(msg.message))
+          } catch {
+            case e: Throwable =>
+              KernelLogger.warn("failed to hash runId, fallback:", e)
+              // directly hash bytes... assert string binary is same
+              DigestUtils.sha256Hex(msg.message.toByteArray)
+          }
+        val key = (if (user == null || (user != null && user.getUsername == null)) "test"
+                   else user.getUsername) + "-" + runIdHashed
+        KernelLogger.info("visit from user:", user, "runIdHashed", runIdHashed, "key", key)
         identifier = Some(key)
+        runId = Some(runIdHashed)
         observers.synchronized {
           observers.put(key, this)
         }
@@ -39,7 +53,7 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
         val converted =
           FuseTransferMessageCase(
             msg.id,
-            key,
+            identifier.get,
             msg.function,
             (),
             error = Some(BinarySerializeHelper.fromGrpcBytes(msg.message))
@@ -58,7 +72,12 @@ class FuseTransferServerObserver(val tx: StreamObserver[FuseTransferMessage])
           })
       case _ =>
         val converted =
-          FuseTransferMessageCase(msg.id, key, msg.function, BinarySerializeHelper.fromGrpcBytes(msg.message))
+          FuseTransferMessageCase(
+            msg.id,
+            identifier.get,
+            msg.function,
+            BinarySerializeHelper.fromGrpcBytes(msg.message)
+          )
 
         KernelLogger.debug("converted:", converted)
         recvData.synchronized {

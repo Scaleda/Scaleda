@@ -39,9 +39,9 @@ class CommandRunner(deps: CommandDeps) extends AbstractCommandRunner {
   procBuilder.directory(workingDir)
   deps.envs.foreach(d => procBuilder.environment().put(d._1, d._2))
   private var process: Option[Process] = None
-  private var terminate: Boolean       = false
-  private var terminating: Boolean     = false
-  private var terminated: Boolean      = false
+  protected var terminate: Boolean     = false
+  protected var terminating: Boolean   = false
+  protected var terminated: Boolean    = false
   protected val returnValue            = Promise[Int]()
   protected val stdOut                 = new LinkedBlockingQueue[String]
   protected val stdErr                 = new LinkedBlockingQueue[String]
@@ -135,7 +135,8 @@ object CommandRunner {
     val steps      = commands.length
     commands.foreach(command => {
       if (!ignoreErrors && meetErrors) return
-      KernelLogger.info(s"running command: ${command.args.map(s => s"\"$s\" ").mkString("")}")
+      val commandDisplay = command.args.map(s => s"""\"$s\" """).mkString("")
+      KernelLogger.info(s"running command: ${commandDisplay}")
       val stepHint = (s"-- Step ($step/$steps)") + (
         if (command.description != "") ": " + command.description
         else ""
@@ -148,15 +149,23 @@ object CommandRunner {
         .map(r => new RemoteCommandRunner(command, r))
         .getOrElse(new CommandRunner(command))
       val r = runner.run
-      do {
-        flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
-        flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
-        Thread.sleep(delay)
-      } while (!r.returnValue.isCompleted && !handler.isTerminating)
-      if (handler.isTerminating) {
-        runner.doTerminate()
-        while (runner.isTerminating) Thread.sleep(delay)
-        while (!r.returnValue.isCompleted) Thread.sleep(delay)
+      try {
+        do {
+          flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
+          flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
+          Thread.sleep(delay)
+        } while (!r.returnValue.isCompleted && !handler.isTerminating)
+        if (handler.isTerminating) {
+          runner.doTerminate()
+          while (runner.isTerminating) Thread.sleep(delay)
+          while (!r.returnValue.isCompleted) Thread.sleep(delay)
+        }
+      } catch {
+        case e: InterruptedException =>
+          KernelLogger.warn("interrupted, wait until process exits")
+          runner.doTerminate()
+          while (runner.isTerminating) Thread.sleep(delay)
+          while (!r.returnValue.isCompleted) Thread.sleep(delay)
       }
       // To ensure output & error are got for the last time
       flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
@@ -171,6 +180,7 @@ object CommandRunner {
           KernelLogger.warn("Exception", e, "when executing command", command)
           throw e
       }
+      KernelLogger.info("execute done", commandDisplay)
     })
   }
 

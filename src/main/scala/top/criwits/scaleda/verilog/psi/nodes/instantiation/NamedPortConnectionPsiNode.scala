@@ -12,7 +12,7 @@ import top.criwits.scaleda.verilog.psi.nodes.expression.ExpressionPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.signal.PortIdentifierPsiNode
 
 class NamedPortConnectionPsiNode(node: ASTNode)
-  extends ANTLRPsiNode(node) with ReferenceHolder[PortIdentifierPsiNode] {
+  extends AbstractPortConnectionPsiNode[PortIdentifierPsiNode](node) {
   override def getHoldPsiNode: PortIdentifierPsiNode =
     PsiTreeUtil.findChildOfType(this, classOf[PortIdentifierPsiNode])
 
@@ -21,7 +21,4 @@ class NamedPortConnectionPsiNode(node: ASTNode)
 
   override def getReference = new NamedPortConnectionReference(this)
 
-  def getSignal: ExpressionPsiNode = {
-    PsiTreeUtil.getChildOfType(this, classOf[ExpressionPsiNode])
-  }
 }

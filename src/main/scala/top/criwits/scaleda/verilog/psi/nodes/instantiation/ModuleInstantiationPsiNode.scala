@@ -5,7 +5,7 @@ import verilog.psi.nodes.ReferenceHolder
 import verilog.psi.nodes.expression.ExpressionPsiNode
 import verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode.{NAMED, NONE, ORDERED}
 import verilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleIdentifierPsiNode}
-import verilog.psi.nodes.signal.PortDeclarationPsiNode
+import verilog.psi.nodes.signal.PortIdentifierPsiNode
 import verilog.references.ModuleInstantiationReference
 
 import com.intellij.lang.ASTNode
@@ -27,7 +27,7 @@ class ModuleInstantiationPsiNode(node: ASTNode)
   def getPortConnectionList: ListOfPortConnectionsPsiNode =
     PsiTreeUtil.findChildOfType(this, classOf[ListOfPortConnectionsPsiNode])
 
-  def getConnectionType: (ModuleInstantiationPsiNode.Value, Option[IndexedSeq[AnyRef]]) = {
+  def getConnectionType: (ModuleInstantiationPsiNode.Value, Option[Seq[AnyRef]]) = {
     val list = getPortConnectionList
     if (list == null) return (NONE, None)
 
@@ -35,21 +35,31 @@ class ModuleInstantiationPsiNode(node: ASTNode)
     val orderedPorts = list.getOrderedPorts
 
     if (namedPorts.nonEmpty) return (NAMED, Some(namedPorts.toIndexedSeq))
-    if (
-      orderedPorts.nonEmpty && (orderedPorts.length != 1 || orderedPorts.head.getSignal != null)
-    ) return (ORDERED, Some(orderedPorts.toIndexedSeq))
+    if (orderedPorts.nonEmpty && (orderedPorts.length != 1 || orderedPorts.head.getExpression != null))
+      return (ORDERED, Some(orderedPorts.toIndexedSeq))
 
     (NONE, None)
   }
 
-  def getConnectMap: Array[(PortDeclarationPsiNode, Option[ExpressionPsiNode])] = {
+  /** Render the connect map for this instance.
+    * @return the connect map. like:
+    * <code>
+    *   Seq(
+    *     (Identifier(a), None),             // NOT CONNECTED
+    *     (Identifier(b), Some(expression)), // CONNECTED TO expression
+    *     (Identifier(c), Some(null))        // STUB
+    *   )
+    * </code>
+    */
+  def getConnectMap: Seq[(PortIdentifierPsiNode, Option[ExpressionPsiNode])] = {
     val reference = getReference
-    val result    = reference.multiResolve(true)
-    if (result.isEmpty) return Array.empty
-    val module = result.head.getElement.asInstanceOf[ModuleDeclarationPsiNode]
-    val ports  = module.getPorts
+    val result    = reference.resolve
+    if (result == null) return Seq()
+    val module = result.asInstanceOf[ModuleDeclarationPsiNode]
+    val ports  = module.getModuleHead.getPorts
 
     val connType = getConnectionType
+
     connType._1 match {
       case NONE => ports.map(port => (port, None)) // nothing connected
       case ORDERED =>
@@ -57,24 +67,20 @@ class ModuleInstantiationPsiNode(node: ASTNode)
         ports.zipWithIndex.map(port =>
           (
             port._1,
-            if (port._2 < connectedSignals.size) Some(connectedSignals(port._2).getSignal) else None
+            if (port._2 < connectedSignals.size) Some(connectedSignals(port._2).getExpression) else None
           )
         )
       case NAMED =>
         val connectedPorts = connType._2.get.map(_.asInstanceOf[NamedPortConnectionPsiNode])
         ports.map(port =>
           (
-            port, {
-              val resolved = connectedPorts.filter(f => {
-                val h = f.getHoldPsiNode
-                if (h != null && h.textMatches(port.getIdentifier.getName)) true else false
+            port,
+            connectedPorts
+              .find(conn => {
+                val resolve = conn.getReference.resolve
+                resolve != null && resolve.asInstanceOf[PortIdentifierPsiNode].getName == port.getName
               })
-              resolved
-                .map(r =>
-                  r.getSignal
-                )
-                .headOption
-            }
+              .map(_.getExpression)
           )
         )
     }

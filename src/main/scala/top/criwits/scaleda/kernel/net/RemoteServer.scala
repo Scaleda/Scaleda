@@ -3,12 +3,7 @@ package kernel.net
 
 import kernel.net.fuse.FuseTransferServer
 import kernel.net.fuse.fs.RemoteFuseTransferGrpc
-import kernel.net.remote.RunReplyType.{
-  RUN_REPLY_TYPE_ERR_AUTH,
-  RUN_REPLY_TYPE_RETURN,
-  RUN_REPLY_TYPE_STDERR,
-  RUN_REPLY_TYPE_STDOUT
-}
+import kernel.net.remote.RunReplyType._
 import kernel.net.remote._
 import kernel.net.user.{JwtAuthorizationInterceptor, RemoteRegisterLoginImpl}
 import kernel.shell.ScaledaRunHandler
@@ -17,9 +12,13 @@ import kernel.toolchain.Toolchain
 import kernel.utils._
 
 import io.grpc.stub.StreamObserver
+import org.apache.commons.codec.digest.DigestUtils
 
 import java.io.File
+import java.time.Instant
+import java.util.UUID
 import scala.async.Async.async
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.existentials
@@ -35,7 +34,11 @@ object RemoteServer {
     "pc.chiro.work"
   )
 
+  val commandThreadPool    = new mutable.HashMap[String, (String, Thread)]()
+  val terminatingCommandId = new mutable.HashSet[String]()
+
   private class RemoteImpl extends RemoteGrpc.Remote {
+
     override def run(
         request: RunRequest,
         responseObserver: StreamObserver[RunReply]
@@ -50,52 +53,80 @@ object RemoteServer {
         return
       }
       // do text replacement
-      val username   = user.getUsername
-      val targetPath = new File(Paths.getServerTemporalDir(), username).getAbsolutePath.replace('\\', '/')
+      val username = user.getUsername
+      val targetPath = new File(
+        Paths.getServerTemporalDir(),
+        username + "-" + DigestUtils.sha256Hex(request.runId)
+      ).getAbsolutePath.replace('\\', '/')
       val sourcePath = request.projectBase
-      val replacer   = new ImplicitPathReplace(sourcePath, targetPath) {
-        override def doReplace(src: String) = super.doReplace(src.replace('\\', '/'))
+      val replacer = new ImplicitPathReplace(sourcePath, targetPath) {
+        override def doCharReplace(src: String, skipInner: Boolean = false) =
+          super.doCharReplace(src.replace('\\', '/'))
       }
       val commandDeps = CommandDeps(
-        args = request.commands.map(replacer.doReplace),
-        path = replacer.doReplace(request.path),
-        envs = request.envs.map(t => (replacer.doReplace(t.a), replacer.doReplace(t.b)))
+        args = request.commands.map(c => replacer.doCharReplace(c)),
+        path = replacer.doCharReplace(request.path),
+        envs = request.envs.map(t => (replacer.doCharReplace(t.a), replacer.doCharReplace(t.b)))
       )
+      // generate command run id
+      val commandId = UUID.randomUUID().toString
+      responseObserver.onNext(RunReply(RUN_REPLY_TYPE_COMMAND_ID, strValue = commandId))
       KernelLogger.info(
         s"remote real execute: cd ${"\"" + commandDeps.path + "\""} && " +
-          s"${commandDeps.args.map(c => "\"" + c + "\"").mkString(" ")}"
+          s"${commandDeps.args.map(c => "\"" + c + "\"").mkString(" ")}",
+        commandId
       )
-      // Note that there's only one command to execute
-      CommandRunner.execute(
-        Seq(commandDeps),
-        new ScaledaRunHandler {
-          override def onStdout(data: String) = {
-            KernelLogger.info("[remote executor stdout]", data)
-            responseObserver.onNext(
-              new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = replacer.doInvReplace(data))
-            )
-          }
+      val commandRunThread = new Thread(() => {
+        // Note that there's only one command to execute
+        CommandRunner.execute(
+          Seq(commandDeps),
+          new ScaledaRunHandler {
 
-          override def onStderr(data: String) = {
-            KernelLogger.warn("[remote executor stderr]", data)
-            responseObserver.onNext(
-              new RunReply(RUN_REPLY_TYPE_STDERR, strValue = replacer.doInvReplace(data))
-            )
-          }
+            /** Return true if handler is stopping this process
+              *
+              * @return terminating
+              */
+            override def isTerminating = {
+              terminatingCommandId.contains(commandId)
+            }
 
-          override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean) = {
-            responseObserver.onNext(
-              new RunReply(
-                RUN_REPLY_TYPE_RETURN,
-                intValue = returnValue,
-                finishedAll = finishedAll,
-                meetErrors = meetErrors
+            override def onStdout(data: String) = {
+              KernelLogger.info("[remote executor stdout]", data)
+              responseObserver.onNext(
+                new RunReply(RUN_REPLY_TYPE_STDOUT, strValue = replacer.doInvCharReplace(data))
               )
-            )
+            }
+
+            override def onStderr(data: String) = {
+              KernelLogger.warn("[remote executor stderr]", data)
+              responseObserver.onNext(
+                new RunReply(RUN_REPLY_TYPE_STDERR, strValue = replacer.doInvCharReplace(data))
+              )
+            }
+
+            override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean) = {
+              responseObserver.onNext(
+                new RunReply(
+                  RUN_REPLY_TYPE_RETURN,
+                  intValue = returnValue,
+                  finishedAll = finishedAll,
+                  meetErrors = meetErrors
+                )
+              )
+            }
           }
-        }
-      )
-      responseObserver.onCompleted()
+        )
+        responseObserver.onCompleted()
+      })
+      commandRunThread.setName(s"remote-run-command-${commandId}")
+      cleanStoppedThreadInPool()
+      commandThreadPool.put(commandId, (request.runId, commandRunThread))
+      commandRunThread.start()
+    }
+
+    private def cleanStoppedThreadInPool() = {
+      commandThreadPool.filterInPlace((_, t) => t._2.isAlive)
+      terminatingCommandId.filterInPlace(commandThreadPool.contains)
     }
 
     override def getProfiles(request: Empty): Future[ProfilesReply] = async {
@@ -114,8 +145,35 @@ object RemoteServer {
         tempPrefix = Paths.getServerTemporalDir()
       )
     }
+
+    override def stopCommand(request: StopCommandRequest): Future[StopCommandReply] = async {
+      val thread = commandThreadPool.get(request.commandId)
+      if (thread.isEmpty) {
+        StopCommandReply(ok = false, reason = "No such command")
+      } else {
+        val t = thread.get._2
+        t.interrupt()
+        terminatingCommandId.add(request.commandId)
+        val timeStart     = Instant.now
+        val deadline      = timeStart.plusMillis(request.timeoutMs)
+        val enableTimeout = request.timeoutMs != 0
+        while (t.isAlive && (enableTimeout && Instant.now.isBefore(deadline))) {
+          Thread.sleep(100)
+        }
+        val ret = if (t.isAlive) {
+          StopCommandReply.of(ok = false, "Timeout")
+        } else {
+          StopCommandReply(ok = true)
+        }
+        cleanStoppedThreadInPool()
+        ret
+      }
+    }
   }
 
+  /** Start the server, using in kernel, not in IDEA
+    * @param port port
+    */
   def serve(port: Int = DEFAULT_PORT): Unit = {
     val executionContext = ExecutionContext.global
     val server = RpcPatch.getStartServer(

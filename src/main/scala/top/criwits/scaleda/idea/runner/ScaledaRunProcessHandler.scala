@@ -23,7 +23,7 @@ import scala.collection.mutable.ArrayBuffer
 class ScaledaRunProcessHandler(
     project: Project,
     logger: BasicLogger,
-    rt: ScaledaRuntime,
+    val rt: ScaledaRuntime,
     invokeAfterFinish: (ScaledaRuntime, Seq[Int], Boolean, Boolean) => Unit
 ) extends ProcessHandler
     with ScaledaRunHandler {
@@ -41,7 +41,7 @@ class ScaledaRunProcessHandler(
       s"destroyProcessImpl, running: $terminated, stopping: $terminating"
     )
     terminating = true
-    notifyProcessTerminated(returnValues.headOption.getOrElse(0))
+    // notifyProcessTerminated(returnValues.headOption.getOrElse(0))
   }
 
   override def detachProcessImpl(): Unit = {
@@ -126,6 +126,7 @@ class ScaledaRunProcessHandler(
       terminated = true
       // invoke only success all
       invokeAfterFinish(rt, returnValues.toSeq, finishedAll, meetErrors)
+      notifyProcessTerminated(returnValue)
     }
   }
 

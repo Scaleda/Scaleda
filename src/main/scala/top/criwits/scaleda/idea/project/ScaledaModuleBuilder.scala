@@ -20,7 +20,7 @@ import javax.swing.Icon
 
 /** Module builder for [[ScaledaModuleType]]
   */
-class ScaledaModuleBuilder extends ModuleBuilder {
+class ScaledaModuleBuilder(val srcRoot: String, val testRoot: String) extends ModuleBuilder {
   override def getModuleType: ModuleType[_] = ScaledaModuleType.getInstance
 //  override def getModuleType: ModuleType[_] = ModuleType.EMPTY // why?
 
@@ -35,7 +35,7 @@ class ScaledaModuleBuilder extends ModuleBuilder {
       if FileUtilRt.createDirectory(contentDir)
     } {
       // generate project structure
-      createProjectStructure(contentDir, getName, "rtl", "src")
+      createProjectStructure(contentDir, getName, "rtl", srcRoot, testRoot)
 
       // register module
       val entry =

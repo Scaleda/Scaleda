@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.runner.task
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.utils.{MainLogger, inReadAction, invokeLater}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import kernel.project.config.ProjectConfig
@@ -13,8 +14,9 @@ import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.{LocalFileSystem, VirtualFile}
 
 import java.io.File
+import javax.swing.tree.DefaultTreeModel
 
-/** Action: reload Scaleda project config, with all its targets and tasks.
+/** Action: Load Scaleda project config, with all its targets and tasks.
   * This action should be performed when
   *
   *  - Start up;
@@ -29,6 +31,7 @@ class ScaledaReloadTasksAction
       AllIcons.Actions.Refresh
     ) {
   override def actionPerformed(e: AnActionEvent): Unit = {
+    implicit val project = e.getProject
     // Detect config file
     var searchedFile: Option[VirtualFile] = None
     inReadAction {
@@ -42,49 +45,59 @@ class ScaledaReloadTasksAction
         })
     }
 
+    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = e.getProject)
     if (searchedFile.isEmpty) {
-      ProjectConfig.configFile = None
-      ProjectConfig.projectBase = None
+      manifest.synchronized {
+        manifest.configFile = None
+        manifest.projectBase = None
+      }
       MainLogger.info(
         "No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project"
       )
 
       // clear the model
-      ScaledaRunWindowFactory.model.foreach(m => {
-        m.setRoot(null) // legal
-        m.reload()
-      })
+      IdeaManifestManager
+        .getObject[DefaultTreeModel](ScaledaRunWindowFactory.getClass.getName)
+        .foreach(m => {
+          m.setRoot(null) // legal
+          m.reload()
+        })
     } else {
       val f = searchedFile.get
       // refill
-      ProjectConfig.configFile = Some(f.getPath)
-      ProjectConfig.projectBase = Some(f.getParent.getPath)
+      manifest.synchronized {
+        manifest.configFile = Some(f.getPath)
+        manifest.projectBase = Some(f.getParent.getPath)
+      }
       MainLogger.info(s"Scaleda config file $f detected")
 
+      // Refresh `scaleda.yml`
       LocalFileSystem
         .getInstance()
         .refreshAndFindFileByIoFile(
-          new File(ProjectConfig.configFile.get)
+          new File(manifest.configFile.get)
         )
       SaveAndSyncHandler.getInstance().scheduleRefresh()
 
-      // invokeLater {
-      // Refresh tree panel while model valid
+      // Refresh tree panel when the model is valid, tricky
       val th = new Thread(() => {
         try {
           var done = false
           while (!done) {
-            ScaledaRunWindowFactory.model
+            IdeaManifestManager
+              .getObject[DefaultTreeModel](ScaledaRunWindowFactory.WINDOW_ID)
               .map(m => {
                 invokeLater {
                   m.setRoot(ScaledaRunWindowFactory.getRootNode)
                   m.reload()
                   // then expand all
-                  ScaledaRunWindowFactory.expandAll.foreach(expandAll =>
-                    ActionManager
-                      .getInstance()
-                      .tryToExecute(expandAll, null, null, null, false)
-                  )
+                  IdeaManifestManager
+                    .getObject[AnAction](ScaledaRunWindowFactory.WINDOW_ID + ".expandAll")
+                    .foreach(expandAll =>
+                      ActionManager
+                        .getInstance()
+                        .tryToExecute(expandAll, null, null, null, false)
+                    )
                 }
                 done = true
                 MainLogger.info("refresh scaleda tree done")
@@ -102,6 +115,5 @@ class ScaledaReloadTasksAction
       th.setDaemon(true)
       th.start()
     }
-    // }
   }
 }

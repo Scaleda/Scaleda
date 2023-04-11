@@ -8,6 +8,7 @@ import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.net.user.ScaledaRegisterLogin
 import kernel.project.config.ProjectConfig
+import kernel.project.{AbstractProject, ManifestManager, ProjectManifest}
 import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
@@ -19,7 +20,8 @@ import scopt.OParser
 import java.io.File
 
 object ShellRunMode extends Enumeration {
-  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register, RefreshToken =
+  val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register, RefreshToken,
+      Create =
     Value
 }
 
@@ -32,22 +34,24 @@ case class ShellArgs(
     profileName: String = "",
     user: User = new User("", "", ""),
     configureName: String = "",
-    extraEnvs: Map[String, String] = Map()
+    extraEnvs: Map[String, String] = Map(),
+    createProjectName: String = "scaleda-rtl",
+    detectProjectWhenCreate: Boolean = true
 )
 
 object ScaledaShellMain {
-  private def loadConfig(projectRootPath: String): Unit = {
-    KernelLogger.info(s"loadConfig($projectRootPath)")
+  private def loadConfig(projectRootPath: String)(implicit manifest: ProjectManifest): Unit = {
+    KernelLogger.debug(s"loadConfig($projectRootPath)")
     val rootDir = new File(projectRootPath)
     if (rootDir.exists() && rootDir.isDirectory) {
-      ProjectConfig.projectBase = Some(rootDir.getAbsolutePath)
+      manifest.projectBase = Some(rootDir.getAbsolutePath)
     }
     val projectConfigFile =
       new File(projectRootPath, ProjectConfig.defaultConfigFile)
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
-      ProjectConfig.configFile = Some(projectConfigFile.getAbsolutePath)
-      val config = ProjectConfig.getConfig()
-      KernelLogger.info(s"project config: $config")
+      manifest.configFile = Some(projectConfigFile.getAbsolutePath)
+      val config = ProjectConfig.getConfig
+      KernelLogger.debug(s"project config: $config")
     }
   }
 
@@ -66,7 +70,10 @@ object ScaledaShellMain {
   }
 
   def main(args: Array[String]): Unit = {
-    KernelLogger.info(s"This is Scaleda shell! Args: ${args.mkString(" ")}")
+    KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
+
+    // default manifest
+    implicit val manifest: ProjectManifest = ManifestManager.getManifest(project = AbstractProject.default)
 
     // set exception handler
     Thread.currentThread().setUncaughtExceptionHandler(new ShellExceptionHandler)
@@ -78,18 +85,18 @@ object ScaledaShellMain {
     // install binaries
     if (!ExtractAssets.isInstalled) {
       ExtractAssets.run()
-      KernelLogger.info("All assets ready")
+      KernelLogger.debug("All assets ready")
     }
 
     // preparse workdir
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(a))
     // preparse server host
     // val host = preParseArgs(args, Seq("-h", "--host"))
-    if (ProjectConfig.configFile.isEmpty) {
+    if (manifest.configFile.isEmpty) {
       // try loading config in pwd
       loadConfig(Paths.pwd.getAbsolutePath)
     }
-    if (ProjectConfig.configFile.isEmpty)
+    if (manifest.configFile.isEmpty)
       KernelLogger.info("No project config detected!")
 
     def requireHost(shellConfig: ShellArgs): Unit = {
@@ -108,6 +115,7 @@ object ScaledaShellMain {
       OParser.sequence(
         programName("scaleda"),
         head("scaleda", "0.1"),
+        help("help").text("Prints this usage text"),
         opt[File]('C', "workdir")
           .action((x, c) => c.copy(workingDir = x))
           .text("Working directory"),
@@ -128,42 +136,62 @@ object ScaledaShellMain {
             c.copy(user = user)
           })
           .text("Specify password"),
-        cmd("install")
-          .text("Install necessary binaries force")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Install)),
-        cmd("serve")
-          .text("Run as server")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
-        cmd("clean")
-          .text("Clean all data on device")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Clean)),
-        cmd("login")
-          .text("Login into server")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Login)),
-        cmd("register")
-          .text("Create account in server")
-          .action((_, c) => c.copy(runMode = ShellRunMode.Register))
+        cmd("remote")
           .children(
-            opt[String]('n', "nickname")
-              .action((x, c) => {
-                val user = c.user
-                user.setNickname(x)
-                c.copy(user = user)
-              })
-              .text("Specify nickname")
+            cmd("serve")
+              .text("\tRun as server")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Serve)),
+            cmd("login")
+              .text("\tLogin into server")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Login)),
+            cmd("register")
+              .text("\tCreate account in server")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Register))
+              .children(
+                opt[String]('n', "nickname")
+                  .action((x, c) => {
+                    val user = c.user
+                    user.setNickname(x)
+                    c.copy(user = user)
+                  })
+                  .text("Specify nickname")
+              ),
+            cmd("refresh")
+              .text("\tRefresh token")
+              .action((_, c) => c.copy(runMode = ShellRunMode.RefreshToken))
           ),
-        cmd("refresh")
-          .text("Refresh token")
-          .action((_, c) => c.copy(runMode = ShellRunMode.RefreshToken)),
-        cmd("profiles")
-          .text("Show loaded profiles")
-          .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
-        cmd("tasks")
-          .text("Show loaded tasks")
-          .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
-        cmd("configurations")
-          .text("Show all configurations to run")
-          .action((_, c) => c.copy(runMode = ShellRunMode.ListConfigurations)),
+        cmd("list")
+          .children(
+            cmd("profiles")
+              .text("\tShow loaded profiles")
+              .action((_, c) => c.copy(runMode = ShellRunMode.ListProfiles)),
+            cmd("tasks")
+              .text("\tShow loaded tasks")
+              .action((_, c) => c.copy(runMode = ShellRunMode.ListTasks)),
+            cmd("configurations")
+              .text("\tShow all configurations to run")
+              .action((_, c) => c.copy(runMode = ShellRunMode.ListConfigurations))
+          ),
+        cmd("manage")
+          .children(
+            cmd("install")
+              .text("\tInstall necessary binaries force")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Install)),
+            cmd("clean")
+              .text("\tClean all data on device")
+              .action((_, c) => c.copy(runMode = ShellRunMode.Clean))
+          ),
+        cmd("create")
+          .text("Create Scaleda Project")
+          .action((_, c) => c.copy(runMode = ShellRunMode.Create))
+          .children(
+            opt[String]('n', "name")
+              .text(s"Specify project name, default is 'scaleda-rtl'")
+              .action((name, c) => c.copy(createProjectName = name)),
+            opt[String]("empty")
+              .text("Create empty project, do not detect project structure")
+              .action((_, c) => c.copy(detectProjectWhenCreate = false))
+          ),
         cmd("run")
           .text("Run task")
           .action((_, c) => c.copy(runMode = ShellRunMode.Run))
@@ -182,11 +210,10 @@ object ScaledaShellMain {
               .text("Specify profile name, otherwise will auto fill"),
             opt[String]('e', "environment")
               .action((x, c) =>
-                c.copy(extraEnvs = c.extraEnvs ++ x.split(';').map(m => (m.split('=').head -> m.split('=')(1))).toMap)
+                c.copy(extraEnvs = c.extraEnvs ++ x.split(';').map(m => m.split('=').head -> m.split('=')(1)).toMap)
               )
               .text("Specify environment, example ENV_A=a;ENV_B=b")
-          ),
-        help("help").text("Prints this usage text")
+          )
       )
     }
     OParser
@@ -197,8 +224,8 @@ object ScaledaShellMain {
             Some(RemoteClient(shellConfig.serverHost))
           else None
         val workingDir = shellConfig.workingDir
-        val config     = ProjectConfig.getConfig()
-        KernelLogger.info(s"shell config: $shellConfig")
+        val config     = ProjectConfig.getConfig
+        KernelLogger.debug(s"shell config: $shellConfig")
         shellConfig.runMode match {
           case ShellRunMode.ListProfiles =>
             KernelLogger.info("local profile list:")
@@ -218,8 +245,7 @@ object ScaledaShellMain {
             }
           case ShellRunMode.ListTasks =>
             KernelLogger.info("task list:")
-            ProjectConfig
-              .getConfig()
+            ProjectConfig.getConfig
               .map(config =>
                 for (p <- config.targets.flatMap(_.tasks)) {
                   KernelLogger.info(s"${JSONHelper(p)}")
@@ -230,8 +256,7 @@ object ScaledaShellMain {
             KernelLogger.info("configurations:")
             KernelLogger.info(ScaledaKernelConfiguration.configurations)
           case ShellRunMode.Run =>
-            ProjectConfig
-              .getConfig()
+            ProjectConfig.getConfig
               .foreach(c => {
                 var profileHost = shellConfig.serverHost
                 var taskName    = shellConfig.taskName
@@ -324,6 +349,27 @@ object ScaledaShellMain {
             if (new ScaledaRegisterLogin(shellConfig.serverHost).refreshAndStore())
               KernelLogger.info("Refresh token done")
             else KernelLogger.error("Refresh token failed")
+          case ShellRunMode.Create =>
+            require(shellConfig.createProjectName.nonEmpty)
+            // detect directory to find is it a toolchain project
+            val validToolchains =
+              if (shellConfig.detectProjectWhenCreate)
+                Toolchain.projectDetectors
+                  .filter(t => t._2.detect(workingDir))
+                  .map(t => t._1)
+              else Seq()
+            // val targets = validToolchains.map(id => {
+            //   KernelLogger.info(s"Detected toolchain: $id")
+            //   val parser = Toolchain.targetParser(id)
+            //   parser.parseAsProject(workingDir)
+            // })
+            val projects = validToolchains.map(id => {
+              KernelLogger.info(s"Detected toolchain: $id")
+              val parser = Toolchain.targetParser(id)
+              parser.parseAsProject(workingDir)
+            })
+            val project = projects.head.copy(name = shellConfig.createProjectName)
+            ProjectConfig.saveConfig(project, targetFile = new File(workingDir, "scaleda.yml"))
           case _ =>
             KernelLogger.error("not implemented.")
         }

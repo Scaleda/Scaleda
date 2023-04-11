@@ -6,6 +6,7 @@ import idea.windows.tool.message.ScaledaMessageRenderer
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import sourcecode.Name
+import top.criwits.scaleda.idea.windows.tasks.ScaledaRunWindowFactory
 
 import java.util.regex.Pattern
 
@@ -103,5 +104,10 @@ class SimpleTester extends AnyFlatSpec with should.Matchers {
       )
       println(m.groupCount())
     }
+  }
+
+  it should "get class path" in {
+    println(getClass.getName)
+    println(ScaledaRunWindowFactory.getClass.getName)
   }
 }

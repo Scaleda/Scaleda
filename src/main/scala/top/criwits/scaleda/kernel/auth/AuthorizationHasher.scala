@@ -1,6 +1,10 @@
 package top.criwits.scaleda
 package kernel.auth
 
-object AuthorizationHasher {
+import org.apache.commons.codec.digest.DigestUtils
 
+object AuthorizationHasher {
+  def encodeString(src: String): String = {
+    DigestUtils.sha256Hex(src)
+  }
 }

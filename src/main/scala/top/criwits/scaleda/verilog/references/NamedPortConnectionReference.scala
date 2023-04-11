@@ -1,33 +1,29 @@
 package top.criwits.scaleda
 package verilog.references
 
+import verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NamedPortConnectionPsiNode}
+import verilog.psi.nodes.module.ModuleDeclarationPsiNode
+import verilog.psi.nodes.signal.PortIdentifierPsiNode
+
+import com.intellij.psi.{PsiElement, PsiReferenceBase}
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.{PsiElementResolveResult, PsiReferenceBase, ResolveResult}
-import top.criwits.scaleda.verilog.psi.nodes.instantiation.{ModuleInstantiationPsiNode, NamedPortConnectionPsiNode}
-import top.criwits.scaleda.verilog.psi.nodes.module.ModuleDeclarationPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode
 
 class NamedPortConnectionReference(element: NamedPortConnectionPsiNode)
-  extends PsiReferenceBase.Poly[NamedPortConnectionPsiNode](
-    element,
-    element.getHoldPsiNodeRelativeTextRange,
-    true
-  ) {
-  override def multiResolve(incompleteCode: Boolean): Array[ResolveResult] = {
-    // first: find which module
+    extends PsiReferenceBase[NamedPortConnectionPsiNode](
+      element,
+      element.getHoldPsiNodeRelativeTextRange
+    ) {
+  override def resolve: PsiElement = {
     val moduleInstantiationPsiNode = PsiTreeUtil.getParentOfType(myElement, classOf[ModuleInstantiationPsiNode])
-    if (moduleInstantiationPsiNode == null) return Array.empty
+    if (moduleInstantiationPsiNode == null) return null
 
-    moduleInstantiationPsiNode.getReference.multiResolve(incompleteCode)
-      .map(it => it.getElement)
-      .filter(it => it.isInstanceOf[ModuleDeclarationPsiNode])
-      .map(it => it.asInstanceOf[ModuleDeclarationPsiNode])
-      .map(it => it.getPorts)
-      .foldLeft(Seq[PortDeclarationPsiNode]())(_ ++ _)
-      .filter(_.getIdentifier.getName == element.getHoldPsiNode.getName)
-      .map(new PsiElementResolveResult((_)))
-      .toArray
+    val ref = moduleInstantiationPsiNode.getReference.resolve
+    if (!ref.isInstanceOf[ModuleDeclarationPsiNode]) return null
+    ref
+      .asInstanceOf[ModuleDeclarationPsiNode]
+      .getModuleHead
+      .getPorts
+      .find(_.getName == element.getHoldPsiNode.getName)
+      .orNull
   }
-
-  override def getVariants = Array()
 }

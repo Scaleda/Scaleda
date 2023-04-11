@@ -38,7 +38,7 @@ object Notification {
     NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID)
 
   def apply(project: Project): Notification = new Notification(project)
-  def apply(): Notification                 = new Notification(ProjectNow.apply().get)
+  // def apply(): Notification                 = new Notification(ProjectNow.apply().get)
 
   def levelMatch(level: LogLevel.Value): NotificationType = {
     import LogLevel._

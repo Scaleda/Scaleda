@@ -2,6 +2,7 @@ package top.criwits.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.utils.MainLogger
 import kernel.net.remote.RemoteProfile
 import kernel.net.user.ScaledaAuthorizationProvider
@@ -54,7 +55,8 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
-  ProjectConfig.getConfig().foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
+  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  ProjectConfig.getConfig.foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
 
   private def maySetProfileToDefault(list: Seq[ProfilePair]): Unit = {
     defaultProfilePair.foreach(default =>
@@ -189,8 +191,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     if (e.getStateChange == ItemEvent.SELECTED) {
       val newTargetName = e.getItem.asInstanceOf[String]
       taskName.removeAllItems()
-      ProjectConfig
-        .getConfig()
+      ProjectConfig.getConfig
         .foreach(c =>
           c.targets.find(_.name == newTargetName).foreach(t => t.tasks.foreach(t => taskName.addItem(t.name)))
         )
@@ -214,8 +215,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     // Warning: because targetName has model data listener, should set targetName first!!
     targetName.setItem(s.targetName)
     taskName.removeAllItems()
-    ProjectConfig
-      .getConfig()
+    ProjectConfig.getConfig
       .foreach(c => c.targets.find(_.name == s.targetName).foreach(t => t.tasks.foreach(t => taskName.addItem(t.name))))
     taskName.setItem(s.taskName)
     environmentVarsComponent.setEnvs(CollectionConverters.asJava(s.extraEnvs))

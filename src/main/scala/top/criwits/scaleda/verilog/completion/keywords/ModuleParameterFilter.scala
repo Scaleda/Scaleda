@@ -4,7 +4,7 @@ package verilog.completion.keywords
 import com.intellij.psi.{PsiComment, PsiElement}
 import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.util.PsiTreeUtil
-import top.criwits.scaleda.verilog.psi.nodes.signal.ParameterDeclarationPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterDeclarationPsiNode
 
 class ModuleParameterFilter extends ElementFilter {
   override def isAcceptable(element: Any, context: PsiElement): Boolean = {

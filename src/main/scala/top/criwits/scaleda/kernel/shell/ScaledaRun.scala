@@ -4,6 +4,7 @@ package kernel.shell
 import idea.runner.{ScaledaRunStage, ScaledaRuntime}
 import kernel.net.RemoteClient
 import kernel.net.remote.Empty
+import kernel.project.ProjectManifest
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig, TaskType}
 import kernel.shell.command.{CommandDeps, CommandRunner, RemoteCommandDeps}
 import kernel.toolchain.executor._
@@ -18,12 +19,17 @@ import scala.collection.mutable.ArrayBuffer
 
 object ScaledaRun {
 
-  /** Must call before run a task, may do preset
+  /** Must call before run a task <br/>
+    * 1. may do preset <br/>
+    * 2. prepare workdir <br/>
     * @param rt runtime
     * @return new runtime
     */
   def preprocess(rt: ScaledaRuntime): ScaledaRuntime = {
-    if (rt.task.preset && rt.stage == ScaledaRunStage.Prepare) {
+    implicit val manifest: ProjectManifest = rt.manifest
+    if (!rt.executor.workingDir.exists() && !rt.executor.workingDir.mkdirs())
+      KernelLogger.warn("Cannot create working directory!")
+    if (!rt.task.custom && rt.stage == ScaledaRunStage.Prepare) {
       // fetch remote system info
       val remoteInfo =
         if (rt.profile.isRemoteProfile) {
@@ -50,17 +56,17 @@ object ScaledaRun {
   ): Unit = {
     require(rt.profile.profileName.nonEmpty, "must provide profile before runTask")
     val remoteDeps =
-      if (rt.profile.isRemoteProfile && ProjectConfig.projectBase.nonEmpty)
-        Some(RemoteCommandDeps(new File(ProjectConfig.projectBase.get), host = rt.profile.host))
+      if (rt.profile.isRemoteProfile && rt.manifest.projectBase.nonEmpty)
+        Some(RemoteCommandDeps(new File(rt.manifest.projectBase.get), host = rt.profile.host, runId = rt.id))
       else None
-    KernelLogger.info(s"runTask workingDir=${rt.workingDir.getAbsoluteFile}")
+    KernelLogger.info(s"runTask workingDir=${rt.projectBase.getAbsoluteFile}")
 
     val info      = Toolchain.toolchains(rt.target.toolchain)
     val toolchain = info._2(rt.executor)
 
     if (!EnvironmentUtils.Backup.env.contains("SKIP_EXECUTION")) {
       // generic commands and apply envs
-      val commands = toolchain.commands(rt.task).map(c => c.copy(envs = rt.extraEnvs.toSeq))
+      val commands = toolchain.commands(rt.task)(manifest = rt.manifest).map(c => c.copy(envs = rt.extraEnvs.toSeq))
       try CommandRunner.executeLocalOrRemote(remoteDeps, commands, handler)
       catch {
         case e: Throwable =>
@@ -86,14 +92,14 @@ object ScaledaRun {
       target: TargetConfig,
       task: TaskConfig,
       profile: ToolchainProfile,
-      workingDir: File
+      projectBase: File
   ): Executor = {
     val workingDirName = target.name + "-" + task.name
     task.taskType match {
       case TaskType.Simulation =>
         // FIXME: GENERATE TESTBENCH?
         val testbench    = task.findTopModule.get // FIXME: should not get if None, but...
-        val workingPlace = new File(new File(workingDir, ".sim"), workingDirName)
+        val workingPlace = new File(new File(projectBase, ".sim"), workingDirName)
         SimulationExecutor(
           workingDir = workingPlace,
           topModule = testbench,
@@ -102,24 +108,24 @@ object ScaledaRun {
         )
       case TaskType.Synthesis =>
         SynthesisExecutor(
-          workingDir = new File(new File(workingDir, ".synth"), workingDirName),
+          workingDir = new File(new File(projectBase, ".synth"), workingDirName),
           topModule = task.findTopModule.get,
           profile = profile
         )
       case TaskType.Implement =>
-        val selectedConstraints = task.findConstraints
+        val selectedConstraints = task.getConstraints
         val singleFile: Option[File] = selectedConstraints.flatMap(path => {
-          val file = new File(workingDir, path)
+          val file = new File(projectBase, path)
           if (file.exists() && file.isFile) Some(file)
           else None
         })
         val singleDir: Option[File] = selectedConstraints.flatMap(path => {
-          val file = new File(workingDir, path)
+          val file = new File(projectBase, path)
           if (file.exists() && file.isDirectory) Some(file)
           else None
         })
         ImplementExecutor(
-          workingDir = new File(new File(workingDir, ".impl"), workingDirName),
+          workingDir = new File(new File(projectBase, ".impl"), workingDirName),
           topModule = task.findTopModule.get,
           profile = profile,
           // in `handlePreset`, constraintsDir will be scanned to add constraints
@@ -128,7 +134,7 @@ object ScaledaRun {
         )
       case TaskType.Programming =>
         ProgrammingExecutor(
-          workingDir = new File(new File(workingDir, ".impl"), workingDirName),
+          workingDir = new File(new File(projectBase, ".impl"), workingDirName),
           profile = profile
         )
     }
@@ -147,8 +153,8 @@ object ScaledaRun {
       taskName: String,
       profileName: String,
       profileHost: String
-  ): Option[ScaledaRuntime] = {
-    val configOptional = ProjectConfig.getConfig()
+  )(implicit manifest: ProjectManifest): Option[ScaledaRuntime] = {
+    val configOptional = ProjectConfig.getConfig
     if (configOptional.isEmpty) {
       KernelLogger.warn("no configure found")
       return None
@@ -159,7 +165,7 @@ object ScaledaRun {
         val (target, task)                                = f
         var remoteProfiles: Option[Seq[ToolchainProfile]] = None
         val profileHostUse                                = task.host.getOrElse(profileHost)
-        KernelLogger.info(s"profileHostUse: $profileHostUse")
+        KernelLogger.debug(s"profileHostUse: $profileHostUse")
         val profile =
           if (profileHostUse == null || profileHostUse.isEmpty) {
             // Run locally if no host argument provided
@@ -193,17 +199,20 @@ object ScaledaRun {
           None
         } else {
           val runtimeId =
+            // NameLegalization.legalization(
             s"${target.toolchain}-${target.name}-${task.name}-${new Date()}"
+          // )
 
-          val workingDir = new File(ProjectConfig.projectBase.get)
-          val executor   = ScaledaRun.generateExecutor(target, task, profile.get, workingDir)
+          val projectBase = new File(manifest.projectBase.get)
+          val executor    = ScaledaRun.generateExecutor(target, task, profile.get, projectBase)
           val runtime = ScaledaRuntime(
             id = runtimeId,
             target = target,
             task = task,
             profile = profile.get,
             executor = executor,
-            workingDir = workingDir
+            projectBase = projectBase,
+            manifest = manifest
           )
 
           Some(runtime)

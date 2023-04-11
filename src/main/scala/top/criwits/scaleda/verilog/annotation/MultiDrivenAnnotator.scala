@@ -2,19 +2,20 @@ package top.criwits.scaleda
 package verilog.annotation
 
 import idea.ScaledaBundle
-import verilog.psi.nodes.always.{AlwaysConstructPsiNode, AssignmentPsiNode}
+import verilog.psi.nodes.always.AlwaysConstructPsiNode
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import top.criwits.scaleda.verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
 
 import scala.jdk.CollectionConverters._
 
 class MultiDrivenAnnotator extends Annotator {
   override def annotate(element: PsiElement, holder: AnnotationHolder): Unit = {
-    if (!element.isInstanceOf[AssignmentPsiNode]) return
-    val assignmenet = element.asInstanceOf[AssignmentPsiNode]
+    if (!element.isInstanceOf[AlwaysAssignmentPsiNode]) return
+    val assignmenet = element.asInstanceOf[AlwaysAssignmentPsiNode]
 
     val module = PsiTreeUtil.getParentOfType(element, classOf[ModuleDeclarationPsiNode])
     if (module == null) return
