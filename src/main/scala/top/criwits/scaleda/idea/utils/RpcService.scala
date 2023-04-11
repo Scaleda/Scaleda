@@ -114,7 +114,7 @@ object RpcService {
             ).getVirtualFile
           if (virtualFile == null) {
             // TODO: i18n
-            Notification().warn("File not found:", info.filepath)
+            Notification(project = project).warn("File not found:", info.filepath)
           } else
             runInEdt {
               val descriptor = new OpenFileDescriptor(project, virtualFile, info.line, info.column)

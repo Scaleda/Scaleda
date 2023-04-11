@@ -185,7 +185,7 @@ class ScaledaRunConfiguration(
           case e: UserException =>
             CreateTypicalNotification.makeAuthorizationNotification(project, e.getMessage, NotificationType.ERROR)
           case e: TimeoutException =>
-            Notification().error("Timeout", e.getMessage, ", check your connections")
+            Notification(project).error("Timeout", e.getMessage, ", check your connections")
           case e: Throwable =>
             e.printStackTrace()
             throw e

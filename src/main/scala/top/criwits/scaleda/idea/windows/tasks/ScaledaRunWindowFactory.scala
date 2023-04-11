@@ -139,14 +139,8 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
   }
 }
 
-// FIXME: multi-projects support
 object ScaledaRunWindowFactory {
   val WINDOW_ID = ScaledaBundle.message("tasks.configuration.name")
-  // var model: Option[DefaultTreeModel] = None
-  // var expandAll: Option[AnAction]     = None
-
-  // var vivadoProject: Option[VivadoProjectConfig]       = None
-  // var vivadoModel: Option[DefaultListModel[VivadoRun]] = None
 
   def getRootNode(implicit manifest: ProjectManifest): ScaledaRunRootNode = {
     ProjectConfig.getConfig

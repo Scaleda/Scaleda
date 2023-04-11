@@ -253,7 +253,6 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
   }
 }
 
-// FIXME: multi-projects support
 object ScaledaIPManagerPanel {
   //copied from CodeStyleAbstractPanel
   private def createConfigEditor: EditorEx = {
