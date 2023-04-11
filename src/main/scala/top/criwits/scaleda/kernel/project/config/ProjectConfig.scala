@@ -2,8 +2,8 @@ package top.criwits.scaleda
 package kernel.project.config
 
 import idea.windows.tasks.ip.IPInstance
+import kernel.project.ProjectManifest
 import kernel.project.ip.ExportConfig
-import kernel.project.{ManifestManager, ProjectManifest}
 import kernel.utils.serialise.{JSONHelper, YAMLHelper}
 import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
 
@@ -124,10 +124,7 @@ object ProjectConfig {
 
   def headTask(implicit manifest: ProjectManifest) = getConfig.flatMap(c => c.headTask)
 
-  def saveConfig(
-      projectConfig: ProjectConfig,
-      targetFile: File = new File(ManifestManager.getManifest().configFile.get)
-  ): Unit = {
+  def saveConfig(projectConfig: ProjectConfig, targetFile: File): Unit = {
     YAMLHelper(projectConfig, targetFile)
   }
 

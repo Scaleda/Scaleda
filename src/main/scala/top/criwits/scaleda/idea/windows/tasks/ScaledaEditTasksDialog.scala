@@ -4,12 +4,14 @@ package idea.windows.tasks
 import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
 import idea.runner.task.ScaledaReloadTasksAction
+import kernel.project.ManifestManager
 import kernel.project.config.ProjectConfig
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 
+import java.io.File
 import javax.swing.JComponent
 
 class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
@@ -33,7 +35,10 @@ class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
       .orNull
   }
   override def doOKAction(): Unit = {
-    ProjectConfig.saveConfig(mainPanel.scaledaRunRootNode.toProjectConfig)
+    ProjectConfig.saveConfig(
+      mainPanel.scaledaRunRootNode.toProjectConfig,
+      targetFile = new File(ManifestManager.getManifest(project = project).configFile.get)
+    )
     ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
     super.doOKAction()
   }

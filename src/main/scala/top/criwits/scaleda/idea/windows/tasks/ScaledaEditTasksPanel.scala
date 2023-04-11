@@ -58,11 +58,11 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
     val taskNode   = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
 
     if (rootNode.nonEmpty)
-      splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head, updateOK).getPanel)
+      splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head, updateOK()).getPanel)
     if (targetNode.nonEmpty)
-      splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head, updateOK).getPanel)
+      splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head, updateOK()).getPanel)
     if (taskNode.nonEmpty)
-      splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head, updateOK).getPanel)
+      splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head, updateOK()).getPanel)
   }
 
   private def addItem(): Unit = {
@@ -125,7 +125,7 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
     }
   }
 
-  private def updateOK: Unit = {
+  private def updateOK(): Unit = {
     setValid(scaledaRunRootNode.validate)
   }
 
