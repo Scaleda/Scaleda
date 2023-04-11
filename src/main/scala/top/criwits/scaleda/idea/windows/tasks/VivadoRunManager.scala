@@ -26,34 +26,33 @@ import java.io.File
 import javax.swing.{DefaultListModel, JList, JPanel, SwingUtilities}
 
 object VivadoRunManager {
-  def handleVivadoProject(project: Project, contentManager: ContentManager): Unit = {
+
+  /** Handle vivado project
+    * @param project project
+    * @param contentManager content manager
+    * @return true if this project is vivado project
+    */
+  def handleVivadoProject(project: Project, contentManager: ContentManager): Boolean = {
     // check if this project has a vivado project
     val projectBase = new File(project.getBasePath)
-    if (!(projectBase.exists() && projectBase.isDirectory)) return
+    if (!(projectBase.exists() && projectBase.isDirectory)) return false
 
     // list file, find *.xpr
     val xprFiles = projectBase.listFiles().filter(_.getName.endsWith(".xpr"))
     // use head file
+    var vivadoProject: Option[VivadoProjectConfig] = None
     xprFiles.headOption.foreach(xprFile => {
       // try to parse it as vivado project struct
-      var vivadoProject: Option[VivadoProjectConfig] = None
       try {
-        // IdeaManifestManager.putObject("vivado-project", XMLHelper(xprFile, classOf[VivadoProjectConfig]))(project =project)
-        // ScaledaRunWindowFactory.vivadoProject = Some(XMLHelper(xprFile, classOf[VivadoProjectConfig]))
         vivadoProject = Some(XMLHelper(xprFile, classOf[VivadoProjectConfig]))
       } catch {
         case e: Throwable => MainLogger.warn("cannot parse vivado project", e)
       }
-      // IdeaManifestManager
-      //   .getObject[VivadoProjectConfig]("vivado-project")(project = project)
       vivadoProject
         .foreach(c => {
           val vivadoModel = new DefaultListModel[VivadoRun]()
-          // IdeaManifestManager.putObject("vivado-model", vivadoModel)(project = project)
-          // ScaledaRunWindowFactory.vivadoModel = Some(new DefaultListModel[VivadoRun]())
-
-          val panel = new SimpleToolWindowPanel(true)
-          val list  = new JBList[VivadoRun](vivadoModel)
+          val panel       = new SimpleToolWindowPanel(true)
+          val list        = new JBList[VivadoRun](vivadoModel)
 
           class VivadoRunListCellRenderer extends ColoredListCellRenderer[VivadoRun] {
             override def customizeCellRenderer(
@@ -160,8 +159,11 @@ object VivadoRunManager {
           require(toolbarComponent != null)
           toolBarPanel.add(toolbarComponent)
           panel.setToolbar(toolBarPanel)
-          contentManager.addContent(new ContentImpl(panel, "Vivado", true))
+          val content = new ContentImpl(panel, "Vivado", true)
+          contentManager.addContent(content)
+          contentManager.setSelectedContent(content)
         })
     })
+    vivadoProject.nonEmpty
   }
 }
