@@ -4,6 +4,6 @@
 null/
 /.env
 /.tmp/
-/docs/
+!/docs/
 /project/target/
 /project/project/target/
