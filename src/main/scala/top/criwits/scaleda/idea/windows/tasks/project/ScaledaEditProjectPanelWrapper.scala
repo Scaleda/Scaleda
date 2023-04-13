@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks.project
 
 import idea.ScaledaBundle
-import idea.utils.ProjectBrowserListener
+import idea.utils.{ChooseTopModuleListener, ProjectBrowserListener}
 import idea.windows.tasks.{ScaledaEditPanelWrapper, ScaledaRunRootNode}
 import kernel.project.ProjectManifest
 import kernel.utils.KernelFileUtils
@@ -36,6 +36,7 @@ class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode, setV
   inner.constraintsField.addBrowseFolderListener(
     new ProjectBrowserListener(FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor())
   )
+  inner.selectTopModuleButton.addActionListener(new ChooseTopModuleListener(inner.topModuleField))
 
   def updateValue(): Unit = {
     projectConfig.name = inner.projectNameField.getText

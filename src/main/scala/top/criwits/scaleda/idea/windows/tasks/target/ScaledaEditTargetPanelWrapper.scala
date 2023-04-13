@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks.target
 
 import idea.ScaledaBundle
-import idea.utils.ProjectBrowserListener
+import idea.utils.{ChooseTopModuleListener, ProjectBrowserListener}
 import idea.windows.tasks.target.toolchain.{EmptyConfigPanel, ExtraConfigPanel, VivadoConfigPanel}
 import idea.windows.tasks.{ScaledaEditPanelWrapper, ScaledaRunTargetNode}
 import kernel.project.ProjectManifest
@@ -50,6 +50,8 @@ class ScaledaEditTargetPanelWrapper(val targetConfig: ScaledaRunTargetNode, setV
   inner.constraintsField.addBrowseFolderListener(
     new ProjectBrowserListener(FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor())
   )
+
+  inner.chooseButton.addActionListener(new ChooseTopModuleListener(inner.topModuleField))
 
   def getPanel: JPanel = this
 

@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea.windows.tasks.task
 
 import idea.ScaledaBundle
-import idea.utils.ProjectBrowserListener
+import idea.utils.{ChooseTopModuleListener, ProjectBrowserListener}
 import idea.windows.tasks.{ScaledaEditPanelWrapper, ScaledaRunTargetNode, ScaledaRunTaskNode}
 import kernel.project.ProjectManifest
 import kernel.project.config.TaskConfig
@@ -54,6 +54,8 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
   panel.constraintsField.addBrowseFolderListener(
     new ProjectBrowserListener(FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor())
   )
+
+  panel.chooseTopModuleButton.addActionListener(new ChooseTopModuleListener(panel.topModuleField))
 
   // add listeners
   panel.addDocumentListener(new DocumentAdapter {
