@@ -43,6 +43,12 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
   toolchainSupportedTaskList.foreach(f => panel.typeField.addItem(f._2._1))
   panel.typeField.setSelectedIndex(0) // set the first; may be overridden later;
 
+  // set text before listeners available
+  panel.nameField.setText(taskConfig.name)
+  panel.topModuleField.setText(taskConfig.topModule.getOrElse(""))
+  panel.typeField.setSelectedIndex(toolchainSupportedTaskList.zipWithIndex.filter(_._1._1 == taskConfig.`type`).head._2)
+  panel.constraintsField.setText(taskConfig.constraints.getOrElse(""))
+
   // add listeners
   panel.addDocumentListener(new DocumentAdapter {
     override def textChanged(e: DocumentEvent): Unit = {
@@ -75,7 +81,7 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
 //    case _ =>
 //  }
 
-  private val parentTopModule = taskConfig.findTopModule
+  private val parentTopModule: Option[String] = taskConfig.parent.flatMap(_.findTopModule)
   private val parentTopModuleValid = parentTopModule.isDefined
 
   if (parentTopModuleValid) {
@@ -86,11 +92,6 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
     PromptSupport.setFontStyle(Font.ITALIC, panel.topModuleField)
     PromptSupport.setBackground(new Color(0, 0, 0, 0), panel.topModuleField)
   }
-
-  panel.nameField.setText(taskConfig.name)
-  panel.topModuleField.setText(taskConfig.topModule.getOrElse(""))
-  panel.typeField.setSelectedIndex(toolchainSupportedTaskList.zipWithIndex.filter(_._1._1 == taskConfig.`type`).head._2)
-  panel.constraintsField.setText(taskConfig.constraints.getOrElse(""))
 
 //
 //  panel.chooseTopModuleButton.addActionListener(new ActionListener {
