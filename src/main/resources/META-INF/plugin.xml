@@ -143,6 +143,7 @@
         <lang.formatter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder"/>
         <internalFileTemplate name="Verilog Module"/>
+        <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage" />
 
     </extensions>
 
