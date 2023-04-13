@@ -29,7 +29,7 @@ class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
     ProjectConfig.getConfig
       .map(c => {
         val rootNode = new ScaledaRunRootNode(c)
-        if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(rootNode, setValid)
+        if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(project, rootNode, setValid)
         mainPanel
       })
       .orNull
