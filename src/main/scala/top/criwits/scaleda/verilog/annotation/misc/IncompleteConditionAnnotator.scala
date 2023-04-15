@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.misc
 
 import idea.ScaledaBundle
 import verilog.psi.nodes.incompleted.IncompleteConditionPsiNode

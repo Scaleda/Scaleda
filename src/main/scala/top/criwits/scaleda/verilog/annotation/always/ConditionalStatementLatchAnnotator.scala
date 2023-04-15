@@ -1,13 +1,9 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.always
 
 import idea.ScaledaBundle
 import verilog.psi.nodes.always.AlwaysConstructPsiNode
-import verilog.psi.nodes.condition.{
-  ConditionalStatementHeadPsiNode,
-  ConditionalStatementPsiNode,
-  ConditionalStatementTailPsiNode
-}
+import verilog.psi.nodes.condition.{ConditionalStatementHeadPsiNode, ConditionalStatementPsiNode, ConditionalStatementTailPsiNode}
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.psi.PsiElement
