@@ -2,7 +2,7 @@ package top.criwits.scaleda
 package idea
 
 import com.intellij.openapi.application.ApplicationManager.{getApplication => application}
-import com.intellij.openapi.application.{ApplicationManager, ModalityState}
+import com.intellij.openapi.application.{ApplicationInfo, ApplicationManager, ModalityState}
 
 import _root_.scala.annotation.nowarn
 
@@ -42,4 +42,5 @@ package object utils {
   @nowarn("cat=deprecation")
   private[this] implicit def toComputable[T](action: => T): com.intellij.openapi.util.Computable[T] = () => action
 
+  def ideaVersion: String = application.getComponent(classOf[ApplicationInfo]).getMajorVersion
 }

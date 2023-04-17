@@ -19,7 +19,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
-import top.criwits.scaleda.kernel.project.config.ProjectConfig
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -68,7 +67,6 @@ class ScaledaMain extends StartupActivity {
         .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
     }
 
-
     // Remote and RPC
     ActionManager
       .getInstance()
@@ -83,7 +81,11 @@ class ScaledaMain extends StartupActivity {
       )
     val rpcService = project.getService(classOf[RpcService])
     rpcService.setProject(project)
-    project.getService(classOf[RvcdService]).setProject(project)
+    try {
+      project.getService(classOf[RvcdService]).setProject(project)
+    } catch {
+      case e: Exception => MainLogger.error("Failed to start RVCD service", e)
+    }
 
     // invoke MessageTab instance
     val _ = ScaledaMessageTab(project)

@@ -12,7 +12,10 @@ import javax.swing.JPanel
 class ConsoleTabManager(project: Project, contentManager: ContentManager)
     extends ContentManagerListener
     with Disposable {
-  val contentFactory = ContentFactory.SERVICE.getInstance()
+
+  val contentFactory = ContentFactory.getInstance()
+  // if (ideaVersion.toIntOption.exists(_ >= 230)) ContentFactory.getInstance()
+  // else ContentFactory.SERVICE.getInstance()
   private val emptyContent = contentFactory.createContent(
     new EmptyTabContentView().getContent,
     "",

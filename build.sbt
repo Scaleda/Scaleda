@@ -4,7 +4,7 @@ import scalapb.compiler.Version.scalapbVersion
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / intellijPluginName := "Scaleda"
 ThisBuild / intellijPlatform := IntelliJPlatform.IdeaCommunity
-ThisBuild / intellijBuild := "221.5787.30"
+ThisBuild / intellijBuild := "231.8109.175"
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11"))
 Global / intellijAttachSources := true
 
@@ -89,7 +89,7 @@ lazy val scaleda = project
     libraryDependencies += "commons-codec" % "commons-codec" % "1.15",
       assembly / assemblyMergeStrategy := {
       case PathList("javax", "servlet", xs @ _*)               => MergeStrategy.first
-      case PathList("io", "grpc", xs @ _*)                     => MergeStrategy.last
+      case PathList("io", "grpc", xs @ _*)                     => MergeStrategy.singleOrError
       case PathList(ps @ _*) if ps.last endsWith ".properties" => MergeStrategy.first
       case PathList(ps @ _*) if ps.last endsWith ".xml"        => MergeStrategy.first
       case PathList(ps @ _*) if ps.last endsWith ".types"      => MergeStrategy.first
