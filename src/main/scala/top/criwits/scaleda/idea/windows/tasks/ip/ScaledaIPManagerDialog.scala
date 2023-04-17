@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 
 import java.awt.AWTEvent
+import java.io.File
 import javax.swing.JComponent
 
 /** Dialog to manage IPs in the Scaleda project
@@ -39,7 +40,7 @@ class ScaledaIPManagerDialog(project: Project) extends DialogWrapper(project) {
     val ips               = mainPanel.toIPInstances
     implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
     val newProjectConfig  = ProjectConfig.config.copy(ips = ips)
-    ProjectConfig.saveConfig(newProjectConfig)
+    ProjectConfig.saveConfig(newProjectConfig, targetFile = new File(manifest.configFile.get))
 
     // Re-generate, only update caches from ProjectConfig layer, and before this `ips` in ProjectConfig should be updated
     KernelFileUtils.doUpdateStubCacheFromProject

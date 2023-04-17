@@ -2,11 +2,13 @@ package top.criwits.scaleda
 package idea.windows.tasks
 
 import idea.ScaledaBundle
+import idea.project.IdeaManifestManager
 import idea.windows.tasks.project.ScaledaEditProjectPanelWrapper
 import idea.windows.tasks.target.ScaledaEditTargetPanelWrapper
 import idea.windows.tasks.task.ScaledaEditTaskPanelWrapper
 import kernel.project.config.{TargetConfig, TaskConfig}
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Splitter
 import com.intellij.ui.components.JBPanelWithEmptyText
 import com.intellij.ui.treeStructure.Tree
@@ -16,15 +18,16 @@ import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import javax.swing.JPanel
 import javax.swing.event.TreeSelectionEvent
-import javax.swing.tree.{DefaultTreeModel, TreePath}
+import javax.swing.tree.DefaultTreeModel
 
 /** Panel for task edit window
   * @param scaledaRunRootNode the root node
   * @param setValid a recall function for parent dialog to change 'ok' valid status
   */
-class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid: Boolean => Unit)
+class ScaledaEditTasksPanel(project: Project, val scaledaRunRootNode: ScaledaRunRootNode, setValid: Boolean => Unit)
     extends JPanel(new BorderLayout) {
-  val model = new DefaultTreeModel(scaledaRunRootNode)
+  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  val model             = new DefaultTreeModel(scaledaRunRootNode)
   // left side, tree
   private val tree = new Tree(model)
   tree.setCellRenderer(new ScaledaRunTreeCellRenderer)
@@ -58,11 +61,11 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
     val taskNode   = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
 
     if (rootNode.nonEmpty)
-      splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head, updateOK).getPanel)
+      splitter.setSecondComponent(new ScaledaEditProjectPanelWrapper(rootNode.head, updateOK()).getPanel)
     if (targetNode.nonEmpty)
-      splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head, updateOK).getPanel)
+      splitter.setSecondComponent(new ScaledaEditTargetPanelWrapper(targetNode.head, updateOK()).getPanel)
     if (taskNode.nonEmpty)
-      splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head, updateOK).getPanel)
+      splitter.setSecondComponent(new ScaledaEditTaskPanelWrapper(taskNode.head, updateOK()).getPanel)
   }
 
   private def addItem(): Unit = {
@@ -99,7 +102,6 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
       tree.setSelectionPath(node.toTreePath)
     }
 
-
   }
 
   private def removeItem() = {
@@ -125,7 +127,7 @@ class ScaledaEditTasksPanel(val scaledaRunRootNode: ScaledaRunRootNode, setValid
     }
   }
 
-  private def updateOK: Unit = {
+  private def updateOK(): Unit = {
     setValid(scaledaRunRootNode.validate)
   }
 

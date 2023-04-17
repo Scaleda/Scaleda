@@ -6,7 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiReferenceBase}
 import top.criwits.scaleda.verilog.psi.nodes.IdentifierPsiNode
 import top.criwits.scaleda.verilog.psi.nodes.expression.HierarchicalIdentifierPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
+import top.criwits.scaleda.verilog.psi.nodes.signal.{SignalDeclarationPsiNode, SignalIdentifierPsiNode}
 import top.criwits.scaleda.verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode
 
 import scala.jdk.CollectionConverters._
@@ -27,8 +27,8 @@ class HierarchicalIdentifierReference(element: HierarchicalIdentifierPsiNode)
 
     val moduleParams = module.getParameters
     val ports = module.getModuleHead.getPorts // todo use getPorts directly
-    val identifiers = module.getChildrenInModuleBody(classOf[SignalIdentifierPsiNode])
-    val ids: Set[SignalIdentifierPsiNode] = (moduleParams ++ ports ++ identifiers).toSet
+    val declarations = module.getChildrenInModuleBody(classOf[SignalDeclarationPsiNode])
+    val ids: Set[SignalIdentifierPsiNode] = (moduleParams ++ ports ++ declarations.map(_.getIdentifier).foldLeft(Seq[SignalIdentifierPsiNode]())(_ ++ _)).toSet
 
     ids.find(p => p.getName == element.getName).orNull
   }

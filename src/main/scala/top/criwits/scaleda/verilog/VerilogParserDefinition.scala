@@ -12,6 +12,7 @@ import com.intellij.psi.{FileViewProvider, PsiFile}
 import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
+import org.antlr.v4.runtime.tree.ParseTree
 import top.criwits.scaleda.verilog.psi.VerilogPsiNodeFactory
 
 final class VerilogParserDefinition extends ParserDefinition {
@@ -20,8 +21,10 @@ final class VerilogParserDefinition extends ParserDefinition {
 
   override def createParser(project: Project): PsiParser =
     new ANTLRParserAdaptor(VerilogLanguage, new VerilogParser(null)) {
-      override def parse(parser: Parser, root: IElementType) = {
-        parser.asInstanceOf[VerilogParser].source_text()
+      override def parse(parser: Parser, root: IElementType): ParseTree = {
+        if (root.isInstanceOf[IFileElementType]) {
+          parser.asInstanceOf[VerilogParser].source_text()
+        } else parser.asInstanceOf[VerilogParser].primary()
       }
     }
 

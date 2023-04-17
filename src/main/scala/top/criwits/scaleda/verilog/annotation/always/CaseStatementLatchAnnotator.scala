@@ -1,5 +1,5 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.always
 
 import idea.ScaledaBundle
 import verilog.psi.nodes.always.AlwaysConstructPsiNode

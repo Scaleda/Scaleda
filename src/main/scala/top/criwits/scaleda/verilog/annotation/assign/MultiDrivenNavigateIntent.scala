@@ -1,13 +1,13 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.assign
+
+import idea.ScaledaBundle
+import verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
-import top.criwits.scaleda.idea.ScaledaBundle
-import top.criwits.scaleda.verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
-import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
 
 class MultiDrivenNavigateIntent(val anotherAssign: AlwaysAssignmentPsiNode) extends BaseIntentionAction{
   override def getFamilyName: String = ScaledaBundle.message("annotation.multidriven.navigate")

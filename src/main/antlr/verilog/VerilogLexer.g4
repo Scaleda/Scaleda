@@ -318,7 +318,7 @@ String
 
 
 One_line_comment
-   : '//' .*? '\r'? '\n' -> channel (HIDDEN)
+   : '//' .*? ('\n'|'\r\n'|EOF) -> channel (HIDDEN)
    ;
 
 Block_comment
@@ -331,5 +331,5 @@ White_space
    ;
 
 Bad_character
-   : .
+   : . -> channel (HIDDEN)
    ;

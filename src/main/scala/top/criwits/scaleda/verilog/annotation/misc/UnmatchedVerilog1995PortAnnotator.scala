@@ -1,8 +1,8 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.misc
 
 import idea.ScaledaBundle
-import verilog.psi.nodes.module.{PortPsiNode, PortReferencePsiNode}
+import verilog.psi.nodes.module.PortReferencePsiNode
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.psi.PsiElement

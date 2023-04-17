@@ -132,9 +132,12 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
         require(toolbarComponent != null)
         toolBarPanel.add(toolbarComponent)
         panel.setToolbar(toolBarPanel)
-        contentManager.addContent(new ContentImpl(panel, "Scaleda", true))
+        val content = new ContentImpl(panel, "Scaleda", true)
+        contentManager.addContent(content)
 
-        VivadoRunManager.handleVivadoProject(project, contentManager)
+        if (!VivadoRunManager.handleVivadoProject(project, contentManager)) {
+          contentManager.setSelectedContent(content)
+        }
       })
   }
 }

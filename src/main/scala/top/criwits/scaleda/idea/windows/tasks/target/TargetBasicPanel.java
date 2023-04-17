@@ -14,7 +14,7 @@ public class TargetBasicPanel {
   public JTextField nameField;
   public JComboBox<String> toolchainField;
   public JTextField topModuleField;
-  private JButton chooseButton;
+  public JButton chooseButton;
   public TextFieldWithBrowseButton constraintsField;
 
 //    public String name;

@@ -14,17 +14,23 @@ import top.criwits.scaleda.verilog.psi.nodes.signal.SignalIdentifierPsiNode
 
 class VerilogFindUsagesProvider extends FindUsagesProvider {
   override def canFindUsagesFor(psiElement: PsiElement): Boolean = {
-    psiElement.isInstanceOf[IdentifierPsiNode]
+    psiElement.isInstanceOf[SignalIdentifierPsiNode] ||
+      psiElement.isInstanceOf[ModuleIdentifierPsiNode]
   }
 
-  override def getWordsScanner: WordsScanner = new DefaultWordsScanner(
-    new ANTLRLexerAdaptor(VerilogLanguage, new VerilogLexer(null)),
-    VerilogLanguage.identifierTokenSet, VerilogLanguage.commentTokenSet, VerilogLanguage.literalTokenSet
-  )
+  override def getWordsScanner: WordsScanner = null
 
   override def getHelpId(psiElement: PsiElement): String = null
 
-  override def getType(element: PsiElement): String = "" // FIXME
+  override def getType(element: PsiElement): String = {
+    if (element.isInstanceOf[SignalIdentifierPsiNode]) {
+      "Signal"
+    } else if (element.isInstanceOf[ModuleIdentifierPsiNode]) {
+      "Module"
+    } else {
+      "Unknown"
+    }
+  }
 
   override def getDescriptiveName(element: PsiElement): String = element.getText
 

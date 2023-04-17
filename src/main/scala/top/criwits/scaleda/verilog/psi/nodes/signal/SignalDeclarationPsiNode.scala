@@ -9,6 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 
 import java.util
+import scala.jdk.CollectionConverters._
 
 /** PSI node for signal declaration.
   *
@@ -30,7 +31,9 @@ abstract class SignalDeclarationPsiNode(node: ASTNode) extends ANTLRPsiNode(node
 
   def getRange: Option[RangePsiNode] = Option(PsiTreeUtil.getChildOfType(this, classOf[RangePsiNode]))
 
-  def getIdentifier: SignalIdentifierPsiNode =
-    PsiTreeUtil.findChildOfAnyType(this, classOf[SignalIdentifierPsiNode])
+  def getIdentifier: Seq[SignalIdentifierPsiNode] = {
+    val result = PsiTreeUtil.findChildrenOfType(this, classOf[SignalIdentifierPsiNode]).asScala
+    result.toSeq
+  }
 
 }

@@ -9,6 +9,7 @@ import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSever
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import top.criwits.scaleda.verilog.psi.nodes.module.ModuleIdentifierPsiNode
 
 /** Annotate instantiated module
   */
@@ -21,10 +22,9 @@ class ModuleInstantiationAnnotator extends Annotator {
 
     val reference = instance.getReference
     val result    = reference.resolve
-    val instantName = PsiTreeUtil.findChildOfType(instance, classOf[NameOfInstancePsiNode])
-    if (instantName == null) return
-    if (instantName.getTextRange == null) return
-    val annotateRange = new TextRange(instance.getTextRange.getStartOffset, instantName.getTextRange.getEndOffset) // FIXME
+    val moduleName = PsiTreeUtil.findChildOfType(instance, classOf[ModuleIdentifierPsiNode])
+    val instanceName = PsiTreeUtil.findChildOfType(instance, classOf[NameOfInstancePsiNode])
+    val annotateRange = new TextRange(instance.getTextRange.getStartOffset, if (instanceName == null) moduleName.getTextRange.getEndOffset else instanceName.getTextRange.getEndOffset)
 
     if (result == null) {
       holder.newAnnotation(

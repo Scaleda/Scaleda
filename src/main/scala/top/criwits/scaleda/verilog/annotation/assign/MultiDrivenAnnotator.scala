@@ -1,14 +1,14 @@
 package top.criwits.scaleda
-package verilog.annotation
+package verilog.annotation.assign
 
 import idea.ScaledaBundle
 import verilog.psi.nodes.always.AlwaysConstructPsiNode
+import verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator, HighlightSeverity}
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import top.criwits.scaleda.verilog.psi.nodes.assignments.AlwaysAssignmentPsiNode
 
 import scala.jdk.CollectionConverters._
 

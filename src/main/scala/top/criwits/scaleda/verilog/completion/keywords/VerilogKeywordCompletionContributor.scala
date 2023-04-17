@@ -68,5 +68,7 @@ class VerilogKeywordCompletionContributor extends CompletionContributor {
 
   registerStandardCompletion(new ParameterAttributeFilter, "signed", "integer", "real", "realtime", "time")
   registerStandardCompletion(new OutputRegFilter, "reg")
+  registerStandardCompletion(new PosNegedgeFilter, "posedge", "negedge")
+  registerStandardCompletion(new EndcaseFilter, "endcase")
 
 }

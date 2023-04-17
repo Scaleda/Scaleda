@@ -1,33 +1,35 @@
 package top.criwits.scaleda
 package idea.windows.tasks.task
 
-import kernel.project.config.{TargetConfig, TaskConfig}
+import idea.ScaledaBundle
+import idea.utils.{ChooseTopModuleListener, ProjectBrowserListener}
+import idea.windows.tasks.{ScaledaEditPanelWrapper, ScaledaRunTargetNode, ScaledaRunTaskNode}
+import kernel.project.ProjectManifest
+import kernel.project.config.TaskConfig
+import kernel.toolchain.Toolchain
+import kernel.utils.KernelFileUtils
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.ui.{DocumentAdapter, SimpleColoredComponent}
 import org.jdesktop.swingx.prompt.PromptSupport
-import idea.ScaledaBundle
-import idea.windows.tasks.{ScaledaEditPanelWrapper, ScaledaRunTargetNode, ScaledaRunTaskNode}
-import kernel.toolchain.Toolchain
 
-import top.criwits.scaleda.kernel.utils.KernelFileUtils
-
+import java.awt.event.ItemEvent
 import java.awt.{BorderLayout, Color, Font}
-import java.awt.event.{ActionEvent, ActionListener, ItemEvent}
 import javax.swing.JPanel
-import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent}
+import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
 
-class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: => Unit)
-    extends JPanel
+class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: => Unit)(implicit
+    manifest: ProjectManifest
+) extends JPanel
     with ScaledaEditPanelWrapper {
 
   private val toolchainType = taskConfig.getParent.asInstanceOf[ScaledaRunTargetNode].toolchain
-  private val toolchain = Toolchain.toolchains(toolchainType) // FIXME: null?
+  private val toolchain     = Toolchain.toolchains(toolchainType) // FIXME: null?
   private val toolchainSupportedTaskList = TaskConfig.taskTypeList
-    .filter(f => toolchain._3.contains(f._2._2)).toList
+    .filter(f => toolchain._3.contains(f._2._2))
+    .toList
 
   // use border layout
   setLayout(new BorderLayout())
@@ -43,20 +45,35 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
   toolchainSupportedTaskList.foreach(f => panel.typeField.addItem(f._2._1))
   panel.typeField.setSelectedIndex(0) // set the first; may be overridden later;
 
+  // set text before listeners available
+  panel.nameField.setText(taskConfig.name)
+  panel.topModuleField.setText(taskConfig.topModule.getOrElse(""))
+  panel.typeField.setSelectedIndex(toolchainSupportedTaskList.zipWithIndex.filter(_._1._1 == taskConfig.`type`).head._2)
+  panel.constraintsField.setText(taskConfig.constraints.getOrElse(""))
+
+  panel.constraintsField.addBrowseFolderListener(
+    new ProjectBrowserListener(FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor())
+  )
+
+  panel.chooseTopModuleButton.addActionListener(new ChooseTopModuleListener(panel.topModuleField))
+
   // add listeners
   panel.addDocumentListener(new DocumentAdapter {
     override def textChanged(e: DocumentEvent): Unit = {
       taskConfig.name = panel.nameField.getText
       taskConfig.topModule = if (!panel.topModuleField.getText.isBlank) Some(panel.topModuleField.getText) else None
-      taskConfig.constraints = if (!panel.constraintsField.getText.isBlank) Some(panel.constraintsField.getText) else None
+      taskConfig.constraints =
+        if (!panel.constraintsField.getText.isBlank) Some(panel.constraintsField.getText) else None
       checkValue
     }
   })
 
-  panel.typeField.addItemListener((e: ItemEvent) => if (e.getStateChange == ItemEvent.SELECTED) {
-    taskConfig.`type` = toolchainSupportedTaskList(panel.typeField.getSelectedIndex)._1
-    checkValue
-  })
+  panel.typeField.addItemListener((e: ItemEvent) =>
+    if (e.getStateChange == ItemEvent.SELECTED) {
+      taskConfig.`type` = toolchainSupportedTaskList(panel.typeField.getSelectedIndex)._1
+      checkValue
+    }
+  )
 //
 //  panel.presetField.addChangeListener((e: ChangeEvent) => {
 //    if (panel.presetField.isSelected) {
@@ -75,22 +92,18 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
 //    case _ =>
 //  }
 
-  private val parentTopModule = taskConfig.findTopModule
-  private val parentTopModuleValid = parentTopModule.isDefined
+  private val parentTopModule: Option[String] = taskConfig.parent.flatMap(_.findTopModule)
+  private val parentTopModuleValid            = parentTopModule.isDefined
 
   if (parentTopModuleValid) {
-    PromptSupport.setPrompt(ScaledaBundle.message("windows.edit.task.inherited_top_module",
-      parentTopModule.get),
-      panel.topModuleField)
+    PromptSupport.setPrompt(
+      ScaledaBundle.message("windows.edit.task.inherited_top_module", parentTopModule.get),
+      panel.topModuleField
+    )
     //noinspection DuplicatedCode
     PromptSupport.setFontStyle(Font.ITALIC, panel.topModuleField)
     PromptSupport.setBackground(new Color(0, 0, 0, 0), panel.topModuleField)
   }
-
-  panel.nameField.setText(taskConfig.name)
-  panel.topModuleField.setText(taskConfig.topModule.getOrElse(""))
-  panel.typeField.setSelectedIndex(toolchainSupportedTaskList.zipWithIndex.filter(_._1._1 == taskConfig.`type`).head._2)
-  panel.constraintsField.setText(taskConfig.constraints.getOrElse(""))
 
 //
 //  panel.chooseTopModuleButton.addActionListener(new ActionListener {
@@ -111,7 +124,6 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
 //      (parentTopModuleValid || !panel.topModuleField.getText.isBlank) &&
 //      (panel.presetField.isSelected || !panel.tclField.getText.isBlank)
 
-
   override def getPanel: JPanel = this
 
   override def checkValue: Boolean = {
@@ -119,7 +131,8 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: 
     statusLabel.clear()
     val messages = new ListBuffer[String]
 
-    if (!KernelFileUtils.isLegalName(taskConfig.name)) messages.addOne(ScaledaBundle.message("windows.edit.task.illegal.name"))
+    if (!KernelFileUtils.isLegalName(taskConfig.name))
+      messages.addOne(ScaledaBundle.message("windows.edit.task.illegal.name"))
     if (taskConfig.findTopModule.isEmpty) messages.addOne(ScaledaBundle.message("windows.edit.task.no.topmodule"))
 
     if (messages.nonEmpty) {
