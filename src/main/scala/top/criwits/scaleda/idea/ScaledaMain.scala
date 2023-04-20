@@ -104,6 +104,6 @@ class ScaledaMain extends ProjectActivity {
         .getInstance()
         .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
     }
-    Unit
+    AnyRef
   }
 }
