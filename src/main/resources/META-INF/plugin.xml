@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>top.criwits.scaleda</id>
     <name>Scaleda</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <vendor>Hans and Chiro</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
@@ -125,7 +125,7 @@
                    implementationClass="top.criwits.scaleda.verilog.annotation.assign.IllegalAssignAnnotator" />
         <annotator language="Verilog"
                    implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.EmptyNamedPortConnectionAnnotator" />
-        <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
+        <lang.documentationProvider language="Verilog" implementationClass="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
                         implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
 

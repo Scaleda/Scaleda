@@ -17,8 +17,9 @@ import kernel.utils.{EnvironmentUtils, KernelLogger}
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
+import kotlin.coroutines.Continuation
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -26,8 +27,8 @@ import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor,
   *  - Check if latest assets are installed;
   *  - Initialise remote service;
   */
-class ScaledaMain extends StartupActivity {
-  override def runActivity(project: Project): Unit = {
+class ScaledaMain extends ProjectActivity {
+  override def execute(project: Project, continuation: Continuation[_ >: kotlin.Unit]): AnyRef = {
     MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
 
     // invoke Env backup
@@ -103,5 +104,6 @@ class ScaledaMain extends StartupActivity {
         .getInstance()
         .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
     }
+    Unit
   }
 }
