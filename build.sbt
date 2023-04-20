@@ -1,5 +1,4 @@
 import org.jetbrains.sbtidea.Keys._
-import scalapb.compiler.Version.scalapbVersion
 
 ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / intellijPluginName := "Scaleda"
@@ -15,7 +14,7 @@ lazy val scaleda = project
   .in(file("."))
   .enablePlugins(SbtIdeaPlugin)
   .settings(
-    version := "0.0.1-SNAPSHOT",
+    version := "0.0.2-SNAPSHOT",
     // Compile / scalaSource := baseDirectory.value / "src",
     // Test / scalaSource := baseDirectory.value / "test",
     // Compile / resourceDirectory := baseDirectory.value / "resources",
@@ -59,7 +58,7 @@ lazy val scaleda = project
       scalapb.gen() -> (Compile / sourceManaged).value
     ),
     libraryDependencies ++= Seq(
-      "io.grpc"               % "grpc-netty-shaded"    % scalapb.compiler.Version.grpcJavaVersion,
+      "io.grpc"               % "grpc-netty-shaded"    % "1.53.0",
       "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
     ),
     // https://mvnrepository.com/artifact/com.hubspot.jinjava/jinjava
