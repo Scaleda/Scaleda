@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="top.scaleda.verilog.editor.codeStyle.VerilogCodeStylePanel">
+  <grid id="27dc6" binding="myPanel" layout-manager="GridLayoutManager" row-count="16" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="629" height="518"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="ce84c" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.indent.spaces"/>
+        </properties>
+      </component>
+      <component id="8bc4d" class="com.intellij.ui.components.fields.IntegerField" binding="myIndentationSpaces">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="7" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="82b17" class="com.intellij.ui.TitledSeparator">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.indent.and.width"/>
+        </properties>
+      </component>
+      <component id="e701a" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.indent.line.break.penalty"/>
+        </properties>
+      </component>
+      <component id="b46df" class="com.intellij.ui.components.fields.IntegerField" binding="myLineBreakPenalty">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="847cb" class="com.intellij.ui.TitledSeparator">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.options"/>
+        </properties>
+      </component>
+      <component id="3b033" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.assignment.statement"/>
+        </properties>
+      </component>
+      <component id="60c31" class="javax.swing.JComboBox" binding="myAssignAlign">
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="85fd5" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.case.item.alignment"/>
+        </properties>
+      </component>
+      <component id="449a6" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.class.member.alignment"/>
+        </properties>
+      </component>
+      <component id="61f91" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.distribution"/>
+        </properties>
+      </component>
+      <component id="5bf8f" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.enum.assignment.alignment"/>
+        </properties>
+      </component>
+      <component id="9ec0e" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.module.net.var.alignment"/>
+        </properties>
+      </component>
+      <component id="f779c" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.named.param.alignment"/>
+        </properties>
+      </component>
+      <component id="17788" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="9" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.named.param.indent"/>
+        </properties>
+      </component>
+      <component id="88fbc" class="javax.swing.JComboBox" binding="myNamedParamIndent">
+        <constraints>
+          <grid row="9" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Wrap"/>
+            <item value="Indent"/>
+          </model>
+        </properties>
+      </component>
+      <component id="adad4" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.indent.wrap.spaces"/>
+        </properties>
+      </component>
+      <component id="c3c99" class="com.intellij.ui.components.fields.IntegerField" binding="myWrapSpaces">
+        <constraints>
+          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="aab" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.indent.over.column.penalty"/>
+        </properties>
+      </component>
+      <component id="1fc3a" class="com.intellij.ui.components.fields.IntegerField" binding="myOverColumnLimitPenalty">
+        <constraints>
+          <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="e5395" class="javax.swing.JComboBox" binding="myCaseAlign">
+        <constraints>
+          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="7a7f4" class="javax.swing.JComboBox" binding="myDistributionAlign">
+        <constraints>
+          <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="f7193" class="javax.swing.JComboBox" binding="myModuleAlign">
+        <constraints>
+          <grid row="7" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="202c" class="javax.swing.JComboBox" binding="myClassAlign">
+        <constraints>
+          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="57e7f" class="javax.swing.JComboBox" binding="myEnumAlign">
+        <constraints>
+          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="fca6a" class="javax.swing.JComboBox" binding="myNamedParamAlign">
+        <constraints>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="e95e0" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.named.port.alignment"/>
+        </properties>
+      </component>
+      <component id="7c07a" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.named.port.indent"/>
+        </properties>
+      </component>
+      <component id="53938" class="javax.swing.JComboBox" binding="myNamedPortIndent">
+        <constraints>
+          <grid row="10" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Wrap"/>
+            <item value="Indent"/>
+          </model>
+        </properties>
+      </component>
+      <component id="e5ea3" class="javax.swing.JComboBox" binding="myNamedPortAlign">
+        <constraints>
+          <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="d55d2" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="11" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.port.declaration.indent"/>
+        </properties>
+      </component>
+      <component id="ded7b" class="javax.swing.JComboBox" binding="myPortDecIndent">
+        <constraints>
+          <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Wrap"/>
+            <item value="Indent"/>
+          </model>
+        </properties>
+      </component>
+      <component id="bdf63" class="javax.swing.JComboBox" binding="myPortDecAlign">
+        <constraints>
+          <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="e9dc7" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.port.declaration.alignment"/>
+        </properties>
+      </component>
+      <component id="8d801" class="javax.swing.JCheckBox" binding="myCompact">
+        <constraints>
+          <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.compact"/>
+        </properties>
+      </component>
+      <component id="de7c6" class="javax.swing.JCheckBox" binding="myExpandCoverpoints">
+        <constraints>
+          <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.coverpoints"/>
+        </properties>
+      </component>
+      <component id="756ab" class="javax.swing.JCheckBox" binding="myAlignPacked">
+        <constraints>
+          <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.packed"/>
+        </properties>
+      </component>
+      <component id="ba85" class="javax.swing.JCheckBox" binding="myAlignUnpacked">
+        <constraints>
+          <grid row="13" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.unpacked"/>
+        </properties>
+      </component>
+      <component id="b3072" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.struct"/>
+        </properties>
+      </component>
+      <component id="2bb20" class="javax.swing.JComboBox" binding="myFormatStruct">
+        <constraints>
+          <grid row="14" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+      <component id="ca88a" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.indent.column.limit"/>
+        </properties>
+      </component>
+      <component id="ac3d" class="com.intellij.ui.components.fields.IntegerField" binding="myColumnLimit">
+        <constraints>
+          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="a0bfe" class="javax.swing.JCheckBox" binding="myWrapLongLines">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.wrap.long.lines"/>
+        </properties>
+      </component>
+      <vspacer id="3207c">
+        <constraints>
+          <grid row="15" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <vspacer id="30e9c">
+        <constraints>
+          <grid row="15" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <vspacer id="7a4c">
+        <constraints>
+          <grid row="15" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <vspacer id="684cd">
+        <constraints>
+          <grid row="15" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <component id="65863" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="129" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.formal.alignment"/>
+        </properties>
+      </component>
+      <component id="cd8d8" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="8" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="bundles/ScaledaBundle" key="codestyle.format.formal.indent"/>
+        </properties>
+      </component>
+      <component id="5234d" class="javax.swing.JComboBox" binding="myFormalIndent">
+        <constraints>
+          <grid row="8" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Wrap"/>
+            <item value="Indent"/>
+          </model>
+        </properties>
+      </component>
+      <component id="7509d" class="javax.swing.JComboBox" binding="myFormalAlign">
+        <constraints>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <model>
+            <item value="Align"/>
+            <item value="Flush left"/>
+            <item value="Preserve"/>
+            <item value="Infer"/>
+          </model>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

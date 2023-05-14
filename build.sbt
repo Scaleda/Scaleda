@@ -25,7 +25,7 @@ lazy val scaleda = project
       "-unchecked",
       "-Xfatal-warnings"
     ),
-    ideBasePackages := Seq("top.criwits.scaleda"),
+    ideBasePackages := Seq("top.scaleda"),
     intellijPlugins := Seq(
       "com.intellij.properties",
       "com.intellij.java",
@@ -53,7 +53,7 @@ lazy val scaleda = project
       xml.version = version.value
     },
     assembly / assemblyJarName := "scaleda.jar",
-    assembly / mainClass := Some("top.criwits.scaleda.kernel.shell.ScaledaShellMain"),
+    assembly / mainClass := Some("top.scaleda.kernel.shell.ScaledaShellMain"),
     Compile / PB.targets := Seq(
       scalapb.gen() -> (Compile / sourceManaged).value
     ),

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-package top.criwits.scaleda.kernel.net;
+package top.scaleda
+package kernel.net;
 
 service Remote {
   rpc Run(RunRequest) returns (stream RunReply) {}
