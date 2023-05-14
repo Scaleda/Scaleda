@@ -8,7 +8,7 @@ ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11"))
 Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
-val jacksonVersion        = "2.13.4"
+val jacksonVersion        = "2.14.2"
 
 lazy val scaleda = project
   .in(file("."))
@@ -35,18 +35,18 @@ lazy val scaleda = project
     libraryDependencies ++= Seq(
       "com.novocode"                % "junit-interface"         % junitInterfaceVersion % Test,
       "org.antlr"                   % "antlr4-intellij-adaptor" % "0.1",
-      "org.antlr"                   % "antlr4"                  % "4.11.1",
-      "org.antlr"                   % "antlr4-runtime"          % "4.11.1",
+      "org.antlr"                   % "antlr4"                  % "4.12.0",
+      "org.antlr"                   % "antlr4-runtime"          % "4.12.0",
       "io.circe"                   %% "circe-yaml"              % "0.14.2",
       "com.github.scopt"           %% "scopt"                   % "4.1.0",
-      "ch.qos.logback"              % "logback-classic"         % "1.4.5",
+      "ch.qos.logback"              % "logback-classic"         % "1.4.6",
       "com.typesafe.scala-logging" %% "scala-logging"           % "3.9.5",
-      "org.scalactic"              %% "scalactic"               % "3.2.14",
-      "org.scalatest"              %% "scalatest"               % "3.2.14"              % "test",
+      "org.scalactic"              %% "scalactic"               % "3.2.15",
+      "org.scalatest"              %% "scalatest"               % "3.2.15"              % "test",
       // for logger
-      "com.lihaoyi" %% "sourcecode" % "0.2.8",
+      "com.lihaoyi" %% "sourcecode" % "0.3.0",
       // for color print
-      "com.lihaoyi" %% "fansi" % "0.3.1"
+      "com.lihaoyi" %% "fansi" % "0.4.0"
     ),
     packageLibraryMappings := Seq.empty, // allow scala-library
     patchPluginXml := pluginXmlOptions { xml =>

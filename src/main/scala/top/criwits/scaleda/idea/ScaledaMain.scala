@@ -5,7 +5,7 @@ import idea.runner.task.ScaledaReloadTasksAction
 import idea.rvcd.RvcdService
 import idea.settings.toolchains.ProfileDetectAction
 import idea.toolchain.{IVerilogIdea, VivadoIdea}
-import idea.utils.{AssetsInstallAction, Icons, MainLogger, RpcService}
+import idea.utils.{AssetsInstallAction, Icons, MainLogger, RpcService, runInEdt}
 import idea.windows.tasks.ScaledaRunWindowFactory
 import idea.windows.tool.ScaledaToolWindowFactory
 import idea.windows.tool.logging.ScaledaLoggingService
@@ -68,20 +68,22 @@ class ScaledaMain extends ProjectActivity {
         .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
     }
 
-    // Remote and RPC
-    ActionManager
-      .getInstance()
-      .tryToExecute(
-        e => {
-          val thread = RpcService.startRpcGotoHandler(project)
-        },
-        null,
-        null,
-        null,
-        true
-      )
     val rpcService = project.getService(classOf[RpcService])
     rpcService.setProject(project)
+    runInEdt {
+      // Remote and RPC
+      ActionManager
+        .getInstance()
+        .tryToExecute(
+          e => {
+            val _thread = RpcService.startRpcGotoHandler(project)
+          },
+          null,
+          null,
+          null,
+          true
+        )
+    }
     try {
       project.getService(classOf[RvcdService]).setProject(project)
     } catch {
@@ -95,8 +97,10 @@ class ScaledaMain extends ProjectActivity {
     Seq(IVerilog, Vivado).foreach(KernelLogger.info("Load Toolchain object", _))
     Seq(VivadoIdea, IVerilogIdea).foreach(KernelLogger.info("Load Toolchain Idea object", _))
 
-    // Attempt to load project
-    ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
+    runInEdt {
+      // Attempt to load project
+      ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
+    }
 
     // Toolchain detect
     if (Toolchain.profiles().isEmpty) {
