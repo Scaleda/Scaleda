@@ -10,6 +10,7 @@ import kernel.utils.{BasicLogger, FileReplaceContext}
 
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.openapi.project.Project
+import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 import java.io.OutputStream
 import scala.collection.mutable.ArrayBuffer

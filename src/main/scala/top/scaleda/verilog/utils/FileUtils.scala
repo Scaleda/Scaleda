@@ -1,18 +1,17 @@
 package top.scaleda
 package verilog.utils
 
-import idea.project.IdeaManifestManager
-import idea.runner.configuration.ScaledaRunConfiguration
-import kernel.project.ProjectManifest
-import kernel.project.config.ProjectConfig
-import kernel.utils.KernelFileUtils
-import verilog.VerilogPSIFileRoot
-
 import com.intellij.execution.RunManager
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
+import top.scaleda.idea.project.IdeaManifestManager
+import top.scaleda.idea.runner.configuration.ScaledaRunConfiguration
+import top.scaleda.kernel.project.ProjectManifest
+import top.scaleda.kernel.project.config.ProjectConfig
+import top.scaleda.kernel.utils.KernelFileUtils
+import top.scaleda.verilog.VerilogPSIFileRoot
 
 import java.io.{File, FilenameFilter}
 import scala.collection.mutable.ArrayBuffer

@@ -11,6 +11,7 @@ import com.intellij.execution.process.{CapturingProcessAdapter, OSProcessHandler
 import com.intellij.formatting.service.AsyncDocumentFormattingService.FormattingTask
 import com.intellij.formatting.service.{AsyncDocumentFormattingService, AsyncFormattingRequest, FormattingService}
 import com.intellij.psi.PsiFile
+import top.scaleda.verilog.formatter.VeribleFormatterHelper
 
 import java.io.{FileReader, LineNumberReader}
 import java.nio.charset.StandardCharsets

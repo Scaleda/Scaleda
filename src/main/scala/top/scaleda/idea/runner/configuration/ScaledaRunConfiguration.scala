@@ -4,7 +4,7 @@ package idea.runner.configuration
 import idea.ScaledaBundle
 import idea.application.config.ScaledaIdeaConfig
 import idea.project.IdeaManifestManager
-import idea.runner.{ScaledaRunProcessHandler, ScaledaRuntime}
+import idea.runner.ScaledaRunProcessHandler
 import idea.rvcd.RvcdService
 import idea.utils.notification.CreateTypicalNotification
 import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
@@ -34,6 +34,8 @@ import com.intellij.openapi.vcs.LocalFilePath
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
+import top.scaleda.idea.toolchain.ToolchainIdea
+import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 import java.io.File
 import java.util.concurrent.TimeoutException
@@ -172,7 +174,7 @@ class ScaledaRunConfiguration(
 
       // attach message parser listener
       ScaledaMessageTab.instance.foreach(_.attach(runtime))
-      Toolchain.toolchainMessageParser
+      ToolchainIdea.toolchainMessageParser
         .get(runtime.target.toolchain)
         .foreach(parserProvider => ScaledaMessageParser.registerParser(runtime.id, parserProvider.messageParser))
 

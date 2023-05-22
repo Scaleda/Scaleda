@@ -1,11 +1,11 @@
 package top.scaleda
 package idea.windows.tool.message
 
-import idea.runner.ScaledaRuntime
 import idea.windows.tool.logging.ScaledaLogReceiver
 import kernel.utils.{FileReplaceContext, LogLevel}
 
 import org.jetbrains.annotations.Nls
+import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 import java.util.regex.Pattern
 import scala.collection.mutable

@@ -3,7 +3,6 @@ package idea.windows.tool.message
 
 import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
-import idea.runner.ScaledaRuntime
 import idea.utils.MainLogger
 import idea.windows.tool.logging.{ConsoleTabManager, ScaledaLoggingService}
 import kernel.utils.LogLevel
@@ -14,6 +13,7 @@ import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, SimpleToolWindowPanel}
 import com.intellij.ui.components.{JBList, JBScrollPane}
+import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 import java.awt.BorderLayout
 import java.awt.event.ItemEvent

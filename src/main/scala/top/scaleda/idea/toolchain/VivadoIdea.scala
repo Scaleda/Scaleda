@@ -1,10 +1,10 @@
 package top.scaleda
 package idea.toolchain
 
-import idea.runner.ScaledaRuntime
 import idea.windows.tool.message._
 import kernel.toolchain.impl.Vivado.internalID
 import kernel.utils.LogLevel
+import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 import java.util.regex.Pattern
 

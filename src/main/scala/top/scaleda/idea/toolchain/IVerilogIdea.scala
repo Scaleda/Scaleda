@@ -1,12 +1,12 @@
 package top.scaleda
 package idea.toolchain
 
-import idea.runner.ScaledaRuntime
 import idea.windows.tool.message._
 import kernel.toolchain.impl.IVerilog.internalID
 import kernel.utils.LogLevel
 
 import org.jetbrains.annotations.Nls
+import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 object IVerilogIdea extends ScaledaMessageToolchainParserProvider {
   private object MessageParser extends ScaledaMessageToolchainParser {

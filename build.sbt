@@ -9,29 +9,26 @@ Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.14.2"
+val thisVersion           = "0.0.2-SNAPSHOT"
 
-lazy val scaleda = project
-  .in(file("."))
-  .enablePlugins(SbtIdeaPlugin)
+lazy val commonSettings = Seq(
+  version := thisVersion,
+  Global / javacOptions ++= Seq("-source", "11", "-target", "11"),
+  Global / scalacOptions ++= Seq(
+    "-deprecation",
+    "-feature",
+    "-unchecked",
+    "-Xfatal-warnings",
+    "-Xasync"
+  ),
+)
+
+lazy val kernel = project
+  .in(file("scaleda-kernel"))
+  .disablePlugins(SbtIdeaPlugin)
   .settings(
-    version := "0.0.2-SNAPSHOT",
-    // Compile / scalaSource := baseDirectory.value / "src",
-    // Test / scalaSource := baseDirectory.value / "test",
-    // Compile / resourceDirectory := baseDirectory.value / "resources",
-    Global / javacOptions ++= Seq("-source", "11", "-target", "11"),
-    Global / scalacOptions ++= Seq(
-      "-deprecation",
-      "-feature",
-      "-unchecked",
-      "-Xfatal-warnings"
-    ),
-    ideBasePackages := Seq("top.scaleda"),
-    intellijPlugins := Seq(
-      "com.intellij.properties",
-      "com.intellij.java",
-      "com.intellij.java-i18n"
-      // "antlr4-intellij-plugin-sample"
-    ).map(_.toPlugin),
+    commonSettings,
+    intellijPlugins := Seq(),
     libraryDependencies ++= Seq(
       "com.novocode"                % "junit-interface"         % junitInterfaceVersion % Test,
       "org.antlr"                   % "antlr4-intellij-adaptor" % "0.1",
@@ -49,10 +46,7 @@ lazy val scaleda = project
       "com.lihaoyi" %% "fansi" % "0.4.0"
     ),
     packageLibraryMappings := Seq.empty, // allow scala-library
-    patchPluginXml := pluginXmlOptions { xml =>
-      xml.version = version.value
-    },
-    assembly / assemblyJarName := "scaleda.jar",
+    assembly / assemblyJarName := "scaleda-kernel.jar",
     assembly / mainClass := Some("top.scaleda.kernel.shell.ScaledaShellMain"),
     Compile / PB.targets := Seq(
       scalapb.gen() -> (Compile / sourceManaged).value
@@ -86,17 +80,39 @@ lazy val scaleda = project
     libraryDependencies += "com.auth0" % "java-jwt" % "4.3.0",
     // https://mvnrepository.com/artifact/commons-codec/commons-codec
     libraryDependencies += "commons-codec" % "commons-codec" % "1.15",
-      assembly / assemblyMergeStrategy := {
-      case PathList("javax", "servlet", xs @ _*)               => MergeStrategy.first
-      case PathList("io", "grpc", xs @ _*)                     => MergeStrategy.singleOrError
-      case PathList(ps @ _*) if ps.last endsWith ".properties" => MergeStrategy.first
-      case PathList(ps @ _*) if ps.last endsWith ".xml"        => MergeStrategy.first
-      case PathList(ps @ _*) if ps.last endsWith ".types"      => MergeStrategy.first
-      case PathList(ps @ _*) if ps.last endsWith ".class"      => MergeStrategy.first
-      case "application.conf"                                  => MergeStrategy.concat
-      case "unwanted.txt"                                      => MergeStrategy.discard
+  )
+
+lazy val plugin = project
+  .in(file("."))
+  .dependsOn(kernel)
+  .settings(
+    commonSettings,
+    ideBasePackages := Seq("top.scaleda"),
+    intellijPlugins := Seq(
+      "com.intellij.properties",
+      "com.intellij.java",
+      "com.intellij.java-i18n"
+      // "antlr4-intellij-plugin-sample"
+    ).map(_.toPlugin),
+    patchPluginXml := pluginXmlOptions { xml =>
+      xml.version = version.value
+    },
+    assembly / assemblyJarName := "scaleda.jar",
+    assembly / assemblyMergeStrategy := {
+      case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
+      case PathList("io", "grpc", xs@_*) => MergeStrategy.singleOrError
+      case PathList(ps@_*) if ps.last endsWith ".properties" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".xml" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".types" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".class" => MergeStrategy.first
+      case "application.conf" => MergeStrategy.concat
+      case "unwanted.txt" => MergeStrategy.discard
       case x =>
         val oldStrategy = (assembly / assemblyMergeStrategy).value
         oldStrategy(x)
     }
   )
+  .enablePlugins(SbtIdeaPlugin)
+
+lazy val root = (project in file("."))
+  .aggregate(kernel, plugin)

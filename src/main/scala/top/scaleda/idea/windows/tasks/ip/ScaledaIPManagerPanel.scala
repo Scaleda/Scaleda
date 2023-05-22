@@ -5,7 +5,7 @@ import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
 import idea.utils.inWriteAction
 import idea.windows.tasks.ip.ScaledaIPManagerPanel.createConfigEditor
-import kernel.project.config.ProjectConfig
+import kernel.project.config.{IPInstance, ProjectConfig}
 
 import com.intellij.lang.Language
 import com.intellij.openapi.editor.colors.impl.DefaultColorsScheme
