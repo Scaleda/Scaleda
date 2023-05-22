@@ -5,8 +5,8 @@ val publicScalaVersion = "2.13.10"
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
 ThisBuild / intellijPlatform := IntelliJPlatform.IdeaCommunity
-ThisBuild / intellijBuild := "231.8109.175"
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11"))
+ThisBuild / intellijBuild := "231.9011.34"
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
@@ -15,7 +15,7 @@ val thisVersion           = "0.0.2-SNAPSHOT"
 
 lazy val commonSettings = Seq(
   version := thisVersion,
-  Global / javacOptions ++= Seq("-source", "11", "-target", "11"),
+  Global / javacOptions ++= Seq("-source", "17", "-target", "17"),
   Global / scalacOptions ++= Seq(
     "-deprecation",
     "-feature",
@@ -91,7 +91,7 @@ lazy val kernel = project
     )
   )
 
-lazy val plugin = project
+lazy val scaleda = project
   .in(file("."))
   .dependsOn(kernel)
   .settings(
@@ -106,9 +106,22 @@ lazy val plugin = project
     patchPluginXml := pluginXmlOptions { xml =>
       xml.version = version.value
     },
-    assembly / assemblyJarName := "scaleda.jar"
+    assembly / assemblyJarName := "scaleda.jar",
+    libraryDependencies ++= publicLibraryDependencies,
+    // assembly / assemblyShadeRules := Seq(
+    //   ShadeRule.rename("io.grpc.netty.shaded.**" -> "scaleda.netty.shaded.@1").inAll
+    // ),
+    assembly / assemblyMergeStrategy := {
+      case PathList("io", "grpc", "netty", "shaded", xs @ _*) => MergeStrategy.discard
+      case PathList("ch", "qos", "logback", xs @ _*) => MergeStrategy.discard
+      case PathList("org", "slf4j", xs @ _*) => MergeStrategy.discard
+      // case PathList("META-INF/versions", xs @ _*) => MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assembly / assemblyMergeStrategy).value
+        oldStrategy(x)
+    }
   )
   .enablePlugins(SbtIdeaPlugin)
 
 lazy val root = (project in file("."))
-  .aggregate(kernel, plugin)
+  .aggregate(kernel, scaleda)
