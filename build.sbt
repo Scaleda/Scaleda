@@ -80,6 +80,19 @@ lazy val kernel = project
     libraryDependencies += "com.auth0" % "java-jwt" % "4.3.0",
     // https://mvnrepository.com/artifact/commons-codec/commons-codec
     libraryDependencies += "commons-codec" % "commons-codec" % "1.15",
+    assembly / assemblyMergeStrategy := {
+      case PathList("javax", "servlet", xs@_*) => MergeStrategy.first
+      case PathList("io", "grpc", xs@_*) => MergeStrategy.singleOrError
+      case PathList(ps@_*) if ps.last endsWith ".properties" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".xml" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".types" => MergeStrategy.first
+      case PathList(ps@_*) if ps.last endsWith ".class" => MergeStrategy.first
+      case "application.conf" => MergeStrategy.concat
+      case "unwanted.txt" => MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assembly / assemblyMergeStrategy).value
+        oldStrategy(x)
+    }
   )
 
 lazy val plugin = project
