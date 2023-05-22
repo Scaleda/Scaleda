@@ -71,7 +71,8 @@ lazy val publicLibraryDependencies = Seq(
   // https://mvnrepository.com/artifact/commons-codec/commons-codec
   "commons-codec" % "commons-codec" % "1.15",
   // for GRPC, same version in IDEA
-  "io.grpc" % "grpc-netty-shaded" % "1.53.0",
+  // "io.grpc" % "grpc-netty-shaded" % "1.53.0",
+  "io.grpc" % "grpc-netty-shaded" % "1.55.1",
   // scalapb
   "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
 )

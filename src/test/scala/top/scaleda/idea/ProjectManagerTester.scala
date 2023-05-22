@@ -1,5 +1,5 @@
 package top.scaleda
-package kernel
+package idea
 
 import idea.project.IdeaManifestManager
 

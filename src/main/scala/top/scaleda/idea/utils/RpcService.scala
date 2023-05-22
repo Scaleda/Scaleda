@@ -81,7 +81,8 @@ class RpcService extends Disposable {
             case _e: Throwable =>
               MainLogger.warn("trying", _e)
               _e.printStackTrace()
-              Thread.sleep(3000)
+              // Thread.sleep(3000)
+              stop = true
           }
         } else {
           MainLogger.debug("gRPC Service has started, waiting...")

@@ -1,12 +1,12 @@
 package top.scaleda
-package kernel
+package idea
 
-import idea.windows.tool.message.ScaledaMessageRenderer
+import idea.windows.tasks.ScaledaRunWindowFactory
+import idea.windows.tool.message.ScaledaMessageRenderer.fileRegex
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 import sourcecode.Name
-import top.scaleda.idea.windows.tasks.ScaledaRunWindowFactory
 
 import java.util.regex.Pattern
 
@@ -28,7 +28,6 @@ class SimpleTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "test file matches" in {
-    import ScaledaMessageRenderer._
     val text =
       "INFO: [Common 17-1381] The checkpoint '/home/chiro/programs/scaleda-sample-project/.synth/Vivado-Vivado Synth/waterfall/waterfall.runs/synth_1/waterfall.dcp' has been generated. && Run output will be captured here: /home/chiro/programs/scaleda-sample-project/.synth/Vivado-Vivado Synth/waterfall/waterfall.runs/synth_1/runme.log" +
         " C:\\Scaleda\\a.txt - caleda.vv"
