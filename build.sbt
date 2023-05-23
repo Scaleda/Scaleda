@@ -21,7 +21,7 @@ Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.14.2"
-val thisVersion           = "0.0.7"
+val thisVersion           = "0.0.8"
 
 lazy val commonSettings = Seq(
   version := thisVersion,
