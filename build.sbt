@@ -12,7 +12,7 @@ Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.14.2"
-val thisVersion           = "0.0.3-SNAPSHOT"
+val thisVersion           = "0.0.4-SNAPSHOT"
 
 lazy val commonSettings = Seq(
   version := thisVersion,
@@ -78,9 +78,6 @@ lazy val publicLibraryDependencies = Seq(
   "com.auth0" % "java-jwt" % "4.3.0",
   // https://mvnrepository.com/artifact/commons-codec/commons-codec
   "commons-codec" % "commons-codec" % "1.15",
-  // for GRPC, same version in IDEA
-  // "io.grpc" % "grpc-netty-shaded" % "1.53.0",
-  // "io.grpc" % "grpc-netty-shaded" % "1.55.1",
   // scalapb
   "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
 )
@@ -92,10 +89,9 @@ lazy val kernel = project
     commonSettings,
     intellijPlugins := Seq(),
     libraryDependencies ++= publicLibraryDependencies,
+    // CAN BE DIFFERENT FROM IDEA VERSION
     libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.55.1",
-    // libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.55.1" % Provided,
     // libraryDependencies += "io.grpc" % "grpc-netty" % "1.55.1",
-    libraryDependencies += "io.grpc" % "grpc-netty" % "1.55.1",
     packageLibraryMappings := Seq.empty, // allow scala-library
     assembly / assemblyJarName := "scaleda-kernel.jar",
     Compile / PB.targets := Seq(
@@ -126,28 +122,8 @@ lazy val scaleda = project
       failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
       // ...
     ),
-    packageLibraryMappings += "com.google.protobuf" % "protobuf-java" % ".*" -> None,
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
-    // assembly / assemblyShadeRules := Seq(
-    //   ShadeRule.rename("io.grpc.netty.shaded.**" -> "scaleda.@1").inAll
-    // ),
-    assembly / assemblyMergeStrategy := {
-      // case PathList("io", "grpc", "netty", "shaded", xs @ _*) => MergeStrategy.discard
-      // case PathList("io", "grpc", "netty", xs @ _*) => MergeStrategy.discard
-      // case PathList("io", "grpc", xs @ _*) => MergeStrategy.preferProject
-      // case PathList("io", "grpc", "netty", xs @ _*) => MergeStrategy.discard
-      // case PathList("io", "netty", xs @ _*) => MergeStrategy.discard
-      // case PathList("org", "antlr", xs @ _*) => MergeStrategy.preferProject
-      // case PathList("com", "thoughtworks", xs @ _*) => MergeStrategy.discard
-      // case PathList("ch", "qos", "logback", xs @ _*) => MergeStrategy.discard
-      // case PathList("org", "slf4j", xs @ _*) => MergeStrategy.discard
-      // case PathList("META-INF/versions", xs @ _*) => MergeStrategy.discard
-      case _ => MergeStrategy.preferProject
-      // case x =>
-      //   val oldStrategy = (assembly / assemblyMergeStrategy).value
-      //   oldStrategy(x)
-    }
   )
   .enablePlugins(SbtIdeaPlugin)
 
