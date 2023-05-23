@@ -2,7 +2,7 @@ package top.scaleda
 package idea.utils
 
 import kernel.net.RpcPatch
-import kernel.utils.Paths
+import kernel.utils.{KernelLogger, Paths}
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
@@ -20,7 +20,7 @@ import scala.language.existentials
 
 class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.ScaledaRpc {
   override def ping(request: ScaledaEmpty): Future[ScaledaEmpty] = async {
-    MainLogger.info("grpc ping")
+    KernelLogger.info("grpc ping")
     ScaledaEmpty.of()
   }
 

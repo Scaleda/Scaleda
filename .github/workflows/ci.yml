@@ -8,10 +8,7 @@
 name: Continuous Integration
 
 on:
-  pull_request:
-    branches: ['**']
   push:
-    branches: ['**']
     tags: [v*.*.*]
 
 env:
@@ -24,7 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         scala: [2.13.10]
-        java: [temurin@11, temurin@17]
+        java: [temurin@17]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
