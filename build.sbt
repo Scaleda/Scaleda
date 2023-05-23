@@ -26,9 +26,15 @@ lazy val commonSettings = Seq(
   assembly / assemblyMergeStrategy := {
     case PathList(ps @ _*) if ps.last endsWith ".class" => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith ".properties" => MergeStrategy.first
+    // case _ => MergeStrategy.preferProject
     case x =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
+  },
+  // assembly / fullClasspath := (Compile / fullClasspath).value,
+  assembly / mainClass := Some("top.scaleda.kernel.shell.ScaledaShellMain"),
+  commands += Command.command("assemblyTrulyFatJar") { state =>
+    """set assembly / fullClasspath := (Compile / fullClasspath).value""" :: "assembly" :: state
   }
 )
 
@@ -85,14 +91,15 @@ lazy val kernel = project
     commonSettings,
     intellijPlugins := Seq(),
     libraryDependencies ++= publicLibraryDependencies,
-    // libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.55.1",
+    libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.55.1",
+    // libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.55.1" % Provided,
+    // libraryDependencies += "io.grpc" % "grpc-netty" % "1.55.1",
     libraryDependencies += "io.grpc" % "grpc-netty" % "1.55.1",
     packageLibraryMappings := Seq.empty, // allow scala-library
     assembly / assemblyJarName := "scaleda-kernel.jar",
-    assembly / mainClass := Some("top.scaleda.kernel.shell.ScaledaShellMain"),
     Compile / PB.targets := Seq(
       scalapb.gen() -> (Compile / sourceManaged).value
-    )
+    ),
   )
 
 lazy val scaleda = project
@@ -113,16 +120,23 @@ lazy val scaleda = project
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
     // assembly / assemblyShadeRules := Seq(
-    //   ShadeRule.rename("io.grpc.netty.shaded.**" -> "scaleda.netty.shaded.@1").inAll
+    //   ShadeRule.rename("io.grpc.netty.shaded.**" -> "scaleda.@1").inAll
     // ),
     assembly / assemblyMergeStrategy := {
       // case PathList("io", "grpc", "netty", "shaded", xs @ _*) => MergeStrategy.discard
-      case PathList("ch", "qos", "logback", xs @ _*) => MergeStrategy.discard
-      case PathList("org", "slf4j", xs @ _*) => MergeStrategy.discard
+      // case PathList("io", "grpc", "netty", xs @ _*) => MergeStrategy.discard
+      // case PathList("io", "grpc", xs @ _*) => MergeStrategy.preferProject
+      // case PathList("io", "grpc", "netty", xs @ _*) => MergeStrategy.discard
+      // case PathList("io", "netty", xs @ _*) => MergeStrategy.discard
+      // case PathList("org", "antlr", xs @ _*) => MergeStrategy.preferProject
+      // case PathList("com", "thoughtworks", xs @ _*) => MergeStrategy.discard
+      // case PathList("ch", "qos", "logback", xs @ _*) => MergeStrategy.discard
+      // case PathList("org", "slf4j", xs @ _*) => MergeStrategy.discard
       // case PathList("META-INF/versions", xs @ _*) => MergeStrategy.discard
-      case x =>
-        val oldStrategy = (assembly / assemblyMergeStrategy).value
-        oldStrategy(x)
+      case _ => MergeStrategy.preferProject
+      // case x =>
+      //   val oldStrategy = (assembly / assemblyMergeStrategy).value
+      //   oldStrategy(x)
     }
   )
   .enablePlugins(SbtIdeaPlugin)

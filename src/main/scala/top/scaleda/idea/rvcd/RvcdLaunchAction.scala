@@ -2,7 +2,6 @@ package top.scaleda
 package idea.rvcd
 
 import idea.utils.OutputLogger
-import kernel.rvcd.Rvcd
 import kernel.shell.command.{CommandDeps, CommandRunner}
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}

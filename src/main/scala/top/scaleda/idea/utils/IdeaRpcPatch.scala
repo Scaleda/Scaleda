@@ -1,5 +1,5 @@
 package top.scaleda
-package kernel.net
+package idea.utils
 
 import kernel.net.user.{AuthorizationProvideCredentials, JwtAuthorizationInterceptor}
 import kernel.utils.KernelLogger
@@ -14,7 +14,7 @@ import io.grpc.stub.AbstractStub
 import java.net.InetSocketAddress
 import scala.language.existentials
 
-object RpcPatch {
+object IdeaRpcPatch {
   private def getDefaultServerProvider =
     getCandidatesViaServiceLoader(classOf[ServerProvider], classOf[ServerProvider].getClassLoader).iterator.next
   private def getDefaultClientProvider = getCandidatesViaServiceLoader(

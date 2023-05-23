@@ -15,17 +15,22 @@ class ScaledaLoggingService extends Disposable {
   private val messagesDidNotRecv = ArrayBuffer[ScaledaLoggingMessage]()
 
   def addListener(sourceId: String, receiver: ScaledaLogReceiver) = {
-    listeners.put(sourceId, receiver)
-    getBufferedMessages(sourceId).foreach(m => receiver.print(m.id, m.msg, m.level))
+    synchronized {
+      listeners.put(sourceId, receiver)
+      getBufferedMessages(sourceId).foreach(m => receiver.print(m.id, m.msg, m.level))
+    }
   }
 
-  def print(id: String, msg: String, l: LogLevel.Value) =
-    listeners.get(id) match {
-      case Some(listener) => listener.print(id, msg, l)
-      case _              => messagesDidNotRecv.addOne(ScaledaLoggingMessage(id, msg, l))
+  def print(id: String, msg: String, l: LogLevel.Value) = {
+    synchronized {
+      listeners.get(id) match {
+        case Some(listener) => listener.print(id, msg, l)
+        case _              => messagesDidNotRecv.addOne(ScaledaLoggingMessage(id, msg, l))
+      }
     }
+  }
 
-  def removeListener(logSourceId: String): Unit = listeners.remove(logSourceId)
+  def removeListener(logSourceId: String): Unit = synchronized { listeners.remove(logSourceId) }
 
   private def getBufferedMessages(logSourceId: String) = {
     val r = messagesDidNotRecv.filter(_.id == logSourceId).toSeq

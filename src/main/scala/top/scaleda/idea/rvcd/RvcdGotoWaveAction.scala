@@ -10,7 +10,6 @@ import verilog.psi.nodes.signal.SignalIdentifierPsiNode
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent, CommonDataKeys}
 import com.intellij.psi.util.PsiTreeUtil
 import rvcd.rvcd.RvcdSignalPath
-import top.scaleda.kernel.rvcd.Rvcd
 
 import scala.collection.mutable.ArrayBuffer
 

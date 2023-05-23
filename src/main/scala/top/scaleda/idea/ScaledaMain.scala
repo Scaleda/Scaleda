@@ -84,16 +84,16 @@ class ScaledaMain extends ProjectActivity {
           true
         )
     }
-    try {
+    // try {
       project.getService(classOf[RvcdService]).setProject(project)
-    } catch {
-      case e: Exception =>
-        MainLogger.error("Failed to start RVCD service", "grpc version is",
-          // io.grpc.internal.GrpcUtil.getGrpcBuildVersion.toString,
-          io.grpc.netty.shaded.io.netty.util.Version.identify().toString,
-          e)
-        e.printStackTrace()
-    }
+    // } catch {
+    //   case e: Exception =>
+    //     MainLogger.error("Failed to start RVCD service", "grpc version is",
+    //       io.grpc.internal.GrpcUtil.getGrpcBuildVersion.toString,
+    //       // io.grpc.netty.shaded.io.netty.util.Version.identify().toString,
+    //       e)
+    //     e.printStackTrace()
+    // }
 
     // invoke MessageTab instance
     val _ = ScaledaMessageTab(project)

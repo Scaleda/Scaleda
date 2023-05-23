@@ -3,7 +3,6 @@ package idea.rvcd
 
 import idea.utils.MainLogger
 import idea.utils.OutputLogger.StdErrToInfoHandler
-import kernel.rvcd.Rvcd
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.utils.{OS, Paths}
 
