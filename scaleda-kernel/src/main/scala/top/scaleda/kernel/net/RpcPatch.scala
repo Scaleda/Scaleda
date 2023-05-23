@@ -6,7 +6,8 @@ import kernel.utils.KernelLogger
 
 import io.grpc.InternalServiceProviders.getCandidatesViaServiceLoader
 import io.grpc._
-import io.grpc.netty.shaded.io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
+// import io.grpc.netty.shaded.io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
+import io.grpc.netty.{NettyChannelBuilder, NettyServerBuilder}
 import io.grpc.stub.AbstractStub
 
 import java.net.InetSocketAddress

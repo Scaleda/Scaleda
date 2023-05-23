@@ -25,6 +25,7 @@ lazy val commonSettings = Seq(
   ),
   assembly / assemblyMergeStrategy := {
     case PathList(ps @ _*) if ps.last endsWith ".class" => MergeStrategy.first
+    case PathList(ps @ _*) if ps.last endsWith ".properties" => MergeStrategy.first
     case x =>
       val oldStrategy = (assembly / assemblyMergeStrategy).value
       oldStrategy(x)
@@ -72,7 +73,7 @@ lazy val publicLibraryDependencies = Seq(
   "commons-codec" % "commons-codec" % "1.15",
   // for GRPC, same version in IDEA
   // "io.grpc" % "grpc-netty-shaded" % "1.53.0",
-  "io.grpc" % "grpc-netty-shaded" % "1.55.1",
+  // "io.grpc" % "grpc-netty-shaded" % "1.55.1",
   // scalapb
   "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
 )
@@ -84,6 +85,8 @@ lazy val kernel = project
     commonSettings,
     intellijPlugins := Seq(),
     libraryDependencies ++= publicLibraryDependencies,
+    // libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.55.1",
+    libraryDependencies += "io.grpc" % "grpc-netty" % "1.55.1",
     packageLibraryMappings := Seq.empty, // allow scala-library
     assembly / assemblyJarName := "scaleda-kernel.jar",
     assembly / mainClass := Some("top.scaleda.kernel.shell.ScaledaShellMain"),
@@ -113,7 +116,7 @@ lazy val scaleda = project
     //   ShadeRule.rename("io.grpc.netty.shaded.**" -> "scaleda.netty.shaded.@1").inAll
     // ),
     assembly / assemblyMergeStrategy := {
-      case PathList("io", "grpc", "netty", "shaded", xs @ _*) => MergeStrategy.discard
+      // case PathList("io", "grpc", "netty", "shaded", xs @ _*) => MergeStrategy.discard
       case PathList("ch", "qos", "logback", xs @ _*) => MergeStrategy.discard
       case PathList("org", "slf4j", xs @ _*) => MergeStrategy.discard
       // case PathList("META-INF/versions", xs @ _*) => MergeStrategy.discard
