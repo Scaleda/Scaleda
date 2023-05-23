@@ -63,7 +63,6 @@ jobs:
   publish:
     name: Publish Artifacts
     needs: [build]
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/master')
     strategy:
       matrix:
         os: [ubuntu-latest]
