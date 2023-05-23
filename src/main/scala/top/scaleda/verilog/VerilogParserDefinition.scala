@@ -2,6 +2,7 @@ package top.scaleda
 package verilog
 
 import verilog.parser._
+import verilog.psi.VerilogPsiNodeFactory
 
 import com.intellij.lang.ParserDefinition.SpaceRequirements
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
@@ -13,7 +14,6 @@ import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactor
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
 import org.antlr.v4.runtime.tree.ParseTree
-import top.scaleda.verilog.psi.VerilogPsiNodeFactory
 
 final class VerilogParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =
@@ -40,7 +40,8 @@ final class VerilogParserDefinition extends ParserDefinition {
 
   override def createFile(viewProvider: FileViewProvider): PsiFile = new VerilogPSIFileRoot(viewProvider)
 
-  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) = SpaceRequirements.MAY
+  // Tt's deprecated
+  // override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) = SpaceRequirements.MAY
 }
 
 //noinspection DuplicatedCode
@@ -49,17 +50,18 @@ object VerilogParserDefinition {
   val tokenNames = (0 to vocabulary.getMaxTokenType) // LONG RINGS THE ALARM BELL
     .map(x => (x, vocabulary.getLiteralName(x)))
     .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
-    .map(x => if (x._2 == null) "<INVALID>" else x._2).toArray
+    .map(x => if (x._2 == null) "<INVALID>" else x._2)
+    .toArray
   PSIElementTypeFactory.defineLanguageIElementTypes(VerilogLanguage, tokenNames, VerilogParser.ruleNames)
   val FILE = new IFileElementType(VerilogLanguage)
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,
     VerilogLexer.Block_comment,
-    VerilogLexer.One_line_comment,
+    VerilogLexer.One_line_comment
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,
-    VerilogLexer.White_space,
+    VerilogLexer.White_space
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
     VerilogLanguage,

@@ -1,4 +1,5 @@
 import org.jetbrains.sbtidea.Keys._
+import org.jetbrains.sbtidea.verifier._
 
 val publicScalaVersion = "2.13.10"
 
@@ -11,7 +12,7 @@ Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.14.2"
-val thisVersion           = "0.0.2-SNAPSHOT"
+val thisVersion           = "0.0.3-SNAPSHOT"
 
 lazy val commonSettings = Seq(
   version := thisVersion,
@@ -24,7 +25,7 @@ lazy val commonSettings = Seq(
     "-Xasync"
   ),
   assembly / assemblyMergeStrategy := {
-    case PathList(ps @ _*) if ps.last endsWith ".class" => MergeStrategy.first
+    case PathList(ps @ _*) if ps.last endsWith ".class"      => MergeStrategy.first
     case PathList(ps @ _*) if ps.last endsWith ".properties" => MergeStrategy.first
     // case _ => MergeStrategy.preferProject
     case x =>
@@ -99,7 +100,7 @@ lazy val kernel = project
     assembly / assemblyJarName := "scaleda-kernel.jar",
     Compile / PB.targets := Seq(
       scalapb.gen() -> (Compile / sourceManaged).value
-    ),
+    )
   )
 
 lazy val scaleda = project
@@ -116,7 +117,16 @@ lazy val scaleda = project
     ).map(_.toPlugin),
     patchPluginXml := pluginXmlOptions { xml =>
       xml.version = version.value
+      xml.sinceBuild = (ThisBuild / intellijBuild).value
     },
+    pluginVerifierOptions := pluginVerifierOptions.value.copy(
+      version = "1.299",                                      // use a specific verifier version
+      offline = true,                                         // forbid the verifier from reaching the internet
+      overrideIDEs = Seq("IC-2023.1.2", "IU-2023.1.2"),       // verify against specific products instead of 'intellijBuild'
+      failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
+      // ...
+    ),
+    packageLibraryMappings += "com.google.protobuf" % "protobuf-java" % ".*" -> None,
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
     // assembly / assemblyShadeRules := Seq(
