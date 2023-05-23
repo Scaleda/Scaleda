@@ -7,7 +7,16 @@ ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
 ThisBuild / intellijPlatform := IntelliJPlatform.IdeaCommunity
 ThisBuild / intellijBuild := "231.9011.34"
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
+
+ThisBuild / githubWorkflowTargetTags += "v*.*.*"
+ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
+ThisBuild / githubWorkflowPublish := Seq(
+  WorkflowStep.Sbt(
+    commands = List("publishPlugin"),
+    name = Some("Publish this plugin"),
+  )
+)
+
 Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
