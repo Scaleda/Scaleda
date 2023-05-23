@@ -24,7 +24,7 @@ class FileInfoData {
   var attrs: Seq[AttrData] = Seq()
 }
 
-@JsonIgnoreProperties(Array("Attr"))
+@JsonIgnoreProperties(ignoreUnknown = true)
 class FileData {
   @JacksonXmlProperty(isAttribute = true)
   var Path: String = ""
@@ -34,7 +34,7 @@ class FileData {
   // var fileInfo: Seq[AttrData] = Seq()
 }
 
-@JsonIgnoreProperties(Array("Filter"))
+@JsonIgnoreProperties(ignoreUnknown = true)
 class FileSet {
   @JacksonXmlProperty(isAttribute = true)
   var Name = "sources_1"
@@ -52,17 +52,8 @@ class FileSet {
   @JacksonXmlElementWrapper(localName = "File")
   var files: Seq[FileData] = Seq()
 }
-@JsonIgnoreProperties(
-  Array(
-    "Strategy",
-    "GeneratedRun",
-    "ReportStrategy",
-    "Report",
-    "RQSFiles",
-    "SynthRun",
-    "GenFullBitstream"
-  )
-)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 class VivadoRun {
   @JacksonXmlProperty(isAttribute = true)
   var Id = ""
@@ -88,15 +79,8 @@ class VivadoRun {
   var Dir = "true"
 }
 
-@JsonIgnoreProperties(
-  Array(
-    "DefaultLaunch",
-    "Simulators",
-    "Board",
-    "DashboardSummary" // TODO
-  )
-)
 @JsonInclude(Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JacksonXmlRootElement(localName = "Project")
 class VivadoProjectConfig {
   // Support Version == 7, Minor do not consider now
