@@ -6,7 +6,7 @@ launch_simulation
 # add_wave -r /*
 
 open_vcd "{{ vcdFile }}"
-log_vcd [ get_object -r * ]
+log_vcd [ get_object -r /* ]
 
 # WARN: relaunch_sim and close_vcd will make vivado crash
 # relaunch_sim
