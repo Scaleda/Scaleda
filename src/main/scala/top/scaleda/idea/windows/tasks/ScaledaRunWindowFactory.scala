@@ -44,7 +44,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
     implicit val projectUsing = project
     if (created) return
     else created = true
-    MainLogger.info("ScaledaRunWindowFactory#createToolWindowContent")
+    // MainLogger.info("ScaledaRunWindowFactory#createToolWindowContent")
     toolWindow.setTitle(ScaledaBundle.message("tasks.tool.window.title"))
     val contentManager: ContentManager = toolWindow.getContentManager
 

@@ -4,7 +4,6 @@ package tcl
 import tcl.parser.{TclLexer, TclParser}
 import tcl.psi.factory.TclPsiNodeFactory
 
-import com.intellij.lang.ParserDefinition.SpaceRequirements
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
@@ -38,9 +37,6 @@ final class TclParserDefinition extends ParserDefinition {
 
   override def createFile(viewProvider: FileViewProvider): PsiFile =
     new TclPSIFileRoot(viewProvider)
-
-  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
-    SpaceRequirements.MAY
 }
 
 //noinspection DuplicatedCode

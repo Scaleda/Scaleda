@@ -56,7 +56,12 @@ class ScaledaModuleBuilder(val srcRoot: String, val testRoot: String) extends Mo
       val psiManager = PsiManager.getInstance(project)
       val psiFile    = psiManager.findFile(vFile)
       if (psiFile != null) {
-        EditorHelper.openInEditor(psiFile)
+        // when project created but not opened, `EditorHelper.openInEditor' fails
+        try {
+          EditorHelper.openInEditor(psiFile)
+        } catch {
+          case _: kotlin.UninitializedPropertyAccessException =>
+        }
       }
     }
   }

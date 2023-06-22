@@ -20,7 +20,7 @@ class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode, setV
 ) extends ScaledaEditPanelWrapper {
   val inner = new ScaledaEditProjectPanel
 
-  // initalise values
+  // initialise values
   inner.projectNameField.setText(projectConfig.name)
   inner.sourceField.setText(projectConfig.source)
   inner.testField.setText(projectConfig.test)

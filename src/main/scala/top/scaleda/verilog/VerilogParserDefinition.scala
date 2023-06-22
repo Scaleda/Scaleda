@@ -4,7 +4,6 @@ package verilog
 import verilog.parser._
 import verilog.psi.VerilogPsiNodeFactory
 
-import com.intellij.lang.ParserDefinition.SpaceRequirements
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
@@ -39,8 +38,6 @@ final class VerilogParserDefinition extends ParserDefinition {
   override def createElement(node: ASTNode) = VerilogPsiNodeFactory.create(node)
 
   override def createFile(viewProvider: FileViewProvider): PsiFile = new VerilogPSIFileRoot(viewProvider)
-
-  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) = SpaceRequirements.MAY
 }
 
 //noinspection DuplicatedCode

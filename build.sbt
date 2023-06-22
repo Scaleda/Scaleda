@@ -2,11 +2,13 @@ import org.jetbrains.sbtidea.Keys._
 import org.jetbrains.sbtidea.verifier._
 
 val publicScalaVersion = "2.13.10"
+// val ideaVersion = "2023.1.3"
+val ideaVersion = "231.9161.38"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
 ThisBuild / intellijPlatform := IntelliJPlatform.IdeaCommunity
-ThisBuild / intellijBuild := "231.9011.34"
+ThisBuild / intellijBuild := ideaVersion
 
 // ThisBuild / githubWorkflowTargetTags += "v*.*.*"
 // ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
@@ -21,7 +23,7 @@ Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.14.2"
-val thisVersion           = "0.0.9"
+val thisVersion           = "0.1.0"
 
 lazy val commonSettings = Seq(
   version := thisVersion,
@@ -125,11 +127,10 @@ lazy val scaleda = project
       xml.sinceBuild = (ThisBuild / intellijBuild).value
     },
     pluginVerifierOptions := pluginVerifierOptions.value.copy(
-      version = "1.299",                                      // use a specific verifier version
-      offline = true,                                         // forbid the verifier from reaching the internet
-      overrideIDEs = Seq("IC-2023.1.2", "IU-2023.1.2"),       // verify against specific products instead of 'intellijBuild'
-      failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
-      // ...
+      version = "1.299",                                          // use a specific verifier version
+      offline = true,                                             // forbid the verifier from reaching the internet
+      // overrideIDEs = Seq("IC", "IU").map(_ + "-" + ideaVersion),  // verify against specific products instead of 'intellijBuild'
+      failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES)     // only fail if deprecated APIs are used
     ),
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,

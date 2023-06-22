@@ -15,6 +15,7 @@ public abstract class DynamicScaledaBundle extends AbstractBundle {
         super(pathToBundle);
     }
 
+    @NotNull
     @Override
     protected ResourceBundle findBundle(@NotNull @NonNls String pathToBundle, @NotNull ClassLoader loader, @NotNull ResourceBundle.Control control) {
         var base = super.findBundle(pathToBundle, loader, control);
@@ -23,7 +24,7 @@ public abstract class DynamicScaledaBundle extends AbstractBundle {
             // load your bundle from baseName_<language>.properties, e.g. "baseName_zh.properties"
             var localizedPath = pathToBundle + "_" + ideLocale.getLanguage();
             var localeBundle = super.findBundle(localizedPath, DynamicScaledaBundle.class.getClassLoader(), control);
-            if (localeBundle != null && !base.equals(localeBundle)) {
+            if (!base.equals(localeBundle)) {
                 setParent(localeBundle, base);
                 return localeBundle;
             }

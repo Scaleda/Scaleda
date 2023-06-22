@@ -1,21 +1,14 @@
 package top.scaleda
 package idea.project.wizard
 
+import idea.ScaledaBundle
 import idea.project.ScaledaModuleBuilder
 
-import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardLanguageStep}
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.ui.dsl.builder.{Panel, Row, RowLayout, TextFieldKt}
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.dsl.builder._
 import kotlin.Unit.{INSTANCE => KUnit}
-import top.scaleda.idea.ScaledaBundle
-import top.scaleda.idea.utils.{MainLogger, inWriteAction}
-
-import javax.swing.JTextField
-import scala.jdk.CollectionConverters.MapHasAsJava
 
 /** Class for project wizard step, or call it configuration?
   * @param parent NewProjectWizardLanguageStep
@@ -43,13 +36,13 @@ class ScaledaNewProjectWizardStep(private val parent: NewProjectWizardLanguageSt
   override def setupUI(builder: Panel): Unit = {
     builder.row(ScaledaBundle.message("module.source.directory"), (row: Row) => {
       row.layout(RowLayout.PARENT_GRID)
-      TextFieldKt.bindText(row.textField().horizontalAlign(HorizontalAlign.FILL), sourceDirectoryProperty)
+      TextFieldKt.bindText(row.textField().align(Align.FILL), sourceDirectoryProperty)
       KUnit
     })
 
     builder.row(ScaledaBundle.message("module.test.directory"), (row: Row) => {
       row.layout(RowLayout.PARENT_GRID)
-      TextFieldKt.bindText(row.textField().horizontalAlign(HorizontalAlign.FILL), testDirectoryProperty)
+      TextFieldKt.bindText(row.textField().align(Align.FILL), testDirectoryProperty)
       KUnit
     })
   }
