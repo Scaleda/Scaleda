@@ -28,7 +28,7 @@ object ExtractAssets {
     oldVersion.close()
     if (version < ASSET_VERSION) return false
 
-    // TODO: copy or extract files from resource
+    // copy or extract files from resource
     install()
 
     // check integrity
@@ -36,7 +36,7 @@ object ExtractAssets {
   }
 
   // install resources in resources/install -> .scaleda/*
-  def install() = {
+  def install(): Unit = {
     val parent = Paths.getGlobalConfigDir
     val files = Seq(
       "scripts/vivado_call.tcl",

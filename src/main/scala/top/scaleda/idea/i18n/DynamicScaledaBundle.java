@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+@Deprecated
 public abstract class DynamicScaledaBundle extends AbstractBundle {
     public DynamicScaledaBundle(@NonNls @NotNull String pathToBundle) {
         super(pathToBundle);
@@ -19,7 +20,7 @@ public abstract class DynamicScaledaBundle extends AbstractBundle {
     @Override
     protected ResourceBundle findBundle(@NotNull @NonNls String pathToBundle, @NotNull ClassLoader loader, @NotNull ResourceBundle.Control control) {
         var base = super.findBundle(pathToBundle, loader, control);
-        var ideLocale = LangBundle.getLocale();
+        var ideLocale = LangBundle.getLocale(); // FIXME: LangBundle.getLocale() is missing for remote env
         if (!ideLocale.equals(Locale.ENGLISH)) {
             // load your bundle from baseName_<language>.properties, e.g. "baseName_zh.properties"
             var localizedPath = pathToBundle + "_" + ideLocale.getLanguage();
