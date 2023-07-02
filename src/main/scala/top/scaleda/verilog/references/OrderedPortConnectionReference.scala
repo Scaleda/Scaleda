@@ -15,7 +15,9 @@ class OrderedPortConnectionReference(element: OrderedPortConnectionPsiNode, inde
     val ref = moduleInstantiationPsiNode.getReference.resolve
     if (!ref.isInstanceOf[ModuleDeclarationPsiNode]) return null
 
-    val ports = ref.asInstanceOf[ModuleDeclarationPsiNode].getModuleHead.getPorts
+    val head = ref.asInstanceOf[ModuleDeclarationPsiNode].getModuleHead
+    if (head.isEmpty) return  null
+    val ports = head.get.getPorts
     if (ports.size <= index) return null
     ports(index)
   }

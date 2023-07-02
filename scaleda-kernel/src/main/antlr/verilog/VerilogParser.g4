@@ -976,6 +976,7 @@ statement
    | attribute_instance* wait_statement
    | attribute_instance* incomplete_statement
    ;
+//statement : seq_block;
 
 statement_or_null
    : statement
@@ -1562,9 +1563,15 @@ constant_range_expression
 dimension_constant_expression
    : constant_expression
    ;
+//
+//expression
+//   : term (binary_operator attribute_instance* term | '?' attribute_instance* expression ':' term)*
+//   ;
 
 expression
-   : term (binary_operator attribute_instance* term | '?' attribute_instance* expression ':' term)*
+   : term
+   | expression binary_operator attribute_instance* expression
+   | expression '?' attribute_instance* expression ':' expression
    ;
 
 term

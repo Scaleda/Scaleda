@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from C:/Users/hans/Coding/seda/scaleda-kernel/src/main/antlr/verilog\VerilogParser.g4 by ANTLR 4.12.0
 package top.scaleda.verilog.parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 

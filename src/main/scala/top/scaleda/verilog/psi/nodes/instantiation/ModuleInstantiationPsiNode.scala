@@ -56,7 +56,8 @@ class ModuleInstantiationPsiNode(node: ASTNode)
     val result    = reference.resolve
     if (result == null) return Seq()
     val module = result.asInstanceOf[ModuleDeclarationPsiNode]
-    val ports  = module.getModuleHead.getPorts
+    if (module.getModuleHead.isEmpty) return Seq()
+    val ports  = module.getModuleHead.get.getPorts // todo can we do it more elegantly?
 
     val connType = getConnectionType
 

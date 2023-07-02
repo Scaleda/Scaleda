@@ -52,7 +52,7 @@ lazy val commonSettings = Seq(
 
 lazy val publicLibraryDependencies = Seq(
   "com.novocode"                % "junit-interface"         % junitInterfaceVersion % Test,
-  "org.antlr"                   % "antlr4-intellij-adaptor" % "0.1",
+//  "org.antlr"                   % "antlr4-intellij-adaptor" % "0.1" // imported with source code
   "org.antlr"                   % "antlr4"                  % "4.12.0",
   "org.antlr"                   % "antlr4-runtime"          % "4.12.0",
   "io.circe"                   %% "circe-yaml"              % "0.14.2",
@@ -134,6 +134,8 @@ lazy val scaleda = project
     ),
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
+    // ANTLR IntelliJ Adapter
+    Compile / unmanagedSourceDirectories += baseDirectory.value / "antlr4-intellij-adaptor/src/main/java",
   )
   .enablePlugins(SbtIdeaPlugin)
 

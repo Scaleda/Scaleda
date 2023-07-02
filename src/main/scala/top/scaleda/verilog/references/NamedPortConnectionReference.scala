@@ -21,9 +21,9 @@ class NamedPortConnectionReference(element: NamedPortConnectionPsiNode)
     if (!ref.isInstanceOf[ModuleDeclarationPsiNode]) return null
     ref
       .asInstanceOf[ModuleDeclarationPsiNode]
-      .getModuleHead
+      .getModuleHead.map(_
       .getPorts
       .find(_.getName == element.getHoldPsiNode.getName)
-      .orNull
+      .orNull).orNull
   }
 }

@@ -29,7 +29,7 @@ class ModulePortProvider extends CompletionProvider[CompletionParameters] {
 
     val moduleDeclaration = resolve.asInstanceOf[ModuleDeclarationPsiNode]
 
-    moduleDeclaration.getModuleHead.getPorts.foreach(port => {result.addElement(
+    moduleDeclaration.getModuleHead.foreach(_.getPorts.foreach(port => {result.addElement(
       LookupElementBuilder.create(port.getName)
         .withIcon(port.getPortType match {
           case PortDeclarationPsiNode.INPUT => Icons.verilogInput
@@ -39,7 +39,7 @@ class ModulePortProvider extends CompletionProvider[CompletionParameters] {
           case _ => AllIcons.General.TodoQuestion // should never reach
         })
         .withInsertHandler(ParenthesesInsertHandler.WITH_PARAMETERS))
-    })
+    }))
 
   }
 }

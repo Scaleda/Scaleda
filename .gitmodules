@@ -1,0 +1,3 @@
+[submodule "antlr4-intellij-adaptor"]
+	path = antlr4-intellij-adaptor
+	url = git@github.com:Scaleda/antlr4-intellij-adaptor

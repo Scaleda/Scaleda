@@ -24,7 +24,13 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     with StructureViewNode
     with DocumentHolder {
   override def getNameIdentifier: PsiElement = {
-    getModuleHead.getModuleIdentifier.orNull
+    val head = getModuleHead
+    if (head.isEmpty) null
+    else {
+      val name = head.get.getModuleIdentifier
+      if (name.isEmpty) null
+      else name.get
+    }
   }
 
   @Nls
@@ -63,7 +69,8 @@ class ModuleDeclarationPsiNode(node: ASTNode)
 
   private def generateModulePreview: String = {
     def generatePorts: String = {
-      val ports = getModuleHead.getPorts
+      if (getModuleHead.isEmpty) return "()" // todo more elegantly
+      val ports = getModuleHead.get.getPorts
       if (ports.isEmpty) "()"
       else {
         val portList = ports
@@ -94,8 +101,11 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     s"module ${getName}${generateParams} ${generatePorts}"
   }
 
-  def getModuleHead: ModuleHeadPsiNode = {
-    PsiTreeUtil.getChildOfType(this, classOf[ModuleHeadPsiNode])
+//  def getModuleHead: ModuleHeadPsiNode = {
+  // if a module is under typing then it probably hasn't head!
+  // module head = 'module' + id + param + port
+  def getModuleHead: Option[ModuleHeadPsiNode] = {
+    Option(PsiTreeUtil.getChildOfType(this, classOf[ModuleHeadPsiNode]))
   }
 
   def getModuleItems: Seq[ModuleItemPsiNode] = {
@@ -107,6 +117,8 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     getModuleItems.map(item => PsiTreeUtil.findChildrenOfType(item, clazz).asScala.toSeq).foldLeft(Seq[T]())(_ ++ _)
   }
 
-  def getParameters: Seq[ParameterIdentifierPsiNode] =
-    getModuleHead.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
+  def getParameters: Seq[ParameterIdentifierPsiNode] = {
+    if (getModuleHead.isEmpty) return Seq[ParameterIdentifierPsiNode]()
+    getModuleHead.get.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
+  }
 }
