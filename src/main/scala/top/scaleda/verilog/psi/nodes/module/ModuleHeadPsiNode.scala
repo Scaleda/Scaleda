@@ -8,8 +8,12 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 
 class ModuleHeadPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
+  /**
+   * Return port identifiers of this module
+   * @return
+   */
   def getPorts: Seq[PortIdentifierPsiNode] = {
-    val listOfPorts = PsiTreeUtil.findChildOfType(this, classOf[AbstractListOfPortsPsiNode])
+    val listOfPorts = PsiTreeUtil.findChildOfType(this, classOf[AbstractListOfPortsPsiNode]) // list_of_ports or list_of_ports_declarations
     if (listOfPorts == null) Seq[PortIdentifierPsiNode]() else listOfPorts.getPortIdentifiers
   }
 

@@ -22,6 +22,6 @@ abstract class AbstractDeclarationPsiNode(node: ASTNode) extends ANTLRPsiNode(no
   }
 }
 
-class OutputDeclarationPsiNode(node: ASTNode) extends AbstractDeclarationPsiNode(node)
-class InputDeclarationPsiNode(node: ASTNode)  extends AbstractDeclarationPsiNode(node)
-class InoutDeclarationPsiNode(node: ASTNode)  extends AbstractDeclarationPsiNode(node)
+class OutputDeclarationPsiNode(node: ASTNode) extends AbstractDeclarationPsiNode(node) // input_declaration ::= 'input' range list_of_port_declarations
+class InputDeclarationPsiNode(node: ASTNode)  extends AbstractDeclarationPsiNode(node) // output_declaration ::= 'output' range list_of_port_declarations
+class InoutDeclarationPsiNode(node: ASTNode)  extends AbstractDeclarationPsiNode(node) // inout_declaration ::= 'inout' range list_of_port_identifiers
