@@ -17,6 +17,16 @@ Scaleda 目前计划增加的功能有：
 
 ## 安装
 
+Scaleda 目前支持 2023.1 及以上版本的 IJ 平台，包括 IDEA Community Edition 和 IDEA Ultimate Edition。
+您可以选择直接下载编译好的插件 zip 包，或者自行编译插件。
+
+### 直接下载 zip 文件
+
+IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载编译好的插件 zip 包，然后在 IJ 平台中安装。
+在 [Releases](https://github.com/Scaleda/Scaleda/releases) 页面中，您可以找到最新的插件 zip 包，它的名字类似于 `Scaleda-0.1.0.zip`。
+
+启动 IDEA 后，选择 `File -> Settings -> Plugins -> Install Plugin from Disk...`，然后选择下载好的 zip 文件，点击 `OK` 即可安装插件。
+
 ### 从源码编译
 
 Scaleda 主要使用 Scala 开发，并使用 sbt（而不是 Gradle）作为构建工具。
