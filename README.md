@@ -13,7 +13,9 @@ Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能�
 
 Scaleda 目前计划增加的功能有：
  - 更加完善的 Verilog 语言支持：重构（Refactoring）、更多代码检查（Inspection）等；
- - 完善自有工程结构：支持更多工具、支持更多操作；
+ - 完善自有工程结构：支持更多工具、支持更多操作。
+
+[这篇](./docs/INTRODUCTION.md) 文档对 Scaleda 的开发背景和基本功能进行了简单的介绍。
 
 ## 安装
 
@@ -26,6 +28,7 @@ IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载
 在 [Releases](https://github.com/Scaleda/Scaleda/releases) 页面中，您可以找到最新的插件 zip 包，它的名字类似于 `Scaleda-0.1.0.zip`。
 
 启动 IDEA 后，选择 `File -> Settings -> Plugins -> Install Plugin from Disk...`，然后选择下载好的 zip 文件，点击 `OK` 即可安装插件。
+有关在 IDEA 中安装 Scaleda 的详细过程，请参考 [这篇](./docs/INSTALLATION.md) 文档。
 
 ### 从源码编译
 
@@ -45,10 +48,11 @@ $ sbt packageArtifactZip
 ```
 
 打包完成后，你可以在 `target/scala-2.12/` 目录下找到打包好的 zip 文件。
+您可以用上节的方法安装插件。
 
-## 项目结构
+## 代码结构
 
-Scaleda 项目的结构如下：
+Scaleda 代码的结构如下：
 
 ### 内核部分
 
