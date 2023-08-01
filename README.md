@@ -54,6 +54,10 @@ $ sbt packageArtifactZip
 打包完成后，你可以在 `target/scala-2.12/` 目录下找到打包好的 zip 文件。
 您可以用上节的方法安装插件。
 
+## 使用手册
+
+PDF 版本的使用手册可以在 [这里](./docs/scaleda-manual.pdf) 下载。
+
 ## 项目结构
 
 这里介绍 Scaleda 这个项目的结构，而不是「使用 Scaleda 开发的 FPGA 项目」的结构。
