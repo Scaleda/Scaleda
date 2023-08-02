@@ -29,44 +29,18 @@ import kotlin.coroutines.Continuation
   */
 class ScaledaMain extends ProjectActivity {
   override def execute(project: Project, continuation: Continuation[_ >: kotlin.Unit]): AnyRef = {
-    MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
+    MainLogger.info("This is Scaleda")
 
     // invoke Env backup
     val _ = EnvironmentUtils.Backup
 
     // Logging service, handling IDEA log output
     project.getService(classOf[ScaledaLoggingService])
+
     // Main service, init jinja and kernel log
-    project.getService(classOf[ScaledaMainService])
+    val mainService = project.getService(classOf[ScaledaMainService])
+    mainService.initToolWindows
 
-    // Setup windows...
-    val toolWindowManager = ToolWindowManager.getInstance(project)
-    toolWindowManager.invokeLater(() => {
-      val builder =
-        new RegisterToolWindowTaskBuilder(ScaledaRunWindowFactory.WINDOW_ID)
-      builder.icon = Icons.mainSmall
-      builder.contentFactory = new ScaledaRunWindowFactory
-      builder.anchor = ToolWindowAnchor.RIGHT
-      // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
-      val toolWindow = toolWindowManager.registerToolWindow(builder.build())
-    })
-    toolWindowManager.invokeLater(() => {
-      val builder =
-        new RegisterToolWindowTaskBuilder(ScaledaToolWindowFactory.WINDOW_ID)
-      builder.icon = Icons.mainSmall
-      builder.contentFactory = new ScaledaToolWindowFactory
-      builder.anchor = ToolWindowAnchor.BOTTOM
-      builder.shouldBeAvailable = true
-
-      val messageWindow = toolWindowManager.registerToolWindow(builder.build())
-    })
-
-    // Check assets
-    if (!ExtractAssets.isInstalled) {
-      ActionManager
-        .getInstance()
-        .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
-    }
 
     val rpcService = project.getService(classOf[RpcService])
     rpcService.setProject(project)

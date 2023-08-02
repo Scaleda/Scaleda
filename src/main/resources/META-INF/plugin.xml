@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>top.scaleda</id>
     <name>Scaleda</name>
-    <version>0.1.0</version>
-    <vendor>Hans and Chiro</vendor>
+    <version>0.1.1</version>
+    <vendor>Scaleda</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
 
