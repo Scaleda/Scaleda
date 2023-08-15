@@ -3,8 +3,8 @@ package idea.runner.task
 
 import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
-import idea.utils.{MainLogger, inReadAction, invokeLater}
-import idea.windows.tasks.ScaledaRunWindowFactory
+import idea.utils.{ScaledaIdeaLogger, inReadAction, invokeLater}
+import idea.windows.rightPanel.ScaledaRunWindowFactory
 import kernel.project.config.ProjectConfig
 
 import com.intellij.icons.AllIcons
@@ -51,7 +51,7 @@ class ScaledaReloadTasksAction
         manifest.configFile = None
         manifest.projectBase = None
       }
-      MainLogger.info(
+      ScaledaIdeaLogger.info(
         "No available Scaleda config (scaleda.yml) found under this project. This is not a Scaleda project"
       )
 
@@ -69,7 +69,7 @@ class ScaledaReloadTasksAction
         manifest.configFile = Some(f.getPath)
         manifest.projectBase = Some(f.getParent.getPath)
       }
-      MainLogger.info(s"Scaleda config file $f detected")
+      ScaledaIdeaLogger.info(s"Scaleda config file $f detected")
 
       // Refresh `scaleda.yml`
       LocalFileSystem
@@ -100,7 +100,7 @@ class ScaledaReloadTasksAction
                     )
                 }
                 done = true
-                MainLogger.info("refresh scaleda tree done")
+                ScaledaIdeaLogger.info("refresh scaleda tree done")
               })
               .getOrElse({
                 done = false

@@ -2,8 +2,8 @@ package top.scaleda
 package idea.runner
 
 import idea.ScaledaBundle
-import idea.utils.{MainLogger, OutputLogger}
-import idea.windows.tool.message.ScaledaMessageRenderer
+import idea.utils.{ScaledaIdeaLogger, OutputLogger}
+import idea.windows.bottomPanel.message.ScaledaMessageRenderer
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.CommandDeps
 import kernel.utils.{BasicLogger, FileReplaceContext}
@@ -38,7 +38,7 @@ class ScaledaRunProcessHandler(
   /** Called when destroy button clicked
     */
   override def destroyProcessImpl(): Unit = {
-    MainLogger.warn(
+    ScaledaIdeaLogger.warn(
       s"destroyProcessImpl, running: $terminated, stopping: $terminating"
     )
     terminating = true
@@ -46,7 +46,7 @@ class ScaledaRunProcessHandler(
   }
 
   override def detachProcessImpl(): Unit = {
-    MainLogger.warn("detachProcessImpl")
+    ScaledaIdeaLogger.warn("detachProcessImpl")
     notifyProcessDetached()
   }
 
@@ -58,7 +58,7 @@ class ScaledaRunProcessHandler(
 
   // Not in use
   private val outputStream = new OutputStream {
-    override def write(i: Int): Unit = MainLogger.warn("getProcessInput:", i)
+    override def write(i: Int): Unit = ScaledaIdeaLogger.warn("getProcessInput:", i)
   }
   override def getProcessInput: OutputStream = outputStream
 

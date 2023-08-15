@@ -25,7 +25,7 @@ class ScaledaRpcServerImpl(project: () => Project) extends ScaledaRpcGrpc.Scaled
   }
 
   override def gotoSource(request: ScaledaGotoSource): Future[ScaledaEmpty] = async {
-    MainLogger.info(s"grpc gotoSource($request)")
+    ScaledaIdeaLogger.info(s"grpc gotoSource($request)")
     // Warn: line number starts from 1
     RpcService.pushGotoInfo(RpcService.RpcGotoInfo(request.file, math.max(0, request.line - 1), request.column))
     ScaledaEmpty.of()
@@ -74,18 +74,18 @@ class RpcService extends Disposable {
             server.get.awaitTermination()
           } catch {
             case _: InterruptedException =>
-              MainLogger.info("gRPC Service stopped, ", if (stop) "will not restart" else "will restart")
+              ScaledaIdeaLogger.info("gRPC Service stopped, ", if (stop) "will not restart" else "will restart")
             case e: IOException =>
-              MainLogger.warn("gRPC Service io err:", e, "will exit")
+              ScaledaIdeaLogger.warn("gRPC Service io err:", e, "will exit")
               stop = true
             case _e: Throwable =>
-              MainLogger.warn("trying", _e)
+              ScaledaIdeaLogger.warn("trying", _e)
               _e.printStackTrace()
               Thread.sleep(3000)
               // stop = true
           }
         } else {
-          MainLogger.debug("gRPC Service has started, waiting...")
+          ScaledaIdeaLogger.debug("gRPC Service has started, waiting...")
           Thread.sleep(1500)
         }
       }
@@ -132,7 +132,7 @@ object RpcService {
         }
       } catch {
         case e: InterruptedException =>
-          MainLogger.warn(Thread.currentThread().getName, "exit normally")
+          ScaledaIdeaLogger.warn(Thread.currentThread().getName, "exit normally")
       }
     })
     thread.setName("rpc-goto-handler")

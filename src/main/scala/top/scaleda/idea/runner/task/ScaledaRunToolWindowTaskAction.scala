@@ -4,7 +4,7 @@ package idea.runner.task
 import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
 import idea.runner.configuration.{ScaledaRunConfigurationFactory, ScaledaRunConfigurationType}
-import idea.windows.tasks.ScaledaRunTaskNode
+import idea.windows.rightPanel.ScaledaRunTaskNode
 import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.Executor

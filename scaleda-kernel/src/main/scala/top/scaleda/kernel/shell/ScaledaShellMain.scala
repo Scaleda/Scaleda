@@ -13,8 +13,7 @@ import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
 import kernel.utils.serialise.JSONHelper
-import kernel.utils.{EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
-
+import kernel.utils.{ScaledaShellLogger, EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
 import scopt.OParser
 
 import java.io.File
@@ -70,6 +69,8 @@ object ScaledaShellMain {
   }
 
   def main(args: Array[String]): Unit = {
+    // init logger
+    KernelLogger.addLogger(ScaledaShellLogger)
     KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
 
     // default manifest

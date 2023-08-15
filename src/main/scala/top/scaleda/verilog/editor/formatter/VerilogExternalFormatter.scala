@@ -2,7 +2,7 @@ package top.scaleda
 package verilog.editor.formatter
 
 import idea.ScaledaBundle
-import idea.utils.{MainLogger, Notification}
+import idea.utils.{ScaledaIdeaLogger, Notification}
 import verilog.editor.codeStyle.VerilogCodeStyleSettings
 import verilog.{VerilogFileType, VerilogLanguage, VerilogPSIFileRoot}
 
@@ -96,7 +96,7 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
 
       return new FormattingTask() {
         override def run(): Unit = {
-          MainLogger.info(cmdLine.getCommandLineString)
+          ScaledaIdeaLogger.info(cmdLine.getCommandLineString)
           handler.addProcessListener(new CapturingProcessAdapter() {
             override def processTerminated(event: ProcessEvent): Unit = {
               val exitCode = event.getExitCode;

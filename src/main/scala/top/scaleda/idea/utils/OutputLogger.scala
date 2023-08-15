@@ -1,7 +1,7 @@
 package top.scaleda
 package idea.utils
 
-import idea.windows.tool.logging.ScaledaLoggingService
+import idea.windows.bottomPanel.console.ConsoleService
 import kernel.shell.ScaledaRunHandler
 import kernel.utils.{BasicLogger, LogLevel}
 
@@ -26,13 +26,8 @@ class OutputLogger(project: Project) extends BasicLogger {
       case Warn  => logger.warn(msg)
       case _     => logger.error(msg)
     }
-
-    val service = project.getService(classOf[ScaledaLoggingService])
+    val service = project.getService(classOf[ConsoleService])
     service.print(OutputLogger.LOGGER_ID, s"$msg\n", level)
-    level match {
-      case Error => Notification(project).logging(level, xs: _*)
-      case _     =>
-    }
   }
 }
 

@@ -3,7 +3,7 @@ package idea.runner.configuration
 
 import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
-import idea.utils.MainLogger
+import idea.utils.ScaledaIdeaLogger
 import kernel.net.remote.RemoteProfile
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.net.{RemoteClient, RemoteServer}
@@ -66,7 +66,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   private def requestRemoteProfiles(): Unit = {
     val host = profileHost.getText
-    MainLogger.info(s"requestRemoteProfiles: $host")
+    ScaledaIdeaLogger.info(s"requestRemoteProfiles: $host")
     if (host.isEmpty) {
       // use local profiles
       profileName.synchronized {
@@ -120,7 +120,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
             }
           } catch {
             case e: Throwable =>
-              MainLogger.info("cannot connect server:", e)
+              ScaledaIdeaLogger.info("cannot connect server:", e)
               if (host == profileHost.getText) {
                 profileName.synchronized {
                   profileName.removeAllItems()
@@ -137,7 +137,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
             }
           }
           if (profiles.nonEmpty && host == profileHost.getText) {
-            MainLogger.info("got profiles", profiles)
+            ScaledaIdeaLogger.info("got profiles", profiles)
             loadedRemoteProfiles.synchronized {
               loadedRemoteProfiles.put(host, profiles)
             }

@@ -1,8 +1,8 @@
 package top.scaleda
 package idea
 
-import idea.windows.tasks.ScaledaRunWindowFactory
-import idea.windows.tool.message.ScaledaMessageRenderer.fileRegex
+import idea.windows.rightPanel.ScaledaRunWindowFactory
+import idea.windows.bottomPanel.message.ScaledaMessageRenderer.fileRegex
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should

@@ -28,7 +28,7 @@ class Notification(project: Project) extends BasicLogger {
       notification.setTitle(title)
       notification.notify(project)
     }
-    MainLogger.info(Seq("notification:") ++ xs: _*)
+    ScaledaIdeaLogger.info(Seq("notification:") ++ xs: _*)
   }
 }
 

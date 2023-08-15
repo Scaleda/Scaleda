@@ -141,3 +141,5 @@ lazy val scaleda = project
 
 lazy val root = (project in file("."))
   .aggregate(kernel, scaleda)
+
+javaOptions += "-Didea.log.debug.categories=top.scaleda"

@@ -1,7 +1,7 @@
 package top.scaleda
 package idea.toolchain
 
-import idea.windows.tool.message.ScaledaMessageToolchainParserProvider
+import idea.windows.bottomPanel.message.ScaledaMessageToolchainParserProvider
 import kernel.toolchain.impl.{IVerilog, Vivado}
 
 object ToolchainIdea {

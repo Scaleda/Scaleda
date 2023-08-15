@@ -7,9 +7,9 @@ import idea.project.IdeaManifestManager
 import idea.runner.ScaledaRunProcessHandler
 import idea.rvcd.RvcdService
 import idea.utils.notification.CreateTypicalNotification
-import idea.utils.{ConsoleLogger, MainLogger, Notification, runInEdt}
+import idea.utils.{ScaledaIdeaLogger, Notification, runInEdt}
 import idea.waveform.{RvcdHandler, WaveformHandler}
-import idea.windows.tool.message.{ScaledaMessageParser, ScaledaMessageTab}
+import idea.windows.bottomPanel.message.{ScaledaMessageParser, ScaledaMessageTab}
 import kernel.database.UserException
 import kernel.project.config.TaskType
 import kernel.shell.ScaledaRun
@@ -35,6 +35,7 @@ import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
 import top.scaleda.idea.toolchain.ToolchainIdea
+import top.scaleda.idea.windows.bottomPanel.console.ConsoleLogger
 import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 import java.io.File
@@ -95,7 +96,7 @@ class ScaledaRunConfiguration(
     val child: Element = element.getChild(STORAGE_ID)
     // ignore empty write
     if (targetName.nonEmpty && taskName.nonEmpty) {
-      MainLogger.debug(s"writeExternal: write $targetName $taskName")
+      ScaledaIdeaLogger.debug(s"writeExternal: write $targetName $taskName")
       if (child != null) {
         dumpValuesToElement(child)
       } else {
@@ -109,7 +110,7 @@ class ScaledaRunConfiguration(
     val child = element.getChild(STORAGE_ID)
     if (child != null) {
       loadValuesFromElement(child)
-      MainLogger.info(s"readExternal: got $targetName $taskName")
+      ScaledaIdeaLogger.info(s"readExternal: got $targetName $taskName")
     }
   }
 
@@ -132,7 +133,7 @@ class ScaledaRunConfiguration(
       ideaExecutor: Executor,
       environment: ExecutionEnvironment
   ): RunProfileState = {
-    MainLogger.info(s"getState: taskName=$taskName, targetName=$targetName, profileName=$profileName")
+    ScaledaIdeaLogger.info(s"getState: taskName=$taskName, targetName=$targetName, profileName=$profileName")
     val searchScope =
       ExecutionSearchScopes
         .executionScope(project, environment.getRunProfile)
@@ -145,7 +146,7 @@ class ScaledaRunConfiguration(
 
     val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
-      MainLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
+      ScaledaIdeaLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
       CreateTypicalNotification.makeAuthorizationNotification(
         project,
         ScaledaBundle.message("tasks.configuration.profile.state.auth", profileHost),
@@ -161,7 +162,7 @@ class ScaledaRunConfiguration(
       val handler =
         new ScaledaRunProcessHandler(
           project,
-          new ConsoleLogger(console, logSourceId = Some(runtime.id)),
+          new ConsoleLogger(project, console, logSourceId = Some(runtime.id)),
           runtime,
           afterExecution
         )
@@ -259,7 +260,7 @@ class ScaledaRunConfiguration(
         ) {
           override def actionPerformed(e: AnActionEvent) = {
             // TODO: Help dialog
-            MainLogger.warn("help", e)
+            ScaledaIdeaLogger.warn("help", e)
           }
         }
       )

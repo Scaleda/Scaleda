@@ -2,7 +2,7 @@ package top.scaleda
 package idea.runner.configuration
 
 import idea.project.IdeaManifestManager
-import idea.utils.MainLogger
+import idea.utils.ScaledaIdeaLogger
 import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.actions.{ConfigurationContext, LazyRunConfigurationProducer}
@@ -16,7 +16,7 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
       context: ConfigurationContext,
       sourceElement: Ref[PsiElement]
   ): Boolean = {
-    MainLogger.debug("setupConfigurationFromContext config taskName:", configuration.taskName)
+    ScaledaIdeaLogger.debug("setupConfigurationFromContext config taskName:", configuration.taskName)
     implicit val manifest = IdeaManifestManager.getImplicitManifest(project = context.getProject)
     ProjectConfig.getConfig
       .map(c => {
@@ -25,7 +25,7 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
         true
       })
       .getOrElse({
-        MainLogger.debug("cannot load config when setting up configurations")
+        ScaledaIdeaLogger.debug("cannot load config when setting up configurations")
         false
       })
   }

@@ -2,7 +2,7 @@ package top.scaleda
 package idea.runner.task
 
 import idea.ScaledaBundle
-import idea.utils.{Icons, MainLogger}
+import idea.utils.{Icons, ScaledaIdeaLogger}
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import top.scaleda.kernel.project.config.{TargetConfig, TaskConfig}
@@ -16,6 +16,6 @@ class ScaledaRunTaskAction(target: TargetConfig, task: TaskConfig)
       Icons.mainSmall
     ) {
   override def actionPerformed(e: AnActionEvent): Unit = {
-    MainLogger.warn(s"starting task ${task.name}")
+    ScaledaIdeaLogger.warn(s"starting task ${task.name}")
   }
 }

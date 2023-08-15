@@ -6,8 +6,8 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{ActionManager, ActionPlaces, AnAction, AnActionEvent, DefaultActionGroup}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
-import idea.utils.MainLogger
-import idea.windows.tasks.{ScaledaRunRootNode, ScaledaRunTargetNode, ScaledaRunTaskNode}
+import idea.utils.ScaledaIdeaLogger
+import idea.windows.rightPanel.{ScaledaRunRootNode, ScaledaRunTargetNode, ScaledaRunTaskNode}
 
 import java.awt.Component
 import java.awt.event.MouseEvent
