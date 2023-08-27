@@ -3,23 +3,23 @@ package idea.runner.configuration
 
 import idea.ScaledaBundle
 import idea.application.config.ScaledaIdeaConfig
-import idea.project.IdeaManifestManager
+import idea.project.io.YmlRootManager
 import idea.runner.ScaledaRunProcessHandler
 import idea.rvcd.RvcdService
+import idea.toolchain.ToolchainIdea
 import idea.utils.notification.CreateTypicalNotification
-import idea.utils.{ScaledaIdeaLogger, Notification, runInEdt}
+import idea.utils.{Notification, ScaledaIdeaLogger, runInEdt}
 import idea.waveform.{RvcdHandler, WaveformHandler}
-import idea.windows.bottomPanel.message.{ScaledaMessageParser, ScaledaMessageTab}
+import idea.windows.bottomPanel.message.{MessageListService, ScaledaMessageParser}
 import kernel.database.UserException
 import kernel.project.config.TaskType
 import kernel.shell.ScaledaRun
-import kernel.toolchain.Toolchain
 import kernel.toolchain.executor.SimulationExecutor
+import kernel.toolchain.runner.ScaledaRuntime
 import kernel.utils.LogLevel
 import kernel.utils.serialise.JSONHelper
 
-import com.intellij.execution.configurations.{LocatableConfigurationBase, RunConfiguration, RunProfileState}
-import com.intellij.execution.filters.TextConsoleBuilderFactory
+import com.intellij.execution.configurations.{LocatableConfigurationBase, RunProfileState}
 import com.intellij.execution.process.{ProcessHandler, ProcessTerminatedListener}
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.ui.ExecutionConsole
@@ -31,12 +31,9 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.LocalFilePath
-import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
-import top.scaleda.idea.toolchain.ToolchainIdea
-import top.scaleda.idea.windows.bottomPanel.console.ConsoleLogger
-import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
+import top.scaleda.idea.windows.bottomPanel.ConsoleService
 
 import java.io.File
 import java.util.concurrent.TimeoutException
@@ -54,7 +51,7 @@ class ScaledaRunConfiguration(
     name: String
 ) extends LocatableConfigurationBase[RunProfileState](project, factory, name) {
 
-  implicit val projectUsing = project
+  implicit val projectUsing: Project = project
 
   var targetName = ""
   var taskName   = ""
@@ -114,13 +111,13 @@ class ScaledaRunConfiguration(
     }
   }
 
-  override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
+  override def getConfigurationEditor: SettingsEditor[ScaledaRunConfiguration] =
     new ScaledaRunConfigurationEditor(project)
 
   def generateRuntime: Option[ScaledaRuntime] =
     ScaledaRun
       .generateRuntimeFromName(targetName, taskName, profileName, profileHost)(manifest =
-        IdeaManifestManager.getImplicitManifest
+        YmlRootManager.getInstance(project).getRoots.head.toProjectManifest
       )
       .map(_.copy(extraEnvs = extraEnvs.toMap))
 
@@ -133,16 +130,9 @@ class ScaledaRunConfiguration(
       ideaExecutor: Executor,
       environment: ExecutionEnvironment
   ): RunProfileState = {
-    ScaledaIdeaLogger.info(s"getState: taskName=$taskName, targetName=$targetName, profileName=$profileName")
-    val searchScope =
-      ExecutionSearchScopes
-        .executionScope(project, environment.getRunProfile)
-
-    val myConsoleBuilder =
-      TextConsoleBuilderFactory.getInstance
-        .createBuilder(project, searchScope)
-
-    val console = myConsoleBuilder.getConsole
+    // clear console and msg list
+    val consoleService = project.getService(classOf[ConsoleService])
+    consoleService.clear()
 
     val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
@@ -155,14 +145,15 @@ class ScaledaRunConfiguration(
       return null
     }
 
+    val runtime = ScaledaRun.preprocess(runtimeOptional.get)
+    return null
+
     (_: Executor, _: ProgramRunner[_]) => {
       // may run preset
-      val runtime = ScaledaRun.preprocess(runtimeOptional.get)
 
       val handler =
         new ScaledaRunProcessHandler(
           project,
-          new ConsoleLogger(project, console, logSourceId = Some(runtime.id)),
           runtime,
           afterExecution
         )
@@ -173,17 +164,16 @@ class ScaledaRunConfiguration(
       // prepare process
       val thread = ScaledaRun.runTaskBackground(handler, runtime)
 
-      // attach message parser listener
-      ScaledaMessageTab.instance.foreach(_.attach(runtime))
+      // message parser
       ToolchainIdea.toolchainMessageParser
         .get(runtime.target.toolchain)
-        .foreach(parserProvider => ScaledaMessageParser.registerParser(runtime.id, parserProvider.messageParser))
+        .foreach(parserProvider =>
+          project.getService(classOf[MessageListService]).registerParser(parserProvider.messageParser)
+        )
+      project.getService(classOf[MessageListService]).registerRuntime(runtime)
 
       // setup exception handler
       thread.setUncaughtExceptionHandler((_thread: Thread, throwable: Throwable) => {
-        // detach message parser listener
-        ScaledaMessageTab.instance.foreach(_.detachFromLogger(runtime.id))
-        ScaledaMessageParser.removeParser(runtime.id)
         throwable match {
           case e: UserException =>
             CreateTypicalNotification.makeAuthorizationNotification(project, e.getMessage, NotificationType.ERROR)
@@ -201,7 +191,7 @@ class ScaledaRunConfiguration(
 
       // return result
       new ExecutionResult {
-        override def getExecutionConsole: ExecutionConsole = console
+        override def getExecutionConsole: ExecutionConsole = null
 
         override def getActions: Array[AnAction] = Array()
 
@@ -226,7 +216,7 @@ class ScaledaRunConfiguration(
         // ScaledaMessageTab.instance.requestFocusInWindow()
         // ToolWindowManager.getInstance(project).
         // not working
-        ScaledaMessageTab.instance.foreach(_.switchToTab())
+        MessageListPanel.instance.foreach(_.switchToTab())
       }
       // DumbService
       //   .getInstance(project)
@@ -237,8 +227,8 @@ class ScaledaRunConfiguration(
       // ToolWindowManager.getInstance(project).getFocusManager
       // ScaledaMessageTab.instance.switchToTab()
 
-      val causeMessage     = ScaledaMessageTab.instance.flatMap(_.getCauseMessage(rt.id))
-      val causeCodeMessage = ScaledaMessageTab.instance.flatMap(_.getCauseCode(rt.id))
+      val causeMessage     = MessageListPanel.instance.flatMap(_.getCauseMessage(rt.id))
+      val causeCodeMessage = MessageListPanel.instance.flatMap(_.getCauseCode(rt.id))
 
       // create notification
       val notification = Notification.NOTIFICATION_GROUP.createNotification(
@@ -269,7 +259,7 @@ class ScaledaRunConfiguration(
           new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {
             override def actionPerformed(e: AnActionEvent) = {
               // TODO: goto message window
-              ScaledaMessageTab.instance.foreach(_.switchToTab())
+              MessageListPanel.instance.foreach(_.switchToTab())
             }
           }
         )
@@ -294,7 +284,7 @@ class ScaledaRunConfiguration(
       notification.notify(project)
     }
     // remove message listeners
-    ScaledaMessageTab.instance.foreach(_.detachFromLogger(rt.id))
+    MessageListPanel.instance.foreach(_.detachFromLogger(rt.id))
     ScaledaMessageParser.removeParser(rt.id)
     if (!meetErrors) {
       rt.task.taskType match {

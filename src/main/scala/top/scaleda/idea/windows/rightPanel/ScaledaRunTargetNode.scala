@@ -22,7 +22,7 @@ class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(
 
   override def getChildCount: Int = tasks.size
 
-  override def getParent: TreeNode = parent.get
+  override def getParent: TreeNode = parent.orNull
 
   override def getIndex(treeNode: TreeNode): Int = tasks.indexOf(treeNode)
 

@@ -12,15 +12,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import java.io.File
 import scala.language.implicitConversions
 
-/** Case class for project-level config, i.e. `scaleda.yml`
-  * @param name Project name
-  * @param `type` Project type, should be 'rtl'
-  * @param source Project source folder
-  * @param sources Project sources, items can be one file or directory
-  * @param test Project test folder
-  * @param topModule Top module name, can be overridden by [[TargetConfig]] or [[TaskConfig]]
-  * @param targets List of [[TargetConfig]]
-  */
 @JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
@@ -91,11 +82,6 @@ case class ProjectConfig(
 
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"
-
-  // NOTICE: These two variables are global flag to indicated if a project is loaded
-  // they should be always updated simultaneously
-  // var projectBase: Option[String] = None
-  // var configFile: Option[String]  = None
 
   // def getConfig(path: Option[String] = ManifestManager.getManifest().configFile): Option[ProjectConfig] = {
   def getConfig(implicit manifest: ProjectManifest): Option[ProjectConfig] = {

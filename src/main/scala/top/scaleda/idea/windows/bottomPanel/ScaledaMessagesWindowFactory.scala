@@ -2,14 +2,13 @@ package top.scaleda
 package idea.windows.bottomPanel
 
 import idea.ScaledaBundle
-import idea.utils.{OutputLogger, ProjectNow, ScaledaIdeaLogger, invokeLater}
-import idea.windows.bottomPanel.console.{ConsoleTabManager, ConsoleService}
-import idea.windows.bottomPanel.message.ScaledaMessageTab
+import idea.project.io.YmlRootManager
+import idea.windows.bottomPanel.console.ConsoleTabManager
+import idea.windows.bottomPanel.message.MessageListPanel
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
-import top.scaleda.idea.project.io.YmlRootManager
 
 class ScaledaMessagesWindowFactory extends ToolWindowFactory {
   override def shouldBeAvailable(project: Project): Boolean = {
@@ -25,13 +24,9 @@ class ScaledaMessagesWindowFactory extends ToolWindowFactory {
       new ConsoleTabManager(project, toolWindow.getContentManager)
     Disposer.register(service, tabManager)
 
-    val messageTab = ScaledaMessageTab(project, tabManager = Some(tabManager))
+    val messageTab = new MessageListPanel(project)
 
-    tabManager.addPanel(messageTab, messageTab.getDisplayName)
-    tabManager.addTab(OutputLogger.LOGGER_ID, ScaledaBundle.message("windows.tool.log.output.title"), switchTo = false)
+    tabManager.addPanel(messageTab, ScaledaBundle.message("windows.tool.log.message.title"))
+    tabManager.addConsoleTab(ScaledaBundle.message("windows.tool.log.console.title"), switchTo = false)
   }
-}
-
-object ScaledaMessagesWindowFactory {
-  val WINDOW_ID = "Scaleda Messages"
 }

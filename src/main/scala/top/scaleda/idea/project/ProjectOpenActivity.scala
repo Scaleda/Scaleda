@@ -15,7 +15,7 @@ import top.scaleda.idea.utils.ScaledaIdeaLogger
  * Runs startup actions just after a project is opened, before it's indexed.
  */
 class ProjectOpenActivity extends StartupActivity with DumbAware {
-
+  private val LOG = Logger.getInstance(classOf[ProjectOpenActivity])
   override def runActivity(project: Project): Unit = {
     if (project == null || project.isDisposed) return
 
@@ -31,7 +31,7 @@ class ProjectOpenActivity extends StartupActivity with DumbAware {
     // check if project is a scaleda project
     val ymlRootManager = YmlRootManager.getInstance(project)
     if (ymlRootManager.getRoots.isEmpty) {
-      ScaledaIdeaLogger.info("Currently this project is not a scaleda project")
+      LOG.info("Currently this project is not a scaleda project. Scaleda will be activated when a scaleda.yml is created.")
       return
     }
 

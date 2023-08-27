@@ -3,7 +3,6 @@ package idea.windows.rightPanel
 
 import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
-import idea.runner.task.ScaledaReloadTasksAction
 import kernel.project.ManifestManager
 import kernel.project.config.ProjectConfig
 

@@ -1,18 +1,18 @@
 package top.scaleda
 package idea.windows.bottomPanel.console
 
-import idea.windows.bottomPanel.ScaledaConsolePanel
+import idea.windows.bottomPanel.ConsoleService
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 
-class ConsoleTab(project: Project, logSourceId: String) extends Disposable {
-  private val panel = new ScaledaConsolePanel(this, project, logSourceId)
+class ConsoleTab(project: Project) extends Disposable {
+  private val panel = new ConsolePanel(this, project)
 
-  def getPanel = panel
+  def getPanel: ConsolePanel = panel
 
   override def dispose(): Unit = {
     val service = project.getService(classOf[ConsoleService])
-    service.removeListener(logSourceId)
+    service.removeListener(panel.receiver)
   }
 }

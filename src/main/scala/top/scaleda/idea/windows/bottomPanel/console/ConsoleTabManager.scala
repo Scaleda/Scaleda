@@ -13,29 +13,34 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
     extends ContentManagerListener
     with Disposable {
 
-  val contentFactory = ContentFactory.getInstance()
-  // if (ideaVersion.toIntOption.exists(_ >= 230)) ContentFactory.getInstance()
-  // else ContentFactory.SERVICE.getInstance()
-  private val emptyContent = contentFactory.createContent(
+  private val contentFactory: ContentFactory = ContentFactory.getInstance()
+
+  //noinspection ScalaExtractStringToBundle,ScalaUnusedExpression
+  private val contentStub = contentFactory.createContent(
     new EmptyTabContentView().getContent,
-    "",
+    "Stub",
     false
   )
 
   contentManager.addContentManagerListener(this)
+  contentManager.addContent(contentStub)
 
-  contentManager.addContent(emptyContent)
-
-  def addTab(logSourceId: String, @Nls name: String, switchTo: Boolean = true) = {
-    // remove empty content
+  /**
+   * Add a console tab to the bottom panel
+   * Should be called only once!
+   * @param name
+   * @param switchTo
+   */
+  def addConsoleTab(@Nls name: String, switchTo: Boolean = true): Unit = {
+    // remove stub if exists
     if (contentManager.getContentCount == 1)
-      contentManager.removeContent(emptyContent, false)
-    val consoleTab = new ConsoleTab(project, logSourceId)
+      contentManager.removeContent(contentStub, false)
+    val consoleTab = new ConsoleTab(project)
     Disposer.register(this, consoleTab)
     addPanel(consoleTab.getPanel, name, switchTo = switchTo)
   }
 
-  def addPanel(panel: JPanel, @Nls name: String, switchTo: Boolean = true) = {
+  def addPanel(panel: JPanel, @Nls name: String, switchTo: Boolean = true): Unit = {
     val content = contentFactory.createContent(panel, name, false)
     content.setPreferredFocusableComponent(panel)
     contentManager.addContent(content)

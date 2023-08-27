@@ -11,11 +11,11 @@ import java.util.regex.Pattern
 import scala.collection.mutable
 
 trait ScaledaMessageToolchainParser {
-  def parse(rt: ScaledaRuntime, @Nls text: String, level: LogLevel.Value): Option[ScaledaMessage] = Some(
+  def parse(rt: ScaledaRuntime, text: String, level: LogLevel.Value): Option[ScaledaMessage] = Some(
     defaultParse(rt, text, level)
   )
 
-  protected def defaultParse(rt: ScaledaRuntime, @Nls text: String, level: LogLevel.Value): ScaledaMessage = {
+  protected def defaultParse(rt: ScaledaRuntime, text: String, level: LogLevel.Value): ScaledaMessage = {
     val levelPattern = Pattern.compile("\\b(info|warn|warning|error|fatal)\\b", Pattern.CASE_INSENSITIVE)
     val levelMatcher = levelPattern.matcher(text)
     // find first level

@@ -1,38 +1,33 @@
 package top.scaleda
 package idea.utils
 
-import idea.windows.bottomPanel.console.ConsoleService
 import kernel.shell.ScaledaRunHandler
 import kernel.utils.{BasicLogger, LogLevel}
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import sourcecode.{File, Line, Name}
+import top.scaleda.idea.windows.bottomPanel.ConsoleService
 
+/**
+ * Logger for all external running stuff.
+ * Message logged here will be sent to (1) console and (2) message list.
+ * @param project current project
+ */
 class OutputLogger(project: Project) extends BasicLogger {
-  val logger: Logger = Logger.getInstance(OutputLogger.LOGGER_ID)
-
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit
       line: Line,
       file: File,
       name: Name
-  ) = {
-    import LogLevel._
+  ): Unit = {
     val args = xs.mkString(" ")
     val msg  = args
-    level match {
-      case Debug => logger.debug(msg)
-      case Info  => logger.info(msg)
-      case Warn  => logger.warn(msg)
-      case _     => logger.error(msg)
-    }
     val service = project.getService(classOf[ConsoleService])
-    service.print(OutputLogger.LOGGER_ID, s"$msg\n", level)
+    service.print(s"$msg\n", level)
   }
 }
 
 object OutputLogger {
-  final val LOGGER_ID                       = "scaleda-output"
   def apply(project: Project): OutputLogger = new OutputLogger(project)
   // def apply(): OutputLogger                 = new OutputLogger(ProjectNow.apply().get)
 

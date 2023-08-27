@@ -192,13 +192,18 @@
     
     <!-- Tool Windows -->
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="scaleda-messages" anchor="bottom" factoryClass="top.scaleda.idea.windows.bottomPanel.ScaledaMessagesWindowFactory" />
+        <toolWindow id="Scaleda Messages"
+                    anchor="bottom" factoryClass="top.scaleda.idea.windows.bottomPanel.ScaledaMessagesWindowFactory" />
+        <toolWindow id="Scaleda Tasks"
+                    anchor="right" factoryClass="top.scaleda.idea.windows.rightPanel.ScaledaTasksWindowFactory" />
     </extensions>
 
 
     <!-- Project Services -->
     <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceImplementation="top.scaleda.idea.windows.bottomPanel.console.ConsoleService"/>
+        <projectService serviceImplementation="top.scaleda.idea.windows.bottomPanel.ConsoleService"/>
+        <projectService serviceImplementation="top.scaleda.idea.windows.bottomPanel.message.MessageListService"/>
+        <projectService serviceImplementation="top.scaleda.idea.windows.rightPanel.ScaledaTasksService" />
         <projectService serviceImplementation="top.scaleda.idea.rvcd.RvcdService"/>
         <projectService serviceImplementation="top.scaleda.idea.utils.RpcService"/>
     </extensions>

@@ -1,7 +1,7 @@
 package top.scaleda
 package idea
 
-import idea.windows.rightPanel.ScaledaRunWindowFactory
+import idea.windows.rightPanel.ScaledaTasksWindowFactory
 import idea.windows.bottomPanel.message.ScaledaMessageRenderer.fileRegex
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -107,6 +107,6 @@ class SimpleTester extends AnyFlatSpec with should.Matchers {
 
   it should "get class path" in {
     println(getClass.getName)
-    println(ScaledaRunWindowFactory.getClass.getName)
+    println(ScaledaTasksWindowFactory.getClass.getName)
   }
 }

@@ -13,10 +13,11 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class ScaledaRunRootNode(val projectConfig: ProjectConfig) extends ScaledaRunTreeNode(projectConfig.name) {
+  var parent: Option[ScaledaTasksDummyRootNode] = None
   override val icon: Icon                                  = Icons.mainSmall
   override def getChildAt(i: Int): TreeNode                = targets(i)
   override def getChildCount: Int                          = targets.size
-  override def getParent: TreeNode                         = null
+  override def getParent: TreeNode                         = parent.orNull
   override def getIndex(treeNode: TreeNode): Int           = targets.indexOf(treeNode)
   override def getAllowsChildren: Boolean                  = true
   override def isLeaf: Boolean                             = false

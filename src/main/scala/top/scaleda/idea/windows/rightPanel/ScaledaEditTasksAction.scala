@@ -2,7 +2,6 @@ package top.scaleda
 package idea.windows.rightPanel
 
 import idea.ScaledaBundle
-import idea.project.IdeaManifestManager
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
