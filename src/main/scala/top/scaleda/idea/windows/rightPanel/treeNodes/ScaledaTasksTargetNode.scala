@@ -1,11 +1,10 @@
 package top.scaleda
-package idea.windows.rightPanel
+package idea.windows.rightPanel.treeNodes
 
 import idea.utils.Icons
 import kernel.project.config.TargetConfig
-
-import top.scaleda.kernel.toolchain.impl.Vivado
-import top.scaleda.kernel.utils.KernelFileUtils
+import kernel.toolchain.impl.Vivado
+import kernel.utils.KernelFileUtils
 
 import java.util
 import java.util.Collections.enumeration
@@ -13,10 +12,10 @@ import javax.swing.tree.TreeNode
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(target.name) {
+class ScaledaTasksTargetNode(val target: TargetConfig) extends ScaledaTasksTreeNode(target.name) {
   override val icon = Icons.target
 
-  var parent: Option[ScaledaRunRootNode] = None
+  var parent: Option[ScaledaTasksRootNode] = None
 
   override def getChildAt(i: Int): TreeNode = tasks(i)
 
@@ -39,7 +38,7 @@ class ScaledaRunTargetNode(val target: TargetConfig) extends ScaledaRunTreeNode(
   var toolchain: String                    = target.toolchain
   var options: Option[Map[String, String]] = target.options
 
-  var tasks: mutable.Buffer[ScaledaRunTaskNode] = target.tasks.map(new ScaledaRunTaskNode(_)).toBuffer
+  var tasks: mutable.Buffer[ScaledaTasksTaskNode] = target.tasks.map(new ScaledaTasksTaskNode(_)).toBuffer
   tasks.foreach(_.parent = Some(this))
 
   def toTargetConfig: TargetConfig = TargetConfig(

@@ -2,7 +2,7 @@ package top.scaleda
 package kernel
 
 import kernel.project.config.ProjectConfig
-import kernel.project.{ManifestManager, ProjectManifest}
+import kernel.project.{ManifestManager, ScaledaProject}
 import kernel.utils.KernelFileUtils
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -18,7 +18,7 @@ class IPTester extends AnyFlatSpec with should.Matchers {
     if (workDirFile.exists()) {
       // backup global project path
       val bkp                                = ManifestManager.getManifest().projectBase
-      implicit val manifest: ProjectManifest = ManifestManager.getManifest()
+      implicit val manifest: ScaledaProject = ManifestManager.getManifest()
       manifest.projectBase = Some(workDir)
       manifest.configFile = Some(new File(workDirFile, ProjectConfig.defaultConfigFile).getAbsolutePath)
       val config =
@@ -27,14 +27,14 @@ class IPTester extends AnyFlatSpec with should.Matchers {
       println(ips)
       val ipSources = ips
         .flatMap(c => {
-          c._2.getSourceSet(manifest = ProjectManifest.getTemporalManifest(c._1)) ++ c._2
-            .getTestSet(manifest = ProjectManifest.getTemporalManifest(c._1))
+          c._2.getSourceSet(project = ScaledaProject.getTemporalProject(c._1)) ++ c._2
+            .getTestSet(project = ScaledaProject.getTemporalProject(c._1))
         })
         .toSet
       println(ipSources)
       // test update cache
       val ipFiles = config.getIpFiles ++ ips
-        .flatMap(c => c._2.getIpFiles(manifest = ProjectManifest.getTemporalManifest(c._1)))
+        .flatMap(c => c._2.getIpFiles(project = ScaledaProject.getTemporalProject(c._1)))
         .toSet
       KernelFileUtils.doUpdateIpFilesCache(ipFiles)
       // restore bkp

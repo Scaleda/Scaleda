@@ -2,8 +2,8 @@ package top.scaleda
 package idea.windows.rightPanel.target.toolchain
 
 import com.intellij.ui.DocumentAdapter
-import idea.windows.rightPanel.ScaledaRunTargetNode
 import kernel.project.config.TargetConfig
+import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksTargetNode
 
 import javax.swing._
 import javax.swing.event.{DocumentEvent, DocumentListener}

@@ -4,14 +4,15 @@ package idea.windows.rightPanel.target
 import idea.ScaledaBundle
 import idea.utils.{ChooseTopModuleListener, ProjectBrowserListener}
 import idea.windows.rightPanel.target.toolchain.{EmptyConfigPanel, ExtraConfigPanel, VivadoConfigPanel}
-import idea.windows.rightPanel.{ScaledaEditPanelWrapper, ScaledaRunTargetNode}
-import kernel.project.ProjectManifest
+import idea.windows.rightPanel.ScaledaEditPanelWrapper
+import kernel.project.ScaledaProject
 import kernel.toolchain.Toolchain
 import kernel.utils.KernelFileUtils
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.ui.{DocumentAdapter, SimpleColoredComponent}
+import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksTargetNode
 
 import java.awt.BorderLayout
 import java.awt.event.ItemEvent
@@ -19,8 +20,8 @@ import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
 
-class ScaledaEditTargetPanelWrapper(val targetConfig: ScaledaRunTargetNode, setValid: => Unit)(implicit
-    manifest: ProjectManifest
+class ScaledaEditTargetPanelWrapper(val targetConfig: ScaledaTasksTargetNode, setValid: => Unit)(implicit
+                                                                                                 manifest: ScaledaProject
 ) extends JPanel
     with ScaledaEditPanelWrapper {
   val inner = new TargetBasicPanel

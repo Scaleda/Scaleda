@@ -3,8 +3,8 @@ package idea.windows.rightPanel.task
 
 import idea.ScaledaBundle
 import idea.utils.{ChooseTopModuleListener, ProjectBrowserListener}
-import idea.windows.rightPanel.{ScaledaEditPanelWrapper, ScaledaRunTargetNode, ScaledaRunTaskNode}
-import kernel.project.ProjectManifest
+import idea.windows.rightPanel.ScaledaEditPanelWrapper
+import kernel.project.ScaledaProject
 import kernel.project.config.TaskConfig
 import kernel.toolchain.Toolchain
 import kernel.utils.KernelFileUtils
@@ -13,6 +13,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.ui.{DocumentAdapter, SimpleColoredComponent}
 import org.jdesktop.swingx.prompt.PromptSupport
+import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksTargetNode, ScaledaTasksTaskNode}
 
 import java.awt.event.ItemEvent
 import java.awt.{BorderLayout, Color, Font}
@@ -20,12 +21,12 @@ import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
 
-class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaRunTaskNode, setValid: => Unit)(implicit
-    manifest: ProjectManifest
+class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaTasksTaskNode, setValid: => Unit)(implicit
+                                                                                           manifest: ScaledaProject
 ) extends JPanel
     with ScaledaEditPanelWrapper {
 
-  private val toolchainType = taskConfig.getParent.asInstanceOf[ScaledaRunTargetNode].toolchain
+  private val toolchainType = taskConfig.getParent.asInstanceOf[ScaledaTasksTargetNode].toolchain
   private val toolchain     = Toolchain.toolchains(toolchainType) // FIXME: null?
   private val toolchainSupportedTaskList = TaskConfig.taskTypeList
     .filter(f => toolchain._3.contains(f._2._2))

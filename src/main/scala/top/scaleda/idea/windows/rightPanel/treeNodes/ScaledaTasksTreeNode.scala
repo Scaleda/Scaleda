@@ -1,10 +1,10 @@
 package top.scaleda
-package idea.windows.rightPanel
+package idea.windows.rightPanel.treeNodes
 
 import javax.swing.Icon
 import javax.swing.tree.{TreeNode, TreePath}
 
-abstract class ScaledaRunTreeNode(var name: String) extends TreeNode {
+abstract class ScaledaTasksTreeNode(var name: String) extends TreeNode {
   val icon: Icon
   var topModule: Option[String]
   var constraints: Option[String]
@@ -13,7 +13,7 @@ abstract class ScaledaRunTreeNode(var name: String) extends TreeNode {
     topModule match {
       case Some(str) => Some(str)
       case None => getParent match {
-        case parent: ScaledaRunTreeNode => parent.findTopModule
+        case parent: ScaledaTasksTreeNode => parent.findTopModule
         case null => None
       }
     }
@@ -23,7 +23,7 @@ abstract class ScaledaRunTreeNode(var name: String) extends TreeNode {
     constraints match {
       case Some(str) => Some(str)
       case None => getParent match {
-        case parent: ScaledaRunTreeNode => parent.findConstraints
+        case parent: ScaledaTasksTreeNode => parent.findConstraints
         case null => None
       }
     }
@@ -32,8 +32,8 @@ abstract class ScaledaRunTreeNode(var name: String) extends TreeNode {
   def validate: Boolean
 
   def toTreePath: TreePath = {
-    if (this.isInstanceOf[ScaledaRunRootNode]) new TreePath(this)
-    else new TreePath(this.getParent.asInstanceOf[ScaledaRunTreeNode].toTreePath, this)
+    if (this.isInstanceOf[ScaledaTasksRootNode]) new TreePath(this)
+    else new TreePath(this.getParent.asInstanceOf[ScaledaTasksTreeNode].toTreePath, this)
   }
 
   override def toString = name

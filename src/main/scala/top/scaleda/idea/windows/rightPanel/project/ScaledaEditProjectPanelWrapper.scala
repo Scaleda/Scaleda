@@ -3,20 +3,21 @@ package idea.windows.rightPanel.project
 
 import idea.ScaledaBundle
 import idea.utils.{ChooseTopModuleListener, ProjectBrowserListener}
-import idea.windows.rightPanel.{ScaledaEditPanelWrapper, ScaledaRunRootNode}
-import kernel.project.ProjectManifest
+import idea.windows.rightPanel.ScaledaEditPanelWrapper
+import kernel.project.ScaledaProject
 import kernel.utils.KernelFileUtils
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.ui.DocumentAdapter
+import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksRootNode
 
 import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
 
-class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaRunRootNode, setValid: => Unit)(implicit
-    manifest: ProjectManifest
+class ScaledaEditProjectPanelWrapper(val projectConfig: ScaledaTasksRootNode, setValid: => Unit)(implicit
+                                                                                                 manifest: ScaledaProject
 ) extends ScaledaEditPanelWrapper {
   val inner = new ScaledaEditProjectPanel
 

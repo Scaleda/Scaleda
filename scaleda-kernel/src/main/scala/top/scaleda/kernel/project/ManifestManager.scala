@@ -7,7 +7,7 @@ import scala.collection.mutable
 
 object ManifestManager {
   // map of project abs-path to project basic info, for default cli project, key is "", value.project is None
-  private val manifestPool: mutable.HashMap[String, ProjectManifest] = mutable.HashMap(
+  private val manifestPool: mutable.HashMap[String, ScaledaProject] = mutable.HashMap(
     // "" -> new ProjectManifest()
   )
   // def putManifest(key: String, manifest: ProjectManifest, overrideManifest: Boolean = false): Unit = {
@@ -24,13 +24,13 @@ object ManifestManager {
   //   val p = if (project == null) AbstractProject.default else project
   //   manifestPool.get(p.getBasePath)
   // }
-  def getManifest(project: AbstractProject = AbstractProject.default): ProjectManifest = {
+  def getManifest(project: AbstractProject = AbstractProject.default): ScaledaProject = {
     this.synchronized {
       val p   = if (project == null) AbstractProject.default else project
       val key = p.getBasePath
       if (manifestPool.contains(key)) manifestPool(key)
       else {
-        val v = new ProjectManifest(p)
+        val v = new ScaledaProject(p)
         KernelLogger.info(s"put manifest ${key}, p=${p}", v)
         manifestPool.put(key, v)
         v
@@ -38,7 +38,7 @@ object ManifestManager {
     }
   }
 
-  private val objectPool: mutable.HashMap[ProjectManifest, mutable.HashMap[String, Any]] = mutable.HashMap()
+  private val objectPool: mutable.HashMap[ScaledaProject, mutable.HashMap[String, Any]] = mutable.HashMap()
 
   def getObjectPool = objectPool
 

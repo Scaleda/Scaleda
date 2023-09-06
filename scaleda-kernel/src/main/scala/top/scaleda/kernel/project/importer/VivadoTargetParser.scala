@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel.project.importer
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.project.config.{ProjectConfig, TargetConfig, TaskConfig}
 import kernel.project.detect.VivadoProjectConfig
 import kernel.toolchain.impl.Vivado
@@ -18,8 +18,7 @@ trait VivadoTargetParser extends BasicTargetParser {
     val o              = XMLHelper(projectFile, classOf[VivadoProjectConfig])
     val projectXprFile = new File(o.Path)
     val projectBase    = projectFile.getParentFile.getAbsolutePath
-    // implicit val manifest = ManifestManager.getManifest()
-    implicit val manifest = ProjectManifest.getTemporalManifest(projectBase)
+    implicit val project: ScaledaProject = ScaledaProject.getTemporalProject(projectBase)
     // $PSRCDIR/sim_1 => <projectBase>/<projectName>.srcs/sim_1
     val replace = new RegexReplace(
       regexPatten = "(\\$PSRCDIR[/\\\\]?)",
@@ -31,7 +30,7 @@ trait VivadoTargetParser extends BasicTargetParser {
       (srcSets.flatMap(_.files.map(_.Path)) ++ srcSets.map(_.RelSrcDir))
         .filter(_.nonEmpty)
         .map(c => replace.doRegexReplace(c))
-        .map(p => KernelFileUtils.toAbsolutePath(p).getOrElse(p))
+        .map(p => KernelFileUtils.toCanonicalPath(p).getOrElse(p))
     val tests = o.fileSets.filter(_.Type == "SimulationSrcs").map(_.RelSrcDir).map(c => replace.doRegexReplace(c))
     // options in xpr usually have TopModule item
     val top = srcSets
@@ -72,7 +71,7 @@ trait VivadoTargetParser extends BasicTargetParser {
       tasks = if (simTop.nonEmpty) Array(synthTask, simTask) else Array(synthTask),
       options = Some(Map("part" -> part))
     )
-    val project = ProjectConfig(
+    ProjectConfig(
       name = projectName,
       // add sources; use relative path; if path is single dir, set to source/test
       sources = if (relativeSources.size > 1) relativeSources else Seq(),
@@ -82,6 +81,5 @@ trait VivadoTargetParser extends BasicTargetParser {
       ipFiles = simpleIPFiles,
       targets = Array(target)
     )
-    project
   }
 }

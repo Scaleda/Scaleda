@@ -1,7 +1,7 @@
 package top.scaleda
 package idea.utils
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import verilog.utils.ModuleUtils
 
 import com.intellij.openapi.actionSystem._
@@ -9,10 +9,10 @@ import com.intellij.openapi.actionSystem._
 import java.awt.event.{ActionEvent, ActionListener}
 import javax.swing.JTextField
 
-class ChooseTopModuleListener(targetField: JTextField)(implicit manifest: ProjectManifest) extends ActionListener {
+class ChooseTopModuleListener(targetField: JTextField)(implicit project: ScaledaProject) extends ActionListener {
   override def actionPerformed(actionEvent: ActionEvent) = {
     val group   = new DefaultActionGroup()
-    val modules = ModuleUtils.parseSourceSetTopModules(Set(manifest.project.getBasePath))
+    val modules = ModuleUtils.parseSourceSetTopModules(Set(project.project.getBasePath))
     if (modules.nonEmpty)
       modules.foreach(name =>
         group.add(new AnAction(name) {

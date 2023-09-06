@@ -1,20 +1,18 @@
 package top.scaleda
-package idea.windows.rightPanel
+package idea.windows.rightPanel.treeNodes
 
+import idea.utils.Icons
 import kernel.project.config.TaskConfig
-
-import com.intellij.icons.AllIcons
-import top.scaleda.idea.utils.Icons
-import top.scaleda.kernel.utils.KernelFileUtils
+import kernel.utils.KernelFileUtils
 
 import java.util
 import javax.swing.Icon
 import javax.swing.tree.TreeNode
 
-class ScaledaRunTaskNode(val task: TaskConfig) extends ScaledaRunTreeNode(task.name) {
+class ScaledaTasksTaskNode(val task: TaskConfig) extends ScaledaTasksTreeNode(task.name) {
   override val icon: Icon = Icons.task
 
-  var parent: Option[ScaledaRunTargetNode] = None
+  var parent: Option[ScaledaTasksTargetNode] = None
 
   override def getChildAt(i: Int): TreeNode = null
 

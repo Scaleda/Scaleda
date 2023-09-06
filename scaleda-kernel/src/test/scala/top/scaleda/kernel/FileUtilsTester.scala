@@ -2,7 +2,7 @@ package top.scaleda
 package kernel
 
 import kernel.project.config.ProjectConfig
-import kernel.project.{ManifestManager, ProjectManifest}
+import kernel.project.{ManifestManager, ScaledaProject}
 import kernel.utils.{KernelFileUtils, OS}
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -51,13 +51,13 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
   it should "converts between absolute paths and relative paths" in {
     // make backup so we can have continuous testing
     val bkp                                = ManifestManager.getManifest().projectBase
-    implicit val manifest: ProjectManifest = ManifestManager.getManifest()
+    implicit val manifest: ScaledaProject = ManifestManager.getManifest()
     if (OS.isWindows) {
       ManifestManager.getManifest().projectBase = Some("C:\\Coding\\my_project")
-      println(KernelFileUtils.toAbsolutePath("\\Coding\\my_project\\src\\1.v"))
-      println(KernelFileUtils.toAbsolutePath("C:\\Coding\\my_project\\src\\1.v"))
-      println(KernelFileUtils.toAbsolutePath("src\\2.v"))
-      println(KernelFileUtils.toAbsolutePath("src/3/4.v"))
+      println(KernelFileUtils.toCanonicalPath("\\Coding\\my_project\\src\\1.v"))
+      println(KernelFileUtils.toCanonicalPath("C:\\Coding\\my_project\\src\\1.v"))
+      println(KernelFileUtils.toCanonicalPath("src\\2.v"))
+      println(KernelFileUtils.toCanonicalPath("src/3/4.v"))
       println(KernelFileUtils.toProjectRelativePath("src/5.v"))
       println(KernelFileUtils.toProjectRelativePath("src\\6.v"))
       println(KernelFileUtils.toProjectRelativePath("C:\\Coding\\my_project\\test\\2.v"))
@@ -66,10 +66,10 @@ class FileUtilsTester extends AnyFlatSpec with should.Matchers {
     } else {
       // same tests on Linux
       ManifestManager.getManifest().projectBase = Some("/home/criwits/my_project")
-      println(KernelFileUtils.toAbsolutePath("/home/criwits/my_project/src/1.v"))
-      println(KernelFileUtils.toAbsolutePath("/home/criwits/my_project/src/2.v"))
-      println(KernelFileUtils.toAbsolutePath("src/3.v"))
-      println(KernelFileUtils.toAbsolutePath("src/4/5.v"))
+      println(KernelFileUtils.toCanonicalPath("/home/criwits/my_project/src/1.v"))
+      println(KernelFileUtils.toCanonicalPath("/home/criwits/my_project/src/2.v"))
+      println(KernelFileUtils.toCanonicalPath("src/3.v"))
+      println(KernelFileUtils.toCanonicalPath("src/4/5.v"))
       println(KernelFileUtils.toProjectRelativePath("src/6.v"))
       println(KernelFileUtils.toProjectRelativePath("src/7.v"))
       println(KernelFileUtils.toProjectRelativePath("/home/criwits/my_project/test/2.v"))

@@ -1,5 +1,5 @@
 package top.scaleda
-package idea.windows.rightPanel
+package idea.windows.rightPanel.treeNodes
 
 import idea.utils.Icons
 import kernel.project.config.ProjectConfig
@@ -12,7 +12,7 @@ import javax.swing.tree.TreeNode
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
-class ScaledaRunRootNode(val projectConfig: ProjectConfig) extends ScaledaRunTreeNode(projectConfig.name) {
+class ScaledaTasksRootNode(val projectConfig: ProjectConfig) extends ScaledaTasksTreeNode(projectConfig.name) {
   var parent: Option[ScaledaTasksDummyRootNode] = None
   override val icon: Icon                                  = Icons.mainSmall
   override def getChildAt(i: Int): TreeNode                = targets(i)
@@ -30,7 +30,7 @@ class ScaledaRunRootNode(val projectConfig: ProjectConfig) extends ScaledaRunTre
   // TODO: configure ProjectConfig.sources
   var test: String = projectConfig.test
 
-  var targets: mutable.Buffer[ScaledaRunTargetNode] = projectConfig.targets.map(new ScaledaRunTargetNode(_)).toBuffer
+  var targets: mutable.Buffer[ScaledaTasksTargetNode] = projectConfig.targets.map(new ScaledaTasksTargetNode(_)).toBuffer
   targets.foreach(_.parent = Some(this))
 
   /** Re-generate project configuration

@@ -6,6 +6,7 @@ import idea.project.io.YmlRootManager
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksRootNode
 
 /** Action: Load Scaleda project config, with all its targets and tasks.
   * This action should be performed when
@@ -32,6 +33,6 @@ class ScaledaReloadTasksAction
     val ymlRoot = YmlRootManager.getInstance(project).getRoots
 
     panel.getRoots.clear()
-    panel.getRoots.addAll(ymlRoot.flatMap(_.toProjectConfig.map(config => new ScaledaRunRootNode(config))))
+    panel.getRoots.addAll(ymlRoot.flatMap(_.toProjectConfig.map(config => new ScaledaTasksRootNode(config))))
   }
 }

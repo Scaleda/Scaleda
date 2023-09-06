@@ -4,7 +4,7 @@ package idea.windows.bottomPanel.message
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import top.scaleda.idea.windows.bottomPanel.ConsoleService
-import top.scaleda.idea.windows.bottomPanel.console.ConsoleReceiver
+import top.scaleda.idea.windows.bottomPanel.console.{ConsoleReceiver, ConsoleTabManager}
 import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 import top.scaleda.kernel.utils.LogLevel
 
@@ -16,6 +16,8 @@ class MessageListService(val project: Project) extends Disposable with ConsoleRe
 
   private var currentParser: Option[ScaledaMessageToolchainParser] = None
   private var currentRuntime: Option[ScaledaRuntime] = None
+
+  private var tabManager: Option[ConsoleTabManager] = None
 
   // register myself to ConsoleService
   project.getService(classOf[ConsoleService]).addListener(this)
@@ -49,4 +51,5 @@ class MessageListService(val project: Project) extends Disposable with ConsoleRe
   }
 
   def getCurrentRuntime: Option[ScaledaRuntime] = currentRuntime
+
 }

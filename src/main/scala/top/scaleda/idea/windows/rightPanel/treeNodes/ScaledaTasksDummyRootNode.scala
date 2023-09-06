@@ -1,5 +1,6 @@
 package top.scaleda
-package idea.windows.rightPanel
+package idea.windows.rightPanel.treeNodes
+
 import java.util
 import javax.swing.Icon
 import javax.swing.tree.TreeNode
@@ -7,12 +8,12 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
-class ScaledaTasksDummyRootNode(roots: Seq[ScaledaRunRootNode] = Seq[ScaledaRunRootNode]()) extends ScaledaRunTreeNode("Dummy Root") {
+class ScaledaTasksDummyRootNode(roots: Seq[ScaledaTasksRootNode] = Seq[ScaledaTasksRootNode]()) extends ScaledaTasksTreeNode("Dummy Root") {
   override val icon: Icon                  = null
   override var topModule: Option[String]   = None
   override var constraints: Option[String] = None
 
-  val rootNodes: mutable.ArrayBuffer[ScaledaRunRootNode] = ArrayBuffer.from(roots)
+  val rootNodes: mutable.ArrayBuffer[ScaledaTasksRootNode] = ArrayBuffer.from(roots)
   rootNodes.foreach(_.parent = Some(this))
 
   override def validate: Boolean = true
@@ -29,6 +30,6 @@ class ScaledaTasksDummyRootNode(roots: Seq[ScaledaRunRootNode] = Seq[ScaledaRunR
 
   override def isLeaf: Boolean = false
 
-  override def children(): util.Enumeration[ScaledaRunRootNode] = util.Collections.enumeration(rootNodes.asJava)
+  override def children(): util.Enumeration[ScaledaTasksRootNode] = util.Collections.enumeration(rootNodes.asJava)
 
 }

@@ -33,6 +33,6 @@ class ConfigurationTest extends AnyFlatSpec with should.Matchers {
 
     val manifest = ManifestManager.getManifest()
     manifest.projectBase = Some("/home/chiro/programs/scaleda-sample-project/")
-    println(ScaledaKernelConfiguration.configurations(manifest = manifest))
+    println(ScaledaKernelConfiguration.configurations(project = manifest))
   }
 }

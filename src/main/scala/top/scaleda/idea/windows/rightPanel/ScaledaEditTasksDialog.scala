@@ -9,6 +9,7 @@ import kernel.project.config.ProjectConfig
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksRootNode
 
 import java.io.File
 import javax.swing.JComponent
@@ -27,7 +28,7 @@ class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
     implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
     ProjectConfig.getConfig
       .map(c => {
-        val rootNode = new ScaledaRunRootNode(c)
+        val rootNode = new ScaledaTasksRootNode(c)
         if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(project, rootNode, setValid)
         mainPanel
       })

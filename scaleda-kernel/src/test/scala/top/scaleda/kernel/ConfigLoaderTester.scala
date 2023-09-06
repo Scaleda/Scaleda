@@ -2,7 +2,7 @@ package top.scaleda
 package kernel
 
 import kernel.project.config.ProjectConfig
-import kernel.project.{ManifestManager, ProjectManifest}
+import kernel.project.{ManifestManager, ScaledaProject}
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
@@ -45,7 +45,7 @@ class ConfigLoaderTester extends AnyFlatSpec with should.Matchers {
   }
 
   it should "load config and parse successfully" in {
-    implicit val manifest: ProjectManifest = ManifestManager.getManifest()
+    implicit val manifest: ScaledaProject = ManifestManager.getManifest()
     manifest.configFile = Some(testFile.getAbsolutePath)
     manifest.projectBase = Some(testFile.getParent)
 

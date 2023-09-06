@@ -13,6 +13,7 @@ import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
+import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksDummyRootNode, ScaledaTasksRootNode}
 
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
@@ -29,8 +30,10 @@ class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, tr
 
   private val tree = new Tree(model)
   tree.setRootVisible(false)
-  tree.setCellRenderer(new ScaledaRunTreeCellRenderer)
+  tree.setCellRenderer(new ScaledaTasksTreeCellRenderer)
+
   TreeUtil.installActions(tree)
+
   private val _ = new TreeSpeedSearch(tree)
 
   // Run
@@ -112,5 +115,5 @@ class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, tr
   def getTree: Tree              = tree
   def getModel: DefaultTreeModel = model
 
-  def getRoots: ArrayBuffer[ScaledaRunRootNode] = dummyRoot.rootNodes
+  def getRoots: ArrayBuffer[ScaledaTasksRootNode] = dummyRoot.rootNodes
 }

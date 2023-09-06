@@ -2,6 +2,7 @@ package top.scaleda
 package idea.windows.rightPanel
 
 import com.intellij.ui.{ColoredTreeCellRenderer, SimpleTextAttributes}
+import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode, ScaledaTasksTreeNode}
 import top.scaleda.kernel.project.config.TaskConfig
 import top.scaleda.kernel.toolchain.Toolchain
 
@@ -9,7 +10,8 @@ import java.awt.Component
 import javax.swing.JTree
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeCellRenderer, TreeCellRenderer}
 
-class ScaledaRunTreeCellRenderer extends ColoredTreeCellRenderer {
+//noinspection ScalaExtractStringToBundle,ReferencePassedToNls
+class ScaledaTasksTreeCellRenderer extends ColoredTreeCellRenderer {
   override def customizeCellRenderer(
       tree: JTree,
       value: Any,
@@ -19,20 +21,20 @@ class ScaledaRunTreeCellRenderer extends ColoredTreeCellRenderer {
       row: Int,
       hasFocus: Boolean
   ): Unit = {
-    val node = value.asInstanceOf[ScaledaRunTreeNode]
+    val node = value.asInstanceOf[ScaledaTasksTreeNode]
     setIcon(node.icon)
     append(node.name)
 
     node match {
-      case node: ScaledaRunRootNode =>
-      case node: ScaledaRunTargetNode =>
+      case node: ScaledaTasksRootNode =>
+      case node: ScaledaTasksTargetNode =>
         append(s" [${
           Toolchain.toolchains.get(node.toolchain) match {
             case Some(v) => v._1
             case _ => "unknown"
           }
         }]", SimpleTextAttributes.GRAY_ATTRIBUTES)
-      case node: ScaledaRunTaskNode =>
+      case node: ScaledaTasksTaskNode =>
         append(s" [${
           TaskConfig.taskTypeList.get(node.`type`) match {
             case Some(v) => v._1

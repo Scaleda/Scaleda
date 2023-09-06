@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import verilog.utils.ModuleUtils
 
 import org.scalatest.flatspec.AnyFlatSpec
@@ -21,8 +21,8 @@ class VerilogParseTest extends AnyFlatSpec with should.Matchers {
     val path = new File("/home/chiro/Vivado/Tests/ip_tests/ip_tests.srcs/sources_1/new")
     // val path = new File("/home/chiro/Vivado/Tests/ip_tests/ip_tests.srcs/")
     if (path.exists()) {
-      val tops = ModuleUtils.parseSourceSetTopModules(Set(path.getAbsolutePath))(manifest =
-        ProjectManifest.getTemporalManifest(path.getAbsolutePath)
+      val tops = ModuleUtils.parseSourceSetTopModules(Set(path.getAbsolutePath))(project =
+        ScaledaProject.getTemporalProject(path.getAbsolutePath)
       )
       println(s"tops: ${tops}")
     }

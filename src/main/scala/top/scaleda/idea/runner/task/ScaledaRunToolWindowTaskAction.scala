@@ -3,7 +3,6 @@ package idea.runner.task
 
 import idea.ScaledaBundle
 import idea.runner.configuration.{ScaledaRunConfigurationFactory, ScaledaRunConfigurationType}
-import idea.windows.rightPanel.ScaledaRunTaskNode
 import kernel.project.config.ProjectConfig
 
 import com.intellij.execution.Executor
@@ -14,6 +13,7 @@ import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 import top.scaleda.idea.project.io.YmlRootManager
+import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksTaskNode
 
 /** Action: run task in right panel
   *
@@ -32,12 +32,12 @@ class ScaledaRunToolWindowTaskAction(
     ) {
   override def update(e: AnActionEvent): Unit = {
     val presentation  = e.getPresentation
-    val selectedNodes = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
+    val selectedNodes = tree.getSelectedNodes(classOf[ScaledaTasksTaskNode], (_: ScaledaTasksTaskNode) => true)
     presentation.setEnabled(selectedNodes.nonEmpty)
   }
 
   override def actionPerformed(e: AnActionEvent): Unit = {
-    val selectedNodes = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
+    val selectedNodes = tree.getSelectedNodes(classOf[ScaledaTasksTaskNode], (_: ScaledaTasksTaskNode) => true)
     selectedNodes.foreach(task => {
       task.parent.foreach(target => {
         target.parent.foreach(root => {

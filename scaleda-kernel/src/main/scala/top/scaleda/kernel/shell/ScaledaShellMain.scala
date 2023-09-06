@@ -8,7 +8,7 @@ import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.net.user.ScaledaRegisterLogin
 import kernel.project.config.ProjectConfig
-import kernel.project.{AbstractProject, ManifestManager, ProjectManifest}
+import kernel.project.{AbstractProject, ManifestManager, ScaledaProject}
 import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
@@ -39,16 +39,16 @@ case class ShellArgs(
 )
 
 object ScaledaShellMain {
-  private def loadConfig(projectRootPath: String)(implicit manifest: ProjectManifest): Unit = {
+  private def loadConfig(projectRootPath: String)(implicit project: ScaledaProject): Unit = {
     KernelLogger.debug(s"loadConfig($projectRootPath)")
     val rootDir = new File(projectRootPath)
     if (rootDir.exists() && rootDir.isDirectory) {
-      manifest.projectBase = Some(rootDir.getAbsolutePath)
+      project.projectBase = Some(rootDir.getAbsolutePath)
     }
     val projectConfigFile =
       new File(projectRootPath, ProjectConfig.defaultConfigFile)
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
-      manifest.configFile = Some(projectConfigFile.getAbsolutePath)
+      project.configFile = Some(projectConfigFile.getAbsolutePath)
       val config = ProjectConfig.getConfig
       KernelLogger.debug(s"project config: $config")
     }
@@ -74,7 +74,7 @@ object ScaledaShellMain {
     KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
 
     // default manifest
-    implicit val manifest: ProjectManifest = ManifestManager.getManifest(project = AbstractProject.default)
+    implicit val manifest: ScaledaProject = ManifestManager.getManifest(project = AbstractProject.default)
 
     // set exception handler
     Thread.currentThread().setUncaughtExceptionHandler(new ShellExceptionHandler)

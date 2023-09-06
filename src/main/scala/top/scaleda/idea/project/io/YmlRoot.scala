@@ -5,7 +5,7 @@ import kernel.project.config.ProjectConfig
 import kernel.utils.serialise.YAMLHelper
 
 import com.intellij.openapi.vfs.VirtualFile
-import top.scaleda.kernel.project.ProjectManifest
+import top.scaleda.kernel.project.ScaledaProject
 
 /** A [[YmlRoot]] = A directory containing a scaleda.yml file.
   * @param root The directory containing the scaleda.yml file.
@@ -27,7 +27,7 @@ class YmlRoot(private val root: VirtualFile, private val yml: VirtualFile) {
     }
   }
 
-  def toProjectManifest: ProjectManifest = new ProjectManifest(
+  def toScaledaProject: ScaledaProject = new ScaledaProject(
     projectBase = Some(root.getCanonicalPath), // or use getPath is enough?
     configFile = Some(yml.getCanonicalPath)
   )

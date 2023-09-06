@@ -2,7 +2,7 @@ package top.scaleda
 package kernel.toolchain.impl
 
 import kernel.net.remote.RemoteInfo
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.shell.command.CommandDeps
 import kernel.toolchain.executor.{Executor, SimulationExecutor}
@@ -20,7 +20,7 @@ class IVerilog(executor: Executor) extends Toolchain(executor) {
 
   override def getName: String = userFriendlyName
 
-  override def simulate(task: TaskConfig)(implicit manifest: ProjectManifest) = {
+  override def simulate(task: TaskConfig)(implicit project: ScaledaProject) = {
     val simExecutor = executor.asInstanceOf[SimulationExecutor]
     // create working directory
     val workingDir = simExecutor.workingDir
@@ -130,7 +130,7 @@ object IVerilog extends ToolchainPresetProvider {
 
   override def handlePreset(rt: ScaledaRuntime, remoteInfo: Option[RemoteInfo]) = {
     require(rt.task.taskType == TaskType.Simulation)
-    implicit val manifest = rt.manifest
+    implicit val manifest = rt.project
     val simExecutor       = rt.executor.asInstanceOf[SimulationExecutor]
     // get testbench info
     val testbench = simExecutor.topModule
