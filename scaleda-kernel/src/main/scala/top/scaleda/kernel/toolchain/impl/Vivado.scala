@@ -212,7 +212,7 @@ object Vivado
       .getAllSourceFiles(
         taskConfig.getIpFiles ++ taskConfig.getAllIps
           .flatMap(c => c._2.getIpFiles(project = ScaledaProject.getTemporalProject(c._1))),
-        suffixing = Set("xcix", "xci")
+        suffix = Set("xcix", "xci")
       )
       .filter(_.exists())
       .map(_.getAbsolutePath)

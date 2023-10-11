@@ -61,7 +61,7 @@ trait VivadoTargetParser extends BasicTargetParser {
 
     val simpleIPFiles = KernelFileUtils
       // search from source set, just from directories
-      .getAllSourceFiles(sources.toSet, suffixing = Set("xci", "xcix"))
+      .getAllSourceFiles(sources.toSet, suffix = Set("xci", "xcix"))
       .map(_.getAbsolutePath)
       .map(p => KernelFileUtils.toProjectRelativePath(p).getOrElse(p))
     val target = TargetConfig(

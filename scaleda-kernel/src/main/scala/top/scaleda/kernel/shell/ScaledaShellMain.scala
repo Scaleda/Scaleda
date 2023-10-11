@@ -8,7 +8,7 @@ import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.net.user.ScaledaRegisterLogin
 import kernel.project.config.ProjectConfig
-import kernel.project.{AbstractProject, ManifestManager, ScaledaProject}
+import kernel.project.ScaledaProject
 import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
@@ -74,7 +74,7 @@ object ScaledaShellMain {
     KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
 
     // default manifest
-    implicit val manifest: ScaledaProject = ManifestManager.getManifest(project = AbstractProject.default)
+    implicit val project: ScaledaProject = new ScaledaProject()
 
     // set exception handler
     Thread.currentThread().setUncaughtExceptionHandler(new ShellExceptionHandler)
@@ -93,11 +93,11 @@ object ScaledaShellMain {
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(a))
     // preparse server host
     // val host = preParseArgs(args, Seq("-h", "--host"))
-    if (manifest.configFile.isEmpty) {
+    if (project.configFile.isEmpty) {
       // try loading config in pwd
       loadConfig(Paths.pwd.getAbsolutePath)
     }
-    if (manifest.configFile.isEmpty)
+    if (project.configFile.isEmpty)
       KernelLogger.info("No project config detected!")
 
     def requireHost(shellConfig: ShellArgs): Unit = {

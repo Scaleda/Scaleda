@@ -2,7 +2,6 @@ package top.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
-import idea.project.IdeaManifestManager
 import idea.utils.ScaledaIdeaLogger
 import kernel.net.remote.RemoteProfile
 import kernel.net.user.ScaledaAuthorizationProvider
@@ -18,6 +17,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, TextFieldWithBrowseButton}
 import com.intellij.ui.SimpleColoredComponent
 import com.intellij.util.ui.{FormBuilder, UIUtil}
+import top.scaleda.idea.project.io.YmlRootManager
+import top.scaleda.kernel.project.ScaledaProject
 
 import java.awt.event.{ItemEvent, KeyEvent, KeyListener}
 import javax.swing.SwingUtilities
@@ -55,7 +56,8 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
-  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
+
   ProjectConfig.getConfig.foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
 
   private def maySetProfileToDefault(list: Seq[ProfilePair]): Unit = {

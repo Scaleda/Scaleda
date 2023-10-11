@@ -1,7 +1,6 @@
 package top.scaleda
 package idea.runner.configuration
 
-import idea.project.IdeaManifestManager
 import idea.utils.ScaledaIdeaLogger
 import kernel.project.config.ProjectConfig
 
@@ -9,6 +8,8 @@ import com.intellij.execution.actions.{ConfigurationContext, LazyRunConfiguratio
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
+import top.scaleda.idea.project.io.YmlRootManager
+import top.scaleda.kernel.project.ScaledaProject
 
 class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[ScaledaRunConfiguration] {
   override def setupConfigurationFromContext(
@@ -17,7 +18,7 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
       sourceElement: Ref[PsiElement]
   ): Boolean = {
     ScaledaIdeaLogger.debug("setupConfigurationFromContext config taskName:", configuration.taskName)
-    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = context.getProject)
+    implicit val project: ScaledaProject = YmlRootManager.getInstance(context.getProject).getRoots.head.toScaledaProject
     ProjectConfig.getConfig
       .map(c => {
         c.headTarget.foreach(t => configuration.targetName = t.name)
@@ -34,7 +35,7 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
       configuration: ScaledaRunConfiguration,
       context: ConfigurationContext
   ): Boolean = {
-    implicit val manifest = IdeaManifestManager.getImplicitManifest(project = context.getProject)
+    implicit val project: ScaledaProject = YmlRootManager.getInstance(context.getProject).getRoots.head.toScaledaProject
     ProjectConfig.getConfig
       .exists(c => {
         c.targets

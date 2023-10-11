@@ -33,14 +33,12 @@ object KernelFileUtils {
     true
   }
 
-  /** Convert any path into an absolute path. For relative path, it is calculated base on project base.<br/>
+  /** Convert any path into an canonical path. For relative path, it is calculated base on project base.<br/>
     * ⚠️ Only work on same OS. Cannot process Window paths on Linux now.
     * @param path the original path string
-    * @return [[None]] iff no project base AND relative path; Otherwise an abspath will be returned
+    * @return [[None]] iff no project base AND relative path; Otherwise an canonical path will be returned
     */
-  def toCanonicalPath(
-      path: String
-  )(implicit project: ScaledaProject): Option[String] = {
+  def toCanonicalPath(path: String)(implicit project: ScaledaProject): Option[String] = {
     val file = new File(path)
     if (!file.isAbsolute) {
       project.projectBase match {
@@ -107,10 +105,10 @@ object KernelFileUtils {
 
   /** Get all source files from a source set.
     * @param sources list of paths, each item can be file or dir, empty string will be dropped
-    * @param suffixing filter by file type
+    * @param suffix filter by file type
     * @return list of files
     */
-  def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v"))(implicit project: ScaledaProject): Seq[File] = {
+  def getAllSourceFiles(sources: Set[String], suffix: Set[String] = Set("v"))(implicit project: ScaledaProject): Seq[File] = {
     sources
       .filter(_.nonEmpty)
       .map(toCanonicalPath(_))
@@ -118,27 +116,28 @@ object KernelFileUtils {
       .map(f => new File(f.get))
       .map(f => {
         if (f.exists()) {
-          if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
+          if (f.isDirectory) scanDirectory(suffix, f) else Seq(f)
         } else Seq()
       })
       .reduceOption(_ ++ _)
       .getOrElse(Seq())
   }
 
-  /** Get all source files under the project. That is:
-    *  - files under `source`
-    *  - files given under `sources`
-    * @param suffixing file type
-    * @return seq of files
-    */
-  @Deprecated
-  def getAllProjectSourceFiles(
-      suffixing: Set[String] = Set("v")
-  )(implicit project: ScaledaProject): Seq[File] = {
-    val sourceDir: File = new File(toCanonicalPath(ProjectConfig.config.source).get)
-    val sources         = ProjectConfig.config.sources.toSet
-    getAllSourceFiles(sources + sourceDir.getAbsolutePath, suffixing = suffixing)
-  }
+//
+//  /** Get all source files under the project. That is:
+//    *  - files under `source`
+//    *  - files given under `sources`
+//    * @param suffixing file type
+//    * @return seq of files
+//    */
+//  @Deprecated
+//  def getAllProjectSourceFiles(
+//      suffixing: Set[String] = Set("v")
+//  )(implicit project: ScaledaProject): Seq[File] = {
+//    val sourceDir: File = new File(toCanonicalPath(ProjectConfig.config.source).get)
+//    val sources         = ProjectConfig.config.sources.toSet
+//    getAllSourceFiles(sources + sourceDir.getAbsolutePath, suffixing = suffixing)
+//  }
 
   // /** Get all test files. That is:
   //   *  - files under `test`

@@ -2,7 +2,6 @@ package top.scaleda
 package idea.windows.rightPanel
 
 import idea.ScaledaBundle
-import idea.project.IdeaManifestManager
 import idea.windows.rightPanel.project.ScaledaEditProjectPanelWrapper
 import idea.windows.rightPanel.target.ScaledaEditTargetPanelWrapper
 import idea.windows.rightPanel.task.ScaledaEditTaskPanelWrapper
@@ -14,7 +13,9 @@ import com.intellij.ui.components.JBPanelWithEmptyText
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{AnActionButton, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
+import top.scaleda.idea.project.io.YmlRootManager
 import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode}
+import top.scaleda.kernel.project.ScaledaProject
 
 import java.awt.BorderLayout
 import javax.swing.JPanel
@@ -27,7 +28,7 @@ import javax.swing.tree.DefaultTreeModel
   */
 class ScaledaEditTasksPanel(project: Project, val scaledaRunRootNode: ScaledaTasksRootNode, setValid: Boolean => Unit)
     extends JPanel(new BorderLayout) {
-  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
   val model             = new DefaultTreeModel(scaledaRunRootNode)
   // left side, tree
   private val tree = new Tree(model)

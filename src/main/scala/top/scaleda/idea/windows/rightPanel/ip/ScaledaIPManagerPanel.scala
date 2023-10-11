@@ -2,7 +2,6 @@ package top.scaleda
 package idea.windows.rightPanel.ip
 
 import idea.ScaledaBundle
-import idea.project.IdeaManifestManager
 import idea.utils.inWriteAction
 import idea.windows.rightPanel.ip.ScaledaIPManagerPanel.createConfigEditor
 import kernel.project.config.{IPInstance, ProjectConfig}
@@ -18,6 +17,8 @@ import com.intellij.openapi.ui.Splitter
 import com.intellij.ui._
 import com.intellij.ui.components.{JBList, JBPanelWithEmptyText, JBTextField}
 import com.intellij.util.ui.{FormBuilder, JBUI}
+import top.scaleda.idea.project.io.YmlRootManager
+import top.scaleda.kernel.project.ScaledaProject
 
 import java.awt.BorderLayout
 import javax.swing._
@@ -25,7 +26,7 @@ import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelect
 import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
-  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
   private val projIP    = ProjectConfig.projectBasicIps.map(s => IP(s._1, library = false, s._2))
   private val libIP     = ProjectConfig.libraryIps.map(s => IP(s._1, library = true, s._2))
   private val ipList    = projIP ++ libIP
@@ -37,7 +38,7 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
   ipInstanceList.addListSelectionListener(onItemSelected)
   // load ip instances from ProjectConfig on initialization
   listModel.clear()
-  ProjectConfig.config.ips.foreach(listModel.addElement)
+  ProjectConfig.getConfig.get.ips.foreach(listModel.addElement)
 
   // Splitter
   val splitter = new Splitter(false, 0.3f)
