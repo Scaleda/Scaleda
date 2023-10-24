@@ -34,7 +34,7 @@ class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, tr
 
   TreeUtil.installActions(tree)
 
-  private val _ = new TreeSpeedSearch(tree)
+  private val search = new TreeSpeedSearch(tree)
 
   // Run
   private val runManager = RunManagerImpl.getInstanceImpl(project)

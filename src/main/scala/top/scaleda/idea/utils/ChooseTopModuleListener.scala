@@ -12,7 +12,7 @@ import javax.swing.JTextField
 class ChooseTopModuleListener(targetField: JTextField)(implicit project: ScaledaProject) extends ActionListener {
   override def actionPerformed(actionEvent: ActionEvent) = {
     val group   = new DefaultActionGroup()
-    val modules = ModuleUtils.parseSourceSetTopModules(Set(project.projectBase))
+    val modules = ModuleUtils.parseSourceSetTopModules(Set(project.projectBase.get))
     if (modules.nonEmpty)
       modules.foreach(name =>
         group.add(new AnAction(name) {

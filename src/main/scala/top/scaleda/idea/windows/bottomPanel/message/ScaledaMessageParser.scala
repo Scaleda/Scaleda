@@ -74,32 +74,6 @@ object ScaledaMessageParser {
   def removeParser(key: String) = allParsers.remove(key)
 }
 
-/** Used to handle messages when running command
-  *
-  * @param handler callback for logging service
-  */
-class ScaledaMessageParser(
-    rt: ScaledaRuntime,
-    handler: ScaledaMessage => Unit
-) extends ConsoleReceiver {
-  override def print(
-      source: String,
-      text: String,
-      level: LogLevel.Value
-  ): Unit = {
-    var parseDone = false
-    for ((_k, parser) <- ScaledaMessageParser.allParsers) {
-      if (!parseDone) {
-        val result = parser.parse(rt, text, level)
-        if (result.nonEmpty) {
-          parseDone = true
-          handler(result.get)
-        }
-      }
-    }
-  }
-}
-
 object ScaledaMessageToolchainParserDefaultProvider extends ScaledaMessageToolchainParserProvider {
   override def messageParser = ScaledaMessageToolchainDefaultParserImpl
 }
