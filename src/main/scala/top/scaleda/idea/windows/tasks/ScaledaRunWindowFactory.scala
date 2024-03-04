@@ -18,7 +18,7 @@ import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
 import com.intellij.ui.content.ContentManager
 import com.intellij.ui.content.impl.ContentImpl
 import com.intellij.ui.treeStructure.Tree
-import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch}
+import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch, TreeUIHelper}
 import com.intellij.util.ui.tree.TreeUtil
 
 import java.awt.GridLayout
@@ -60,7 +60,7 @@ class ScaledaRunWindowFactory extends ToolWindowFactory {
 
         tree.setCellRenderer(new ScaledaRunTreeCellRenderer)
         TreeUtil.installActions(tree)
-        new TreeSpeedSearch(tree)
+        TreeUIHelper.getInstance().installTreeSpeedSearch(tree)
         panel.add(ScrollPaneFactory.createScrollPane(tree))
         // var autoScrollHandler = new AutoScrollTo
 
