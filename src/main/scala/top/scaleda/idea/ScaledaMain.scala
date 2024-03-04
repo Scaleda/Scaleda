@@ -63,9 +63,20 @@ class ScaledaMain extends ProjectActivity {
 
     // Check assets
     if (!ExtractAssets.isInstalled) {
-      ActionManager
-        .getInstance()
-        .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
+      try {
+        ActionManager
+          .getInstance()
+          .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
+      } catch {
+        case e: Exception =>
+          MainLogger.warn("Failed to install assets, retry in main thread", e)
+          try {
+            ExtractAssets.run()
+          } catch {
+            case e: Exception =>
+              MainLogger.error("Failed to install assets", e)
+          }
+      }
     }
 
     val rpcService = project.getService(classOf[RpcService])
