@@ -3,7 +3,6 @@ package idea.runner
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.{KillableColoredProcessHandler, ProcessTerminatedListener}
-import com.intellij.execution.process.mediator.rpc.CommandLine
 import com.intellij.execution.ui.{ConsoleView, ConsoleViewContentType}
 import com.intellij.openapi.util.Key
 

@@ -7,7 +7,7 @@ import verilog.utils.FileUtils
 
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBList
-import com.intellij.ui.{ColoredListCellRenderer, ListSpeedSearch, ToolbarDecorator}
+import com.intellij.ui.{ColoredListCellRenderer, ListSpeedSearch, ToolbarDecorator, TreeUIHelper}
 
 import java.awt.BorderLayout
 import javax.swing.event.ListSelectionEvent
@@ -41,7 +41,7 @@ class ModuleTreePanel(project: Project, dialog: SelectModuleDialogWrapper) exten
 
   myList.setCellRenderer(colouredListCellRenderer)
 
-  new ListSpeedSearch(myList)
+  TreeUIHelper.getInstance().installListSpeedSearch(myList)
 
   val decorator: ToolbarDecorator = ToolbarDecorator.createDecorator(myList)
     .disableRemoveAction()

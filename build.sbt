@@ -3,7 +3,7 @@ import org.jetbrains.sbtidea.verifier._
 
 val publicScalaVersion = "2.13.10"
 // val ideaVersion = "2023.1.3"
-val ideaVersion = "231.9161.38"
+val ideaVersion = "241.14024.14"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
@@ -23,7 +23,7 @@ Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.14.2"
-val thisVersion           = "0.1.0"
+val thisVersion           = "0.1.1"
 
 lazy val commonSettings = Seq(
   version := thisVersion,
