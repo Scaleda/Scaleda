@@ -53,6 +53,8 @@ object Toolchain {
       new IVerilog(executor), IVerilog.supportedTask),
     Yosys.internalID -> (Yosys.userFriendlyName, (executor: Executor) =>
       new Yosys(executor), Yosys.supportedTask),
+    MLFSP.internalID -> (MLFSP.userFriendlyName, (executor: Executor) =>
+      new MLFSP(executor), MLFSP.supportedTask),
   )
 
   def toolchainIds = toolchains.keys.toArray

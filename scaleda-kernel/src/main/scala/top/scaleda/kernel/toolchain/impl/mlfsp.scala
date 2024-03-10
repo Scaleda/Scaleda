@@ -10,7 +10,7 @@ import top.scaleda.kernel.utils.{KernelFileUtils, OS}
 
 import java.io.File
 
-class Yosys(executor: Executor) extends Toolchain(executor) {
+class MLFSP(executor: Executor) extends Toolchain(executor) {
   override def getInternalID: String = internalID
   override def getName: String       = userFriendlyName
 
@@ -32,22 +32,19 @@ class Yosys(executor: Executor) extends Toolchain(executor) {
         }
         else {
           Seq(
-            new File(new File(executor.profile.path, "bin"), "yosys").getAbsolutePath
+            "yosys",
+            new File(executor.profile.path, "run.ys").getAbsolutePath
           )
-        }) ++ Seq(
-          "-o",
-          new File(workingDir.getAbsolutePath, f"${synExecutor.topModule}.edif").getAbsolutePath,
-          "-S"
-        ) ++ sources.map(_.getAbsolutePath),
+        }),
         path = workingDir.getAbsolutePath
       )
     )
   }
 }
 
-object Yosys {
-  val userFriendlyName: String = "Yosys"
-  val internalID: String       = "yosys"
+object MLFSP {
+  val userFriendlyName: String = "Machine Learning in FPGA Synthesis and Placement"
+  val internalID: String       = "mlfsp"
   val supportedTask: Set[TaskType.Value] = Set(
     TaskType.Synthesis
   )
@@ -60,14 +57,11 @@ object Yosys {
      */
     override def verifyCommandLine: Option[Seq[CommandDeps]] = {
       if (OS.isWindows) {
-        Some(
-          Seq(
-            CommandDeps(args = Seq(new File(toolchainProfile.path, "environment.bat").getAbsolutePath))
-            // CommandDeps(args = Seq(new File(new File(toolchainProfile.path, "bin"), "yosys.exe").getAbsolutePath, "-V"))
-          )
-        )
+        None
       } else {
-        Some(Seq(CommandDeps(args = Seq(new File(new File(toolchainProfile.path, "bin"), "yosys").getAbsolutePath, "-V"))))
+        Some(Seq(
+          CommandDeps(args = Seq("yosys", "-V")),
+        ))
       }
     }
 
@@ -78,16 +72,11 @@ object Yosys {
      * @return
      */
     override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
-      // if (outputs.exists(_.contains("Yosys"))) {
-      //   (true, Some(outputs.find(_.contains("Yosys")).get))
-      // } else {
-      //   (false, None)
-      // }
       if (returnValues.forall(_ == 0)) {
         if (OS.isWindows) {
           (true, Some("Yosys version TBD"))
         } else {
-          (true, Some(outputs.head.split(" ").take(2).mkString(" ")))
+          (true, Some(outputs.head.split(" ").take(2).mkString(" ") + " MLFSP"))
         }
       } else {
         (false, None)
