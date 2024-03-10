@@ -2,7 +2,7 @@
 
 ## 概述
 
-Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能为 IJ 平台增加包括 HDL 工程管理、HDL 语言支持、FPGA 工具调用等功能，从而将 IJ 打造成为灵活而强大的 FPGA 开发工具。
+Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能 IntelliJ IDEA 增加包括 HDL 工程管理、HDL 语言支持、FPGA 工具调用等功能，从而将 IJ 打造成为灵活而强大的 FPGA 开发工具。
 目前，Scaleda 已支持的功能包括：
 
  - Verilog 语言的基本语法功能（语法高亮、代码折叠、代码格式化、代码注释、代码导航等）；
@@ -11,11 +11,26 @@ Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能�
  - 自有工程结构，支持调用 Vivado、iverilog 等工具进行仿真、综合、实现等操作；
  - 支持加载 Vivado 工程并调用其中的综合、实现等操作；
 
+![使用 Scaleda 进行 Verilog 开发](./docs/assets/main-screenshot.png)
+
 Scaleda 目前计划增加的功能有：
- - 更加完善的 Verilog 语言支持：重构（Refactoring）、更多代码检查（Inspection）等；
- - 完善自有工程结构：支持更多工具、支持更多操作；
+ - 更加完善的 Verilog 语言支持：重构（Refactoring）、更多的代码检查（Inspection）等；
+ - 完善自有工程结构：支持更多工具、支持更多操作。
+
+[这篇](./docs/INTRODUCTION.md) 文档对 Scaleda 的开发背景和基本功能进行了简单的介绍。
 
 ## 安装
+
+Scaleda 目前支持 **2023.1 及以上版本** 的 IJ 平台，包括 IDEA Community Edition 和 IDEA Ultimate Edition。
+您可以选择直接下载编译好的插件 zip 包，或者自行编译插件。
+
+### 直接下载 zip 文件来安装
+
+IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载编译好的插件 zip 包，然后在 IJ 中安装。
+在 [Releases](https://github.com/Scaleda/Scaleda/releases) 页面中，您可以找到最新的插件 zip 包，它的名字类似于 `Scaleda-0.1.0.zip`。
+
+启动 IDEA 后，选择 `File -> Settings -> Plugins -> Install Plugin from Disk...`，然后选择下载好的 zip 文件，点击 `OK` 即可安装插件。
+有关在 IDEA 中安装 Scaleda 的详细过程，请参考 [这篇](./docs/INSTALLATION.md) 文档。
 
 ### 从源码编译
 
@@ -28,17 +43,27 @@ Scaleda 主要使用 Scala 开发，并使用 sbt（而不是 Gradle）作为构
 $ sbt compile
 ```
 
-编译完成后，使用 sbt 进行打包：
+注意，第一次在本仓库下启动 sbt 时，sbt 可能会从网络下载 IJ 平台的依赖和源码，这可能需要一些时间并占用磁盘空间。
+
+编译完成后，使用下面的命令进行打包：
 
 ```bash
 $ sbt packageArtifactZip
 ```
 
 打包完成后，你可以在 `target/scala-2.12/` 目录下找到打包好的 zip 文件。
+您可以用上节的方法安装插件。
+
+## 使用手册
+
+PDF 版本的使用手册可以在 [这里](./docs/scaleda-manual.pdf) 下载。
 
 ## 项目结构
 
-Scaleda 项目的结构如下：
+这里介绍 Scaleda 这个项目的结构，而不是「使用 Scaleda 开发的 FPGA 项目」的结构。
+对于后者，请参考 [这篇](./docs/PROJECT.md) 文档。
+
+Scaleda 是一个使用 Scala 和 Java 开发的 IDEA 插件，其源码的结构如下：
 
 ### 内核部分
 
