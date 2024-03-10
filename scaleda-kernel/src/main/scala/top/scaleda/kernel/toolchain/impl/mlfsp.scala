@@ -32,8 +32,7 @@ class MLFSP(executor: Executor) extends Toolchain(executor) {
         }
         else {
           Seq(
-            "yosys",
-            new File(executor.profile.path, "run.ys").getAbsolutePath
+            new File(executor.profile.path, "run.sh").getAbsolutePath
           )
         }),
         path = workingDir.getAbsolutePath
