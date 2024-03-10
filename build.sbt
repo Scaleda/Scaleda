@@ -1,5 +1,6 @@
 import org.jetbrains.sbtidea.Keys._
 import org.jetbrains.sbtidea.verifier._
+import scala.io.Source
 
 val publicScalaVersion = "2.13.10"
 // val ideaVersion = "2023.1.3"
@@ -23,7 +24,8 @@ Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.14.2"
-val thisVersion           = "0.1.1"
+
+val thisVersion = Source.fromFile(new File(".version")).getLines().toSeq.head.strip()
 
 lazy val commonSettings = Seq(
   version := thisVersion,

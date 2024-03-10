@@ -60,11 +60,14 @@ jobs:
       - name: Run sbt test
         run: sbt ++${{ matrix.scala }} test
 
-      - name: Compress target directories
-        run: tar cf targets.tar target scaleda-kernel/target project/target
+      - name: Make plugin zip package
+        run: |
+          sbt packageArtifactZip
+          version=$(cat .version)
+          echo "VERSION=$version" >> $GITHUB_ENV
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
         with:
-          name: target-${{ matrix.os }}-${{ matrix.scala }}-${{ matrix.java }}
-          path: targets.tar
+          name: scaleda-${{ matrix.os }}-${{ matrix.scala }}-${{ matrix.java }}
+          path: target/Scaleda-${{ env.VERSION }}.zip
