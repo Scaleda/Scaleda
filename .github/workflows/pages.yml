@@ -19,6 +19,23 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: recursive
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Cache NPM dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-npm-cache
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache
+      - name: Install Dependencies
+        run: |
+          cd docs && npm install
+      - name: Build
+        run: |
+          cd docs && npm run build
       - name: Setup Java (temurin@11)
         if: matrix.java == 'temurin@11'
         uses: actions/setup-java@v2
@@ -45,26 +62,9 @@ jobs:
       - name: Generate Scaladoc
         run: |
           sbt ++${{ matrix.scala }} doc || echo "generate done"
-          rm -rf docs/source/api && echo "remove old api/"
-          mv target/scala-${{ matrix.scala2 }}/api docs/source/ && echo "move api/ to source/api/"
-          ls docs/source/api/*
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: Cache NPM dependencies
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-npm-cache
-          restore-keys: |
-            ${{ runner.OS }}-npm-cache
-      - name: Install Dependencies
+      - name: Copy Scaladoc to static deploy files
         run: |
-          cd docs && npm install
-      - name: Build
-        run: |
-          cd docs && npm run build
+          mv ./target/scala-${{ matrix.scala2 }}/api ./docs/public/ && echo "move api/ to docs/public/api/"
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:

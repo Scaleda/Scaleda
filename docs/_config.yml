@@ -8,7 +8,7 @@ subtitle: 'Scalable EDA Project'
 description: 'Scaleda（=Scalable + EDA）是一款用于 FPGA（Verilog）开发的集成开发环境。它致力于提供用户友好的开发平台，支持智能化的 Verilog 代码编写及便捷的仿真调试体验，并可接入 Vivado 等厂商工具链实现逻辑综合、实现等功能。'
 keywords: EDA, Scala, FPGA
 author: Chiro & Hans
-language: zh-cn
+language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL
@@ -91,7 +91,6 @@ pagination_dir: page
 ## include:/exclude: options only apply to the 'source/' folder
 include:
 exclude:
-  - "api/**/*"
 ignore:
 
 # Extensions
