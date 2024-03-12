@@ -1,7 +1,7 @@
 <idea-plugin>
-    <id>top.criwits.scaleda</id>
+    <id>top.scaleda</id>
     <name>Scaleda</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <vendor>Hans and Chiro</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
@@ -18,22 +18,22 @@
 
     <!-- Actions -->
     <actions>
-        <action id="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction"
-                class="top.criwits.scaleda.idea.runner.task.ScaledaRunLastTaskAction" text="Run Last Scaleda Task"
+        <action id="top.scaleda.idea.runner.task.ScaledaRunLastTaskAction"
+                class="top.scaleda.idea.runner.task.ScaledaRunLastTaskAction" text="Run Last Scaleda Task"
                 description="Run last Scaleda task"/>
-        <action id="top.criwits.scaleda.idea.rvcd.RvcdLaunchAction"
-                class="top.criwits.scaleda.idea.rvcd.RvcdLaunchAction" text="Launch Rvcd"
+        <action id="top.scaleda.idea.rvcd.RvcdLaunchAction"
+                class="top.scaleda.idea.rvcd.RvcdLaunchAction" text="Launch Rvcd"
                 description="Launch Rvcd if not running"/>
-        <action id="top.criwits.scaleda.idea.utils.AssetsInstallManuallyAction"
-                class="top.criwits.scaleda.idea.utils.AssetsInstallManuallyAction" text="Install Scaleda Assets"
+        <action id="top.scaleda.idea.utils.AssetsInstallManuallyAction"
+                class="top.scaleda.idea.utils.AssetsInstallManuallyAction" text="Install Scaleda Assets"
                 description="Manually install Scaleda assets"/>
-        <action id="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
-                class="top.criwits.scaleda.idea.rvcd.RvcdGotoWaveAction"
+        <action id="top.scaleda.idea.rvcd.RvcdGotoWaveAction"
+                class="top.scaleda.idea.rvcd.RvcdGotoWaveAction"
                 text="Waveform">
             <add-to-group group-id="EditorPopupMenu.GoTo" anchor="after" relative-to-action="GotoDeclaration"/>
         </action>
-        <action id="top.criwits.scaleda.idea.project.NewVerilogFileAction"
-                class="top.criwits.scaleda.idea.project.NewVerilogFileAction"
+        <action id="top.scaleda.idea.project.NewVerilogFileAction"
+                class="top.scaleda.idea.project.NewVerilogFileAction"
                 text="Verilog File" description="Create new Verilog file">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
@@ -49,15 +49,15 @@
 
     <!-- Startup Activities -->
     <extensions defaultExtensionNs="com.intellij">
-        <postStartupActivity implementation="top.criwits.scaleda.idea.ScaledaMain"/>
+        <postStartupActivity implementation="top.scaleda.idea.ScaledaMain"/>
     </extensions>
 
     <!-- Services -->
     <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceImplementation="top.criwits.scaleda.idea.ScaledaMainService"/>
-        <projectService serviceImplementation="top.criwits.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
-        <projectService serviceImplementation="top.criwits.scaleda.idea.rvcd.RvcdService"/>
-        <projectService serviceImplementation="top.criwits.scaleda.idea.utils.RpcService"/>
+        <projectService serviceImplementation="top.scaleda.idea.ScaledaMainService"/>
+        <projectService serviceImplementation="top.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
+        <projectService serviceImplementation="top.scaleda.idea.rvcd.RvcdService"/>
+        <projectService serviceImplementation="top.scaleda.idea.utils.RpcService"/>
     </extensions>
 
     <!-- Verilog Support -->
@@ -65,87 +65,87 @@
         <!-- file type support -->
         <fileType
                 name="Verilog"
-                implementationClass="top.criwits.scaleda.verilog.VerilogFileType"
+                implementationClass="top.scaleda.verilog.VerilogFileType"
                 language="Verilog"
                 extensions="v"/>
 
         <!-- parser -->
         <lang.parserDefinition language="Verilog"
-                               implementationClass="top.criwits.scaleda.verilog.VerilogParserDefinition"/>
-        <lang.ast.factory language="Verilog" implementationClass="top.criwits.scaleda.verilog.VerilogASTFactory"/>
+                               implementationClass="top.scaleda.verilog.VerilogParserDefinition"/>
+        <lang.ast.factory language="Verilog" implementationClass="top.scaleda.verilog.VerilogASTFactory"/>
         <lang.syntaxHighlighterFactory language="Verilog"
-                                       implementationClass="top.criwits.scaleda.verilog.highlight.VerilogSyntaxHighlighterFactory"/>
+                                       implementationClass="top.scaleda.verilog.highlight.VerilogSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="Verilog"
-                                      implementationClass="top.criwits.scaleda.verilog.structview.VerilogStructViewFactory"/>
+                                      implementationClass="top.scaleda.verilog.structview.VerilogStructViewFactory"/>
         <lang.braceMatcher language="Verilog"
-                           implementationClass="top.criwits.scaleda.verilog.editor.brace.VerilogBraceMatcherProvider"/>
+                           implementationClass="top.scaleda.verilog.editor.brace.VerilogBraceMatcherProvider"/>
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.verilog.completion.signal.SignalNameCompletionContributor"/>
+                                implementationClass="top.scaleda.verilog.completion.signal.SignalNameCompletionContributor"/>
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.verilog.completion.keywords.VerilogKeywordCompletionContributor"/>
+                                implementationClass="top.scaleda.verilog.completion.keywords.VerilogKeywordCompletionContributor"/>
         <completion.contributor language="Verilog"
-                                implementationClass="top.criwits.scaleda.verilog.completion.module.ModuleItemOuterReferenceCompletionContributor"/>
+                                implementationClass="top.scaleda.verilog.completion.module.ModuleItemOuterReferenceCompletionContributor"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
+                   implementationClass="top.scaleda.verilog.highlight.VerilogHighlightingAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModuleInstantiationAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.instantiation.ModuleInstantiationAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModulePortConnectionAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.instantiation.ModulePortConnectionAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.assign.MultiDrivenAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.assign.MultiDrivenAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.always.AmbiguousClockAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.always.AmbiguousClockAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.always.AmbiguousAssignInAlways"/>
+                   implementationClass="top.scaleda.verilog.annotation.always.AmbiguousAssignInAlways"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.always.AssignmentsMixedUse"/>
+                   implementationClass="top.scaleda.verilog.annotation.always.AssignmentsMixedUse"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.misc.HierarchicalReferenceAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.misc.HierarchicalReferenceAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.misc.IncompleteSeqBlockAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.misc.IncompleteSeqBlockAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.misc.UnmatchedVerilog1995PortAnnotator" />
+                   implementationClass="top.scaleda.verilog.annotation.misc.UnmatchedVerilog1995PortAnnotator" />
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.misc.IncompleteConditionAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.misc.IncompleteConditionAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.assign.OrOperatorInSensitiveList"/>
+                   implementationClass="top.scaleda.verilog.annotation.assign.OrOperatorInSensitiveList"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.always.ConditionalStatementLatchAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.always.ConditionalStatementLatchAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.always.CaseStatementLatchAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.always.CaseStatementLatchAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.misc.WidthConcatAmbiguousAnnotator"/>
+                   implementationClass="top.scaleda.verilog.annotation.misc.WidthConcatAmbiguousAnnotator"/>
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.ModuleParameterAssignmentsAnnotator" />
+                   implementationClass="top.scaleda.verilog.annotation.instantiation.ModuleParameterAssignmentsAnnotator" />
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.NamedParameterAssignmentAnnotator" />
+                   implementationClass="top.scaleda.verilog.annotation.instantiation.NamedParameterAssignmentAnnotator" />
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.UnresolvedPortConnectionAnnotator" />
+                   implementationClass="top.scaleda.verilog.annotation.instantiation.UnresolvedPortConnectionAnnotator" />
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.assign.IllegalAssignAnnotator" />
+                   implementationClass="top.scaleda.verilog.annotation.assign.IllegalAssignAnnotator" />
         <annotator language="Verilog"
-                   implementationClass="top.criwits.scaleda.verilog.annotation.instantiation.EmptyNamedPortConnectionAnnotator" />
-        <documentationProvider implementation="top.criwits.scaleda.verilog.document.VerilogDocumentationProvider"/>
+                   implementationClass="top.scaleda.verilog.annotation.instantiation.EmptyNamedPortConnectionAnnotator" />
+        <lang.documentationProvider language="Verilog" implementationClass="top.scaleda.verilog.document.VerilogDocumentationProvider"/>
         <lang.commenter language="Verilog"
-                        implementationClass="top.criwits.scaleda.verilog.commenter.VerilogCommenter"/>
+                        implementationClass="top.scaleda.verilog.commenter.VerilogCommenter"/>
 
         <!-- editor -->
         <spellchecker.support language="Verilog"
-                              implementationClass="top.criwits.scaleda.verilog.spell.VerilogSpellcheckStrategy"/>
-        <enterHandlerDelegate implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler"/>
+                              implementationClass="top.scaleda.verilog.spell.VerilogSpellcheckStrategy"/>
+        <enterHandlerDelegate implementation="top.scaleda.verilog.editor.enter.VerilogEnterAfterBeginHandler"/>
         <enterHandlerDelegate
-                implementation="top.criwits.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler"/>
-        <typedHandler implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogTypedHandler"/>
+                implementation="top.scaleda.verilog.editor.enter.VerilogEnterAfterModuleDefinitionHandler"/>
+        <typedHandler implementation="top.scaleda.verilog.editor.formatter.VerilogTypedHandler"/>
         <lang.foldingBuilder language="Verilog"
-                             implementationClass="top.criwits.scaleda.verilog.editor.folding.VerilogFoldingBuilder"/>
+                             implementationClass="top.scaleda.verilog.editor.folding.VerilogFoldingBuilder"/>
         <lang.findUsagesProvider language="Verilog"
-                                 implementationClass="top.criwits.scaleda.verilog.references.VerilogFindUsagesProvider"/>
-        <lineIndentProvider implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
-        <formattingService implementation="top.criwits.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
+                                 implementationClass="top.scaleda.verilog.references.VerilogFindUsagesProvider"/>
+        <lineIndentProvider implementation="top.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
+        <formattingService implementation="top.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
         <lang.formatter language="Verilog"
-                        implementationClass="top.criwits.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder"/>
+                        implementationClass="top.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder"/>
         <internalFileTemplate name="Verilog Module"/>
-        <colorSettingsPage implementation="top.criwits.scaleda.idea.settings.editor.VerilogColorSettingsPage" />
+        <colorSettingsPage implementation="top.scaleda.idea.settings.editor.VerilogColorSettingsPage" />
 
     </extensions>
 
@@ -153,57 +153,57 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileType
                 name="Tcl"
-                implementationClass="top.criwits.scaleda.tcl.TclFileType"
+                implementationClass="top.scaleda.tcl.TclFileType"
                 language="Tcl"
                 extensions="tcl"/>
         <lang.parserDefinition language="Tcl"
-                               implementationClass="top.criwits.scaleda.tcl.TclParserDefinition"/>
-        <!--        <lang.ast.factory language="Tcl" implementationClass="top.criwits.scaleda.tcl.TclASTFactory"/>-->
+                               implementationClass="top.scaleda.tcl.TclParserDefinition"/>
+        <!--        <lang.ast.factory language="Tcl" implementationClass="top.scaleda.tcl.TclASTFactory"/>-->
         <!--        <lang.syntaxHighlighterFactory language="Tcl"-->
-        <!--                                       implementationClass="top.criwits.scaleda.tcl.TclSyntaxHighlighterFactory"/>-->
+        <!--                                       implementationClass="top.scaleda.tcl.TclSyntaxHighlighterFactory"/>-->
         <lang.commenter language="Tcl"
-                        implementationClass="top.criwits.scaleda.tcl.commenter.TclCommenter"/>
+                        implementationClass="top.scaleda.tcl.commenter.TclCommenter"/>
     </extensions>
 
     <!-- Settings -->
     <extensions defaultExtensionNs="com.intellij">
         <langCodeStyleSettingsProvider
-                implementation="top.criwits.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettingsProvider"/>
+                implementation="top.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettingsProvider"/>
         <applicationConfigurable groupId="build"
                                  bundle="bundles.ScaledaBundle"
                                  key="settings.generic"
-                                 id="top.criwits.scaleda.idea.settings.generic.ScaledaGenericConfigurable"
-                                 instance="top.criwits.scaleda.idea.settings.generic.ScaledaGenericConfigurable">
+                                 id="top.scaleda.idea.settings.generic.ScaledaGenericConfigurable"
+                                 instance="top.scaleda.idea.settings.generic.ScaledaGenericConfigurable">
             <configurable groupId="build"
                           bundle="bundles.ScaledaBundle"
                           key="settings.toolchains"
-                          id="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
-                          instance="top.criwits.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
+                          id="top.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
+                          instance="top.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
             <configurable groupId="build"
                           bundle="bundles.ScaledaBundle"
                           key="settings.auth.name"
-                          id="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"
-                          instance="top.criwits.scaleda.idea.settings.auth.AuthorizationEditor"/>
+                          id="top.scaleda.idea.settings.auth.AuthorizationEditor"
+                          instance="top.scaleda.idea.settings.auth.AuthorizationEditor"/>
 
         </applicationConfigurable>
     </extensions>
 
     <!-- Module, Project and SDK -->
     <extensions defaultExtensionNs="com.intellij">
-        <!--        <sdkType implementation="top.criwits.scaleda.idea.project.ScaledaSDK" />-->
-        <moduleType id="SCALEDA_MODULE" implementationClass="top.criwits.scaleda.idea.project.ScaledaModuleType"/>
+        <!--        <sdkType implementation="top.scaleda.idea.project.ScaledaSDK" />-->
+        <moduleType id="SCALEDA_MODULE" implementationClass="top.scaleda.idea.project.ScaledaModuleType"/>
         <newProjectWizard.language id="scaleda"
-                                   implementation="top.criwits.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+                                   implementation="top.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
-        <!--        <projectImportProvider implementation="top.criwits.scaleda.idea.project.ScaledaProjectImportProvider" />-->
+        <!--        <projectImportProvider implementation="top.scaleda.idea.project.ScaledaProjectImportProvider" />-->
     </extensions>
 
 
     <!-- Scaleda run tasks -->
     <extensions defaultExtensionNs="com.intellij">
-        <configurationType implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationType"/>
+        <configurationType implementation="top.scaleda.idea.runner.configuration.ScaledaRunConfigurationType"/>
         <runConfigurationProducer
-                implementation="top.criwits.scaleda.idea.runner.configuration.ScaledaRunConfigurationProducer"/>
+                implementation="top.scaleda.idea.runner.configuration.ScaledaRunConfigurationProducer"/>
     </extensions>
 
     <!-- Notification group -->
