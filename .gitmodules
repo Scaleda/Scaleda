@@ -1,3 +1,6 @@
 [submodule "antlr4-intellij-adaptor"]
 	path = antlr4-intellij-adaptor
 	url = git@github.com:Scaleda/antlr4-intellij-adaptor
+[submodule "docs/themes/cactus"]
+	path = docs/themes/cactus
+	url = https://github.com/probberechts/hexo-theme-cactus.git

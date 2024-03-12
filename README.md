@@ -11,7 +11,7 @@ Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能 
  - 自有工程结构，支持调用 Vivado、iverilog 等工具进行仿真、综合、实现等操作；
  - 支持加载 Vivado 工程并调用其中的综合、实现等操作；
 
-![使用 Scaleda 进行 Verilog 开发](./docs/assets/main-screenshot.png)
+![使用 Scaleda 进行 Verilog 开发](docs/source/images/main-screenshot.png)
 
 Scaleda 目前计划增加的功能有：
  - 更加完善的 Verilog 语言支持：重构（Refactoring）、更多的代码检查（Inspection）等；
@@ -61,7 +61,7 @@ PDF 版本的使用手册可以在 [这里](./docs/scaleda-manual.pdf) 下载。
 ## 项目结构
 
 这里介绍 Scaleda 这个项目的结构，而不是「使用 Scaleda 开发的 FPGA 项目」的结构。
-对于后者，请参考 [这篇](./docs/PROJECT.md) 文档。
+对于后者，请参考 [这篇](docs/source/_posts/project) 文档。
 
 Scaleda 是一个使用 Scala 和 Java 开发的 IDEA 插件，其源码的结构如下：
 
