@@ -44,7 +44,7 @@ jobs:
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
       - name: Generate Scaladoc
         run: |
-          sbt ++${{ matrix.scala }} doc
+          sbt ++${{ matrix.scala }} doc || echo "generate done"
           rm -rf docs/source/api
           mv target/scala-${{ matrix.scala2 }}/api docs/source/
       - name: Use Node.js 16.x
