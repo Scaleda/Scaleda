@@ -45,8 +45,9 @@ jobs:
       - name: Generate Scaladoc
         run: |
           sbt ++${{ matrix.scala }} doc || echo "generate done"
-          rm -rf docs/source/api
-          mv target/scala-${{ matrix.scala2 }}/api docs/source/
+          rm -rf docs/source/api && echo "remove old api/"
+          mv target/scala-${{ matrix.scala2 }}/api docs/source/ && echo "move api/ to source/api/"
+          ls docs/source/api/*
       - name: Use Node.js 16.x
         uses: actions/setup-node@v2
         with:
