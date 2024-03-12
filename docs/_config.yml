@@ -5,7 +5,9 @@
 # Site
 title: Scaleda
 subtitle: 'Scalable EDA Project'
-description: 'Scaleda（=Scalable + EDA）是一款用于 FPGA（Verilog）开发的集成开发环境。它致力于提供用户友好的开发平台，支持智能化的 Verilog 代码编写及便捷的仿真调试体验，并可接入 Vivado 等厂商工具链实现逻辑综合、实现等功能。'
+description: |
+  Scaleda（=Scalable + EDA）是一款用于 FPGA（Verilog）开发的集成开发环境。它致力于提供用户友好的开发平台，支持智能化的 Verilog 代码编写及便捷的仿真调试体验，并可接入 Vivado 等厂商工具链实现逻辑综合、实现等功能。
+  本项目的开发由哈尔滨工业大学（深圳）徐勇教授指导，项目来源于哈工大（深圳）- 中微半导人工智能芯片联合实验室。
 keywords: EDA, Scala, FPGA
 author: Chiro & Hans
 language: zh-CN

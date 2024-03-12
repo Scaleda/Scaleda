@@ -88,7 +88,7 @@ Scaleda 参考和使用了诸多开源项目，包括但不限于：
 
 Scaleda 使用[《木兰宽松许可证（第 2 版）》](https://license.coscl.org.cn/MulanPSL2)协议开源，详情请参考 [LICENSE](LICENSE) 文件。
 
-Scaleda 的开发由哈尔滨工业大学（深圳）徐勇教授指导。
+Scaleda 的开发由哈尔滨工业大学（深圳）徐勇教授指导，项目来源于哈工大（深圳）- 中微半导人工智能芯片联合实验室。
 
 感谢 JetBrains 提供的工具支持。
 
