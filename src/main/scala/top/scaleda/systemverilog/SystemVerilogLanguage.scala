@@ -3,4 +3,4 @@ package systemverilog
 
 import com.intellij.lang.Language
 
-object SystemVerilogLanguage extends Language("Tcl")
+object SystemVerilogLanguage extends Language("SystemVerilog")

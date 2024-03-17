@@ -5,7 +5,7 @@ import idea.ScaledaBundle
 import idea.project.IdeaManifestManager
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
 
 class ScaledaEditTasksAction
     extends AnAction(
@@ -22,4 +22,6 @@ class ScaledaEditTasksAction
   override def actionPerformed(e: AnActionEvent): Unit = {
     val _r = new ScaledaEditTasksDialog(e.getProject).showAndGet()
   }
+
+  override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.EDT
 }

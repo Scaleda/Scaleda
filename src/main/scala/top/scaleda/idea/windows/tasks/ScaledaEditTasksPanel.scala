@@ -14,6 +14,7 @@ import com.intellij.ui.components.JBPanelWithEmptyText
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{AnActionButton, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
+import top.scaleda.kernel.project.ProjectManifest
 
 import java.awt.BorderLayout
 import javax.swing.JPanel
@@ -26,7 +27,7 @@ import javax.swing.tree.DefaultTreeModel
   */
 class ScaledaEditTasksPanel(project: Project, val scaledaRunRootNode: ScaledaRunRootNode, setValid: Boolean => Unit)
     extends JPanel(new BorderLayout) {
-  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  implicit val manifest: ProjectManifest = IdeaManifestManager.getImplicitManifest(project = project)
   val model             = new DefaultTreeModel(scaledaRunRootNode)
   // left side, tree
   private val tree = new Tree(model)

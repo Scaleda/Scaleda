@@ -18,6 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, TextFieldWithBrowseButton}
 import com.intellij.ui.SimpleColoredComponent
 import com.intellij.util.ui.{FormBuilder, UIUtil}
+import top.scaleda.kernel.project.ProjectManifest
 
 import java.awt.event.{ItemEvent, KeyEvent, KeyListener}
 import javax.swing.SwingUtilities
@@ -55,7 +56,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
-  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  implicit val manifest: ProjectManifest = IdeaManifestManager.getImplicitManifest(project = project)
   ProjectConfig.getConfig.foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
 
   private def maySetProfileToDefault(list: Seq[ProfilePair]): Unit = {

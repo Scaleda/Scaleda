@@ -3,8 +3,8 @@ package systemverilog
 
 import com.intellij.openapi.diagnostic.Logger
 
-class TclLogger
+class SystemVerilogLogger
 
-object TclLogger {
-  val Log = Logger.getInstance(classOf[TclLogger])
+object SystemVerilogLogger {
+  val Log = Logger.getInstance(classOf[SystemVerilogLogger])
 }

@@ -1,8 +1,8 @@
 package top.scaleda
 package systemverilog.psi.factory.nodes
 
-import tcl.TclLanguage
-import tcl.parser.TclLexer
+import systemverilog.SystemVerilogLanguage
+import systemverilog.parser.SystemVerilogLexer
 
 import com.intellij.psi.tree.IElementType
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory
@@ -10,12 +10,12 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiLeafNode
 
 import java.util
 
-object TclPsiLeafNodeFactory {
+object SystemVerilogPsiLeafNodeFactory {
   private val tokenIElementTypeClassMap =
     new util.HashMap[IElementType, Class[_ <: ANTLRPsiLeafNode]]
 
   def getTokenIElementType(tokenIndex: Int) = PSIElementTypeFactory
-    .getTokenIElementTypes(TclLanguage)
+    .getTokenIElementTypes(SystemVerilogLanguage)
     .get(tokenIndex)
 
   def create(`type`: IElementType, text: CharSequence): ANTLRPsiLeafNode = {
@@ -35,7 +35,7 @@ object TclPsiLeafNodeFactory {
     create(getTokenIElementType(tokenIndex), charSequence)
 
   tokenIElementTypeClassMap.put(
-    getTokenIElementType(TclLexer.IDENTIFICADOR),
+    getTokenIElementType(SystemVerilogLexer.IDENTIFIER),
     classOf[IdentifierPsiLeafNode]
   )
 }

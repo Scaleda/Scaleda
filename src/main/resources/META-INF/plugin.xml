@@ -165,6 +165,17 @@
                         implementationClass="top.scaleda.tcl.commenter.TclCommenter"/>
     </extensions>
 
+    <!-- SystemVerilog Support -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType
+                name="SystemVerilog"
+                implementationClass="top.scaleda.systemverilog.SystemVerilogFileType"
+                language="SystemVerilog"
+                extensions="sv"/>
+        <lang.parserDefinition language="SystemVerilog"
+                               implementationClass="top.scaleda.systemverilog.SystemVerilogParserDefinition"/>
+    </extensions>
+
     <!-- Settings -->
     <extensions defaultExtensionNs="com.intellij">
         <langCodeStyleSettingsProvider

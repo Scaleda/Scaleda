@@ -1,19 +1,19 @@
 package top.scaleda
 package systemverilog.psi.factory
 
-import tcl.TclLanguage
-import tcl.parser.TclParser
-import tcl.psi.factory.nodes.InicioPsiNode
+import systemverilog.SystemVerilogLanguage
+import systemverilog.parser.SystemVerilogParser
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.tree.IElementType
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import systemverilog.psi.factory.nodes.SourceTextPsiNode
 
 import scala.collection.mutable
 
 object SystemVerilogPsiNodeFactory {
-  private val LANGUAGE = TclLanguage
+  private val LANGUAGE = SystemVerilogLanguage
   private val ruleIElementTypeClassMap =
     new mutable.HashMap[IElementType, Class[_ <: ANTLRPsiNode]]
 
@@ -34,11 +34,11 @@ object SystemVerilogPsiNodeFactory {
 
   // ruleIElementTypeClassMap.put(
   //   // TODO: check this
-  //   getRuleIElementType(TclParser.RULE_declaracion),
+  //   getRuleIElementType(SystemVerilogParser.RULE_declaracion),
   //   classOf[IdentifierPsiNode]
   // )
   ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_inicio),
-    classOf[InicioPsiNode]
+    getRuleIElementType(SystemVerilogParser.RULE_source_text),
+    classOf[SourceTextPsiNode]
   )
 }

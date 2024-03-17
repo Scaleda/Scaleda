@@ -5,7 +5,7 @@ import idea.ScaledaBundle
 import kernel.project.ManifestManager
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
 import top.scaleda.idea.project.IdeaManifestManager
 
 class ScaledaIPManageAction
@@ -22,4 +22,6 @@ class ScaledaIPManageAction
   override def actionPerformed(e: AnActionEvent): Unit = {
     val _r = new ScaledaIPManagerDialog(e.getProject).showAndGet()
   }
+
+  override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.EDT
 }

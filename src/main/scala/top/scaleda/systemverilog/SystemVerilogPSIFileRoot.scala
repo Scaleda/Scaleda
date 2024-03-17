@@ -14,11 +14,11 @@ class SystemVerilogPSIFileRoot(viewProvider: FileViewProvider)
     with ScopeNode {
 
   override def getFileType: FileType =
-    TclFileType.instance.asInstanceOf[FileType]
+    SystemVerilogFileType.instance.asInstanceOf[FileType]
 
-  override def toString: String = "Tcl file"
+  override def toString: String = "SystemVerilog file"
 
-  override def getIcon(flags: Int): Icon = TclFileType.DefaultIcon
+  override def getIcon(flags: Int): Icon = SystemVerilogFileType.DefaultIcon
 
   override def getContext: ScopeNode = null
 

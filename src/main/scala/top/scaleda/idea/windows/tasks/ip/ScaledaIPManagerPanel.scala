@@ -18,6 +18,7 @@ import com.intellij.openapi.ui.Splitter
 import com.intellij.ui._
 import com.intellij.ui.components.{JBList, JBPanelWithEmptyText, JBTextField}
 import com.intellij.util.ui.{FormBuilder, JBUI}
+import top.scaleda.kernel.project.ProjectManifest
 
 import java.awt.BorderLayout
 import javax.swing._
@@ -25,7 +26,7 @@ import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelect
 import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
-  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  implicit val manifest: ProjectManifest = IdeaManifestManager.getImplicitManifest(project = project)
   private val projIP    = ProjectConfig.projectBasicIps.map(s => IP(s._1, library = false, s._2))
   private val libIP     = ProjectConfig.libraryIps.map(s => IP(s._1, library = true, s._2))
   private val ipList    = projIP ++ libIP

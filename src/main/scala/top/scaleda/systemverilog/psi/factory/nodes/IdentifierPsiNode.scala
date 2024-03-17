@@ -1,7 +1,7 @@
 package top.scaleda
 package systemverilog.psi.factory.nodes
 
-import tcl.parser.TclParser
+import systemverilog.parser.SystemVerilogLexer
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiNameIdentifierOwner
@@ -18,5 +18,5 @@ class IdentifierPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with PsiNameId
   override def getNameIdentifier = getFirstChild.getFirstChild
 
   @throws[IncorrectOperationException]
-  override def setName(s: String) = getFirstChild.replace(TclPsiLeafNodeFactory.create(TclParser.IDENTIFICADOR, s))
+  override def setName(s: String) = getFirstChild.replace(SystemVerilogPsiLeafNodeFactory.create(SystemVerilogLexer.IDENTIFIER, s))
 }

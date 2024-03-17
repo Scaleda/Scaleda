@@ -1,8 +1,8 @@
 package top.scaleda
 package systemverilog
 
-import tcl.parser.{TclLexer, TclParser}
-import tcl.psi.factory.TclPsiNodeFactory
+import systemverilog.parser.{SystemVerilogLexer, SystemVerilogParser}
+import systemverilog.psi.factory.SystemVerilogPsiNodeFactory
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
@@ -11,38 +11,35 @@ import com.intellij.psi.{FileViewProvider, PsiFile}
 import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
-import top.scaleda.tcl.parser.{TclLexer, TclParser}
-import top.scaleda.tcl.psi.factory.TclPsiNodeFactory
 
-final class TclParserDefinition extends ParserDefinition {
+final class SystemVerilogParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =
-    new ANTLRLexerAdaptor(SystemVerilogLanguage, new TclLexer(null))
+    new ANTLRLexerAdaptor(SystemVerilogLanguage, new SystemVerilogLexer(null))
 
   override def createParser(project: Project): PsiParser =
-    new ANTLRParserAdaptor(SystemVerilogLanguage, new TclParser(null)) {
+    new ANTLRParserAdaptor(SystemVerilogLanguage, new SystemVerilogParser(null)) {
       override def parse(parser: Parser, root: IElementType) = {
-        // TODO: check this
-        parser.asInstanceOf[TclParser].inicio()
+        parser.asInstanceOf[SystemVerilogParser].source_text()
       }
     }
 
-  override def getWhitespaceTokens = TclParserDefinition.WHITESPACE
+  override def getWhitespaceTokens = SystemVerilogParserDefinition.WHITESPACE
 
-  override def getFileNodeType = TclParserDefinition.FILE
+  override def getFileNodeType = SystemVerilogParserDefinition.FILE
 
-  override def getCommentTokens = TclParserDefinition.COMMENTS
+  override def getCommentTokens = SystemVerilogParserDefinition.COMMENTS
 
-  override def getStringLiteralElements = TclParserDefinition.STRING
+  override def getStringLiteralElements = SystemVerilogParserDefinition.STRING
 
-  override def createElement(node: ASTNode) = TclPsiNodeFactory.create(node)
+  override def createElement(node: ASTNode) = SystemVerilogPsiNodeFactory.create(node)
 
   override def createFile(viewProvider: FileViewProvider): PsiFile =
     new SystemVerilogPSIFileRoot(viewProvider)
 }
 
 //noinspection DuplicatedCode
-object TclParserDefinition {
-  private val vocabulary = TclParser.VOCABULARY
+object SystemVerilogParserDefinition {
+  private val vocabulary = SystemVerilogParser.VOCABULARY
 //  val tokenNames = (0 to vocabulary.getMaxTokenType) // LONG RINGS THE ALARM BELL
 //    .map(x => (x, vocabulary.getLiteralName(x)))
 //    .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
@@ -52,22 +49,22 @@ object TclParserDefinition {
     SystemVerilogLanguage,
     // tokenNames :+ "<INVALID>",
     vocabulary,
-    TclParser.ruleNames
+    SystemVerilogParser.ruleNames
   )
   val FILE = new IFileElementType(SystemVerilogLanguage)
   val tokens = PSIElementTypeFactory.getTokenIElementTypes(SystemVerilogLanguage)
-  TclLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
+  // SystemVerilogLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     SystemVerilogLanguage,
-    TclLexer.COMMENT,
-    TclLexer.COMMENT_INLINE,
+    SystemVerilogLexer.BLOCK_COMMENT,
+    SystemVerilogLexer.LINE_COMMENT,
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     SystemVerilogLanguage,
-    TclLexer.WS
+    SystemVerilogLexer.WHITE_SPACE
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
     SystemVerilogLanguage,
-    TclLexer.CONST_STRING
+    SystemVerilogLexer.STRING_LITERAL
   )
 }

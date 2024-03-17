@@ -1,5 +1,4 @@
 // Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/systemverilog/SystemVerilogLexer.g4 by ANTLR 4.13.1
-package top.scaleda.systemverilog.parser;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

@@ -633,7 +633,7 @@ fragment ESC_ASCII_NO_NEWLINE     : '\\' ASCII_NO_NEWLINE;
 fragment ESC_ASCII_PRINTABLE      : '\\' ASCII_PRINTABLE;
 fragment ESC_NEWLINE              : '\\' NEWLINE;
 fragment ESC_SPECIAL_CHAR         : '\\' ( [nt\\"vfa] | CHAR_HEX | CHAR_OCTAL);
-fragment IDENTIFIER               : ESCAPED_IDENTIFIER | SIMPLE_IDENTIFIER;
+IDENTIFIER                        : ESCAPED_IDENTIFIER | SIMPLE_IDENTIFIER;
 fragment MACRO_ARGS               : '(' ( MACRO_ARGS | ASCII_NO_PARENTHESES)* ')';
 fragment NEWLINE                  : '\r'? '\n';
 fragment SPACE_TAB                : [ \t]+;

@@ -89,7 +89,7 @@ public class SystemVerilogParser extends Parser {
 		DEFAULT_NETTYPE_VALUE=406, MACRO_NAME=407, FILENAME=408, MACRO_DELIMITER=409, 
 		MACRO_ESC_NEWLINE=410, MACRO_ESC_QUOTE=411, MACRO_QUOTE=412, MACRO_TEXT=413, 
 		SOURCE_TEXT=414, TIME_UNIT=415, TIME_VALUE=416, UNCONNECTED_DRIVE_VALUE=417, 
-		MACRO_IDENTIFIER=418;
+		MACRO_IDENTIFIER=418, IDENTIFIER=419;
 	public static final int
 		RULE_library_text = 0, RULE_library_description = 1, RULE_library_declaration = 2, 
 		RULE_library_incdir = 3, RULE_include_statement = 4, RULE_file_path_spec = 5, 
@@ -704,7 +704,7 @@ public class SystemVerilogParser extends Parser {
 			"DEFAULT_NETTYPE_VALUE", "MACRO_NAME", "FILENAME", "MACRO_DELIMITER", 
 			"MACRO_ESC_NEWLINE", "MACRO_ESC_QUOTE", "MACRO_QUOTE", "MACRO_TEXT", 
 			"SOURCE_TEXT", "TIME_UNIT", "TIME_VALUE", "UNCONNECTED_DRIVE_VALUE", 
-			"MACRO_IDENTIFIER"
+			"MACRO_IDENTIFIER", "IDENTIFIER"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -64276,7 +64276,7 @@ public class SystemVerilogParser extends Parser {
 	}
 
 	private static final String _serializedATNSegment0 =
-		"\u0004\u0001\u01a2\u26dc\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001"+
+		"\u0004\u0001\u01a3\u26dc\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001"+
 		"\u0002\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004"+
 		"\u0002\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007"+
 		"\u0002\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b"+

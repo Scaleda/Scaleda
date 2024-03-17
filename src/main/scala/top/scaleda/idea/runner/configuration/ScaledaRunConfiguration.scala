@@ -53,7 +53,7 @@ class ScaledaRunConfiguration(
     name: String
 ) extends LocatableConfigurationBase[RunProfileState](project, factory, name) {
 
-  implicit val projectUsing = project
+  implicit val projectUsing: Project = project
 
   var targetName = ""
   var taskName   = ""

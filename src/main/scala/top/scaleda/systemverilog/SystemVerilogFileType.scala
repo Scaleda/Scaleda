@@ -7,23 +7,23 @@ import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
 
 import javax.swing.Icon
 
-final class TclFileType extends LanguageFileType(SystemVerilogLanguage) {
-  override def getName: String = "Tcl"
+final class SystemVerilogFileType extends LanguageFileType(SystemVerilogLanguage) {
+  override def getName: String = "SystemVerilog"
 
-  override def getDescription: String = "Tcl"
+  override def getDescription: String = "SystemVerilog"
 
-  override def getDefaultExtension: String = TclFileType.DefaultExtension
+  override def getDefaultExtension: String = SystemVerilogFileType.DefaultExtension
 
-  override def getIcon: Icon = TclFileType.DefaultIcon
+  override def getIcon: Icon = SystemVerilogFileType.DefaultIcon
 }
 
-object TclFileType {
-  private final val DefaultExtension = "tcl"
-  final val DefaultIcon = Icons.tcl
-  val instance = new TclFileType
+object SystemVerilogFileType {
+  private final val DefaultExtension = "systemVerilog"
+  final val DefaultIcon = Icons.systemVerilog
+  val instance = new SystemVerilogFileType
 
-  def isTcl(fileType: FileType): Boolean = fileType match {
-    case _: TclFileType => true
+  def isSystemVerilog(fileType: FileType): Boolean = fileType match {
+    case _: SystemVerilogFileType => true
     case _ => false
   }
 }
