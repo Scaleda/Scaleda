@@ -59,10 +59,18 @@ jobs:
       - name: Run sbt test
         run: sbt test
 
-      - name: Make plugin zip package
+      - name: Make plugin zip package (Linux)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           sbt packageArtifactZip
           version=$(cat .version)
+          echo "VERSION=$version" >> $GITHUB_ENV
+
+      - name: Make plugin zip package (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          sbt packageArtifactZip
+          $version = Get-Content -Path .version
           echo "VERSION=$version" >> $GITHUB_ENV
 
       - name: Upload target directories
