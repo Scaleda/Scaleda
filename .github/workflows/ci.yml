@@ -20,7 +20,7 @@ jobs:
     name: Build and Test
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
         java: [temurin@17]
     runs-on: ${{ matrix.os }}
     steps:
