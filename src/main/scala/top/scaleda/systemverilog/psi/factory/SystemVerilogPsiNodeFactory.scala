@@ -32,11 +32,6 @@ object SystemVerilogPsiNodeFactory {
     new ANTLRPsiNode(astNode)
   }
 
-  // ruleIElementTypeClassMap.put(
-  //   // TODO: check this
-  //   getRuleIElementType(SystemVerilogParser.RULE_declaracion),
-  //   classOf[IdentifierPsiNode]
-  // )
   ruleIElementTypeClassMap.put(
     getRuleIElementType(SystemVerilogParser.RULE_source_text),
     classOf[SourceTextPsiNode]

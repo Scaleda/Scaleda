@@ -2,6 +2,7 @@ package top.scaleda
 package systemverilog
 
 import systemverilog.psi.factory.nodes.SystemVerilogPsiLeafNodeFactory
+
 import com.intellij.lang.DefaultASTFactoryImpl
 import com.intellij.psi.tree.IElementType
 

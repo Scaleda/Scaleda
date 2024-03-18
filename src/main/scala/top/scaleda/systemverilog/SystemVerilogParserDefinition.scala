@@ -45,19 +45,14 @@ object SystemVerilogParserDefinition {
 //    .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
 //    .map(x => if (x._2 == null) "<INVALID>" else x._2)
 //    .toArray
-  PSIElementTypeFactory.defineLanguageIElementTypes(
-    SystemVerilogLanguage,
-    // tokenNames :+ "<INVALID>",
-    vocabulary,
-    SystemVerilogParser.ruleNames
-  )
-  val FILE = new IFileElementType(SystemVerilogLanguage)
+  PSIElementTypeFactory.defineLanguageIElementTypes(SystemVerilogLanguage, vocabulary, SystemVerilogParser.ruleNames)
+  val FILE   = new IFileElementType(SystemVerilogLanguage)
   val tokens = PSIElementTypeFactory.getTokenIElementTypes(SystemVerilogLanguage)
   // SystemVerilogLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     SystemVerilogLanguage,
     SystemVerilogLexer.BLOCK_COMMENT,
-    SystemVerilogLexer.LINE_COMMENT,
+    SystemVerilogLexer.LINE_COMMENT
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     SystemVerilogLanguage,
