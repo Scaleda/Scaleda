@@ -26,9 +26,9 @@ abstract class SignalIdentifierPsiNode(node: ASTNode)
 
   def getTypeText = getDeclaration.getTypeText
   def getRange = getDeclaration.getRange
-  def getDimension: Option[DimensionPsiNode] = {
+  def getDimension: Option[CovergroupValuePsiNode] = {
     val variableType = PsiTreeUtil.getParentOfType(this, classOf[VariableTypePsiNode])
-    Option(PsiTreeUtil.getChildOfType(variableType, classOf[DimensionPsiNode]))
+    Option(PsiTreeUtil.getChildOfType(variableType, classOf[CovergroupValuePsiNode]))
   }
 
   override def getDocument: String = {

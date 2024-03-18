@@ -7,8 +7,8 @@ import com.intellij.util.IncorrectOperationException;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.scaleda.verilog.parser.VerilogLexer;
-import top.scaleda.verilog.psi.VerilogPsiLeafNodeFactory;
+import top.scaleda.systemverilog.parser.SystemVerilogLexer;
+import top.scaleda.systemverilog.psi.SystemVerilogPsiLeafNodeFactory;
 
 public class ModuleIdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifierOwner {
 
@@ -31,6 +31,6 @@ public class ModuleIdentifierPsiNode extends ANTLRPsiNode implements PsiNameIden
 
     @Override
     public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
-        return getFirstChild().replace(VerilogPsiLeafNodeFactory.create(VerilogLexer.Simple_identifier, s));
+        return getFirstChild().replace(SystemVerilogPsiLeafNodeFactory.create(SystemVerilogLexer.SIMPLE_IDENTIFIER, s));
     }
 }

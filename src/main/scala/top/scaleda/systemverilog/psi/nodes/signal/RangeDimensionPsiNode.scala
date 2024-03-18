@@ -33,5 +33,5 @@ abstract class RangeDimensionPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
  * TODO: [??:??], or interface
  * @param node
  */
-class RangePsiNode(node: ASTNode) extends RangeDimensionPsiNode(node)
-class DimensionPsiNode(node: ASTNode) extends RangeDimensionPsiNode(node)
+class RangeValuePsiNode(node: ASTNode) extends RangeDimensionPsiNode(node)
+class CovergroupValuePsiNode(node: ASTNode) extends RangeDimensionPsiNode(node)

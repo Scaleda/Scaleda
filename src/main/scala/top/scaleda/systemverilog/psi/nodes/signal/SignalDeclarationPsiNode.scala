@@ -27,11 +27,11 @@ abstract class SignalDeclarationPsiNode(node: ASTNode) extends ANTLRPsiNode(node
     */
   override def getTypeText: String = {
     val typeChildren: Array[PsiElement] =
-      util.Arrays.copyOf(this.getChildren, this.getChildren.length - 2).filterNot(_.isInstanceOf[RangePsiNode])
+      util.Arrays.copyOf(this.getChildren, this.getChildren.length - 2).filterNot(_.isInstanceOf[RangeValuePsiNode])
     typeChildren.map(_.getText).foldLeft("")(_ + " " + _).trim
   }
 
-  def getRange: Option[RangePsiNode] = Option(PsiTreeUtil.getChildOfType(this, classOf[RangePsiNode]))
+  def getRange: Option[RangeValuePsiNode] = Option(PsiTreeUtil.getChildOfType(this, classOf[RangeValuePsiNode]))
 
   def getIdentifier: Seq[SignalIdentifierPsiNode] = {
     val result = PsiTreeUtil.findChildrenOfType(this, classOf[SignalIdentifierPsiNode]).asScala

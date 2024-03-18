@@ -31,6 +31,10 @@ options {
     tokenVocab = SystemVerilogLexer;
 }
 
+source_text
+    : timeunits_declaration? description* EOF
+    ;
+
 // A.1.1 Library source text
 library_text
     : library_description* EOF
@@ -60,9 +64,9 @@ file_path_spec
     ;
 
 // A.1.2 SystemVerilog source text
-source_text
-    : timeunits_declaration? description* EOF
-    ;
+//source_text
+//    : timeunits_declaration? description* EOF
+//    ;
 
 description
     : module_declaration
@@ -2352,6 +2356,7 @@ statement_item
     | randsequence_statement
     | randcase_statement
     | expect_property_statement
+    | incomplete_statement
     ;
 
 function_statement
@@ -2427,9 +2432,15 @@ disable_statement
     ;
 
 // A.6.6 Conditional statements
-conditional_statement
-    : unique_priority? 'if' '(' cond_predicate ')' statement_or_null ('else' statement_or_null)?
-    ;
+// conditional_statement
+//     : unique_priority? 'if' '(' cond_predicate ')' statement_or_null ('else' statement_or_null)?
+//     ;
+conditional_statement_body: 'if' '(' expression ')' statement_or_null ;
+conditional_statement_head: conditional_statement_body ;
+conditional_statement_chain: conditional_statement_body ;
+conditional_statement_else_tail: 'else' statement_or_null ;
+conditional_statement_else_chain: 'else' conditional_statement_chain ;
+conditional_statement: conditional_statement_head conditional_statement_else_chain* conditional_statement_else_tail? ;
 
 unique_priority
     : 'unique'
@@ -2446,10 +2457,23 @@ expression_or_cond_pattern
     ;
 
 // A.6.7 Case statements
+
+case_body_1
+    : case_item+
+    ;
+
+case_body_2
+    : 'matches' case_pattern_item+
+    ;
+
+case_body_3
+    : 'inside' case_inside_item+
+    ;
+
 case_statement
-    : unique_priority? case_keyword '(' case_expression ')' case_item+ 'endcase'
-    | unique_priority? case_keyword '(' case_expression ')' 'matches' case_pattern_item+ 'endcase'
-    | unique_priority? 'case' '(' case_expression ')' 'inside' case_inside_item+ 'endcase'
+    : unique_priority? case_keyword '(' case_expression ')' case_body_1 'endcase'
+    | unique_priority? case_keyword '(' case_expression ')' case_body_2 'endcase'
+    | unique_priority? 'case' '(' case_expression ')' case_body_3 'endcase'
     ;
 
 case_keyword
@@ -3954,3 +3978,8 @@ udp_identifier
 variable_identifier
     : identifier
     ;
+
+// extra: acceptable incompelited things
+incomplete_statement: incomplete_condition_statement ;
+
+incomplete_condition_statement: 'if' '(' expression ')' ;

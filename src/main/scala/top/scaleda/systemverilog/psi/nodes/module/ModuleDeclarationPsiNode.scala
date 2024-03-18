@@ -17,12 +17,15 @@ import org.jetbrains.annotations.Nls
 
 import scala.jdk.CollectionConverters._
 
-/**
- * PSI node for parser rule module_declaration
- * module_declaration ::= module_head module_item* 'endmodule'
- *
- * @param node AST node
- */
+/** PSI node for parser rule module_declaration
+  * module_declaration
+  * : module_header timeunits_declaration? module_item* 'endmodule' module_name?
+  * | attribute_instance* module_keyword lifetime? module_identifier '(' '.*' ')' ';' timeunits_declaration? module_item* 'endmodule' module_name?
+  * | 'extern' module_header
+  * ;
+  *
+  * @param node AST node
+  */
 class ModuleDeclarationPsiNode(node: ASTNode)
     extends ANTLRPsiNode(node)
     with PsiNameIdentifierOwner
@@ -120,6 +123,8 @@ class ModuleDeclarationPsiNode(node: ASTNode)
 
   def getParameters: Seq[ParameterIdentifierPsiNode] = {
     if (getModuleHead.isEmpty) return Seq[ParameterIdentifierPsiNode]()
-    getModuleHead.get.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
+    getModuleHead.get.getModuleParameterPortList
+      .map(_.getParameterIdentifiers)
+      .getOrElse(Seq[ParameterIdentifierPsiNode]())
   }
 }

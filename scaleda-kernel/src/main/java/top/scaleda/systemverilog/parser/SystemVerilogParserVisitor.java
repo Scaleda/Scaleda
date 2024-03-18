@@ -11,6 +11,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface SystemVerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#source_text}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSource_text(SystemVerilogParser.Source_textContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SystemVerilogParser#library_text}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -46,12 +52,6 @@ public interface SystemVerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFile_path_spec(SystemVerilogParser.File_path_specContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SystemVerilogParser#source_text}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSource_text(SystemVerilogParser.Source_textContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SystemVerilogParser#description}.
 	 * @param ctx the parse tree
@@ -2645,6 +2645,36 @@ public interface SystemVerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDisable_statement(SystemVerilogParser.Disable_statementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#conditional_statement_body}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_body(SystemVerilogParser.Conditional_statement_bodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#conditional_statement_head}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_head(SystemVerilogParser.Conditional_statement_headContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#conditional_statement_chain}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_chain(SystemVerilogParser.Conditional_statement_chainContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#conditional_statement_else_tail}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_else_tail(SystemVerilogParser.Conditional_statement_else_tailContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#conditional_statement_else_chain}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditional_statement_else_chain(SystemVerilogParser.Conditional_statement_else_chainContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SystemVerilogParser#conditional_statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -2668,6 +2698,24 @@ public interface SystemVerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExpression_or_cond_pattern(SystemVerilogParser.Expression_or_cond_patternContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#case_body_1}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCase_body_1(SystemVerilogParser.Case_body_1Context ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#case_body_2}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCase_body_2(SystemVerilogParser.Case_body_2Context ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#case_body_3}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCase_body_3(SystemVerilogParser.Case_body_3Context ctx);
 	/**
 	 * Visit a parse tree produced by {@link SystemVerilogParser#case_statement}.
 	 * @param ctx the parse tree
@@ -4486,4 +4534,16 @@ public interface SystemVerilogParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitVariable_identifier(SystemVerilogParser.Variable_identifierContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#incomplete_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncomplete_statement(SystemVerilogParser.Incomplete_statementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SystemVerilogParser#incomplete_condition_statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncomplete_condition_statement(SystemVerilogParser.Incomplete_condition_statementContext ctx);
 }

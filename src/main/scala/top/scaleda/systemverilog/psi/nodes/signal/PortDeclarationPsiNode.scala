@@ -25,7 +25,7 @@ class PortDeclarationPsiNode(node: ASTNode) extends SignalDeclarationPsiNode(nod
     if (declaration == null) "unknown" else declaration.getTypeText
   }
 
-  override def getRange: Option[RangePsiNode] = getDeclaration.flatMap(d => Option(PsiTreeUtil.getChildOfType(d, classOf[RangePsiNode])))
+  override def getRange: Option[RangeValuePsiNode] = getDeclaration.flatMap(d => Option(PsiTreeUtil.getChildOfType(d, classOf[RangeValuePsiNode])))
 }
 
 object PortDeclarationPsiNode extends Enumeration {

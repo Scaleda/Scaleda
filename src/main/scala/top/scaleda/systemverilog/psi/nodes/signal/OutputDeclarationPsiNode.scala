@@ -13,7 +13,7 @@ import java.util
 abstract class AbstractDeclarationPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
   def getTypeText: String = {
     val typeChildren: Array[PsiElement] =
-      util.Arrays.copyOf(this.getChildren, this.getChildren.length - 1).filterNot(_.isInstanceOf[RangePsiNode])
+      util.Arrays.copyOf(this.getChildren, this.getChildren.length - 1).filterNot(_.isInstanceOf[RangeValuePsiNode])
     typeChildren.map(_.getText).foldLeft("")(_ + " " + _).trim
   }
 
