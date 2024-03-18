@@ -1,8 +1,9 @@
 package top.scaleda
-package systemverilog.psi.factory.nodes
+package systemverilog.psi
 
 import systemverilog.SystemVerilogLanguage
 import systemverilog.parser.SystemVerilogLexer
+import systemverilog.psi.nodes.IdentifierPsiLeafNode
 
 import com.intellij.psi.tree.IElementType
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory

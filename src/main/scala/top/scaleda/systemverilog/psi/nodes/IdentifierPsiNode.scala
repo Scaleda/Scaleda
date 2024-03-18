@@ -1,5 +1,5 @@
 package top.scaleda
-package systemverilog.psi.factory.nodes
+package systemverilog.psi.nodes
 
 import systemverilog.parser.SystemVerilogLexer
 
@@ -7,6 +7,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.util.IncorrectOperationException
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import top.scaleda.systemverilog.psi.SystemVerilogPsiLeafNodeFactory
 
 
 class IdentifierPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with PsiNameIdentifierOwner {

@@ -1,7 +1,7 @@
 package top.scaleda
 package systemverilog
 
-import verilog.psi.nodes.ScopeNode
+import systemverilog.psi.nodes.ScopeNode
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType

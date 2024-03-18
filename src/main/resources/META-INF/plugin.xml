@@ -177,6 +177,8 @@
         <lang.ast.factory language="SystemVerilog" implementationClass="top.scaleda.systemverilog.SystemVerilogASTFactory"/>
         <lang.syntaxHighlighterFactory language="SystemVerilog"
                                        implementationClass="top.scaleda.systemverilog.highlight.SystemVerilogSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="SystemVerilog"
+                                      implementationClass="top.scaleda.systemverilog.structview.SystemVerilogStructViewFactory"/>
     </extensions>
 
     <!-- Settings -->

@@ -2,7 +2,6 @@ package top.scaleda
 package systemverilog
 
 import systemverilog.parser.{SystemVerilogLexer, SystemVerilogParser}
-import systemverilog.psi.factory.SystemVerilogPsiNodeFactory
 import com.intellij.lang.{ASTNode, ParserDefinition, PsiParser}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
@@ -11,6 +10,7 @@ import com.intellij.psi.{FileViewProvider, PsiFile}
 import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, PSIElementTypeFactory}
 import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
 import org.antlr.v4.runtime.Parser
+import top.scaleda.systemverilog.psi.SystemVerilogPsiNodeFactory
 
 final class SystemVerilogParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =

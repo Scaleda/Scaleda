@@ -1,5 +1,5 @@
 package top.scaleda
-package systemverilog.psi.factory
+package systemverilog.psi
 
 import systemverilog.SystemVerilogLanguage
 import systemverilog.parser.SystemVerilogParser
@@ -8,7 +8,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.tree.IElementType
 import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
-import systemverilog.psi.factory.nodes.SourceTextPsiNode
+import top.scaleda.systemverilog.psi.nodes.SourceTextPsiNode
 
 import scala.collection.mutable
 

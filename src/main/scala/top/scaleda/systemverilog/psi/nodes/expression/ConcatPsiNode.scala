@@ -1,7 +1,7 @@
 package top.scaleda
-package systemverilog.psi.factory.nodes
+package systemverilog.psi.nodes.expression
 
 import com.intellij.lang.ASTNode
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 
-class SourceTextPsiNode(node: ASTNode) extends ANTLRPsiNode(node)
+class ConcatPsiNode(node: ASTNode) extends ANTLRPsiNode(node)
