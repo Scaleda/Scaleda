@@ -12,12 +12,17 @@ import kernel.utils.serialise.JSONHelper
 
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunProfileState}
+import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
+import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
+import top.scaleda.idea.windows.bottomPanel.console.ConsoleReceiver
+import top.scaleda.kernel.utils.LogLevel
 
 import scala.collection.mutable
 import scala.language.existentials
@@ -116,6 +121,28 @@ class ScaledaRunConfiguration(
     val consoleService = project.getService(classOf[ConsoleService])
     consoleService.clear()
 
+    val searchScope =
+      ExecutionSearchScopes
+        .executionScope(project, environment.getRunProfile)
+
+    val myConsoleBuilder =
+      TextConsoleBuilderFactory.getInstance
+        .createBuilder(project, searchScope)
+
+    val console = myConsoleBuilder.getConsole
+    consoleService.addListener((text: String, level: LogLevel.Value) => {
+      console.print(
+        text,
+        level match {
+          case LogLevel.Info => ConsoleViewContentType.NORMAL_OUTPUT
+          case LogLevel.Warn => ConsoleViewContentType.LOG_WARNING_OUTPUT
+          case LogLevel.Error => ConsoleViewContentType.ERROR_OUTPUT
+          case LogLevel.Fatal => ConsoleViewContentType.ERROR_OUTPUT
+          case _ => ConsoleViewContentType.SYSTEM_OUTPUT
+        }
+      )
+    })
+
     val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
       ScaledaIdeaLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
@@ -129,7 +156,7 @@ class ScaledaRunConfiguration(
 
     val runtime = ScaledaRun.preprocess(runtimeOptional.get)
 
-    new ScaledaRunProfileState(project, runtime, afterExecution)
+    new ScaledaRunProfileState(project, runtime, console, afterExecution)
   }
 
   private def afterExecution(

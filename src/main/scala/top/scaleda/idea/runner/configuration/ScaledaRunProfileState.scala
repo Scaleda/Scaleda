@@ -24,6 +24,7 @@ import java.util.concurrent.TimeoutException
 class ScaledaRunProfileState(
     project: Project,
     runtime: ScaledaRuntime,
+    console: ExecutionConsole,
     invokeAfterFinish: (ScaledaRuntime, Seq[Int], Boolean, Boolean) => Unit
 ) extends RunProfileState {
   override def execute(executor: Executor, runner: ProgramRunner[_]): ExecutionResult = {
@@ -66,7 +67,7 @@ class ScaledaRunProfileState(
 
     // return result
     new ExecutionResult {
-      override def getExecutionConsole: ExecutionConsole = null
+      override def getExecutionConsole: ExecutionConsole = console
 
       override def getActions: Array[AnAction] = Array()
 
