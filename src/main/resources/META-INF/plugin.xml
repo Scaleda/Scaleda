@@ -170,7 +170,7 @@
         <lang.syntaxHighlighterFactory language="SystemVerilog"
                                        implementationClass="top.scaleda.systemverilog.highlight.SystemVerilogSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="SystemVerilog"
-                                      implementationClass="top.scaleda.systemverilog.structview.StructViewFactory"/>
+                                      implementationClass="top.scaleda.systemverilog.structview.SystemVerilogStructViewFactory"/>
     </extensions>
 
     <!-- Settings -->
