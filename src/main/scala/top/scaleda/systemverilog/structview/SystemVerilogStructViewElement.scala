@@ -2,10 +2,7 @@ package top.scaleda
 package systemverilog.structview
 
 import systemverilog.SystemVerilogPSIFileRoot
-
-import top.scaleda.systemverilog.psi.nodes.clazz.ClassDeclarationPsiNode
-// import systemverilog.psi.nodes.always.AlwaysConstructPsiNode
-// import systemverilog.psi.nodes.condition.ConditionalStatementInnerPsiNode
+import systemverilog.psi.nodes.clazz.{ClassConstructorPsiNode, ClassDeclarationPsiNode}
 import systemverilog.psi.nodes.module.ModuleDeclarationPsiNode
 import systemverilog.psi.nodes.signal.{
   NetDeclarationPsiNode,
@@ -41,13 +38,13 @@ class SystemVerilogStructViewElement(val element: PsiElement)
       case root: SystemVerilogPSIFileRoot => // Root node
         val modules = PsiTreeUtil
           .findChildrenOfAnyType(
-            element,
+            root,
             classOf[ModuleDeclarationPsiNode]
           )
           .asScala
         val classes = PsiTreeUtil
           .findChildrenOfAnyType(
-            element,
+            root,
             classOf[ClassDeclarationPsiNode]
           )
           .asScala
@@ -63,7 +60,7 @@ class SystemVerilogStructViewElement(val element: PsiElement)
         //   .asScala
 
         // reg
-        val regDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[VariableDeclarationPsiNode]).asScala
+        val regDeclarations = PsiTreeUtil.findChildrenOfAnyType(module, classOf[VariableDeclarationPsiNode]).asScala
         val regs            = new ListBuffer[VariableIdentifierPsiNode]
         regDeclarations
           .map(r => {
@@ -71,7 +68,7 @@ class SystemVerilogStructViewElement(val element: PsiElement)
           })
 
         // net
-        val netDeclarations = PsiTreeUtil.findChildrenOfAnyType(element, classOf[NetDeclarationPsiNode]).asScala
+        val netDeclarations = PsiTreeUtil.findChildrenOfAnyType(module, classOf[NetDeclarationPsiNode]).asScala
         val nets            = new ListBuffer[NetIdentifierPsiNode]
         netDeclarations
           .foreach(r => {
@@ -81,14 +78,11 @@ class SystemVerilogStructViewElement(val element: PsiElement)
         // alwaysBlocks ++ regs ++ nets
         regs ++ nets
 
-      case clazz: ClassDeclarationPsiNode => Seq.empty
-
-      // FIXME: not work belows
-      // case always: AlwaysConstructPsiNode => // Always node
-      //   always.getChildren.filter(_.isInstanceOf[ConditionalStatementInnerPsiNode]).toSeq
-      //
-      // case conditionalStatement: ConditionalStatementInnerPsiNode => // if...
-      //   conditionalStatement.getChildren.filter(_.isInstanceOf[ConditionalStatementInnerPsiNode]).toSeq
+      case clazz: ClassDeclarationPsiNode => {
+        clazz.getProperties ++ clazz.getConstraints ++ clazz.getConstructors ++ clazz.getMethods.filter(method => {
+          PsiTreeUtil.getChildOfType(method, classOf[ClassConstructorPsiNode]) == null
+        })
+      }
 
       case _ => Seq.empty
     }

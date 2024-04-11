@@ -8,7 +8,7 @@ import com.intellij.lang.PsiStructureViewFactory
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
 
-/** Factory for structure view of Verilog language, with EP `lang.psiStructureViewFactory` in `plugin.xml`.
+/** Factory for structure view of System Verilog language, with EP `lang.psiStructureViewFactory` in `plugin.xml`.
   *
   * Factory overrides [[createStructureViewModel]] function and provide the [[SystemVerilogStructViewModel]] class.
   */

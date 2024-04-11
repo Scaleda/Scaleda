@@ -2,11 +2,12 @@ package top.scaleda
 package systemverilog.structview
 
 import systemverilog.SystemVerilogPSIFileRoot
+import systemverilog.psi.nodes.clazz.ClassDeclarationPsiNode
 import systemverilog.psi.nodes.module.ModuleDeclarationPsiNode
 
 import com.intellij.ide.structureView.{StructureViewModel, StructureViewModelBase, StructureViewTreeElement}
 
-/** Structure view model of Verilog language.
+/** Structure view model of System Verilog language.
   * @param root PSI File for the source file
   */
 class SystemVerilogStructViewModel(root: SystemVerilogPSIFileRoot)
@@ -15,15 +16,19 @@ class SystemVerilogStructViewModel(root: SystemVerilogPSIFileRoot)
 
   /** For those PSI nodes they can show plus (+) symbol for they contain further elements.
     *
-    *  - [[VerilogPSIFileRoot]] -- File root
+    *  - [[SystemVerilogPSIFileRoot]] -- File root
     *  - [[ModuleDeclarationPsiNode]] -- Module declaration
     *
     * @param element Tree element
     * @return
     */
   override def isAlwaysShowsPlus(element: StructureViewTreeElement): Boolean =
-    element.getValue.isInstanceOf[SystemVerilogPSIFileRoot] ||
-      element.getValue.isInstanceOf[ModuleDeclarationPsiNode]
+    element.getValue match {
+      case _: SystemVerilogPSIFileRoot => true
+      case _: ModuleDeclarationPsiNode => true
+      case _: ClassDeclarationPsiNode  => true
+      case _                           => false
+    }
 
   override def isAlwaysLeaf(element: StructureViewTreeElement): Boolean = !isAlwaysShowsPlus(element)
 }

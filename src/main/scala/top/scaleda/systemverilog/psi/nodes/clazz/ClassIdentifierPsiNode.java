@@ -12,25 +12,25 @@ import top.scaleda.systemverilog.psi.SystemVerilogPsiLeafNodeFactory;
 
 public class ClassIdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifierOwner {
 
-    public ClassIdentifierPsiNode(@NotNull ASTNode node) {
-        super(node);
-    }
+  public ClassIdentifierPsiNode(@NotNull ASTNode node) {
+    super(node);
+  }
 
-    @Override
-    public String getName() {
-        if (getNameIdentifier() == null)
-            return null;
-        return getNameIdentifier().getText();
-    }
+  @Override
+  public String getName() {
+    if (getNameIdentifier() == null)
+      return null;
+    return getNameIdentifier().getText();
+  }
 
-    @Nullable
-    @Override
-    public PsiElement getNameIdentifier() {
-        return getFirstChild().getFirstChild();
-    }
+  @Nullable
+  @Override
+  public PsiElement getNameIdentifier() {
+    return getFirstChild().getFirstChild();
+  }
 
-    @Override
-    public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
-        return getFirstChild().replace(SystemVerilogPsiLeafNodeFactory.create(SystemVerilogLexer.SIMPLE_IDENTIFIER, s));
-    }
+  @Override
+  public PsiElement setName(@NotNull String s) throws IncorrectOperationException {
+    return getFirstChild().replace(SystemVerilogPsiLeafNodeFactory.create(SystemVerilogLexer.SIMPLE_IDENTIFIER, s));
+  }
 }
