@@ -2,10 +2,17 @@ package top.scaleda
 package systemverilog.structview
 
 import systemverilog.SystemVerilogPSIFileRoot
+
+import top.scaleda.systemverilog.psi.nodes.clazz.ClassDeclarationPsiNode
 // import systemverilog.psi.nodes.always.AlwaysConstructPsiNode
 // import systemverilog.psi.nodes.condition.ConditionalStatementInnerPsiNode
 import systemverilog.psi.nodes.module.ModuleDeclarationPsiNode
-import systemverilog.psi.nodes.signal.{NetDeclarationPsiNode, NetIdentifierPsiNode, VariableDeclarationPsiNode, VariableIdentifierPsiNode}
+import systemverilog.psi.nodes.signal.{
+  NetDeclarationPsiNode,
+  NetIdentifierPsiNode,
+  VariableDeclarationPsiNode,
+  VariableIdentifierPsiNode
+}
 
 import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.{SortableTreeElement, TreeElement}
@@ -16,7 +23,9 @@ import com.intellij.psi.{PsiElement, PsiNamedElement}
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-class SystemVerilogStructViewElement(val element: PsiElement) extends StructureViewTreeElement with SortableTreeElement {
+class SystemVerilogStructViewElement(val element: PsiElement)
+    extends StructureViewTreeElement
+    with SortableTreeElement {
   override def getValue: AnyRef = element
 
   override def getAlphaSortKey: String = element match {
@@ -30,12 +39,19 @@ class SystemVerilogStructViewElement(val element: PsiElement) extends StructureV
     val treeElements = new ListBuffer[TreeElement]
     val children = element match {
       case root: SystemVerilogPSIFileRoot => // Root node
-        PsiTreeUtil
+        val modules = PsiTreeUtil
           .findChildrenOfAnyType(
             element,
             classOf[ModuleDeclarationPsiNode]
           )
           .asScala
+        val classes = PsiTreeUtil
+          .findChildrenOfAnyType(
+            element,
+            classOf[ClassDeclarationPsiNode]
+          )
+          .asScala
+        modules ++ classes
 
       case module: ModuleDeclarationPsiNode => // Module node
         // always blocks
@@ -64,6 +80,8 @@ class SystemVerilogStructViewElement(val element: PsiElement) extends StructureV
 
         // alwaysBlocks ++ regs ++ nets
         regs ++ nets
+
+      case clazz: ClassDeclarationPsiNode => Seq.empty
 
       // FIXME: not work belows
       // case always: AlwaysConstructPsiNode => // Always node

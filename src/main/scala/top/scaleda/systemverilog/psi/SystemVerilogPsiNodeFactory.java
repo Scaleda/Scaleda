@@ -20,6 +20,9 @@ import top.scaleda.systemverilog.psi.nodes.assignments.NonblockingAssignmentPsiN
 import top.scaleda.systemverilog.psi.nodes.block.CaseBodyPsiNode;
 import top.scaleda.systemverilog.psi.nodes.block.CaseStatementPsiNode;
 import top.scaleda.systemverilog.psi.nodes.block.SeqBlockPsiNode;
+import top.scaleda.systemverilog.psi.nodes.clazz.ClassDeclarationPsiNode;
+import top.scaleda.systemverilog.psi.nodes.clazz.ClassIdentifierPsiNode;
+import top.scaleda.systemverilog.psi.nodes.clazz.ClassItemPsiNode;
 import top.scaleda.systemverilog.psi.nodes.condition.ConditionalStatementChainPsiNode;
 import top.scaleda.systemverilog.psi.nodes.condition.ConditionalStatementHeadPsiNode;
 import top.scaleda.systemverilog.psi.nodes.condition.ConditionalStatementPsiNode;
@@ -83,6 +86,11 @@ public class SystemVerilogPsiNodeFactory {
 
     /// Inside module, module or generate item
     map.put(getRuleIElementType(SystemVerilogParser.RULE_module_item), ModuleItemPsiNode.class);
+
+    // Class
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_class_identifier), ClassIdentifierPsiNode.class);
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_class_declaration), ClassDeclarationPsiNode.class);
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_class_item), ClassItemPsiNode.class);
 
     // Always construct
     /// Always block
