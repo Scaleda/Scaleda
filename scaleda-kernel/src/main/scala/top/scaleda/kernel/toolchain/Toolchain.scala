@@ -50,7 +50,11 @@ object Toolchain {
 //    PDS.internalID -> (PDS.userFriendlyName, (executor: Executor) => new PDS(executor), PDS.supportedTask),
 //    Verilator.internalID -> (Verilator.userFriendlyName, (executor: Executor) => new Verilator(executor), Verilator.supportedTask),
     IVerilog.internalID -> (IVerilog.userFriendlyName, (executor: Executor) =>
-      new IVerilog(executor), IVerilog.supportedTask)
+      new IVerilog(executor), IVerilog.supportedTask),
+    Yosys.internalID -> (Yosys.userFriendlyName, (executor: Executor) =>
+      new Yosys(executor), Yosys.supportedTask),
+    MLFSP.internalID -> (MLFSP.userFriendlyName, (executor: Executor) =>
+      new MLFSP(executor), MLFSP.supportedTask),
   )
 
   def toolchainIds = toolchains.keys.toArray

@@ -49,7 +49,7 @@
 
     <!-- Startup Activities -->
     <extensions defaultExtensionNs="com.intellij">
-<!--        <postStartupActivity implementation="top.scaleda.idea.ScaledaMain"/>-->
+        <postStartupActivity implementation="top.scaleda.idea.ScaledaMain"/>
     </extensions>
 
     <!-- Verilog Support -->
@@ -155,6 +155,22 @@
         <!--                                       implementationClass="top.scaleda.tcl.TclSyntaxHighlighterFactory"/>-->
         <lang.commenter language="Tcl"
                         implementationClass="top.scaleda.tcl.commenter.TclCommenter"/>
+    </extensions>
+
+    <!-- SystemVerilog Support -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType
+                name="SystemVerilog"
+                implementationClass="top.scaleda.systemverilog.SystemVerilogFileType"
+                language="SystemVerilog"
+                extensions="sv"/>
+        <lang.parserDefinition language="SystemVerilog"
+                               implementationClass="top.scaleda.systemverilog.SystemVerilogParserDefinition"/>
+        <lang.ast.factory language="SystemVerilog" implementationClass="top.scaleda.systemverilog.SystemVerilogASTFactory"/>
+        <lang.syntaxHighlighterFactory language="SystemVerilog"
+                                       implementationClass="top.scaleda.systemverilog.highlight.SystemVerilogSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="SystemVerilog"
+                                      implementationClass="top.scaleda.systemverilog.structview.StructViewFactory"/>
     </extensions>
 
     <!-- Settings -->

@@ -1,4 +1,4 @@
-// Generated from C:/Users/hans/Coding/seda/scaleda-kernel/src/main/antlr/verilog\VerilogParser.g4 by ANTLR 4.12.0
+// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/verilog/VerilogParser.g4 by ANTLR 4.13.1
 package top.scaleda.verilog.parser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class VerilogParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.12.0", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =

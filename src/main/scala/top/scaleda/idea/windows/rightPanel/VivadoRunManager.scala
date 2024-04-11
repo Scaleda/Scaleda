@@ -19,7 +19,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.components.JBList
 import com.intellij.ui.content.ContentManager
 import com.intellij.ui.content.impl.ContentImpl
-import com.intellij.ui.{ColoredListCellRenderer, ListSpeedSearch, ScrollPaneFactory}
+import com.intellij.ui.{ColoredListCellRenderer, ListSpeedSearch, ScrollPaneFactory, TreeUIHelper}
 
 import java.awt.GridLayout
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
@@ -71,7 +71,7 @@ object VivadoRunManager {
           }
 
           list.setCellRenderer(new VivadoRunListCellRenderer)
-          new ListSpeedSearch[VivadoRun](list)
+          TreeUIHelper.getInstance().installListSpeedSearch(list)
           panel.add(ScrollPaneFactory.createScrollPane(list))
 
           // Run

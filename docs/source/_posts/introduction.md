@@ -1,4 +1,6 @@
-# Scaleda 综述
+---
+title: Scaleda 综述
+---
 
 Scaleda（=Scalable + EDA）是一款用于 FPGA（Verilog）开发的集成开发环境。
 它致力于提供用户友好的开发平台，支持智能化的 Verilog 代码编写及便捷的仿真调试体验，并可接入 Vivado 等厂商工具链实现逻辑综合、实现等功能。
@@ -7,7 +9,7 @@ Scaleda 基于 IntelliJ 平台，是 IntelliJ IDEA 上的一款插件。
 用户可以在安装社区版 IDEA 后，安装 Scaleda 插件来使用它。
 简而言之，Scaleda 目前是 IDEA 上的一款集 Verilog 语法及语义提示、FPGA EDA 工具链管理与调用、FPGA 项目管理的插件。
 
-![使用 Scaleda 进行 Verilog 开发](./assets/main-screenshot.png)
+![使用 Scaleda 进行 Verilog 开发](/images/main-screenshot.png)
 
 Scaleda 的开发背景来源于我们对 FPGA 开发教学普及情况的观察。
 传统的 FPGA 开发围绕厂商提供的 EDA 软件进行。
@@ -30,7 +32,7 @@ Scaleda 是在 IntelliJ 平台上运行的。
 Scaleda 支持创建、打开、保存和管理自有格式的 FPGA 项目。
 这套项目系统支持在同一个项目中指定不同的「任务」（如仿真、综合），每个任务可以有不同的顶层模块，可以在不同的平台（如 Xilinx Vivado）上执行，并提供了基本的调试功能。
 此外，Scaleda 也可以直接打开 Xilinx Vivado 项目，编辑其中的代码，甚至调用 Vivado 的综合、实现等任务。
-[点击此处](./PROJECT.md)查看更多关于项目管理的介绍。
+[点击此处](/project)查看更多关于项目管理的介绍。
 
 ### 语义级补全
 
@@ -40,7 +42,7 @@ Scaleda 会根据您当前代码的上下文，自动给出合适的候选提示
 - 当您正在写模块端口列表时，会自动补全 input 或 output 一类的关键词，也能在您想要填写位宽时提示模块级参数。
 - 当您正在写表达式时，会自动补全可用的信号列表。
 
-![根据代码上下文提示](./assets/input-hint.png)
+![根据代码上下文提示](/images/input-hint.png)
 
 ### 信号类型提示
 
@@ -49,22 +51,22 @@ Scaleda 会根据您当前代码的上下文，自动给出合适的候选提示
 您可以将鼠标移动到某个信号上，浮窗会展示此信号的定义。
 您也可以按住 Ctrl 点击以跳转到那个信号的定义处。
 
-![信号类型提示](./assets/signal-color.png)
+![信号类型提示](/images/signal-color.png)
 
 同样的提示也应用于模块的实例化上。
 您可以轻松地通过浮窗查看某个被实例化的模块的原始模块头（即定义了模块参数和模块端口的部分），跳转到模块定义，或是查看某一个端口和参数的属性。
 
-![模块实例化提示](./assets/module-description.png)
+![模块实例化提示](/images/module-description.png)
 
 ### 问题代码提示
 
 Scaleda 会根据您的代码，给出可能的问题提示，例如多驱动、未使用的信号等。
 
-![不合适的 assign 语句](./assets/improper-assign.png)
+![不合适的 assign 语句](/images/improper-assign.png)
 
-![模块实例化时，有端口未连接](./assets/module-instance.png)
+![模块实例化时，有端口未连接](/images/module-instance.png)
 
-![多驱动问题，即一个信号在多个地方被赋值](./assets/multi-driven.png)
+![多驱动问题，即一个信号在多个地方被赋值](/images/multi-driven.png)
 
 ### 代码格式化
 

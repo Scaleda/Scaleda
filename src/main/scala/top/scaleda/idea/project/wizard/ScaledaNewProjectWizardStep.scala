@@ -5,7 +5,7 @@ import idea.ScaledaBundle
 import idea.project.ScaledaModuleBuilder
 import kernel.utils.KernelFileUtils
 
-import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardLanguageStep}
+import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardStep}
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
@@ -17,10 +17,11 @@ import kotlin.Unit.{INSTANCE => KUnit}
 /** Class for project wizard step, or call it configuration?
  * @param parent NewProjectWizardLanguageStep
  */
-class ScaledaNewProjectWizardStep(private val parent: NewProjectWizardLanguageStep)
+class ScaledaNewProjectWizardStep(private val parent: NewProjectWizardStep)
   extends AbstractNewProjectWizardStep(parent) {
   // basic info
-  private val moduleNameProperty: GraphProperty[String] = getPropertyGraph.lazyProperty(() => parent.getName)
+  // private val moduleNameProperty: GraphProperty[String] = getPropertyGraph.lazyProperty(() => parent.getName)
+  private val moduleNameProperty: GraphProperty[String] = getPropertyGraph.lazyProperty(() => parent.toString)
   private def moduleName: String                        = moduleNameProperty.get()
   private val projectRoot                               = getContext.getProjectDirectory.toAbsolutePath
 
@@ -30,10 +31,10 @@ class ScaledaNewProjectWizardStep(private val parent: NewProjectWizardLanguageSt
 
   // detect when Scaleda is selected
   parent.getPropertyGraph.afterPropagation({ () =>
-    if (parent.getLanguage == ScaledaNewProjectWizard.ScaledaLanguageText) {
-      // do something for preparation, if need!
-      // TODO
-    }
+    // if (parent.getLanguage == ScaledaNewProjectWizard.ScaledaLanguageText) {
+    //   // do something for preparation, if need!
+    //   // TODO
+    // }
     KUnit
   })
 

@@ -53,6 +53,8 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
         messages.clear()
       }
     }
+
+    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
   }
 
 
@@ -93,6 +95,7 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
       sortByLevel = state
       sortData()
     }
+    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
   }
 
 
@@ -119,6 +122,8 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
       override def isSelected(e: AnActionEvent): Boolean = {
         if (enabledLevel.contains(level)) true else false
       }
+
+      override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
     }
   })
 

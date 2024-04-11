@@ -9,10 +9,11 @@ import com.intellij.ide.{CommonActionsManager, DefaultTreeExpander}
 import com.intellij.openapi.actionSystem.{ActionManager, CustomShortcutSet, DefaultActionGroup}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.intellij.ui.TreeSpeedSearch
+import com.intellij.ui.{TreeSpeedSearch, TreeUIHelper}
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
+import top.scaleda.idea.utils.ScaledaIdeaLogger
 import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksDummyRootNode, ScaledaTasksRootNode}
 
 import java.awt.event.{KeyEvent, MouseAdapter, MouseEvent}
@@ -23,6 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, true) {
   // register myself to tasks tree service
   private val service = project.getService(classOf[ScaledaTasksService])
+  ScaledaIdeaLogger.info("ScaledaTasksPanel started")
   service.setPanel(this)
 
   private val dummyRoot: ScaledaTasksDummyRootNode = new ScaledaTasksDummyRootNode()
@@ -34,7 +36,9 @@ class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, tr
 
   TreeUtil.installActions(tree)
 
-  private val search = new TreeSpeedSearch(tree)
+  locally {
+    val _ = TreeUIHelper.getInstance().installTreeSpeedSearch(tree)
+  }
 
   // Run
   private val runManager = RunManagerImpl.getInstanceImpl(project)

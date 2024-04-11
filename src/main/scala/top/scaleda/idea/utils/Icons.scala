@@ -22,18 +22,18 @@ object Icons {
   final val folder = IconLoader.getIcon("/icons/icon-over-folder", Icons.getClass)
 
   final val project = AllIcons.Actions.ModuleDirectory
-  final val target = AllIcons.Actions.RunAll
-  final val task = AllIcons.Actions.Execute
+  final val target  = AllIcons.Actions.RunAll
+  final val task    = AllIcons.Actions.Execute
 
-  final val verilog = IconLoader.getIcon("/icons/verilog", Icons.getClass)
+  final val verilog       = IconLoader.getIcon("/icons/verilog", Icons.getClass)
   final val verilogModule = getIcon("/icons/verilog-module")
-  final val verilogWire = getIcon("/icons/verilog-wire")
-  final val verilogReg = getIcon("/icons/verilog-reg")
+  final val verilogWire   = getIcon("/icons/verilog-wire")
+  final val verilogReg    = getIcon("/icons/verilog-reg")
   final val verilogAlways = getIcon("/icons/verilog-always")
 
-  final val verilogInput =AllIcons.Nodes.Interface
-  final val verilogOutput = getIcon("/icons/verilog-output")
-  final val verilogInout = getIcon("/icons/verilog-inout")
+  final val verilogInput     = AllIcons.Nodes.Interface
+  final val verilogOutput    = getIcon("/icons/verilog-output")
+  final val verilogInout     = getIcon("/icons/verilog-inout")
   final val verilogOutputReg = getIcon("/icons/verilog-output-reg")
 
   final val tcl = IconLoader.getIcon("/icons/tcl", Icons.getClass)
@@ -41,4 +41,6 @@ object Icons {
     IconLoader.getIcon("/icons/scaledaToolWindow", Icons.getClass)
   final val logVerbose =
     IconLoader.getIcon("/icons/log-verbose", Icons.getClass)
+
+  final val systemVerilog = IconLoader.getIcon("/icons/systemverilog", Icons.getClass)
 }

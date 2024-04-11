@@ -9,7 +9,7 @@ import com.intellij.execution.Executor
 import com.intellij.execution.impl.{RunManagerImpl, RunnerAndConfigurationSettingsImpl}
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
 import top.scaleda.idea.project.io.YmlRootManager
@@ -58,4 +58,6 @@ class ScaledaRunToolWindowTaskAction(
           )
         })})})
   }
+
+  override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
 }

@@ -13,9 +13,9 @@ import com.intellij.ui.components.JBPanelWithEmptyText
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{AnActionButton, ToolbarDecorator}
 import com.intellij.util.ui.JBUI
-import top.scaleda.idea.project.io.YmlRootManager
-import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode}
-import top.scaleda.kernel.project.ScaledaProject
+import idea.project.io.YmlRootManager
+import idea.windows.rightPanel.treeNodes.{ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode}
+import kernel.project.ScaledaProject
 
 import java.awt.BorderLayout
 import javax.swing.JPanel

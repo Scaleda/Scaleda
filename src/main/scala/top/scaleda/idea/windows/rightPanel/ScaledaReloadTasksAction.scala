@@ -5,7 +5,8 @@ import idea.ScaledaBundle
 import idea.project.io.YmlRootManager
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
+import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
+import top.scaleda.idea.utils.ScaledaIdeaLogger
 import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksRootNode
 
 /** Action: Load Scaleda project config, with all its targets and tasks.
@@ -23,6 +24,7 @@ class ScaledaReloadTasksAction
       AllIcons.Actions.Refresh
     ) {
   override def actionPerformed(e: AnActionEvent): Unit = {
+    ScaledaIdeaLogger.debug("Reloading Scaleda tasks...")
     val project = e.getProject
     if (project == null || project.isDisposed) return
 
@@ -32,7 +34,13 @@ class ScaledaReloadTasksAction
 
     val ymlRoot = YmlRootManager.getInstance(project).getRoots
 
+    ymlRoot.flatMap(_.toProjectConfig).foreach { config =>
+      ScaledaIdeaLogger.debug(s"Loaded project config: ${config.name}")
+    }
+
     panel.getRoots.clear()
     panel.getRoots.addAll(ymlRoot.flatMap(_.toProjectConfig.map(config => new ScaledaTasksRootNode(config))))
   }
+
+  override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
 }

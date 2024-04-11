@@ -1,0 +1,6 @@
+package top.scaleda
+package systemverilog.psi.nodes.signal
+
+import com.intellij.lang.ASTNode
+
+class VariableIdentifierPsiNode(node: ASTNode) extends SignalIdentifierPsiNode(node)

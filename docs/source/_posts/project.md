@@ -1,4 +1,6 @@
-# Scaleda 项目系统介绍
+---
+title: Scaleda 项目系统介绍
+---
 
 此处的「Scaleda 项目」指采用 Scaleda 开发的 FPGA 项目。
 一个 Scaleda 项目即是一个 FPGA 工程，包括一个或多个源文件、一个或多个约束文件、一个或多个 IP 核等，可以支持多种任务（如仿真、综合、实现等），可以在多种平台（如 Xilinx Vivado）上执行。
@@ -12,7 +14,7 @@ HDL 文件是项目的核心。在一个 Scaleda 项目中，HDL 文件（目前
 一个项目可以有多个源码文件，也可以有多个测试文件。
 默认情况下，源码放在项目下 src 文件夹中，而测试文件在 test 文件夹里。
 
-![HDL 文件](./assets/hdl.png)
+![HDL 文件](/images/hdl.png)
 
 ### 目标平台
 
@@ -32,7 +34,7 @@ HDL 文件是项目的核心。在一个 Scaleda 项目中，HDL 文件（目前
 
 Scaleda Tasks 面板中会以树形结构，展示当前项目中已有的任务：
 
-![任务](./assets/tasks.png)
+![任务](/images/tasks.png)
 
 以上图为例，这一项目中有 3 个目标平台，目标平台「iverilog」使用 Icarus Verilog 工具链，目标平台「vivado1」和「vivado2」使用 Vivado 工具链，可能设置了不同的器件型号。
 这些目标平台之下又有仿真、综合等任务，它们可以设置不同的顶层模块、测试文件、综合选项等。
