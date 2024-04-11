@@ -5,6 +5,7 @@ import idea.project.io.YmlRootManager
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
+import com.intellij.ui.content.impl.ContentImpl
 import top.scaleda.idea.ScaledaBundle
 
 class ScaledaTasksWindowFactory extends ToolWindowFactory {

@@ -7,7 +7,11 @@ import idea.project.io.YmlRootManager
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
 import top.scaleda.idea.utils.ScaledaIdeaLogger
-import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksRootNode
+import top.scaleda.idea.windows.rightPanel.treeNodes.{
+  ScaledaTasksRootNode,
+  ScaledaTasksTargetNode,
+  ScaledaTasksTaskNode
+}
 
 /** Action: Load Scaleda project config, with all its targets and tasks.
   * This action should be performed when
@@ -35,11 +39,14 @@ class ScaledaReloadTasksAction
     val ymlRoot = YmlRootManager.getInstance(project).getRoots
 
     ymlRoot.flatMap(_.toProjectConfig).foreach { config =>
-      ScaledaIdeaLogger.debug(s"Loaded project config: ${config.name}")
+      ScaledaIdeaLogger.info(s"Loaded project config: ${config.name}")
     }
 
-    panel.getRoots.clear()
-    panel.getRoots.addAll(ymlRoot.flatMap(_.toProjectConfig.map(config => new ScaledaTasksRootNode(config))))
+    // panel.getRoots.clear()
+    // panel.getRoots.addAll(ymlRoot.flatMap(_.toProjectConfig.map(config => new ScaledaTasksRootNode(config))))
+    ymlRoot.flatMap(_.toProjectConfig.map(config => new ScaledaTasksRootNode(config))).foreach { root =>
+      panel.getModel.setRoot(root)
+    }
   }
 
   override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT

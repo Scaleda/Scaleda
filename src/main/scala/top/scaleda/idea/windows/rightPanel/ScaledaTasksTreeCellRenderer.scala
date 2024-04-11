@@ -2,7 +2,7 @@ package top.scaleda
 package idea.windows.rightPanel
 
 import com.intellij.ui.{ColoredTreeCellRenderer, SimpleTextAttributes}
-import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode, ScaledaTasksTreeNode}
+import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksDummyRootNode, ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode, ScaledaTasksTreeNode}
 import top.scaleda.kernel.project.config.TaskConfig
 import top.scaleda.kernel.toolchain.Toolchain
 
@@ -26,7 +26,8 @@ class ScaledaTasksTreeCellRenderer extends ColoredTreeCellRenderer {
     append(node.name)
 
     node match {
-      case node: ScaledaTasksRootNode =>
+      case _: ScaledaTasksDummyRootNode => append(" Dummy Root Node", SimpleTextAttributes.GRAY_ATTRIBUTES)
+      case node: ScaledaTasksRootNode => append(s" [project ${node.name}]")
       case node: ScaledaTasksTargetNode =>
         append(s" [${
           Toolchain.toolchains.get(node.toolchain) match {

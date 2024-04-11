@@ -9,7 +9,7 @@ import com.intellij.ide.{CommonActionsManager, DefaultTreeExpander}
 import com.intellij.openapi.actionSystem.{ActionManager, CustomShortcutSet, DefaultActionGroup}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.intellij.ui.{TreeSpeedSearch, TreeUIHelper}
+import com.intellij.ui.{ScrollPaneFactory, TreeSpeedSearch, TreeUIHelper}
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
@@ -27,11 +27,13 @@ class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, tr
   ScaledaIdeaLogger.info("ScaledaTasksPanel started")
   service.setPanel(this)
 
-  private val dummyRoot: ScaledaTasksDummyRootNode = new ScaledaTasksDummyRootNode()
-  private val model: DefaultTreeModel = new DefaultTreeModel(dummyRoot)
+  // FIXME: not working...
+  // private val dummyRoot: ScaledaTasksDummyRootNode = new ScaledaTasksDummyRootNode()
+  private val model: DefaultTreeModel = new DefaultTreeModel(null)
 
   private val tree = new Tree(model)
-  tree.setRootVisible(false)
+  // tree.setRootVisible(false)
+  tree.setRootVisible(true)
   tree.setCellRenderer(new ScaledaTasksTreeCellRenderer)
 
   TreeUtil.installActions(tree)
@@ -104,14 +106,7 @@ class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, tr
   setToolbar(toolbar.getComponent)
   toolbar.setTargetComponent(this)
 
-  private val panel = new JPanel()
-  panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS))
-
-  private val scrollbar = new JBScrollPane()
-  scrollbar.setViewportView(tree)
-  panel.add(scrollbar)
-
-  setContent(panel)
+  add(ScrollPaneFactory.createScrollPane(tree))
 
   // Run reload action
   ActionManager.getInstance().tryToExecute(refreshTasksAction, null, null, null, true)
@@ -119,5 +114,5 @@ class ScaledaTasksPanel(project: Project) extends SimpleToolWindowPanel(true, tr
   def getTree: Tree              = tree
   def getModel: DefaultTreeModel = model
 
-  def getRoots: ArrayBuffer[ScaledaTasksRootNode] = dummyRoot.rootNodes
+  // def getRoots: ArrayBuffer[ScaledaTasksRootNode] = dummyRoot.rootNodes
 }
