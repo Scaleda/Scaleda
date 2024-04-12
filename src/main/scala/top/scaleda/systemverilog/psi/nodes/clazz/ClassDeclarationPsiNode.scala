@@ -57,7 +57,6 @@ class ClassDeclarationPsiNode(node: ASTNode)
   }
 
   private def getClassItemType[T <: PsiElement](clazz: Class[T]): Seq[T] = {
-    println("class tag", clazz)
     val result =
       PsiTreeUtil.findChildrenOfType(this, clazz).asScala
     if (result == null) Seq[T]() else result.toSeq
