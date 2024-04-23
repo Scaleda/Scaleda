@@ -11,6 +11,7 @@ import top.scaleda.systemverilog.parser.SystemVerilogParser;
 import top.scaleda.systemverilog.psi.nodes.IdentifierPsiNode;
 import top.scaleda.systemverilog.psi.nodes.SourceTextPsiNode;
 import top.scaleda.systemverilog.psi.nodes.StatementPsiNode;
+import top.scaleda.systemverilog.psi.nodes.always.AlwaysConstructPsiNode;
 import top.scaleda.systemverilog.psi.nodes.always.DelayOrEventControlPsiNode;
 import top.scaleda.systemverilog.psi.nodes.always.DelayValuePsiNode;
 import top.scaleda.systemverilog.psi.nodes.always.EventExpressionPsiNode;
@@ -28,6 +29,7 @@ import top.scaleda.systemverilog.psi.nodes.condition.ConditionalStatementTailPsi
 import top.scaleda.systemverilog.psi.nodes.expression.*;
 import top.scaleda.systemverilog.psi.nodes.function.FunctionDeclarationPsiNode;
 import top.scaleda.systemverilog.psi.nodes.incompleted.IncompleteConditionPsiNode;
+import top.scaleda.systemverilog.psi.nodes.initial.InitialPsiNode;
 import top.scaleda.systemverilog.psi.nodes.instantiation.*;
 import top.scaleda.systemverilog.psi.nodes.module.*;
 import top.scaleda.systemverilog.psi.nodes.parameter.*;
@@ -102,10 +104,7 @@ public class SystemVerilogPsiNodeFactory {
 
     // Always construct
     /// Always block
-    // map.put(
-    //     getRuleIElementType(SystemVerilogParser.RULE_always_construct),
-    //     AlwaysConstructPsiNode.class
-    // );
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_always_construct), AlwaysConstructPsiNode.class);
     /// Delay or event control
     map.put(getRuleIElementType(SystemVerilogParser.RULE_delay_or_event_control), DelayOrEventControlPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_delay_value), DelayValuePsiNode.class);
@@ -115,6 +114,8 @@ public class SystemVerilogPsiNodeFactory {
     map.put(getRuleIElementType(SystemVerilogParser.RULE_blocking_assignment), BlockingAssignmentPsiNode.class);
     /// Assign
     map.put(getRuleIElementType(SystemVerilogParser.RULE_net_assignment), NetAssignmentPsiNode.class);
+    /// Initial
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_initial_construct), InitialPsiNode.class);
 
     // Signals
     /// Net (wire, tri, etc.)

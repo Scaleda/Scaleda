@@ -2,7 +2,10 @@ package top.scaleda
 package systemverilog.structview
 
 import systemverilog.SystemVerilogPSIFileRoot
+import systemverilog.psi.nodes.always.AlwaysConstructPsiNode
 import systemverilog.psi.nodes.clazz.{ClassConstructorPsiNode, ClassDeclarationPsiNode, ClassMethodPsiNode}
+import systemverilog.psi.nodes.function.FunctionDeclarationPsiNode
+import systemverilog.psi.nodes.initial.InitialPsiNode
 import systemverilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleItemPsiNode}
 import systemverilog.psi.nodes.signal.{
   NetDeclarationPsiNode,
@@ -10,14 +13,13 @@ import systemverilog.psi.nodes.signal.{
   VariableDeclarationPsiNode,
   VariableIdentifierPsiNode
 }
+import systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
 import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.{SortableTreeElement, TreeElement}
 import com.intellij.navigation.{ItemPresentation, NavigationItem}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiNamedElement}
-import top.scaleda.systemverilog.psi.nodes.function.FunctionDeclarationPsiNode
-import top.scaleda.systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -58,16 +60,26 @@ class SystemVerilogStructViewElement(val element: PsiElement)
           .asScala
           .filter(t => PsiTreeUtil.getParentOfType(t, classOf[ClassMethodPsiNode]) == null)
           .filter(t => PsiTreeUtil.getParentOfType(t, classOf[ModuleItemPsiNode]) == null)
-        tasks ++ modules ++ classes
+        val functions = PsiTreeUtil
+          .findChildrenOfAnyType(
+            root,
+            classOf[FunctionDeclarationPsiNode]
+          )
+          .asScala
+          .filter(t => PsiTreeUtil.getParentOfType(t, classOf[ClassMethodPsiNode]) == null)
+          .filter(t => PsiTreeUtil.getParentOfType(t, classOf[ModuleItemPsiNode]) == null)
+        tasks ++ functions ++ modules ++ classes
 
       case module: ModuleDeclarationPsiNode => // Module node
         // always blocks
-        // val alwaysBlocks = PsiTreeUtil
-        //   .findChildrenOfAnyType(
-        //     element,
-        //     classOf[AlwaysConstructPsiNode]
-        //   )
-        //   .asScala
+        val alwaysBlocks = PsiTreeUtil
+          .findChildrenOfAnyType(
+            element,
+            classOf[AlwaysConstructPsiNode]
+          )
+          .asScala
+        // initial blocks
+        val initialBlocks = PsiTreeUtil.findChildrenOfAnyType(module, classOf[InitialPsiNode]).asScala
 
         // reg
         val regDeclarations = PsiTreeUtil.findChildrenOfAnyType(module, classOf[VariableDeclarationPsiNode]).asScala
@@ -87,14 +99,14 @@ class SystemVerilogStructViewElement(val element: PsiElement)
 
         // functions
         val functions = PsiTreeUtil.findChildrenOfAnyType(module, classOf[FunctionDeclarationPsiNode]).asScala
+        // tasks
+        val tasks = PsiTreeUtil.findChildrenOfAnyType(module, classOf[TaskDeclarationPsiNode]).asScala
 
-        // alwaysBlocks ++ regs ++ nets
-        functions ++ regs ++ nets
+        functions ++ tasks ++ initialBlocks ++ alwaysBlocks ++ regs ++ nets
 
       case clazz: ClassDeclarationPsiNode =>
-        clazz.getProperties ++ clazz.getConstraints ++ clazz.getConstructors ++ clazz.getMethods.filter(method => {
-          PsiTreeUtil.getChildOfType(method, classOf[ClassConstructorPsiNode]) == null
-        }) ++ clazz.getParameters
+        clazz.getParameterPorts ++ clazz.getParameters ++ clazz.getProperties ++
+          clazz.getConstraints ++ clazz.getConstructors ++ clazz.getMethodsNoConstructor
 
       case _ => Seq.empty
     }

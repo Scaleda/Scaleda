@@ -79,12 +79,17 @@ class ClassDeclarationPsiNode(node: ASTNode)
     if (result == null) Seq[T]() else result.toSeq
   }
 
-  def getClassItems: Seq[ClassItemPsiNode]            = getClassItemType(classOf[ClassItemPsiNode])
-  def getProperties: Seq[ClassPropertyPsiNode]        = getClassItemType(classOf[ClassPropertyPsiNode])
-  def getConstraints: Seq[ClassConstraintPsiNode]     = getClassItemType(classOf[ClassConstraintPsiNode])
-  def getConstructors: Seq[ClassConstructorPsiNode]   = getClassItemType(classOf[ClassConstructorPsiNode])
-  def getMethods: Seq[ClassMethodPsiNode]             = getClassItemType(classOf[ClassMethodPsiNode])
-  def getParameters: Seq[ParameterDeclarationPsiNode] = getClassItemType(classOf[ParameterDeclarationPsiNode])
+  def getClassItems: Seq[ClassItemPsiNode]          = getClassItemType(classOf[ClassItemPsiNode])
+  def getProperties: Seq[ClassPropertyPsiNode]      = getClassItemType(classOf[ClassPropertyPsiNode])
+  def getConstraints: Seq[ClassConstraintPsiNode]   = getClassItemType(classOf[ClassConstraintPsiNode])
+  def getConstructors: Seq[ClassConstructorPsiNode] = getClassItemType(classOf[ClassConstructorPsiNode])
+  def getMethods: Seq[ClassMethodPsiNode]           = getClassItemType(classOf[ClassMethodPsiNode])
+  def getMethodsNoConstructor: Seq[ClassMethodPsiNode] =
+    getMethods.filter(method => PsiTreeUtil.getChildOfType(method, classOf[ClassConstructorPsiNode]) == null)
+  def getParameters: Seq[ParameterDeclarationPsiNode] =
+    getClassItemType(classOf[ParameterDeclarationPsiNode]).filter(t =>
+      PsiTreeUtil.getParentOfType(t, classOf[ParameterPortDeclarationPsiNode]) == null
+    )
   def getParameterPorts: Seq[ParameterPortDeclarationPsiNode] = getClassItemType(
     classOf[ParameterPortDeclarationPsiNode]
   )
