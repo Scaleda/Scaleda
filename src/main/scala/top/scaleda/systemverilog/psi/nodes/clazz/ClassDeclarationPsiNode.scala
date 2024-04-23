@@ -49,7 +49,19 @@ class ClassDeclarationPsiNode(node: ASTNode)
   override def getElementName: String = {
     val parameterPorts = getParameterPorts
     val identifiers    = parameterPorts.map(_.getNameIdentifier.getText)
-    "class " + getName + "(" + identifiers.mkString(", ") + ")"
+    val extensionNode  = PsiTreeUtil.getChildrenOfType(this, classOf[ClassExtensionPsiNode])
+    val extension =
+      if (extensionNode != null) extensionNode.headOption.map(" " + _.getText).getOrElse("") else ""
+    val implementationNode = PsiTreeUtil.getChildrenOfType(this, classOf[ClassImplementationPsiNode])
+    val implementation =
+      if (implementationNode != null)
+        implementationNode.headOption
+          .map(" " + _.getText)
+          .getOrElse("")
+      else ""
+    "class " + getName + (if (identifiers.isEmpty) ""
+                          else "(" + identifiers.mkString(", ") + ")") +
+      extension + implementation
   }
 
   def getFile: SystemVerilogPSIFileRoot = {

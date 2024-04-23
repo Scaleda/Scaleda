@@ -90,6 +90,8 @@ public class SystemVerilogPsiNodeFactory {
     map.put(getRuleIElementType(SystemVerilogParser.RULE_class_constructor_declaration), ClassConstructorPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_class_method), ClassMethodPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_port_declaration), ParameterPortDeclarationPsiNode.class);
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_class_extension), ClassExtensionPsiNode.class);
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_class_implementation), ClassImplementationPsiNode.class);
 
     // Always construct
     /// Always block
