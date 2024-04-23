@@ -10,6 +10,7 @@ import systemverilog.psi.nodes.signal.{NetIdentifierPsiNode, VariableIdentifierP
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
+import top.scaleda.systemverilog.psi.nodes.function.FunctionDeclarationPsiNode
 import top.scaleda.systemverilog.psi.nodes.parameter.ParameterDeclarationPsiNode
 import top.scaleda.systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
@@ -32,6 +33,7 @@ class SystemVerilogItemPresentation(val element: PsiElement) extends ItemPresent
     case _: VariableIdentifierPsiNode   => Icons.verilogReg
     case _: NetIdentifierPsiNode        => Icons.verilogWire
     case _: TaskDeclarationPsiNode      => AllIcons.Actions.Execute
+    case _: FunctionDeclarationPsiNode  => AllIcons.Nodes.Function
     case _                              => AllIcons.General.TodoQuestion // should never reach!
   }
 }

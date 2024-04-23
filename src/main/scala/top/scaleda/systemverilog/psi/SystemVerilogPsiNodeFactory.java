@@ -26,6 +26,7 @@ import top.scaleda.systemverilog.psi.nodes.condition.ConditionalStatementHeadPsi
 import top.scaleda.systemverilog.psi.nodes.condition.ConditionalStatementPsiNode;
 import top.scaleda.systemverilog.psi.nodes.condition.ConditionalStatementTailPsiNode;
 import top.scaleda.systemverilog.psi.nodes.expression.*;
+import top.scaleda.systemverilog.psi.nodes.function.FunctionDeclarationPsiNode;
 import top.scaleda.systemverilog.psi.nodes.incompleted.IncompleteConditionPsiNode;
 import top.scaleda.systemverilog.psi.nodes.instantiation.*;
 import top.scaleda.systemverilog.psi.nodes.module.*;
@@ -74,6 +75,8 @@ public class SystemVerilogPsiNodeFactory {
     map.put(getRuleIElementType(SystemVerilogParser.RULE_port_identifier), PortIdentifierPsiNode.class);
     /// Parameter declaration
     map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_declaration), ParameterDeclarationPsiNode.class);
+    /// module functions
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_function_declaration), FunctionDeclarationPsiNode.class);
 
     map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_identifier), ParameterIdentifierPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_param_assignment), ParamAssignmentPsiNode.class);

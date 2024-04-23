@@ -2,8 +2,8 @@ package top.scaleda
 package systemverilog.structview
 
 import systemverilog.SystemVerilogPSIFileRoot
-import systemverilog.psi.nodes.clazz.{ClassConstructorPsiNode, ClassDeclarationPsiNode}
-import systemverilog.psi.nodes.module.ModuleDeclarationPsiNode
+import systemverilog.psi.nodes.clazz.{ClassConstructorPsiNode, ClassDeclarationPsiNode, ClassMethodPsiNode}
+import systemverilog.psi.nodes.module.{ModuleDeclarationPsiNode, ModuleItemPsiNode}
 import systemverilog.psi.nodes.signal.{
   NetDeclarationPsiNode,
   NetIdentifierPsiNode,
@@ -16,6 +16,7 @@ import com.intellij.ide.util.treeView.smartTree.{SortableTreeElement, TreeElemen
 import com.intellij.navigation.{ItemPresentation, NavigationItem}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiNamedElement}
+import top.scaleda.systemverilog.psi.nodes.function.FunctionDeclarationPsiNode
 import top.scaleda.systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
 import scala.collection.mutable.ListBuffer
@@ -55,6 +56,8 @@ class SystemVerilogStructViewElement(val element: PsiElement)
             classOf[TaskDeclarationPsiNode]
           )
           .asScala
+          .filter(t => PsiTreeUtil.getParentOfType(t, classOf[ClassMethodPsiNode]) == null)
+          .filter(t => PsiTreeUtil.getParentOfType(t, classOf[ModuleItemPsiNode]) == null)
         tasks ++ modules ++ classes
 
       case module: ModuleDeclarationPsiNode => // Module node
@@ -82,14 +85,16 @@ class SystemVerilogStructViewElement(val element: PsiElement)
             nets.addAll(PsiTreeUtil.findChildrenOfAnyType(r, classOf[NetIdentifierPsiNode]).asScala)
           })
 
-        // alwaysBlocks ++ regs ++ nets
-        regs ++ nets
+        // functions
+        val functions = PsiTreeUtil.findChildrenOfAnyType(module, classOf[FunctionDeclarationPsiNode]).asScala
 
-      case clazz: ClassDeclarationPsiNode => {
+        // alwaysBlocks ++ regs ++ nets
+        functions ++ regs ++ nets
+
+      case clazz: ClassDeclarationPsiNode =>
         clazz.getProperties ++ clazz.getConstraints ++ clazz.getConstructors ++ clazz.getMethods.filter(method => {
           PsiTreeUtil.getChildOfType(method, classOf[ClassConstructorPsiNode]) == null
         }) ++ clazz.getParameters
-      }
 
       case _ => Seq.empty
     }
