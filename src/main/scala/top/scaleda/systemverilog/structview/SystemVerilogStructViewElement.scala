@@ -16,6 +16,7 @@ import com.intellij.ide.util.treeView.smartTree.{SortableTreeElement, TreeElemen
 import com.intellij.navigation.{ItemPresentation, NavigationItem}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiNamedElement}
+import top.scaleda.systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
@@ -48,7 +49,13 @@ class SystemVerilogStructViewElement(val element: PsiElement)
             classOf[ClassDeclarationPsiNode]
           )
           .asScala
-        modules ++ classes
+        val tasks = PsiTreeUtil
+          .findChildrenOfAnyType(
+            root,
+            classOf[TaskDeclarationPsiNode]
+          )
+          .asScala
+        tasks ++ modules ++ classes
 
       case module: ModuleDeclarationPsiNode => // Module node
         // always blocks

@@ -31,6 +31,7 @@ import top.scaleda.systemverilog.psi.nodes.instantiation.*;
 import top.scaleda.systemverilog.psi.nodes.module.*;
 import top.scaleda.systemverilog.psi.nodes.parameter.*;
 import top.scaleda.systemverilog.psi.nodes.signal.*;
+import top.scaleda.systemverilog.psi.nodes.task.TaskDeclarationPsiNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,6 +93,9 @@ public class SystemVerilogPsiNodeFactory {
     map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_port_declaration), ParameterPortDeclarationPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_class_extension), ClassExtensionPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_class_implementation), ClassImplementationPsiNode.class);
+
+    // Task
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_task_declaration), TaskDeclarationPsiNode.class);
 
     // Always construct
     /// Always block

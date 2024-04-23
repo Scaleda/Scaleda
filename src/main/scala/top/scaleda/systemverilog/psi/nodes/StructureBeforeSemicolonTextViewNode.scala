@@ -6,5 +6,5 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 
 class StructureBeforeSemicolonTextViewNode(node: ASTNode) extends ANTLRPsiNode(node) with StructureViewNode {
 
-  override def getElementName: String = node.getText.split(";").head
+  override def getElementName: String = node.getText.split(";").head.replace("\n", "")
 }

@@ -11,6 +11,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
 import top.scaleda.systemverilog.psi.nodes.parameter.ParameterDeclarationPsiNode
+import top.scaleda.systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
 import javax.swing.Icon
 
@@ -27,9 +28,10 @@ class SystemVerilogItemPresentation(val element: PsiElement) extends ItemPresent
     case _: ClassConstructorPsiNode     => AllIcons.Nodes.ClassInitializer
     case _: ClassMethodPsiNode          => AllIcons.Nodes.Method
     case _: ParameterDeclarationPsiNode => AllIcons.Nodes.Parameter
-    case _: ModuleDeclarationPsiNode    => Icons.verilogModule
+    case _: ModuleDeclarationPsiNode    => Icons.systemVerilog
     case _: VariableIdentifierPsiNode   => Icons.verilogReg
     case _: NetIdentifierPsiNode        => Icons.verilogWire
+    case _: TaskDeclarationPsiNode      => AllIcons.Actions.Execute
     case _                              => AllIcons.General.TodoQuestion // should never reach!
   }
 }
