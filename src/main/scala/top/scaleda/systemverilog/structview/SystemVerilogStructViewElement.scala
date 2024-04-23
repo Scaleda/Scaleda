@@ -81,7 +81,7 @@ class SystemVerilogStructViewElement(val element: PsiElement)
       case clazz: ClassDeclarationPsiNode => {
         clazz.getProperties ++ clazz.getConstraints ++ clazz.getConstructors ++ clazz.getMethods.filter(method => {
           PsiTreeUtil.getChildOfType(method, classOf[ClassConstructorPsiNode]) == null
-        })
+        }) ++ clazz.getParameters
       }
 
       case _ => Seq.empty

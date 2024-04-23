@@ -4,6 +4,7 @@ package systemverilog.psi.nodes.clazz
 import systemverilog.SystemVerilogPSIFileRoot
 import systemverilog.parser.SystemVerilogLexer
 import systemverilog.psi.SystemVerilogPsiLeafNodeFactory
+import systemverilog.psi.nodes.parameter.{ParameterDeclarationPsiNode, ParameterPortDeclarationPsiNode}
 import systemverilog.psi.nodes.{DocumentHolder, SimpleIdentifierPsiLeafNode, StructureViewNode}
 
 import com.intellij.lang.ASTNode
@@ -45,7 +46,11 @@ class ClassDeclarationPsiNode(node: ASTNode)
   }
 
   //noinspection ScalaWrongPlatformMethodsUsage
-  override def getElementName: String = getName // for struct view
+  override def getElementName: String = {
+    val parameterPorts = getParameterPorts
+    val identifiers    = parameterPorts.map(_.getNameIdentifier.getText)
+    "class " + getName + "(" + identifiers.mkString(", ") + ")"
+  }
 
   def getFile: SystemVerilogPSIFileRoot = {
     val file = PsiTreeUtil.getParentOfType(this, classOf[SystemVerilogPSIFileRoot])
@@ -62,9 +67,13 @@ class ClassDeclarationPsiNode(node: ASTNode)
     if (result == null) Seq[T]() else result.toSeq
   }
 
-  def getClassItems: Seq[ClassItemPsiNode]          = getClassItemType(classOf[ClassItemPsiNode])
-  def getProperties: Seq[ClassPropertyPsiNode]      = getClassItemType(classOf[ClassPropertyPsiNode])
-  def getConstraints: Seq[ClassConstraintPsiNode]   = getClassItemType(classOf[ClassConstraintPsiNode])
-  def getConstructors: Seq[ClassConstructorPsiNode] = getClassItemType(classOf[ClassConstructorPsiNode])
-  def getMethods: Seq[ClassMethodPsiNode]           = getClassItemType(classOf[ClassMethodPsiNode])
+  def getClassItems: Seq[ClassItemPsiNode]            = getClassItemType(classOf[ClassItemPsiNode])
+  def getProperties: Seq[ClassPropertyPsiNode]        = getClassItemType(classOf[ClassPropertyPsiNode])
+  def getConstraints: Seq[ClassConstraintPsiNode]     = getClassItemType(classOf[ClassConstraintPsiNode])
+  def getConstructors: Seq[ClassConstructorPsiNode]   = getClassItemType(classOf[ClassConstructorPsiNode])
+  def getMethods: Seq[ClassMethodPsiNode]             = getClassItemType(classOf[ClassMethodPsiNode])
+  def getParameters: Seq[ParameterDeclarationPsiNode] = getClassItemType(classOf[ParameterDeclarationPsiNode])
+  def getParameterPorts: Seq[ParameterPortDeclarationPsiNode] = getClassItemType(
+    classOf[ParameterPortDeclarationPsiNode]
+  )
 }

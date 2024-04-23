@@ -1,5 +1,5 @@
 package top.scaleda
-package systemverilog.psi.nodes.signal.parameter
+package systemverilog.psi.nodes.parameter
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.util.PsiTreeUtil

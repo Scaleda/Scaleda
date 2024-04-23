@@ -1,5 +1,5 @@
 package top.scaleda
-package systemverilog.psi.nodes.signal.parameter
+package systemverilog.psi.nodes.parameter
 
 import systemverilog.psi.nodes.expression.{ConstantExpressionPsiNode, ExpressionPsiNode}
 import systemverilog.psi.nodes.signal.SignalIdentifierPsiNode

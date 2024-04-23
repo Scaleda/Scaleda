@@ -5,7 +5,6 @@ import systemverilog.SystemVerilogPSIFileRoot
 import systemverilog.parser.SystemVerilogLexer
 import systemverilog.psi.SystemVerilogPsiLeafNodeFactory
 import systemverilog.psi.nodes.signal.PortIdentifierPsiNode
-import systemverilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode
 import systemverilog.psi.nodes.{DocumentHolder, SimpleIdentifierPsiLeafNode, StructureViewNode}
 
 import com.intellij.lang.ASTNode
@@ -14,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import org.jetbrains.annotations.Nls
+import top.scaleda.systemverilog.psi.nodes.parameter.ParameterIdentifierPsiNode
 
 import scala.jdk.CollectionConverters._
 

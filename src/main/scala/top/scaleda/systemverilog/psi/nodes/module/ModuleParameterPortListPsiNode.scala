@@ -1,11 +1,10 @@
 package top.scaleda
 package systemverilog.psi.nodes.module
 
-import systemverilog.psi.nodes.signal.parameter.{ParameterDeclarationPsiNode, ParameterIdentifierPsiNode}
-
 import com.intellij.lang.ASTNode
 import com.intellij.psi.util.PsiTreeUtil
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
+import top.scaleda.systemverilog.psi.nodes.parameter.{ParameterDeclarationPsiNode, ParameterIdentifierPsiNode}
 
 class ModuleParameterPortListPsiNode(node: ASTNode) extends ANTLRPsiNode(node) {
   def getParameterDeclarations: Seq[ParameterDeclarationPsiNode] = {

@@ -29,11 +29,8 @@ import top.scaleda.systemverilog.psi.nodes.expression.*;
 import top.scaleda.systemverilog.psi.nodes.incompleted.IncompleteConditionPsiNode;
 import top.scaleda.systemverilog.psi.nodes.instantiation.*;
 import top.scaleda.systemverilog.psi.nodes.module.*;
+import top.scaleda.systemverilog.psi.nodes.parameter.*;
 import top.scaleda.systemverilog.psi.nodes.signal.*;
-import top.scaleda.systemverilog.psi.nodes.signal.parameter.ListOfParamAssignmentsPsiNode;
-import top.scaleda.systemverilog.psi.nodes.signal.parameter.ParamAssignmentPsiNode;
-import top.scaleda.systemverilog.psi.nodes.signal.parameter.ParameterDeclarationPsiNode;
-import top.scaleda.systemverilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,8 +72,7 @@ public class SystemVerilogPsiNodeFactory {
     /// Port identifier
     map.put(getRuleIElementType(SystemVerilogParser.RULE_port_identifier), PortIdentifierPsiNode.class);
     /// Parameter declaration
-    map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_declaration), // this without ';'
-            ParameterDeclarationPsiNode.class);
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_declaration), ParameterDeclarationPsiNode.class);
 
     map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_identifier), ParameterIdentifierPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_param_assignment), ParamAssignmentPsiNode.class);
@@ -93,6 +89,7 @@ public class SystemVerilogPsiNodeFactory {
     map.put(getRuleIElementType(SystemVerilogParser.RULE_class_constraint), ClassConstraintPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_class_constructor_declaration), ClassConstructorPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_class_method), ClassMethodPsiNode.class);
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_parameter_port_declaration), ParameterPortDeclarationPsiNode.class);
 
     // Always construct
     /// Always block
