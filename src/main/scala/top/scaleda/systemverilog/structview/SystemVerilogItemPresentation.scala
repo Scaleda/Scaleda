@@ -3,18 +3,18 @@ package systemverilog.structview
 
 import idea.utils.Icons
 import systemverilog.psi.nodes.StructureViewNode
+import systemverilog.psi.nodes.always.AlwaysConstructPsiNode
 import systemverilog.psi.nodes.clazz._
+import systemverilog.psi.nodes.function.FunctionDeclarationPsiNode
+import systemverilog.psi.nodes.initial.InitialPsiNode
 import systemverilog.psi.nodes.module.ModuleDeclarationPsiNode
+import systemverilog.psi.nodes.parameter.{ParameterDeclarationPsiNode, ParameterPortDeclarationPsiNode}
 import systemverilog.psi.nodes.signal.{NetIdentifierPsiNode, VariableIdentifierPsiNode}
+import systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.PsiElement
-import top.scaleda.systemverilog.psi.nodes.always.AlwaysConstructPsiNode
-import top.scaleda.systemverilog.psi.nodes.function.FunctionDeclarationPsiNode
-import top.scaleda.systemverilog.psi.nodes.initial.InitialPsiNode
-import top.scaleda.systemverilog.psi.nodes.parameter.{ParameterDeclarationPsiNode, ParameterPortDeclarationPsiNode}
-import top.scaleda.systemverilog.psi.nodes.task.TaskDeclarationPsiNode
 
 import javax.swing.Icon
 

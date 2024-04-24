@@ -175,6 +175,22 @@
         <formattingService implementation="top.scaleda.systemverilog.editor.formatter.SystemVerilogExternalFormatter"/>
     </extensions>
 
+    <!-- Bluespec Support -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType
+                name="Bluespec"
+                implementationClass="top.scaleda.bluespec.BluespecFileType"
+                language="Bluespec"
+                extensions="bsv"/>
+        <lang.parserDefinition language="Bluespec"
+                               implementationClass="top.scaleda.bluespec.BluespecParserDefinition"/>
+        <lang.ast.factory language="Bluespec" implementationClass="top.scaleda.bluespec.BluespecASTFactory"/>
+        <lang.syntaxHighlighterFactory language="Bluespec"
+                                       implementationClass="top.scaleda.bluespec.highlight.BluespecSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="Bluespec"
+                                      implementationClass="top.scaleda.bluespec.structview.BluespecStructViewFactory"/>
+    </extensions>
+
     <!-- Settings -->
     <extensions defaultExtensionNs="com.intellij">
         <langCodeStyleSettingsProvider
@@ -207,7 +223,7 @@
                                    implementation="top.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
     </extensions>
-    
+
     <!-- Tool Windows -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Scaleda Messages"

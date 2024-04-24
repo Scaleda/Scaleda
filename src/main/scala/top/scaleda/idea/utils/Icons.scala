@@ -43,4 +43,6 @@ object Icons {
     IconLoader.getIcon("/icons/log-verbose", Icons.getClass)
 
   final val systemVerilog = IconLoader.getIcon("/icons/systemverilog", Icons.getClass)
+
+  final val bluespec = AllIcons.Actions.Execute
 }
