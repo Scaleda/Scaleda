@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel.configuration
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.utils.Paths
 import kernel.utils.serialise.XMLHelper
 
@@ -74,8 +74,8 @@ object ScaledaKernelConfiguration {
   /** Get all configurations in .run dir
     * @return Map filename(no ext) -> configuration
     */
-  def configurations(implicit manifest: ProjectManifest): Map[String, ScaledaKernelConfiguration] = {
-    val projectDirString = manifest.projectBase.getOrElse(Paths.pwd.getAbsolutePath)
+  def configurations(implicit project: ScaledaProject): Map[String, ScaledaKernelConfiguration] = {
+    val projectDirString = project.projectBase.getOrElse(Paths.pwd.getAbsolutePath)
     val dotRunDir        = new File(projectDirString, ".run")
     if (!dotRunDir.exists() || (dotRunDir.exists() && !dotRunDir.isDirectory)) return Map()
     val files = dotRunDir.listFiles(new FilenameFilter {

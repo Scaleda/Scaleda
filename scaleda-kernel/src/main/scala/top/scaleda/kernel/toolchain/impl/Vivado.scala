@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel.toolchain.impl
 import kernel.net.remote.RemoteInfo
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.project.config.TaskType._
 import kernel.project.config._
 import kernel.project.detect.BasicProjectDetector
@@ -51,22 +51,22 @@ class Vivado(executor: Executor) extends Toolchain(executor) with ToolchainProfi
     )
   )
 
-  override def simulate(task: TaskConfig)(implicit manifest: ProjectManifest) = {
+  override def simulate(task: TaskConfig)(implicit project: ScaledaProject) = {
     val tclUse = getTclFromTask(task, "run_sim.tcl")
     commandDepsForSingleTcl(tclUse)
   }
 
-  override def synthesise(task: TaskConfig)(implicit manifest: ProjectManifest) = {
+  override def synthesise(task: TaskConfig)(implicit project: ScaledaProject) = {
     val tclUse = getTclFromTask(task, "run_synth.tcl")
     commandDepsForSingleTcl(tclUse)
   }
 
-  override def implement(task: TaskConfig)(implicit manifest: ProjectManifest) = {
+  override def implement(task: TaskConfig)(implicit project: ScaledaProject) = {
     val tclUse = getTclFromTask(task, "run_impl.tcl")
     commandDepsForSingleTcl(tclUse)
   }
 
-  override def programming(task: TaskConfig)(implicit manifest: ProjectManifest) = {
+  override def programming(task: TaskConfig)(implicit project: ScaledaProject) = {
     val tclUse = getTclFromTask(task, "run_program.tcl")
     // TODO: Vivado programming
     commandDepsForSingleTcl(tclUse)
@@ -144,7 +144,7 @@ object Vivado
       targetTemplateFiles: Seq[File] = Seq(),
       ipsData: Map[String, ProjectConfig] = Map()
   ): TemplateContext = {
-    implicit val manifest                       = rt.manifest
+    implicit val manifest                       = rt.project
     def doSeparatorReplace(src: String): String = src.replace('\\', '/')
     val (taskConfig, targetConfig, executor)    = (rt.task, rt.target, rt.executor)
 
@@ -197,10 +197,10 @@ object Vivado
     val top = topOptional.get
     val sources =
       if (sim)
-        taskConfig.getTestSet ++ ips.flatMap(c => c._2.getTestSet(manifest = ProjectManifest.getTemporalManifest(c._1)))
+        taskConfig.getTestSet ++ ips.flatMap(c => c._2.getTestSet(project = ScaledaProject.getTemporalProject(c._1)))
       else
         taskConfig.getSourceSet ++ ips.flatMap(c =>
-          c._2.getSourceSet(manifest = ProjectManifest.getTemporalManifest(c._1))
+          c._2.getSourceSet(project = ScaledaProject.getTemporalProject(c._1))
         )
     val topFile =
       KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
@@ -211,8 +211,8 @@ object Vivado
     val ipList = KernelFileUtils
       .getAllSourceFiles(
         taskConfig.getIpFiles ++ taskConfig.getAllIps
-          .flatMap(c => c._2.getIpFiles(manifest = ProjectManifest.getTemporalManifest(c._1))),
-        suffixing = Set("xcix", "xci")
+          .flatMap(c => c._2.getIpFiles(project = ScaledaProject.getTemporalProject(c._1))),
+        suffix = Set("xcix", "xci")
       )
       .filter(_.exists())
       .map(_.getAbsolutePath)
@@ -287,7 +287,7 @@ object Vivado
 
   override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntime] = {
     var rt                = rtOld
-    implicit val manifest = rt.manifest
+    implicit val manifest = rt.project
     val userTokenBean     = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
     // A local username is required...
     // TODO: Move preset process to server side?

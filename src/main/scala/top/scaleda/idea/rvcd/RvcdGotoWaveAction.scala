@@ -1,7 +1,7 @@
 package top.scaleda
 package idea.rvcd
 
-import idea.utils.MainLogger
+import idea.utils.ScaledaIdeaLogger
 import verilog.VerilogPSIFileRoot
 import verilog.psi.nodes.IdentifierPsiNode
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
@@ -63,7 +63,7 @@ class RvcdGotoWaveAction extends AnAction {
     var paths   = ArrayBuffer[String]()
     var psiNode = currentSignal
     while (psiNode != null && psiNode.getParent != null) {
-      MainLogger.info(s"psi now: $psiNode")
+      ScaledaIdeaLogger.info(s"psi now: $psiNode")
       (psiNode match {
         case p: SignalIdentifierPsiNode  => Some(p.getNameIdentifier.getText)
         case m: ModuleDeclarationPsiNode => Some(m.getNameIdentifier.getText)
@@ -73,7 +73,7 @@ class RvcdGotoWaveAction extends AnAction {
     }
 
     paths = paths.reverse
-    MainLogger.info(s"RvcdGotoWaveAction: psi=$currentSignal, signal=${currentSignal.getText}, paths=$paths")
+    ScaledaIdeaLogger.info(s"RvcdGotoWaveAction: psi=$currentSignal, signal=${currentSignal.getText}, paths=$paths")
     val (client, shutdown) = Rvcd()
     client.gotoSignal(RvcdSignalPath.of("", paths.toSeq))
     shutdown()

@@ -2,8 +2,7 @@ package top.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
-import idea.project.IdeaManifestManager
-import idea.utils.MainLogger
+import idea.utils.ScaledaIdeaLogger
 import kernel.net.remote.RemoteProfile
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.net.{RemoteClient, RemoteServer}
@@ -18,6 +17,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, TextFieldWithBrowseButton}
 import com.intellij.ui.SimpleColoredComponent
 import com.intellij.util.ui.{FormBuilder, UIUtil}
+import top.scaleda.idea.project.io.YmlRootManager
+import top.scaleda.kernel.project.ScaledaProject
 
 import java.awt.event.{ItemEvent, KeyEvent, KeyListener}
 import javax.swing.SwingUtilities
@@ -55,7 +56,8 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
-  implicit val manifest = IdeaManifestManager.getImplicitManifest(project = project)
+  implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
+
   ProjectConfig.getConfig.foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
 
   private def maySetProfileToDefault(list: Seq[ProfilePair]): Unit = {
@@ -66,7 +68,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   private def requestRemoteProfiles(): Unit = {
     val host = profileHost.getText
-    MainLogger.info(s"requestRemoteProfiles: $host")
+    ScaledaIdeaLogger.info(s"requestRemoteProfiles: $host")
     if (host.isEmpty) {
       // use local profiles
       profileName.synchronized {
@@ -120,7 +122,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
             }
           } catch {
             case e: Throwable =>
-              MainLogger.info("cannot connect server:", e)
+              ScaledaIdeaLogger.info("cannot connect server:", e)
               if (host == profileHost.getText) {
                 profileName.synchronized {
                   profileName.removeAllItems()
@@ -137,7 +139,7 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
             }
           }
           if (profiles.nonEmpty && host == profileHost.getText) {
-            MainLogger.info("got profiles", profiles)
+            ScaledaIdeaLogger.info("got profiles", profiles)
             loadedRemoteProfiles.synchronized {
               loadedRemoteProfiles.put(host, profiles)
             }

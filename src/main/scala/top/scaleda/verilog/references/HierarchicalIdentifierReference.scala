@@ -26,7 +26,9 @@ class HierarchicalIdentifierReference(element: HierarchicalIdentifierPsiNode)
     if (module == null) return null
 
     val moduleParams = module.getParameters
-    val ports = module.getModuleHead.getPorts // todo use getPorts directly
+    val head = module.getModuleHead // todo use getPorts directly
+    if (head.isEmpty) return null
+    val ports = head.get.getPorts
     val declarations = module.getChildrenInModuleBody(classOf[SignalDeclarationPsiNode])
     val ids: Set[SignalIdentifierPsiNode] = (moduleParams ++ ports ++ declarations.map(_.getIdentifier).foldLeft(Seq[SignalIdentifierPsiNode]())(_ ++ _)).toSet
 

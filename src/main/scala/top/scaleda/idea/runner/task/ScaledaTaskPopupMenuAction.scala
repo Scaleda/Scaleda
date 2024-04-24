@@ -6,8 +6,8 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{ActionManager, ActionPlaces, AnAction, AnActionEvent, DefaultActionGroup}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.treeStructure.Tree
-import idea.utils.MainLogger
-import idea.windows.tasks.{ScaledaRunRootNode, ScaledaRunTargetNode, ScaledaRunTaskNode}
+import idea.utils.ScaledaIdeaLogger
+import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode}
 
 import java.awt.Component
 import java.awt.event.MouseEvent
@@ -24,9 +24,9 @@ class ScaledaTaskPopupMenuAction(
     val group = new DefaultActionGroup()
 
     // check which node is selected
-    val rootNode = tree.getSelectedNodes(classOf[ScaledaRunRootNode], (_: ScaledaRunRootNode) => true)
-    val targetNode = tree.getSelectedNodes(classOf[ScaledaRunTargetNode], (_: ScaledaRunTargetNode) => true)
-    val taskNode = tree.getSelectedNodes(classOf[ScaledaRunTaskNode], (_: ScaledaRunTaskNode) => true)
+    val rootNode = tree.getSelectedNodes(classOf[ScaledaTasksRootNode], (_: ScaledaTasksRootNode) => true)
+    val targetNode = tree.getSelectedNodes(classOf[ScaledaTasksTargetNode], (_: ScaledaTasksTargetNode) => true)
+    val taskNode = tree.getSelectedNodes(classOf[ScaledaTasksTaskNode], (_: ScaledaTasksTaskNode) => true)
 
 //    if (targetNode.nonEmpty) {
 //      group.add(new ScaledaEditTargetAction(targetNode.head.target, tree, project))

@@ -2,7 +2,7 @@ package top.scaleda
 package idea.runner.task
 
 import idea.ScaledaBundle
-import idea.utils.{Icons, MainLogger}
+import idea.utils.{Icons, ScaledaIdeaLogger}
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import top.scaleda.kernel.project.config.{TargetConfig, TaskConfig}
@@ -18,7 +18,7 @@ class ScaledaRunLastTaskAction
   override def actionPerformed(e: AnActionEvent): Unit = {
     import ScaledaRunLastTaskAction._
     if (lastRunTarget.nonEmpty && lastRunTask.nonEmpty) {
-      MainLogger.warn("starting target", JSONHelper(lastRunTarget.get), "task", JSONHelper(lastRunTask.get))
+      ScaledaIdeaLogger.warn("starting target", JSONHelper(lastRunTarget.get), "task", JSONHelper(lastRunTask.get))
     }
   }
 }

@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel.project.config
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.project.ip.ExportConfig
 import kernel.utils.serialise.{JSONHelper, YAMLHelper}
 import kernel.utils.{KernelFileUtils, KernelLogger, Paths}
@@ -12,15 +12,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import java.io.File
 import scala.language.implicitConversions
 
-/** Case class for project-level config, i.e. `scaleda.yml`
-  * @param name Project name
-  * @param `type` Project type, should be 'rtl'
-  * @param source Project source folder
-  * @param sources Project sources, items can be one file or directory
-  * @param test Project test folder
-  * @param topModule Top module name, can be overridden by [[TargetConfig]] or [[TaskConfig]]
-  * @param targets List of [[TargetConfig]]
-  */
 @JsonInclude(Include.NON_EMPTY)
 case class ProjectConfig(
     name: String = "default-project",
@@ -92,14 +83,8 @@ case class ProjectConfig(
 object ProjectConfig {
   val defaultConfigFile = "scaleda.yml"
 
-  // NOTICE: These two variables are global flag to indicated if a project is loaded
-  // they should be always updated simultaneously
-  // var projectBase: Option[String] = None
-  // var configFile: Option[String]  = None
-
-  // def getConfig(path: Option[String] = ManifestManager.getManifest().configFile): Option[ProjectConfig] = {
-  def getConfig(implicit manifest: ProjectManifest): Option[ProjectConfig] = {
-    manifest.configFile.flatMap(p => {
+  def getConfig(implicit project: ScaledaProject): Option[ProjectConfig] = {
+    project.configFile.flatMap(p => {
       try {
         val config = YAMLHelper(new File(p), classOf[ProjectConfig])
         KernelLogger.debug(s"Loaded project config ${JSONHelper(config)}")
@@ -117,28 +102,22 @@ object ProjectConfig {
     })
   }
 
-  def config(implicit manifest: ProjectManifest) = getConfig.get
-
-  def headTarget(implicit manifest: ProjectManifest) = getConfig.flatMap(c => c.headTarget)
-
-  def headTask(implicit manifest: ProjectManifest) = getConfig.flatMap(c => c.headTask)
-
   def saveConfig(projectConfig: ProjectConfig, targetFile: File): Unit = {
     YAMLHelper(projectConfig, targetFile)
   }
 
   def libraryIpPaths: Set[File] = Set(Paths.getIpDir)
 
-  def projectIpPaths(implicit manifest: ProjectManifest): Set[File] =
+  def projectIpPaths(implicit project: ScaledaProject): Set[File] =
     Set(".ip", "ip", "ips")
-      .map(p => new File(manifest.projectBase.get, p))
+      .map(p => new File(project.projectBase.get, p))
       .filter(_.exists())
 
   def libraryIps: Map[String, ProjectConfig] =
     libraryIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
 
   def projectBasicIps(implicit
-      manifest: ProjectManifest
+      manifest: ScaledaProject
   ): Map[String, ProjectConfig] =
     projectIpPaths.flatMap(p => KernelFileUtils.parseIpParentDirectory(p)).toMap
 }

@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel.utils
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.project.config.{IPInstance, ProjectConfig, TaskConfig}
 import kernel.toolchain.impl.Vivado
 import kernel.utils.serialise.YAMLHelper
@@ -33,23 +33,21 @@ object KernelFileUtils {
     true
   }
 
-  /** Convert any path into an absolute path. For relative path, it is calculated base on project base.<br/>
+  /** Convert any path into an canonical path. For relative path, it is calculated base on project base.<br/>
     * ⚠️ Only work on same OS. Cannot process Window paths on Linux now.
     * @param path the original path string
-    * @return [[None]] iff no project base AND relative path; Otherwise an abspath will be returned
+    * @return [[None]] iff no project base AND relative path; Otherwise an canonical path will be returned
     */
-  def toAbsolutePath(
-      path: String
-  )(implicit manifest: ProjectManifest): Option[String] = {
+  def toCanonicalPath(path: String)(implicit project: ScaledaProject): Option[String] = {
     val file = new File(path)
     if (!file.isAbsolute) {
-      manifest.projectBase match {
+      project.projectBase match {
         case Some(base) =>
-          Some(new File(new File(base), path).getAbsolutePath.replace('\\', '/'))
+          Some(new File(new File(base), path).getCanonicalPath.replace('\\', '/'))
         case None => None
       }
     } else {
-      Some(file.getAbsolutePath.replace('\\', '/'))
+      Some(file.getCanonicalPath.replace('\\', '/')) // fixme: network path in Windows starts with \\
     }
   }
 
@@ -61,12 +59,12 @@ object KernelFileUtils {
     */
   def toProjectRelativePath(
       path: String
-  )(implicit manifest: ProjectManifest): Option[String] = {
-    if (manifest.projectBase.isEmpty) return None
+  )(implicit project: ScaledaProject): Option[String] = {
+    if (project.projectBase.isEmpty) return None
     val file = new File(path)
     if (file.isAbsolute) {
       val pathAbs  = java.nio.file.Paths.get(file.getAbsolutePath)
-      val pathBase = java.nio.file.Paths.get(manifest.projectBase.get) // should work
+      val pathBase = java.nio.file.Paths.get(project.projectBase.get) // should work
       try {
         Some(pathBase.relativize(pathAbs).toString.replace('\\', '/'))
       } catch {
@@ -107,40 +105,39 @@ object KernelFileUtils {
 
   /** Get all source files from a source set.
     * @param sources list of paths, each item can be file or dir, empty string will be dropped
-    * @param suffixing filter by file type
+    * @param suffix filter by file type
     * @return list of files
     */
-  def getAllSourceFiles(sources: Set[String], suffixing: Set[String] = Set("v"))(implicit
-      manifest: ProjectManifest
-  ): Seq[File] = {
+  def getAllSourceFiles(sources: Set[String], suffix: Set[String] = Set("v"))(implicit project: ScaledaProject): Seq[File] = {
     sources
       .filter(_.nonEmpty)
-      .map(toAbsolutePath(_))
+      .map(toCanonicalPath(_))
       .filter(_.nonEmpty)
       .map(f => new File(f.get))
       .map(f => {
         if (f.exists()) {
-          if (f.isDirectory) scanDirectory(suffixing, f) else Seq(f)
+          if (f.isDirectory) scanDirectory(suffix, f) else Seq(f)
         } else Seq()
       })
       .reduceOption(_ ++ _)
       .getOrElse(Seq())
   }
 
-  /** Get all source files under the project. That is:
-    *  - files under `source`
-    *  - files given under `sources`
-    * @param suffixing file type
-    * @return seq of files
-    */
-  @Deprecated
-  def getAllProjectSourceFiles(
-      suffixing: Set[String] = Set("v")
-  )(implicit manifest: ProjectManifest): Seq[File] = {
-    val sourceDir: File = new File(toAbsolutePath(ProjectConfig.config.source).get)
-    val sources         = ProjectConfig.config.sources.toSet
-    getAllSourceFiles(sources + sourceDir.getAbsolutePath, suffixing = suffixing)
-  }
+//
+//  /** Get all source files under the project. That is:
+//    *  - files under `source`
+//    *  - files given under `sources`
+//    * @param suffixing file type
+//    * @return seq of files
+//    */
+//  @Deprecated
+//  def getAllProjectSourceFiles(
+//      suffixing: Set[String] = Set("v")
+//  )(implicit project: ScaledaProject): Seq[File] = {
+//    val sourceDir: File = new File(toCanonicalPath(ProjectConfig.config.source).get)
+//    val sources         = ProjectConfig.config.sources.toSet
+//    getAllSourceFiles(sources + sourceDir.getAbsolutePath, suffixing = suffixing)
+//  }
 
   // /** Get all test files. That is:
   //   *  - files under `test`
@@ -196,7 +193,7 @@ object KernelFileUtils {
     * @param module module name
     * @return optional file
     */
-  def getModuleFileFromSet(sources: Set[String], module: String)(implicit manifest: ProjectManifest): Option[File] = {
+  def getModuleFileFromSet(sources: Set[String], module: String)(implicit project: ScaledaProject): Option[File] = {
     getAllSourceFiles(sources).foreach(f => {
       val readModule = getModuleTitle(f)
       val matched    = readModule.filter(_ == module)
@@ -326,12 +323,12 @@ object KernelFileUtils {
     * @param projectBase base
     * @return
     */
-  def parseAsAbsolutePath(path: String)(implicit manifest: ProjectManifest) =
-    toAbsolutePath(path).getOrElse(path)
+  def parseAsAbsolutePath(path: String)(implicit project: ScaledaProject) =
+    toCanonicalPath(path).getOrElse(path)
 
-  def ipCacheDirectory(implicit manifest: ProjectManifest) = new File(manifest.projectBase.getOrElse(""), ".cache")
+  def ipCacheDirectory(implicit project: ScaledaProject) = new File(project.projectBase.getOrElse(""), ".cache")
 
-  def getAllCachedIpHash(implicit manifest: ProjectManifest): Set[String] = {
+  def getAllCachedIpHash(implicit project: ScaledaProject): Set[String] = {
     val list = ipCacheDirectory.listFiles()
     if (list != null)
       list.filter(_.isDirectory).map(_.getName).toSet
@@ -341,7 +338,7 @@ object KernelFileUtils {
   /** Remove an ip cache by hash
     * @param hash ip file hash
     */
-  def removeIpFileCache(hash: String)(implicit manifest: ProjectManifest): Unit = {
+  def removeIpFileCache(hash: String)(implicit project: ScaledaProject): Unit = {
     val parent = ipCacheDirectory
     if (parent.exists()) {
       val f = new File(parent, hash)
@@ -353,7 +350,7 @@ object KernelFileUtils {
     * @param ipFile ip file, simple target ip
     * @param hash optional hash, if not provided, will calculate hash from file
     */
-  def createIpFileCache(ipFile: File, hash: Option[String] = None)(implicit manifest: ProjectManifest): Unit = {
+  def createIpFileCache(ipFile: File, hash: Option[String] = None)(implicit project: ScaledaProject): Unit = {
     val hashUse         = hash.getOrElse(DigestUtils.sha256Hex(new FileInputStream(ipFile)))
     val parent          = ipCacheDirectory
     val targetDirectory = new File(parent, hashUse)
@@ -406,7 +403,7 @@ object KernelFileUtils {
     */
   def doUpdateIpFilesCache(
       ipFiles: Set[String]
-  )(implicit manifest: ProjectManifest): Unit = {
+  )(implicit project: ScaledaProject): Unit = {
     val ipRealFiles = ipFiles
       .map(parseAsAbsolutePath(_))
       .map(new File(_))
@@ -487,7 +484,7 @@ object KernelFileUtils {
     * @return generated sources
     */
   def handleIpInstances(task: TaskConfig, targetDirectory: File, targetAction: Set[String])(implicit
-      manifest: ProjectManifest
+      manifest: ScaledaProject
   ): Seq[File] = {
     val ips         = task.getAllIps
     val ipInstances = task.getIpInstances
@@ -556,7 +553,7 @@ object KernelFileUtils {
   /** Update stubs cache from runtime
     * @param rt runtime
     */
-  def doUpdateStubCacheFromRuntime(rt: ScaledaRuntime)(implicit manifest: ProjectManifest): Seq[File] = {
+  def doUpdateStubCacheFromRuntime(rt: ScaledaRuntime)(implicit project: ScaledaProject): Seq[File] = {
     // get ALL Scaleda IPs
     val ips: Map[String, ProjectConfig] = rt.task.getAllIps.filter(_._2.exports.nonEmpty)
     // collect Scaleda IPs and make stubs from ip instances
@@ -570,7 +567,7 @@ object KernelFileUtils {
 
   /** Update stubs in ProjectConfig
     */
-  def doUpdateStubCacheFromProject(implicit manifest: ProjectManifest): Unit = {
+  def doUpdateStubCacheFromProject(implicit project: ScaledaProject): Unit = {
     ProjectConfig.getConfig
       .foreach(c => {
         val ips: Map[String, ProjectConfig] = c.getAllIps.filter(_._2.exports.nonEmpty)

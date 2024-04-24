@@ -1,9 +1,10 @@
 import org.jetbrains.sbtidea.Keys._
 import org.jetbrains.sbtidea.verifier._
+import scala.io.Source
 
-val publicScalaVersion = "2.13.10"
+val publicScalaVersion = "2.13.12"
 // val ideaVersion = "2023.1.3"
-val ideaVersion = "231.9161.38"
+val ideaVersion = "241.14024.14"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
@@ -22,8 +23,9 @@ ThisBuild / intellijBuild := ideaVersion
 Global / intellijAttachSources := true
 
 val junitInterfaceVersion = "0.11"
-val jacksonVersion        = "2.14.2"
-val thisVersion           = "0.1.0"
+val jacksonVersion        = "2.17.0"
+
+val thisVersion = Source.fromFile(new File(".version")).getLines().toSeq.head.strip()
 
 lazy val commonSettings = Seq(
   version := thisVersion,
@@ -52,17 +54,17 @@ lazy val commonSettings = Seq(
 
 lazy val publicLibraryDependencies = Seq(
   "com.novocode"                % "junit-interface"         % junitInterfaceVersion % Test,
-  "org.antlr"                   % "antlr4-intellij-adaptor" % "0.1",
-  "org.antlr"                   % "antlr4"                  % "4.12.0",
-  "org.antlr"                   % "antlr4-runtime"          % "4.12.0",
-  "io.circe"                   %% "circe-yaml"              % "0.14.2",
+  //  "org.antlr"                   % "antlr4-intellij-adaptor" % "0.1" // imported with source code
+  "org.antlr"                   % "antlr4"                  % "4.13.1",
+  "org.antlr"                   % "antlr4-runtime"          % "4.13.1",
+  "io.circe"                   %% "circe-yaml"              % "1.15.0",
   "com.github.scopt"           %% "scopt"                   % "4.1.0",
-  "ch.qos.logback"              % "logback-classic"         % "1.4.6",
+  "ch.qos.logback"              % "logback-classic"         % "1.4.14",
   "com.typesafe.scala-logging" %% "scala-logging"           % "3.9.5",
-  "org.scalactic"              %% "scalactic"               % "3.2.15",
-  "org.scalatest"              %% "scalatest"               % "3.2.15"              % "test",
+  "org.scalactic"              %% "scalactic"               % "3.2.17",
+  "org.scalatest"              %% "scalatest"               % "3.2.17"              % "test",
   // for logger
-  "com.lihaoyi" %% "sourcecode" % "0.3.0",
+  "com.lihaoyi" %% "sourcecode" % "0.3.1",
   // for color print
   "com.lihaoyi" %% "fansi" % "0.4.0",
   // https://mvnrepository.com/artifact/com.hubspot.jinjava/jinjava
@@ -70,7 +72,7 @@ lazy val publicLibraryDependencies = Seq(
   // https://mvnrepository.com/artifact/com.google.guava/guava
   "com.google.guava" % "guava" % "31.1-jre",
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  "commons-io" % "commons-io" % "2.11.0",
+  "commons-io" % "commons-io" % "2.15.1",
   // https://mvnrepository.com/artifact/log4j/log4j
   "log4j"                   % "log4j"         % "1.2.17",
   "org.scala-lang.modules" %% "scala-async"   % "1.0.1",
@@ -86,9 +88,9 @@ lazy val publicLibraryDependencies = Seq(
   // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
   "org.xerial" % "sqlite-jdbc" % "3.41.0.0",
   // https://mvnrepository.com/artifact/com.auth0/java-jwt
-  "com.auth0" % "java-jwt" % "4.3.0",
+  "com.auth0" % "java-jwt" % "4.4.0",
   // https://mvnrepository.com/artifact/commons-codec/commons-codec
-  "commons-codec" % "commons-codec" % "1.15",
+  "commons-codec" % "commons-codec" % "1.16.0",
   // scalapb
   "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
 )
@@ -134,8 +136,12 @@ lazy val scaleda = project
     ),
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
+    // ANTLR IntelliJ Adapter
+    Compile / unmanagedSourceDirectories += baseDirectory.value / "antlr4-intellij-adaptor/src/main/java",
   )
   .enablePlugins(SbtIdeaPlugin)
 
 lazy val root = (project in file("."))
   .aggregate(kernel, scaleda)
+
+javaOptions += "-Didea.log.debug.categories=top.scaleda"

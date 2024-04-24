@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel.project.config
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.utils.KernelFileUtils
 import kernel.utils.KernelFileUtils.parseAsAbsolutePath
 
@@ -55,11 +55,11 @@ abstract class ConfigNode() {
     case None      => parentNode.flatMap(_.getConstraints)
   }
 
-  /** Get all source set. Default is project base.
+  /** Get all source set based on project base, with folders and files mixed
     * @return sources in absolute path
     */
   @JsonIgnore
-  def getSourceSet(implicit manifest: ProjectManifest): Set[String] = {
+  def getSourceSet(implicit project: ScaledaProject): Set[String] = {
     (parentNode match {
       case Some(parent) => parent.getSourceSet
       case None         => Set()
@@ -71,7 +71,7 @@ abstract class ConfigNode() {
     * @return testbench in absolute path
     */
   @JsonIgnore
-  def getTestSet(implicit manifest: ProjectManifest): Set[String] = {
+  def getTestSet(implicit project: ScaledaProject): Set[String] = {
     (parentNode match {
       case Some(parent) => parent.getTestSet
       case None         => Set()
@@ -84,7 +84,7 @@ abstract class ConfigNode() {
     * @return simple target ip files or search path in absolute path
     */
   @JsonIgnore
-  def getIpFiles(implicit manifest: ProjectManifest): Set[String] = {
+  def getIpFiles(implicit project: ScaledaProject): Set[String] = {
     (parentNode match {
       case Some(parent) => parent.getIpFiles
       case None         => Set()
@@ -95,7 +95,7 @@ abstract class ConfigNode() {
     * @return ip search paths
     */
   @JsonIgnore
-  def getIpPaths(implicit manifest: ProjectManifest): Set[String] = {
+  def getIpPaths(implicit project: ScaledaProject): Set[String] = {
     val basicPaths = ProjectConfig.projectIpPaths ++ ProjectConfig.libraryIpPaths
     basicPaths.map(_.getAbsolutePath) ++ (parentNode match {
       case Some(parent) => parent.getIpPaths
@@ -107,7 +107,7 @@ abstract class ConfigNode() {
     * @return map of ip abs-path and [[ProjectConfig]]
     */
   @JsonIgnore
-  def getLocalIps(implicit manifest: ProjectManifest): Map[String, ProjectConfig] = {
+  def getLocalIps(implicit project: ScaledaProject): Map[String, ProjectConfig] = {
     val paths = getIpPaths
     // search just one layer: .ips/<ip name>
     paths
@@ -122,7 +122,7 @@ abstract class ConfigNode() {
     * @return map of ip abs-path and [[ProjectConfig]]
     */
   @JsonIgnore
-  def getAllIps(implicit manifest: ProjectManifest): Map[String, ProjectConfig] = {
+  def getAllIps(implicit project: ScaledaProject): Map[String, ProjectConfig] = {
     // base of this current project
     val localIps = getLocalIps
     // BFS Search
@@ -137,7 +137,7 @@ abstract class ConfigNode() {
         resultIpIds += top._2.exports.get.id
         results += top
         // only search more ips in ProjectConfig
-        q ++= top._2.getLocalIps(manifest = ProjectManifest.getTemporalManifest(top._1))
+        q ++= top._2.getLocalIps(project = ScaledaProject.getTemporalProject(top._1))
       }
     }
     results.toMap
@@ -147,7 +147,7 @@ abstract class ConfigNode() {
     * @return name and context
     */
   @JsonIgnore
-  def getIpInstances(implicit manifest: ProjectManifest): Seq[IPInstance] = {
+  def getIpInstances(implicit project: ScaledaProject): Seq[IPInstance] = {
     (parentNode match {
       case Some(parent) => parent.getIpInstances
       case None         => Seq()

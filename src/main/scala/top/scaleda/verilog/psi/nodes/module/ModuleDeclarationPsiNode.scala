@@ -4,7 +4,7 @@ package verilog.psi.nodes.module
 import verilog.VerilogPSIFileRoot
 import verilog.parser.VerilogLexer
 import verilog.psi.VerilogPsiLeafNodeFactory
-import verilog.psi.nodes.signal.PortDeclarationPsiNode
+import verilog.psi.nodes.signal.{PortDeclarationPsiNode, PortIdentifierPsiNode}
 import verilog.psi.nodes.signal.parameter.ParameterIdentifierPsiNode
 import verilog.psi.nodes.{SimpleIdentifierPsiLeafNode, StructureViewNode}
 
@@ -18,13 +18,25 @@ import top.scaleda.verilog.psi.nodes.DocumentHolder
 
 import scala.jdk.CollectionConverters._
 
+/**
+ * PSI node for parser rule module_declaration
+ * module_declaration ::= module_head module_item* 'endmodule'
+ * @param node AST node
+ */
 class ModuleDeclarationPsiNode(node: ASTNode)
     extends ANTLRPsiNode(node)
     with PsiNameIdentifierOwner
     with StructureViewNode
     with DocumentHolder {
+
   override def getNameIdentifier: PsiElement = {
-    getModuleHead.getModuleIdentifier.orNull
+    val head = getModuleHead
+    if (head.isEmpty) null
+    else {
+      val name = head.get.getModuleIdentifier
+      if (name.isEmpty) null
+      else name.get
+    }
   }
 
   @Nls
@@ -33,6 +45,7 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     case null                => "(unknown)"
   }
 
+  //noinspection DuplicatedCode
   override def setName(name: String): PsiElement = {
     val child = PsiTreeUtil.findChildOfType(this.getNameIdentifier, classOf[SimpleIdentifierPsiLeafNode])
     if (child == null) null
@@ -41,16 +54,10 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     }
   }
 
-  override def getElementName: String = getName
+  //noinspection ScalaWrongPlatformMethodsUsage
+  override def getElementName: String = getName // for struct view
 
-//  def getPorts: Array[PortDeclarationPsiNode] = {
-//    import scala.jdk.CollectionConverters._
-//    val list = PsiTreeUtil.findChildrenOfType(this, classOf[ListOfPortDeclarationsPsiNode]).asScala
-//    if (list.isEmpty) return Array.empty[PortDeclarationPsiNode]
-//
-//    val result = PsiTreeUtil.getChildrenOfType(list.head, classOf[PortDeclarationPsiNode])
-//    if (result == null) Array.empty[PortDeclarationPsiNode] else result
-//  }
+  def getPorts: Seq[PortIdentifierPsiNode] = getModuleHead.map(_.getPorts).getOrElse(Seq[PortIdentifierPsiNode]())
 
   def getFile: VerilogPSIFileRoot = {
     val file = PsiTreeUtil.getParentOfType(this, classOf[VerilogPSIFileRoot])
@@ -63,7 +70,8 @@ class ModuleDeclarationPsiNode(node: ASTNode)
 
   private def generateModulePreview: String = {
     def generatePorts: String = {
-      val ports = getModuleHead.getPorts
+      if (getModuleHead.isEmpty) return "()" // todo more elegantly
+      val ports = getModuleHead.get.getPorts
       if (ports.isEmpty) "()"
       else {
         val portList = ports
@@ -94,8 +102,11 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     s"module ${getName}${generateParams} ${generatePorts}"
   }
 
-  def getModuleHead: ModuleHeadPsiNode = {
-    PsiTreeUtil.getChildOfType(this, classOf[ModuleHeadPsiNode])
+//  def getModuleHead: ModuleHeadPsiNode = {
+  // if a module is under typing then it probably hasn't head!
+  // module head = 'module' + id + param + (port_declarations | port)
+  def getModuleHead: Option[ModuleHeadPsiNode] = {
+    Option(PsiTreeUtil.getChildOfType(this, classOf[ModuleHeadPsiNode]))
   }
 
   def getModuleItems: Seq[ModuleItemPsiNode] = {
@@ -107,6 +118,8 @@ class ModuleDeclarationPsiNode(node: ASTNode)
     getModuleItems.map(item => PsiTreeUtil.findChildrenOfType(item, clazz).asScala.toSeq).foldLeft(Seq[T]())(_ ++ _)
   }
 
-  def getParameters: Seq[ParameterIdentifierPsiNode] =
-    getModuleHead.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
+  def getParameters: Seq[ParameterIdentifierPsiNode] = {
+    if (getModuleHead.isEmpty) return Seq[ParameterIdentifierPsiNode]()
+    getModuleHead.get.getModuleParameterPortList.map(_.getParameterIdentifiers).getOrElse(Seq[ParameterIdentifierPsiNode]())
+  }
 }

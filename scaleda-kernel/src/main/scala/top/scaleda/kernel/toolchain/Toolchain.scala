@@ -1,7 +1,7 @@
 package top.scaleda
 package kernel.toolchain
 
-import kernel.project.ProjectManifest
+import kernel.project.ScaledaProject
 import kernel.project.config.{TaskConfig, TaskType}
 import kernel.project.detect.BasicProjectDetector
 import kernel.project.importer.BasicTargetParser
@@ -24,15 +24,15 @@ abstract class Toolchain(val executor: Executor) {
 
   def getName: String
 
-  def simulate(task: TaskConfig)(implicit manifest: ProjectManifest): Seq[CommandDeps] = ???
+  def simulate(task: TaskConfig)(implicit project: ScaledaProject): Seq[CommandDeps] = Seq.empty
 
-  def synthesise(task: TaskConfig)(implicit manifest: ProjectManifest): Seq[CommandDeps] = ???
+  def synthesise(task: TaskConfig)(implicit project: ScaledaProject): Seq[CommandDeps] = Seq.empty
 
-  def implement(task: TaskConfig)(implicit manifest: ProjectManifest): Seq[CommandDeps] = ???
+  def implement(task: TaskConfig)(implicit project: ScaledaProject): Seq[CommandDeps] = Seq.empty
 
-  def programming(task: TaskConfig)(implicit manifest: ProjectManifest): Seq[CommandDeps] = ???
+  def programming(task: TaskConfig)(implicit project: ScaledaProject): Seq[CommandDeps] = Seq.empty
 
-  def commands(task: TaskConfig)(implicit manifest: ProjectManifest) = task.taskType match {
+  def commands(task: TaskConfig)(implicit project: ScaledaProject): Seq[CommandDeps] = task.taskType match {
     case TaskType.Simulation  => simulate(task)
     case TaskType.Synthesis   => synthesise(task)
     case TaskType.Implement   => implement(task)
@@ -50,7 +50,11 @@ object Toolchain {
 //    PDS.internalID -> (PDS.userFriendlyName, (executor: Executor) => new PDS(executor), PDS.supportedTask),
 //    Verilator.internalID -> (Verilator.userFriendlyName, (executor: Executor) => new Verilator(executor), Verilator.supportedTask),
     IVerilog.internalID -> (IVerilog.userFriendlyName, (executor: Executor) =>
-      new IVerilog(executor), IVerilog.supportedTask)
+      new IVerilog(executor), IVerilog.supportedTask),
+    Yosys.internalID -> (Yosys.userFriendlyName, (executor: Executor) =>
+      new Yosys(executor), Yosys.supportedTask),
+    MLFSP.internalID -> (MLFSP.userFriendlyName, (executor: Executor) =>
+      new MLFSP(executor), MLFSP.supportedTask),
   )
 
   def toolchainIds = toolchains.keys.toArray

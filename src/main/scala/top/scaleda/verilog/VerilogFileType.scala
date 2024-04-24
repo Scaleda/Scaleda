@@ -22,7 +22,7 @@ object VerilogFileType {
   final val DefaultIcon = Icons.verilog
   val instance = new VerilogFileType
 
-  Log.warn(s"DefaultIcon size = ${DefaultIcon.getIconWidth}x${DefaultIcon.getIconHeight}")
+  Log.debug(s"DefaultIcon size = ${DefaultIcon.getIconWidth}x${DefaultIcon.getIconHeight}")
 
   def isVerilog(fileType: FileType): Boolean = fileType match {
     case _: VerilogFileType => true

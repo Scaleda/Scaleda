@@ -42,5 +42,5 @@ package object utils {
   @nowarn("cat=deprecation")
   private[this] implicit def toComputable[T](action: => T): com.intellij.openapi.util.Computable[T] = () => action
 
-  def ideaVersion: String = application.getComponent(classOf[ApplicationInfo]).getMajorVersion
+  // def ideaVersion: String = application.getComponent(classOf[ApplicationInfo]).getMajorVersion
 }

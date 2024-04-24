@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>top.scaleda</id>
     <name>Scaleda</name>
-    <version>0.1.0</version>
-    <vendor>Hans and Chiro</vendor>
+    <version>0.1.1</version>
+    <vendor>Scaleda</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
 
@@ -50,14 +50,6 @@
     <!-- Startup Activities -->
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="top.scaleda.idea.ScaledaMain"/>
-    </extensions>
-
-    <!-- Services -->
-    <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceImplementation="top.scaleda.idea.ScaledaMainService"/>
-        <projectService serviceImplementation="top.scaleda.idea.windows.tool.logging.ScaledaLoggingService"/>
-        <projectService serviceImplementation="top.scaleda.idea.rvcd.RvcdService"/>
-        <projectService serviceImplementation="top.scaleda.idea.utils.RpcService"/>
     </extensions>
 
     <!-- Verilog Support -->
@@ -165,6 +157,24 @@
                         implementationClass="top.scaleda.tcl.commenter.TclCommenter"/>
     </extensions>
 
+    <!-- SystemVerilog Support -->
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType
+                name="SystemVerilog"
+                implementationClass="top.scaleda.systemverilog.SystemVerilogFileType"
+                language="SystemVerilog"
+                extensions="sv"/>
+        <lang.parserDefinition language="SystemVerilog"
+                               implementationClass="top.scaleda.systemverilog.SystemVerilogParserDefinition"/>
+        <lang.ast.factory language="SystemVerilog" implementationClass="top.scaleda.systemverilog.SystemVerilogASTFactory"/>
+        <lang.syntaxHighlighterFactory language="SystemVerilog"
+                                       implementationClass="top.scaleda.systemverilog.highlight.SystemVerilogSyntaxHighlighterFactory"/>
+        <lang.psiStructureViewFactory language="SystemVerilog"
+                                      implementationClass="top.scaleda.systemverilog.structview.SystemVerilogStructViewFactory"/>
+        <!-- same as Verilog -->
+        <formattingService implementation="top.scaleda.systemverilog.editor.formatter.SystemVerilogExternalFormatter"/>
+    </extensions>
+
     <!-- Settings -->
     <extensions defaultExtensionNs="com.intellij">
         <langCodeStyleSettingsProvider
@@ -190,14 +200,37 @@
 
     <!-- Module, Project and SDK -->
     <extensions defaultExtensionNs="com.intellij">
-        <!--        <sdkType implementation="top.scaleda.idea.project.ScaledaSDK" />-->
+        <postStartupActivity implementation="top.scaleda.idea.project.ProjectOpenActivity" />
+        <projectService serviceImplementation="top.scaleda.idea.project.io.YmlRootManager" />
         <moduleType id="SCALEDA_MODULE" implementationClass="top.scaleda.idea.project.ScaledaModuleType"/>
         <newProjectWizard.language id="scaleda"
                                    implementation="top.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
-        <!--        <projectImportProvider implementation="top.scaleda.idea.project.ScaledaProjectImportProvider" />-->
+    </extensions>
+    
+    <!-- Tool Windows -->
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Scaleda Messages"
+                    anchor="bottom" factoryClass="top.scaleda.idea.windows.bottomPanel.ScaledaMessagesWindowFactory" />
+        <toolWindow id="Scaleda Tasks"
+                    anchor="right" factoryClass="top.scaleda.idea.windows.rightPanel.ScaledaTasksWindowFactory" />
     </extensions>
 
+
+    <!-- Project Services -->
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceImplementation="top.scaleda.idea.windows.bottomPanel.ConsoleService"/>
+        <projectService serviceImplementation="top.scaleda.idea.windows.bottomPanel.message.MessageListService"/>
+        <projectService serviceImplementation="top.scaleda.idea.windows.rightPanel.ScaledaTasksService" />
+        <projectService serviceImplementation="top.scaleda.idea.rvcd.RvcdService"/>
+        <projectService serviceImplementation="top.scaleda.idea.utils.RpcService"/>
+    </extensions>
+
+    <!-- App Services -->
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceInterface="top.scaleda.idea.ScaledaAppService"
+                            serviceImplementation="top.scaleda.idea.ScaledaAppServiceImpl" />
+    </extensions>
 
     <!-- Scaleda run tasks -->
     <extensions defaultExtensionNs="com.intellij">

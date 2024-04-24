@@ -1,7 +1,6 @@
 package top.scaleda
 package kernel.project.ip
 
-import kernel.project.ManifestManager
 import kernel.template.Template
 import kernel.utils.{ImplicitPathReplace, NoPathReplace, RegexReplace}
 
@@ -86,7 +85,7 @@ case class ExportConfig(
   def renderTemplate(context: Map[String, Any] = Map(), projectBase: Option[String] = None)(implicit
       replace: ImplicitPathReplace = NoPathReplace
   ): Map[String, String] = {
-    val base = if (projectBase.nonEmpty) projectBase.get else ManifestManager.getManifest().projectBase.get
+    val base = projectBase.get
     // relative path from project base
     templates
       .map(name => (name, new File(base, name)))

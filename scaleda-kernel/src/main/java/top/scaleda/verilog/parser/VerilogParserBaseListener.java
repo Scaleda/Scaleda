@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/verilog/VerilogParser.g4 by ANTLR 4.13.1
 package top.scaleda.verilog.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;

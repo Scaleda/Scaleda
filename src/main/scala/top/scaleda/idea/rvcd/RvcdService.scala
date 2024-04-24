@@ -1,7 +1,7 @@
 package top.scaleda
 package idea.rvcd
 
-import idea.utils.MainLogger
+import idea.utils.ScaledaIdeaLogger
 import idea.utils.OutputLogger.StdErrToInfoHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.utils.{OS, Paths}
@@ -40,7 +40,7 @@ class RvcdService extends Disposable {
       val cmdLine = Seq(RvcdService.rvcdFile.getAbsolutePath) ++ source
         .map(s => Seq("-i", s.getAbsolutePath))
         .fold(Seq())(_ ++ _) ++ Seq(waveform.getAbsolutePath)
-      MainLogger.info(s"Starting RVCD with command line: ${cmdLine.mkString(" ")}")
+      ScaledaIdeaLogger.info(s"Starting RVCD with command line: ${cmdLine.mkString(" ")}")
 
       // run
       await(

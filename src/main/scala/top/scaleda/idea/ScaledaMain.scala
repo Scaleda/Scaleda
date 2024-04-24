@@ -1,15 +1,10 @@
 package top.scaleda
 package idea
 
-import idea.runner.task.ScaledaReloadTasksAction
 import idea.rvcd.RvcdService
 import idea.settings.toolchains.ProfileDetectAction
 import idea.toolchain.{IVerilogIdea, VivadoIdea}
-import idea.utils.{AssetsInstallAction, Icons, MainLogger, RpcService, runInEdt}
-import idea.windows.tasks.ScaledaRunWindowFactory
-import idea.windows.tool.ScaledaToolWindowFactory
-import idea.windows.tool.logging.ScaledaLoggingService
-import idea.windows.tool.message.ScaledaMessageTab
+import idea.utils.{AssetsInstallAction, Icons, RpcService, ScaledaIdeaLogger, runInEdt}
 import kernel.bin.ExtractAssets
 import kernel.toolchain.Toolchain
 import kernel.toolchain.impl._
@@ -20,6 +15,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
 import kotlin.coroutines.Continuation
+import top.scaleda.idea.windows.rightPanel.{ScaledaReloadTasksAction, ScaledaTasksPanel, ScaledaTasksService}
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -29,43 +25,54 @@ import kotlin.coroutines.Continuation
   */
 class ScaledaMain extends ProjectActivity {
   override def execute(project: Project, continuation: Continuation[_ >: kotlin.Unit]): AnyRef = {
-    MainLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
+    ScaledaIdeaLogger.info("This is Scaleda, an EDA tool for FPGAs based on IntelliJ platform")
 
     // invoke Env backup
     val _ = EnvironmentUtils.Backup
 
     // Logging service, handling IDEA log output
-    project.getService(classOf[ScaledaLoggingService])
-    // Main service, init jinja and kernel log
-    project.getService(classOf[ScaledaMainService])
+    // project.getService(classOf[ScaledaLoggingService])
+    // // Main service, init jinja and kernel log
+    // project.getService(classOf[ScaledaMainService])
 
     // Setup windows...
-    val toolWindowManager = ToolWindowManager.getInstance(project)
-    toolWindowManager.invokeLater(() => {
-      val builder =
-        new RegisterToolWindowTaskBuilder(ScaledaRunWindowFactory.WINDOW_ID)
-      builder.icon = Icons.mainSmall
-      builder.contentFactory = new ScaledaRunWindowFactory
-      builder.anchor = ToolWindowAnchor.RIGHT
-      // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
-      val toolWindow = toolWindowManager.registerToolWindow(builder.build())
-    })
-    toolWindowManager.invokeLater(() => {
-      val builder =
-        new RegisterToolWindowTaskBuilder(ScaledaToolWindowFactory.WINDOW_ID)
-      builder.icon = Icons.mainSmall
-      builder.contentFactory = new ScaledaToolWindowFactory
-      builder.anchor = ToolWindowAnchor.BOTTOM
-      builder.shouldBeAvailable = true
-
-      val messageWindow = toolWindowManager.registerToolWindow(builder.build())
-    })
+    // val toolWindowManager = ToolWindowManager.getInstance(project)
+    // toolWindowManager.invokeLater(() => {
+    //   val builder =
+    //     new RegisterToolWindowTaskBuilder(ScaledaRunWindowFactory.WINDOW_ID)
+    //   builder.icon = Icons.mainSmall
+    //   builder.contentFactory = new ScaledaRunWindowFactory
+    //   builder.anchor = ToolWindowAnchor.RIGHT
+    //   // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
+    //   val toolWindow = toolWindowManager.registerToolWindow(builder.build())
+    // })
+    // toolWindowManager.invokeLater(() => {
+    //   val builder =
+    //     new RegisterToolWindowTaskBuilder(ScaledaToolWindowFactory.WINDOW_ID)
+    //   builder.icon = Icons.mainSmall
+    //   builder.contentFactory = new ScaledaToolWindowFactory
+    //   builder.anchor = ToolWindowAnchor.BOTTOM
+    //   builder.shouldBeAvailable = true
+    //
+    //   val messageWindow = toolWindowManager.registerToolWindow(builder.build())
+    // })
 
     // Check assets
     if (!ExtractAssets.isInstalled) {
-      ActionManager
-        .getInstance()
-        .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
+      try {
+        ActionManager
+          .getInstance()
+          .tryToExecute(new AssetsInstallAction(project), null, null, null, true)
+      } catch {
+        case e: Exception =>
+          ScaledaIdeaLogger.warn("Failed to install assets, retry in main thread", e)
+          try {
+            ExtractAssets.run()
+          } catch {
+            case e: Exception =>
+              ScaledaIdeaLogger.error("Failed to install assets", e)
+          }
+      }
     }
 
     val rpcService = project.getService(classOf[RpcService])
@@ -96,7 +103,7 @@ class ScaledaMain extends ProjectActivity {
     // }
 
     // invoke MessageTab instance
-    val _ = ScaledaMessageTab(project)
+    // val _ = ScaledaMessageTab(project)
 
     // invoke all toolchains
     Seq(IVerilog, Vivado).foreach(KernelLogger.info("Load Toolchain object", _))

@@ -2,7 +2,7 @@ package top.scaleda
 package idea.settings.auth
 
 import idea.ScaledaBundle
-import idea.utils.MainLogger
+import idea.utils.ScaledaIdeaLogger
 import kernel.net.user.{ScaledaAuthorizationProvider, UserTokenBean}
 
 import com.intellij.openapi.options.SearchableConfigurable
@@ -60,10 +60,10 @@ class AuthorizationEditor extends SearchableConfigurable {
   override def apply(): Unit = {
     if (canApply) {
       val data = cloneModel
-      MainLogger.info("apply data model", data)
+      ScaledaIdeaLogger.info("apply data model", data)
       ScaledaAuthorizationProvider.saveTokenPairs(data)
       reload()
-    } else MainLogger.warn("Cannot apply data now!")
+    } else ScaledaIdeaLogger.warn("Cannot apply data now!")
   }
 
   override def createComponent(): JComponent = ToolbarDecorator
@@ -93,7 +93,7 @@ class AuthorizationEditor extends SearchableConfigurable {
         // stuck here
         v.setVisible(true)
         v.getUserToken.foreach(t => {
-          MainLogger.info("modifying selected", selected, "=>", t)
+          ScaledaIdeaLogger.info("modifying selected", selected, "=>", t)
           dataModel.setElementAt(t, selectedIndex)
         })
         canApply = true
@@ -104,7 +104,7 @@ class AuthorizationEditor extends SearchableConfigurable {
         val copy  = cloneModel
         val index = copy.indexWhere(_.host == t.host)
         if (index >= 0) {
-          MainLogger.info("removing selected", t, "at", index)
+          ScaledaIdeaLogger.info("removing selected", t, "at", index)
           dataModel.removeElementAt(index)
         }
         selected = None

@@ -2,14 +2,15 @@ package top.scaleda
 package idea.runner
 
 import idea.ScaledaBundle
-import idea.utils.{MainLogger, OutputLogger}
-import idea.windows.tool.message.ScaledaMessageRenderer
+import idea.utils.{OutputLogger, ScaledaIdeaLogger}
+import idea.windows.bottomPanel.message.ScaledaMessageRenderer
 import kernel.shell.ScaledaRunHandler
 import kernel.shell.command.CommandDeps
 import kernel.utils.{BasicLogger, FileReplaceContext}
 
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.openapi.project.Project
+import top.scaleda.idea.windows.bottomPanel.ConsoleService
 import top.scaleda.kernel.toolchain.runner.ScaledaRuntime
 
 import java.io.OutputStream
@@ -23,7 +24,6 @@ import scala.collection.mutable.ArrayBuffer
   */
 class ScaledaRunProcessHandler(
     project: Project,
-    logger: BasicLogger,
     val rt: ScaledaRuntime,
     invokeAfterFinish: (ScaledaRuntime, Seq[Int], Boolean, Boolean) => Unit
 ) extends ProcessHandler
@@ -35,10 +35,12 @@ class ScaledaRunProcessHandler(
 
   val returnValues = ArrayBuffer[Int]()
 
+  private val consoleService = project.getService(classOf[ConsoleService])
+
   /** Called when destroy button clicked
     */
   override def destroyProcessImpl(): Unit = {
-    MainLogger.warn(
+    ScaledaIdeaLogger.warn(
       s"destroyProcessImpl, running: $terminated, stopping: $terminating"
     )
     terminating = true
@@ -46,7 +48,7 @@ class ScaledaRunProcessHandler(
   }
 
   override def detachProcessImpl(): Unit = {
-    MainLogger.warn("detachProcessImpl")
+    ScaledaIdeaLogger.warn("detachProcessImpl")
     notifyProcessDetached()
   }
 
@@ -58,16 +60,17 @@ class ScaledaRunProcessHandler(
 
   // Not in use
   private val outputStream = new OutputStream {
-    override def write(i: Int): Unit = MainLogger.warn("getProcessInput:", i)
+    override def write(i: Int): Unit = ScaledaIdeaLogger.warn("getProcessInput:", i)
   }
   override def getProcessInput: OutputStream = outputStream
 
-  override def onShellCommand(command: CommandDeps) =
-    logger.debug("cd", s"\"${command.path}\"", "&&", command.args.map(s => s"\"$s\"").mkString(" "))
-
   private val outputLogger = OutputLogger(project)
 
-  override def onStepDescription(data: String): Unit = logger.debug(data)
+  override def onShellCommand(command: CommandDeps): Unit =
+    outputLogger.debug("cd", s"\"${command.path}\"", "&&", command.args.map(s => s"\"$s\"").mkString(" "))
+
+
+  override def onStepDescription(data: String): Unit = outputLogger.debug(data)
 
   private def doContextReplace(src: String): String = {
     var now = src
@@ -103,22 +106,18 @@ class ScaledaRunProcessHandler(
   }
 
   override def onStdout(data: String): Unit = {
-    logger.info(doContextReplace(data))
     outputLogger.info(doContextReplace(data))
   }
 
   override def onStderr(data: String): Unit = {
-    logger.warn(doContextReplace(data))
     outputLogger.warn(doContextReplace(data))
   }
 
   override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit = {
     val msg = ScaledaBundle.message("task.run.return.text", returnValue)
     if (meetErrors) {
-      logger.warn(msg)
       outputLogger.warn(msg)
     } else {
-      logger.debug(msg)
       outputLogger.debug(msg)
     }
     returnValues.append(returnValue)

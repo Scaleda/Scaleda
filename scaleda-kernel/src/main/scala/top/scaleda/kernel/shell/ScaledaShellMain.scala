@@ -8,13 +8,12 @@ import kernel.net.RemoteClient
 import kernel.net.remote.Empty
 import kernel.net.user.ScaledaRegisterLogin
 import kernel.project.config.ProjectConfig
-import kernel.project.{AbstractProject, ManifestManager, ProjectManifest}
+import kernel.project.ScaledaProject
 import kernel.server.ScaledaServerMain
 import kernel.template.Template
 import kernel.toolchain.Toolchain
 import kernel.utils.serialise.JSONHelper
-import kernel.utils.{EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
-
+import kernel.utils.{ScaledaShellLogger, EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
 import scopt.OParser
 
 import java.io.File
@@ -40,16 +39,16 @@ case class ShellArgs(
 )
 
 object ScaledaShellMain {
-  private def loadConfig(projectRootPath: String)(implicit manifest: ProjectManifest): Unit = {
+  private def loadConfig(projectRootPath: String)(implicit project: ScaledaProject): Unit = {
     KernelLogger.debug(s"loadConfig($projectRootPath)")
     val rootDir = new File(projectRootPath)
     if (rootDir.exists() && rootDir.isDirectory) {
-      manifest.projectBase = Some(rootDir.getAbsolutePath)
+      project.projectBase = Some(rootDir.getAbsolutePath)
     }
     val projectConfigFile =
       new File(projectRootPath, ProjectConfig.defaultConfigFile)
     if (projectConfigFile.exists() && !projectConfigFile.isDirectory) {
-      manifest.configFile = Some(projectConfigFile.getAbsolutePath)
+      project.configFile = Some(projectConfigFile.getAbsolutePath)
       val config = ProjectConfig.getConfig
       KernelLogger.debug(s"project config: $config")
     }
@@ -70,10 +69,12 @@ object ScaledaShellMain {
   }
 
   def main(args: Array[String]): Unit = {
+    // init logger
+    KernelLogger.addLogger(ScaledaShellLogger)
     KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
 
     // default manifest
-    implicit val manifest: ProjectManifest = ManifestManager.getManifest(project = AbstractProject.default)
+    implicit val project: ScaledaProject = new ScaledaProject()
 
     // set exception handler
     Thread.currentThread().setUncaughtExceptionHandler(new ShellExceptionHandler)
@@ -92,11 +93,11 @@ object ScaledaShellMain {
     preParseArgs(args, Seq("-C", "--workdir")).foreach(a => loadConfig(a))
     // preparse server host
     // val host = preParseArgs(args, Seq("-h", "--host"))
-    if (manifest.configFile.isEmpty) {
+    if (project.configFile.isEmpty) {
       // try loading config in pwd
       loadConfig(Paths.pwd.getAbsolutePath)
     }
-    if (manifest.configFile.isEmpty)
+    if (project.configFile.isEmpty)
       KernelLogger.info("No project config detected!")
 
     def requireHost(shellConfig: ShellArgs): Unit = {

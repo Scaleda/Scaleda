@@ -1,7 +1,7 @@
 package top.scaleda
 package idea.toolchain
 
-import idea.windows.tool.message._
+import idea.windows.bottomPanel.message._
 import kernel.toolchain.impl.Vivado.internalID
 import kernel.utils.LogLevel
 import top.scaleda.kernel.toolchain.runner.ScaledaRuntime

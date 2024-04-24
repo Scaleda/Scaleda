@@ -2,16 +2,18 @@ package top.scaleda
 package verilog.editor.formatter
 
 import idea.ScaledaBundle
-import idea.utils.{MainLogger, Notification}
+import idea.utils.{Notification, ScaledaIdeaLogger}
 import verilog.editor.codeStyle.VerilogCodeStyleSettings
+import verilog.formatter.VeribleFormatterHelper
 import verilog.{VerilogFileType, VerilogLanguage, VerilogPSIFileRoot}
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.{CapturingProcessAdapter, OSProcessHandler, ProcessEvent}
 import com.intellij.formatting.service.AsyncDocumentFormattingService.FormattingTask
 import com.intellij.formatting.service.{AsyncDocumentFormattingService, AsyncFormattingRequest, FormattingService}
+import com.intellij.lang.Language
+import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.psi.PsiFile
-import top.scaleda.verilog.formatter.VeribleFormatterHelper
 
 import java.io.{FileReader, LineNumberReader}
 import java.nio.charset.StandardCharsets
@@ -40,7 +42,7 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
 
     def getLineNumber(offset1: Int, offset2: Int): (Int, Int) = {
       val lineNumberReader = new LineNumberReader(reader)
-      (0 until  offset1).foreach(_ => lineNumberReader.read())
+      (0 until offset1).foreach(_ => lineNumberReader.read())
       val r1 = lineNumberReader.getLineNumber + 1
       (offset1 until offset2).foreach(_ => lineNumberReader.read())
       val r2 = lineNumberReader.getLineNumber + 1
@@ -48,16 +50,18 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
       (r1, r2)
     }
 
-    val lines = formattingRequest.getFormattingRanges.asScala.map(range => {
-      val l = getLineNumber(range.getStartOffset, range.getEndOffset)
-      s"${l._1}-${l._2}"
-    }).mkString(",")
+    val lines = formattingRequest.getFormattingRanges.asScala
+      .map(range => {
+        val l = getLineNumber(range.getStartOffset, range.getEndOffset)
+        s"${l._1}-${l._2}"
+      })
+      .mkString(",")
 
     reader.close()
 
     val params = Seq(
-      "--indentation_spaces=" + codeStyleSettings.getIndentOptions(VerilogFileType.instance).INDENT_SIZE,
-      "--column_limit=" + codeStyleSettings.getRightMargin(VerilogLanguage),
+      "--indentation_spaces=" + codeStyleSettings.getIndentOptions(getFileType).INDENT_SIZE,
+      "--column_limit=" + codeStyleSettings.getRightMargin(getLanguage),
       "--line_break_penalty=" + verilogStyle.LINE_BREAK_PENALTY,
       "--over_column_limit_penalty=" + verilogStyle.OVER_COLUMN_LIMIT_PENALTY,
       "--wrap_spaces=" + verilogStyle.WRAP_SPACES,
@@ -94,9 +98,9 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
 
       val handler = new OSProcessHandler(cmdLine.withCharset(StandardCharsets.UTF_8))
 
-      return new FormattingTask() {
+      new FormattingTask() {
         override def run(): Unit = {
-          MainLogger.info(cmdLine.getCommandLineString)
+          ScaledaIdeaLogger.info(cmdLine.getCommandLineString)
           handler.addProcessListener(new CapturingProcessAdapter() {
             override def processTerminated(event: ProcessEvent): Unit = {
               val exitCode = event.getExitCode;
@@ -115,7 +119,7 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
 
         override def cancel(): Boolean = {
           handler.destroyProcess()
-          return true
+          true
         }
 
         override def isRunUnderProgress: Boolean = true
@@ -123,7 +127,7 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
     } catch {
       case e: ExecutionException =>
         formattingRequest.onError(ScaledaBundle.message("notification.formatting.failed"), e.getMessage)
-        return null
+        null
     }
   }
 
@@ -132,8 +136,14 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
   override def getName: String = "Verilog"
 
   override def getFeatures: util.Set[FormattingService.Feature] =
-    util.EnumSet.of(FormattingService.Feature.FORMAT_FRAGMENTS, FormattingService.Feature.AD_HOC_FORMATTING) // FIXME: What is AD_HOC?
+    util.EnumSet.of(
+      FormattingService.Feature.FORMAT_FRAGMENTS,
+      FormattingService.Feature.AD_HOC_FORMATTING
+    ) // FIXME: What is AD_HOC?
 
   override def canFormat(file: PsiFile): Boolean =
     file.isInstanceOf[VerilogPSIFileRoot]
+
+  def getFileType: LanguageFileType = VerilogFileType.instance
+  def getLanguage: Language        = VerilogLanguage
 }

@@ -10,12 +10,15 @@ import java.util.zip.ZipInputStream
 import scala.io.Source
 
 object ExtractAssets {
-  private val ASSET_VERSION   = 1 // Update me when newer assets are loaded
+  private val ASSET_VERSION   = 3 // Update me when newer assets are loaded
   private val ZIP_BUFFER_SIZE = 1024
 
   private val targetDirectory = Paths.getBinaryDir
-  private val binaryList      = Array("rvcd", "rvcd.exe") ++ VeribleFormatterHelper.allVeribleAssets
   private val resourceFile    = "bin/assets.zip"
+  private val binaryList =
+    Array("rvcd", "rvcd.exe") ++
+      Array("surfer", "surfer.exe") ++
+      VeribleFormatterHelper.allVeribleAssets
 
   def isInstalled: Boolean = {
     // check if version file
@@ -26,9 +29,10 @@ object ExtractAssets {
     val oldVersion = Source.fromFile(versionFile)
     val version    = oldVersion.getLines().mkString("").toInt
     oldVersion.close()
+    KernelLogger.info(f"Assets version ${version} found, packed version is ${ASSET_VERSION}")
     if (version < ASSET_VERSION) return false
 
-    // TODO: copy or extract files from resource
+    // copy or extract files from resource
     install()
 
     // check integrity
@@ -36,7 +40,7 @@ object ExtractAssets {
   }
 
   // install resources in resources/install -> .scaleda/*
-  def install() = {
+  def install(): Unit = {
     val parent = Paths.getGlobalConfigDir
     val files = Seq(
       "scripts/vivado_call.tcl",
