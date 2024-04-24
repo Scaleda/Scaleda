@@ -32,10 +32,13 @@ class AlwaysConstructPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with Stru
       .filter(f => !getDrivenSignals.exists(_ == f))
   }
 
-  def getControl: DelayOrEventControlPsiNode = PsiTreeUtil.findChildOfAnyType(this, classOf[DelayOrEventControlPsiNode])
+  def getDelayOrEventControl: DelayOrEventControlPsiNode =
+    PsiTreeUtil.findChildOfAnyType(this, classOf[DelayOrEventControlPsiNode])
+  def getEventControl: DelayOrEventControlPsiNode =
+    PsiTreeUtil.findChildOfAnyType(this, classOf[DelayOrEventControlPsiNode])
 
   override def getElementName: String = {
-    val delayOrEventControlPsiNode = getControl
+    val delayOrEventControlPsiNode = getDelayOrEventControl
     val eventText =
       if (delayOrEventControlPsiNode == null) ""
       else {
@@ -57,11 +60,10 @@ class AlwaysConstructPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with Stru
     s"($eventText) → " + getDrivenSignals.map(_.getName).mkString(", ")
   }
 
-  /**
-    * Will judge simply by posedge/negedge (events) or delay (delay)
+  /** Will judge simply by posedge/negedge (events) or delay (delay)
     */
   def isCombinationLogic: Boolean = {
-    val delayOrEventControlPsiNode = getControl
+    val delayOrEventControlPsiNode = getDelayOrEventControl
     // default to time logic, example: `always #1`
     if (delayOrEventControlPsiNode == null) return false
     if (delayOrEventControlPsiNode.isEventControl) {

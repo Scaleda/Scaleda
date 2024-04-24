@@ -18,6 +18,7 @@ import top.scaleda.systemverilog.psi.nodes.always.EventExpressionPsiNode;
 import top.scaleda.systemverilog.psi.nodes.assignments.BlockingAssignmentPsiNode;
 import top.scaleda.systemverilog.psi.nodes.assignments.NetAssignmentPsiNode;
 import top.scaleda.systemverilog.psi.nodes.assignments.NonblockingAssignmentPsiNode;
+import top.scaleda.systemverilog.psi.nodes.assignments.ProceduralContinuousAssignmentPsiNode;
 import top.scaleda.systemverilog.psi.nodes.block.CaseBodyPsiNode;
 import top.scaleda.systemverilog.psi.nodes.block.CaseStatementPsiNode;
 import top.scaleda.systemverilog.psi.nodes.block.SeqBlockPsiNode;
@@ -112,6 +113,7 @@ public class SystemVerilogPsiNodeFactory {
     /// Assignment
     map.put(getRuleIElementType(SystemVerilogParser.RULE_nonblocking_assignment), NonblockingAssignmentPsiNode.class);
     map.put(getRuleIElementType(SystemVerilogParser.RULE_blocking_assignment), BlockingAssignmentPsiNode.class);
+    map.put(getRuleIElementType(SystemVerilogParser.RULE_procedural_continuous_assignment), ProceduralContinuousAssignmentPsiNode.class);
     /// Assign
     map.put(getRuleIElementType(SystemVerilogParser.RULE_net_assignment), NetAssignmentPsiNode.class);
     /// Initial

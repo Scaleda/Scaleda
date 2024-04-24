@@ -171,6 +171,8 @@
                                        implementationClass="top.scaleda.systemverilog.highlight.SystemVerilogSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="SystemVerilog"
                                       implementationClass="top.scaleda.systemverilog.structview.SystemVerilogStructViewFactory"/>
+        <!-- same as Verilog -->
+        <formattingService implementation="top.scaleda.systemverilog.editor.formatter.SystemVerilogExternalFormatter"/>
     </extensions>
 
     <!-- Settings -->
