@@ -8,7 +8,6 @@ import org.antlr.intellij.adaptor.lexer.RuleIElementType;
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode;
 import top.scaleda.bluespec.psi.nodes.IdentifierPsiNode;
 import top.scaleda.bluespec.psi.nodes.SourceTextPsiNode;
-import top.scaleda.bluespec.psi.nodes.StatementPsiNode;
 // import top.scaleda.bluespec.psi.nodes.always.AlwaysConstructPsiNode;
 // import top.scaleda.bluespec.psi.nodes.always.DelayOrEventControlPsiNode;
 // import top.scaleda.bluespec.psi.nodes.always.DelayValuePsiNode;
@@ -27,7 +26,6 @@ import top.scaleda.bluespec.psi.nodes.StatementPsiNode;
 // import top.scaleda.bluespec.psi.nodes.condition.ConditionalStatementTailPsiNode;
 // import top.scaleda.bluespec.psi.nodes.expression.*;
 // import top.scaleda.bluespec.psi.nodes.function.FunctionDeclarationPsiNode;
-import top.scaleda.bluespec.psi.nodes.incompleted.IncompleteConditionPsiNode;
 // import top.scaleda.bluespec.psi.nodes.initial.InitialPsiNode;
 // import top.scaleda.bluespec.psi.nodes.instantiation.*;
 import top.scaleda.bluespec.psi.nodes.module.*;
@@ -54,7 +52,7 @@ public class BluespecPsiNodeFactory {
     /// Module keywords
     // map.put(getRuleIElementType(BluespecParser.RULE_module_keyword), ModuleKeywordPsiNode.class);
     /// Module declaration
-    // map.put(getRuleIElementType(BluespecParser.RULE_moduleProto), ModuleDeclarationPsiNode.class);
+    map.put(getRuleIElementType(BluespecParser.RULE_moduleProto), ModuleDeclarationPsiNode.class);
     // map.put(getRuleIElementType(BluespecParser.RULE_module_header), ModuleHeadPsiNode.class);
     /// Module identifier
     // map.put(getRuleIElementType(BluespecParser.RULE_module_identifier), ModuleIdentifierPsiNode.class);
@@ -135,7 +133,7 @@ public class BluespecPsiNodeFactory {
     // map.put(getRuleIElementType(BluespecParser.RULE_net_identifier), NetIdentifierPsiNode.class);
     // /// Variables (reg, integer, etc.)
     // /// Identifier
-    // map.put(getRuleIElementType(BluespecParser.RULE_identifier), IdentifierPsiNode.class);
+    map.put(getRuleIElementType(BluespecParser.RULE_identifier), IdentifierPsiNode.class);
     //
     // map.put(getRuleIElementType(BluespecParser.RULE_data_type), VariableDeclarationPsiNode.class);
     // // map.put(getRuleIElementType(BluespecParser.RULE_variable_identifier), VariableIdentifierPsiNode.class);
