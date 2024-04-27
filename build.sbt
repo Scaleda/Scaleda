@@ -1,10 +1,11 @@
-import org.jetbrains.sbtidea.Keys._
-import org.jetbrains.sbtidea.verifier._
+import org.jetbrains.sbtidea.Keys.*
+import org.jetbrains.sbtidea.verifier.*
 import scala.io.Source
 
 val publicScalaVersion = "2.13.12"
 // val ideaVersion = "2023.1.3"
-val ideaVersion = "241.14024.14"
+// val ideaVersion = "241.14024.14"
+val ideaVersion = "241.14494.240"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
@@ -59,20 +60,20 @@ lazy val publicLibraryDependencies = Seq(
   "org.antlr"                   % "antlr4-runtime"          % "4.13.1",
   "io.circe"                   %% "circe-yaml"              % "1.15.0",
   "com.github.scopt"           %% "scopt"                   % "4.1.0",
-  "ch.qos.logback"              % "logback-classic"         % "1.4.14",
+  "ch.qos.logback"              % "logback-classic"         % "1.5.6",
   "com.typesafe.scala-logging" %% "scala-logging"           % "3.9.5",
-  "org.scalactic"              %% "scalactic"               % "3.2.17",
-  "org.scalatest"              %% "scalatest"               % "3.2.17"              % "test",
+  "org.scalactic"              %% "scalactic"               % "3.2.18",
+  "org.scalatest"              %% "scalatest"               % "3.2.18"              % "test",
   // for logger
-  "com.lihaoyi" %% "sourcecode" % "0.3.1",
+  "com.lihaoyi" %% "sourcecode" % "0.4.1",
   // for color print
-  "com.lihaoyi" %% "fansi" % "0.4.0",
+  "com.lihaoyi" %% "fansi" % "0.5.0",
   // https://mvnrepository.com/artifact/com.hubspot.jinjava/jinjava
-  "com.hubspot.jinjava" % "jinjava" % "2.7.0",
+  "com.hubspot.jinjava" % "jinjava" % "2.7.2",
   // https://mvnrepository.com/artifact/com.google.guava/guava
-  "com.google.guava" % "guava" % "31.1-jre",
+  "com.google.guava" % "guava" % "33.1.0-jre",
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  "commons-io" % "commons-io" % "2.15.1",
+  "commons-io" % "commons-io" % "2.16.1",
   // https://mvnrepository.com/artifact/log4j/log4j
   "log4j"                   % "log4j"         % "1.2.17",
   "org.scala-lang.modules" %% "scala-async"   % "1.0.1",
@@ -86,11 +87,11 @@ lazy val publicLibraryDependencies = Seq(
   // https://mvnrepository.com/artifact/com.github.serceman/jnr-fuse
   "com.github.serceman" % "jnr-fuse" % "0.5.7",
   // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-  "org.xerial" % "sqlite-jdbc" % "3.41.0.0",
+  "org.xerial" % "sqlite-jdbc" % "3.45.3.0",
   // https://mvnrepository.com/artifact/com.auth0/java-jwt
   "com.auth0" % "java-jwt" % "4.4.0",
   // https://mvnrepository.com/artifact/commons-codec/commons-codec
-  "commons-codec" % "commons-codec" % "1.16.0",
+  "commons-codec" % "commons-codec" % "1.16.1",
   // scalapb
   "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
 )
@@ -103,7 +104,7 @@ lazy val kernel = project
     intellijPlugins := Seq(),
     libraryDependencies ++= publicLibraryDependencies,
     // CAN BE DIFFERENT FROM IDEA VERSION
-    libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.55.1",
+    libraryDependencies += "io.grpc" % "grpc-netty-shaded" % "1.62.2",
     // libraryDependencies += "io.grpc" % "grpc-netty" % "1.55.1",
     packageLibraryMappings := Seq.empty, // allow scala-library
     assembly / assemblyJarName := "scaleda-kernel.jar",
@@ -129,7 +130,7 @@ lazy val scaleda = project
       xml.sinceBuild = (ThisBuild / intellijBuild).value
     },
     pluginVerifierOptions := pluginVerifierOptions.value.copy(
-      version = "1.299",                                          // use a specific verifier version
+      version = "1.365",                                          // use a specific verifier version
       offline = true,                                             // forbid the verifier from reaching the internet
       // overrideIDEs = Seq("IC", "IU").map(_ + "-" + ideaVersion),  // verify against specific products instead of 'intellijBuild'
       failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES)     // only fail if deprecated APIs are used
