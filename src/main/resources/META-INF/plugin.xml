@@ -167,8 +167,8 @@
         <lang.parserDefinition language="SystemVerilog"
                                implementationClass="top.scaleda.systemverilog.SystemVerilogParserDefinition"/>
         <lang.ast.factory language="SystemVerilog" implementationClass="top.scaleda.systemverilog.SystemVerilogASTFactory"/>
-        <lang.syntaxHighlighterFactory language="SystemVerilog"
-                                       implementationClass="top.scaleda.systemverilog.highlight.SystemVerilogSyntaxHighlighterFactory"/>
+<!--        <lang.syntaxHighlighterFactory language="SystemVerilog"-->
+<!--                                       implementationClass="top.scaleda.systemverilog.highlight.SystemVerilogSyntaxHighlighterFactory"/>-->
         <lang.psiStructureViewFactory language="SystemVerilog"
                                       implementationClass="top.scaleda.systemverilog.structview.SystemVerilogStructViewFactory"/>
         <!-- same as Verilog -->

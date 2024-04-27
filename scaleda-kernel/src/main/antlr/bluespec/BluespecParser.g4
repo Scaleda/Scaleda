@@ -1,139 +1,14 @@
 // Copy from https://github.com/mshr-h/vscode-verilog-hdl-support/blob/main/syntaxes/bsv.g4
-// and modified
+// and modified to BluespecLexer.g4 BluespecParser.g4
 
-grammar Bluespec;
+parser grammar BluespecParser;
+
+options {
+    tokenVocab = BluespecLexer;
+}
 
 top:
     (exportDecl| importDecl| packageStmt| r_package)*;
-
-// meta: [] - optional {} - zero or more
-
-BlockComment
-    :   '/*' .*? '*/'
-        -> skip
-    ;
-
-LineComment
-    :   '//' ~[\r\n]*
-        -> skip
-    ;
-
-
-Whitespace
-    :   [ \t]+
-        -> skip
-    ;
-
-Newline
-    :   (   '\r' '\n'?
-        |   '\n'
-        )
-        -> skip
-    ;
-
-
-// string literals
-fragment
-CharacterConstant
-    :   '\'' CCharSequence '\'';
-
-fragment
-CCharSequence
-    :   CChar+
-    ;
-
-fragment
-CChar
-    :   ~['\\\r\n]
-    |   EscapeSequence
-    ;
-
-fragment
-NoneWhitespace:
-    ~[ \t];
-
-fragment
-EscapeSequence
-    :   SimpleEscapeSequence
-    |   OctalEscapeSequence
-    |   HexadecimalEscapeSequence
-    ;
-
-fragment
-SimpleEscapeSequence
-    :   '\\' ['"abfnrtv\\]
-    ;
-fragment
-OctalEscapeSequence
-    :   '\\' OctalDigit OctalDigit? OctalDigit?
-    ;
-fragment
-HexadecimalEscapeSequence
-    :   '\\x' HexadecimalDigit+
-    ;
-
-StringLiteral
-    :   '"' SCharSequence? '"'
-    ;
-
-fragment
-SChar
-    :   ~["\\\r\n]
-    |   EscapeSequence
-    |   '\\\n'   // Added line
-    |   '\\\r\n' // Added line
-    ;
-
-fragment
-HexadecimalDigit
-    :   [0-9a-fA-F]
-    ;
-
-
-fragment
-OctalDigit
-    :   [0-7]
-    ;
-
-fragment
-SCharSequence
-    :   SChar+
-    ;
-
-
-// id
-
-fragment
-Digit
-    :   [0-9]
-    ;
-
-Identifier
-    :   (IdentifierNondigit)
-        (   IdentifierNondigit
-        |   Digit
-        )*
-    | '\\' NoneWhitespace+; // for special symbal
-
-fragment
-FileName
-    :   
-        (   IdentifierNondigit
-        |   Digit
-        )+
-    ;
-
-fragment
-IdentifierNondigit
-    :   Nondigit
-    ;
-
-
-fragment
-Nondigit
-    :   [a-zA-Z_$]
-    ;
-
 
 identifier : Identifier
            | 'no_reset' 
@@ -148,85 +23,9 @@ identifier_type : Identifier
                 | 'void'
                 | 'module'
                 | 'rule';
-// Integer literals
-IntLiteral  :   '\'0' | '\'1'
-            |   SizedIntLiteral
-            |   UnsizedIntLiteral;
-
-fragment
-SizedIntLiteral :  BitWidth BaseLiteral;
-
-fragment
-UnsizedIntLiteral   :  /*Sign?*/ BaseLiteral  // ignore sign this stage
-                    |   /*Sign?*/ DecNum;
-
-fragment
-BaseLiteral :   ('\'d' | '\'D') DecDigitsUnderscore
-            |   ('\'h' | '\'H') HexDigitsUnderscore
-            |   ('\'o' | '\'O') OctDigitsUnderscore
-            |   ('\'b' | '\'B') BinDigitsUnderscore;
-
-fragment
-DecNum      :  DecDigits DecDigitsUnderscore?;
-fragment
-BitWidth    :  DecDigits;
-fragment
-Sign        :  '+' | '-';
-
-fragment
-DecDigits   :  Digit+;
-fragment
-DecDigitsUnderscore     :  [0-9_]+;
-fragment
-HexDigitsUnderscore     :  [0-9a-fA-F_]+;
-fragment
-OctDigitsUnderscore     :  [0-7_]+; 
-fragment
-BinDigitsUnderscore     :  [01_]+;
-
-//  Real literals
-
-RealLiteral : DecNum('.'DecDigitsUnderscore)? Exp Sign? DecDigitsUnderscore
-            | DecNum'.'DecDigitsUnderscore;
-
-fragment
-Exp         : 'e' | 'E';
 
 //  String literals
 stringLiteral : StringLiteral;
-
-//  Compiler directives
-
-CompilerDirective   : ('`include' Whitespace* StringLiteral
-                    | '`include' Whitespace* '<' Whitespace* FileName Whitespace* '>'
-                    | '`include' MacroInvocation
-                    | '`line' Whitespace* LineNumber Whitespace* '"' Whitespace* FileName Whitespace* '"' Whitespace* Level
-                    | '`undef' Whitespace* MacroName
-                    | '`resetall'
-                    | '`ifdef' Whitespace* MacroName
-                    | '`ifndef' Whitespace* MacroName
-                    | '`elsif' Whitespace* MacroName
-                    | '`else'
-                    | '`endif'
-                    ) -> skip;
-
-fragment
-LineNumber  : DecDigits;
-fragment
-Level       : '0' | '1' | '2';
-fragment
-MacroName   : Identifier;
-fragment
-MacroFormals: Identifier;
- 
-fragment
-MacroInvocation_ : '\''MacroName('('MacroActuals')')?;
-
-MacroInvocation : MacroInvocation_;
-fragment
-MacroActuals    : SubstText (',' SubstText)*;
-fragment
-SubstText       : .*?;
 
 // Packages and the outermost structure of a BSV design
 
