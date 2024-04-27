@@ -1,9 +1,9 @@
-// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/bluespec/BluespecParser.g4 by ANTLR 4.13.1
+// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/bluespec/Bluespec.g4 by ANTLR 4.13.1
 package top.scaleda.bluespec.parser;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
- * This class provides an empty implementation of {@link BluespecParserVisitor},
+ * This class provides an empty implementation of {@link BluespecVisitor},
  * which can be extended to create a visitor which only needs to handle a subset
  * of the available methods.
  *
@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * operations with no return type.
  */
 @SuppressWarnings("CheckReturnValue")
-public class BluespecParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements BluespecParserVisitor<T> {
+public class BluespecBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements BluespecVisitor<T> {
 	/**
 	 * {@inheritDoc}
 	 *

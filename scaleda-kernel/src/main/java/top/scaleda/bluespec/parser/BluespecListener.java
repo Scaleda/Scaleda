@@ -1,4 +1,4 @@
-// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/bluespec/BluespecParser.g4 by ANTLR 4.13.1
+// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/bluespec/Bluespec.g4 by ANTLR 4.13.1
 package top.scaleda.bluespec.parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  * This interface defines a complete listener for a parse tree produced by
  * {@link BluespecParser}.
  */
-public interface BluespecParserListener extends ParseTreeListener {
+public interface BluespecListener extends ParseTreeListener {
 	/**
 	 * Enter a parse tree produced by {@link BluespecParser#top}.
 	 * @param ctx the parse tree

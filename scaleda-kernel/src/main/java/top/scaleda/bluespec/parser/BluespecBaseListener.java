@@ -1,4 +1,4 @@
-// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/bluespec/BluespecParser.g4 by ANTLR 4.13.1
+// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/bluespec/Bluespec.g4 by ANTLR 4.13.1
 package top.scaleda.bluespec.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -6,12 +6,12 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
- * This class provides an empty implementation of {@link BluespecParserListener},
+ * This class provides an empty implementation of {@link BluespecListener},
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
 @SuppressWarnings("CheckReturnValue")
-public class BluespecParserBaseListener implements BluespecParserListener {
+public class BluespecBaseListener implements BluespecListener {
 	/**
 	 * {@inheritDoc}
 	 *

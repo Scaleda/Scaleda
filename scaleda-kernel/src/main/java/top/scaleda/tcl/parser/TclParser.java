@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from /home/chiro/programs/scaleda/scaleda-kernel/src/main/antlr/tcl/Tcl.g4 by ANTLR 4.13.1
 package top.scaleda.tcl.parser;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class TclParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.11.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -101,7 +101,7 @@ public class TclParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "java-escape"; }
+	public String getGrammarFileName() { return "Tcl.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -155,7 +155,7 @@ public class TclParser extends Parser {
 			setState(91);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (((_la) & ~0x3f) == 0 && ((1L << _la) & 4947802325856L) != 0) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 4947802325856L) != 0)) {
 				{
 				{
 				setState(82);
@@ -1386,7 +1386,7 @@ public class TclParser extends Parser {
 			{
 			setState(199);
 			_la = _input.LA(1);
-			if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 481036337152L) != 0) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 481036337152L) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2409,7 +2409,7 @@ public class TclParser extends Parser {
 			{
 			setState(312);
 			_la = _input.LA(1);
-			if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 62914560L) != 0) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 62914560L) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2460,7 +2460,7 @@ public class TclParser extends Parser {
 			{
 			setState(314);
 			_la = _input.LA(1);
-			if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 1006632960L) != 0) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 1006632960L) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2562,7 +2562,7 @@ public class TclParser extends Parser {
 			{
 			setState(318);
 			_la = _input.LA(1);
-			if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 30064771072L) != 0) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 30064771072L) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -2720,7 +2720,7 @@ public class TclParser extends Parser {
 			{
 			setState(324);
 			_la = _input.LA(1);
-			if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 3848290697216L) != 0) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 3848290697216L) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {

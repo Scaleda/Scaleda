@@ -1,20 +1,228 @@
 // Copy from https://github.com/mshr-h/vscode-verilog-hdl-support/blob/main/syntaxes/bsv.g4
-// and modified to BluespecLexer.g4 BluespecParser.g4
+// and modified
 
-parser grammar BluespecParser;
+grammar Bluespec;
 
-options {
-    tokenVocab = BluespecLexer;
-}
+//@header {
+//package top.scaleda.bluespec.parser;
+//}
 
 top:
-    (exportDecl| importDecl| packageStmt| r_package)*;
+    (exportDecl| importDecl| packageStmt| r_package)* EOF;
+
+BlockComment
+    :   '/*' .*? '*/'
+        -> channel (HIDDEN)
+    ;
+
+LineComment
+    :   '//' ~[\r\n]*
+        -> channel (HIDDEN)
+    ;
+
+
+Whitespace
+//    :   [ \t]+
+    :   [ \t\n\r]+
+        -> channel (HIDDEN)
+    ;
+
+//Newline
+//    :   (   '\r' '\n'?
+//        |   '\n'
+//        )
+//        -> channel (HIDDEN)
+//    ;
+
+
+// meta: [] - optional {} - zero or more
+
+// string literals
+fragment
+CharacterConstant
+    :   '\'' CCharSequence '\'';
+
+fragment
+CCharSequence
+    :   CChar+
+    ;
+
+fragment
+CChar
+    :   ~['\\\r\n]
+    |   EscapeSequence
+    ;
+
+fragment
+NoneWhitespace:
+    ~[ \t];
+
+fragment
+EscapeSequence
+    :   SimpleEscapeSequence
+    |   OctalEscapeSequence
+    |   HexadecimalEscapeSequence
+    ;
+
+fragment
+SimpleEscapeSequence
+    :   '\\' ['"abfnrtv\\]
+    ;
+fragment
+OctalEscapeSequence
+    :   '\\' OctalDigit OctalDigit? OctalDigit?
+    ;
+fragment
+HexadecimalEscapeSequence
+    :   '\\x' HexadecimalDigit+
+    ;
+
+StringLiteral
+    :   '"' SCharSequence? '"'
+    ;
+
+fragment
+SChar
+    :   ~["\\\r\n]
+    |   EscapeSequence
+    |   '\\\n'   // Added line
+    |   '\\\r\n' // Added line
+    ;
+
+fragment
+HexadecimalDigit
+    :   [0-9a-fA-F]
+    ;
+
+
+fragment
+OctalDigit
+    :   [0-7]
+    ;
+
+fragment
+SCharSequence
+    :   SChar+
+    ;
+
+
+// id
+
+fragment
+Digit
+    :   [0-9]
+    ;
+
+Identifier
+    :   (IdentifierNondigit)
+        (   IdentifierNondigit
+        |   Digit
+        )*
+    | '\\' NoneWhitespace+; // for special symbal
+
+fragment
+FileName
+    :
+        (   IdentifierNondigit
+        |   Digit
+        )+
+    ;
+
+fragment
+IdentifierNondigit
+    :   Nondigit
+    ;
+
+
+fragment
+Nondigit
+    :   [a-zA-Z_$]
+    ;
+
+
+// Integer literals
+IntLiteral  :   '\'0' | '\'1'
+            |   SizedIntLiteral
+            |   UnsizedIntLiteral;
+
+fragment
+SizedIntLiteral :  BitWidth BaseLiteral;
+
+fragment
+UnsizedIntLiteral   :  /*Sign?*/ BaseLiteral  // ignore sign this stage
+                    |   /*Sign?*/ DecNum;
+
+fragment
+BaseLiteral :   ('\'d' | '\'D') DecDigitsUnderscore
+            |   ('\'h' | '\'H') HexDigitsUnderscore
+            |   ('\'o' | '\'O') OctDigitsUnderscore
+            |   ('\'b' | '\'B') BinDigitsUnderscore;
+
+fragment
+DecNum      :  DecDigits DecDigitsUnderscore?;
+fragment
+BitWidth    :  DecDigits;
+fragment
+Sign        :  '+' | '-';
+
+fragment
+DecDigits   :  Digit+;
+fragment
+DecDigitsUnderscore     :  [0-9_]+;
+fragment
+HexDigitsUnderscore     :  [0-9a-fA-F_]+;
+fragment
+OctDigitsUnderscore     :  [0-7_]+;
+fragment
+BinDigitsUnderscore     :  [01_]+;
+
+//  Real literals
+
+RealLiteral : DecNum('.'DecDigitsUnderscore)? Exp Sign? DecDigitsUnderscore
+            | DecNum'.'DecDigitsUnderscore;
+
+fragment
+Exp         : 'e' | 'E';
+
+//  Compiler directives
+
+CompilerDirective   : ('`include' Whitespace* StringLiteral
+                    | '`include' Whitespace* '<' Whitespace* FileName Whitespace* '>'
+                    | '`include' MacroInvocation
+                    | '`line' Whitespace* LineNumber Whitespace* '"' Whitespace* FileName Whitespace* '"' Whitespace* Level
+                    | '`undef' Whitespace* MacroName
+                    | '`resetall'
+                    | '`ifdef' Whitespace* MacroName
+                    | '`ifndef' Whitespace* MacroName
+                    | '`elsif' Whitespace* MacroName
+                    | '`else'
+                    | '`endif'
+                    ) -> channel (HIDDEN);
+
+fragment
+LineNumber  : DecDigits;
+fragment
+Level       : '0' | '1' | '2';
+fragment
+MacroName   : Identifier;
+fragment
+MacroFormals: Identifier;
+
+fragment
+MacroInvocation_ : '\''MacroName('('MacroActuals')')?;
+
+MacroInvocation : MacroInvocation_;
+fragment
+MacroActuals    : SubstText (',' SubstText)*;
+fragment
+SubstText       : .*?;
+
 
 identifier : Identifier
-           | 'no_reset' 
+           | 'no_reset'
            | identifier '::' identifier
            | identifier '.' identifier
-           | identifier ('[' expression? ']')//undoc
+//           | identifier ('[' expression? ']')//undoc
            | identifier '[]';//undoc
 identifier_type : Identifier
                 | 'Action'
@@ -459,7 +667,7 @@ functionDef         : attributeInstances?
                     | 'function' type? identifier '(' functionFormals? ')' provisos? '=' expression ';';//strange
 
 functionProto       : 'function' type? identifier ('(' functionFormals? ')')? provisos? ';'; // too strange
-                   
+
 functionFormals     : functionFormal (',' functionFormal)*;
 functionFormal      : type? identifier ('(' functionFormals? ')')?; // strange
 
@@ -716,10 +924,10 @@ systemTaskCall      : '$realtobits' '(' expression ')'
                     | stringAVTaskName '(' (expression  (',' expression)*)? ')'
                     | 'fgetc' '(' identifier ')';
 
-stringAVTaskName    : '$swriteAV' 
-                    | '$swritebAV' 
-                    | '$swriteoAV' 
-                    | '$swritehAV' 
+stringAVTaskName    : '$swriteAV'
+                    | '$swritebAV'
+                    | '$swriteoAV'
+                    | '$swritehAV'
                     | '$sformatAV';
 
 // attributes
@@ -746,7 +954,7 @@ typedepends         : 'dependencies' '(' typedepend (',' typedepend)* ')';
 typedepend          : typelist 'determines' typelist;
 
 overloadedDef       : functionProto
-                    | varDecl 
+                    | varDecl
                     | moduleProto// strange
                     | moduleDef//strange
                     | functionDef;// strange

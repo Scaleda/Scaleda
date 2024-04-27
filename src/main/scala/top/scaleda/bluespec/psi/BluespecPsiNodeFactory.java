@@ -54,7 +54,7 @@ public class BluespecPsiNodeFactory {
     /// Module keywords
     // map.put(getRuleIElementType(BluespecParser.RULE_module_keyword), ModuleKeywordPsiNode.class);
     /// Module declaration
-    map.put(getRuleIElementType(BluespecParser.RULE_moduleProto), ModuleDeclarationPsiNode.class);
+    // map.put(getRuleIElementType(BluespecParser.RULE_moduleProto), ModuleDeclarationPsiNode.class);
     // map.put(getRuleIElementType(BluespecParser.RULE_module_header), ModuleHeadPsiNode.class);
     /// Module identifier
     // map.put(getRuleIElementType(BluespecParser.RULE_module_identifier), ModuleIdentifierPsiNode.class);
