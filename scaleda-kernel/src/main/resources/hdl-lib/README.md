@@ -1,0 +1,1 @@
+- bsc-lib: copy from https://github.com/mshr-h/vscode-verilog-hdl-support/tree/main/syntaxes/bsc-lib
