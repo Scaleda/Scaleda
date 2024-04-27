@@ -1,15 +1,17 @@
 package top.scaleda
 package tcl
 
+import idea.utils.Icons
+import kernel.language.LangTcl
+
 import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
-import top.scaleda.idea.utils.Icons
 
 import javax.swing.Icon
 
 final class TclFileType extends LanguageFileType(TclLanguage) {
-  override def getName: String = "Tcl"
+  override def getName: String = LangTcl.getName
 
-  override def getDescription: String = "Tcl"
+  override def getDescription: String = LangTcl.getDescription
 
   override def getDefaultExtension: String = TclFileType.DefaultExtension
 
@@ -17,7 +19,7 @@ final class TclFileType extends LanguageFileType(TclLanguage) {
 }
 
 object TclFileType {
-  private final val DefaultExtension = "tcl"
+  private final val DefaultExtension = LangTcl.getDefaultExtension
   final val DefaultIcon = Icons.tcl
   val instance = new TclFileType
 

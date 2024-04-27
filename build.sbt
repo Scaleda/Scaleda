@@ -4,7 +4,6 @@ import scala.io.Source
 
 val publicScalaVersion = "2.13.12"
 // val ideaVersion = "2023.1.3"
-// val ideaVersion = "241.14024.14"
 val ideaVersion = "241.14494.240"
 
 ThisBuild / scalaVersion := publicScalaVersion

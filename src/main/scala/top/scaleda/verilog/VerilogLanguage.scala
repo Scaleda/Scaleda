@@ -1,13 +1,14 @@
 package top.scaleda
 package verilog
 
+import kernel.language.LangVerilog
+import verilog.parser.VerilogLexer
+
 import com.intellij.lang.Language
-import com.intellij.notification.NotificationGroupManager
 import com.intellij.psi.tree.TokenSet
 import org.antlr.intellij.adaptor.lexer.{PSIElementTypeFactory, RuleIElementType, TokenIElementType}
-import top.scaleda.verilog.parser.VerilogLexer
 
-object VerilogLanguage extends Language("Verilog") {
+object VerilogLanguage extends Language(LangVerilog.getName) {
   def getTokenType(id: Int): TokenIElementType = PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(id)
   def getRuleType(id: Int): RuleIElementType = PSIElementTypeFactory.getRuleIElementTypes(VerilogLanguage).get(id)
 

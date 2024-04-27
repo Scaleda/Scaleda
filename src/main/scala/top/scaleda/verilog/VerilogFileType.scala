@@ -1,14 +1,16 @@
 package top.scaleda
 package verilog
 
-import VerilogLogger.Log
+import idea.utils.Icons
+import kernel.language.LangVerilog
+import verilog.VerilogLogger.Log
+
 import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
-import top.scaleda.idea.utils.Icons
 
 import javax.swing.Icon
 
 final class VerilogFileType extends LanguageFileType(VerilogLanguage) {
-  override def getName: String = "Verilog"
+  override def getName: String = LangVerilog.getName
 
   override def getDescription: String = "Verilog"
 

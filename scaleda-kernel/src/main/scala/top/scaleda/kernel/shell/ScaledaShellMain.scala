@@ -1,26 +1,28 @@
 package top.scaleda
 package kernel.shell
 
-import kernel.bin.ExtractAssets
-import kernel.configuration.ScaledaKernelConfiguration
-import kernel.database.dao.User
-import kernel.net.RemoteClient
-import kernel.net.remote.Empty
-import kernel.net.user.ScaledaRegisterLogin
-import kernel.project.config.ProjectConfig
-import kernel.project.ScaledaProject
-import kernel.server.ScaledaServerMain
-import kernel.template.Template
-import kernel.toolchain.Toolchain
-import kernel.utils.serialise.JSONHelper
-import kernel.utils.{ScaledaShellLogger, EnvironmentUtils, KernelLogger, Paths, ScaledaClean}
+import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import scopt.OParser
+import top.scaleda.kernel.bin.ExtractAssets
+import top.scaleda.kernel.configuration.ScaledaKernelConfiguration
+import top.scaleda.kernel.database.dao.User
+import top.scaleda.kernel.language.SupportedLanguages
+import top.scaleda.kernel.net.RemoteClient
+import top.scaleda.kernel.net.remote.Empty
+import top.scaleda.kernel.net.user.ScaledaRegisterLogin
+import top.scaleda.kernel.project.ScaledaProject
+import top.scaleda.kernel.project.config.ProjectConfig
+import top.scaleda.kernel.server.ScaledaServerMain
+import top.scaleda.kernel.template.Template
+import top.scaleda.kernel.toolchain.Toolchain
+import top.scaleda.kernel.utils.serialise.JSONHelper
+import top.scaleda.kernel.utils._
 
 import java.io.File
 
 object ShellRunMode extends Enumeration {
   val None, Install, Run, ListProfiles, ListTasks, ListConfigurations, Serve, Clean, Login, Register, RefreshToken,
-      Create =
+      Create, ParseAST =
     Value
 }
 
@@ -35,7 +37,9 @@ case class ShellArgs(
     configureName: String = "",
     extraEnvs: Map[String, String] = Map(),
     createProjectName: String = "scaleda-rtl",
-    detectProjectWhenCreate: Boolean = true
+    detectProjectWhenCreate: Boolean = true,
+    parseFilepath: String = "",
+    parseFileType: String = ""
 )
 
 object ScaledaShellMain {
@@ -115,7 +119,7 @@ object ScaledaShellMain {
       import builder._
       OParser.sequence(
         programName("scaleda"),
-        head("scaleda", "0.1"),
+        head("scaleda"),
         help("help").text("Prints this usage text"),
         opt[File]('C', "workdir")
           .action((x, c) => c.copy(workingDir = x))
@@ -214,6 +218,24 @@ object ScaledaShellMain {
                 c.copy(extraEnvs = c.extraEnvs ++ x.split(';').map(m => m.split('=').head -> m.split('=')(1)).toMap)
               )
               .text("Specify environment, example ENV_A=a;ENV_B=b")
+          ),
+        cmd("tools")
+          .text("Useful tools")
+          .children(
+            cmd("ast")
+              .text("Parse & show AST of a file")
+              .action((_, c) => c.copy(runMode = ShellRunMode.ParseAST))
+              .children(
+                opt[String]('f', "file")
+                  .action((x, c) => c.copy(parseFilepath = x))
+                  .text("Specify file"),
+                opt[String]('t', "type")
+                  .action((x, c) => c.copy(parseFileType = x))
+                  .text(
+                    f"Specify file language type, available: ${SupportedLanguages.all.map(_.getName).mkString(", ")}"
+                  )
+                  .optional()
+              )
           )
       )
     }
@@ -371,6 +393,34 @@ object ScaledaShellMain {
             })
             val project = projects.head.copy(name = shellConfig.createProjectName)
             ProjectConfig.saveConfig(project, targetFile = new File(workingDir, "scaleda.yml"))
+          case ShellRunMode.ParseAST =>
+            if (shellConfig.parseFilepath.isEmpty) {
+              KernelLogger.error("No file specified")
+            } else {
+              val file = new File(shellConfig.parseFilepath)
+              if (!file.exists()) {
+                KernelLogger.error("File not exists")
+              } else {
+                val ext = if (shellConfig.parseFileType.isEmpty) {
+                  file.getName.split('.').last
+                } else {
+                  shellConfig.parseFileType
+                }
+                val lang = SupportedLanguages.all.find(_.getExtensions.contains(ext))
+                lang match {
+                  case Some(lang) =>
+                    KernelLogger.info(s"Parse file: $file, type: ${lang.getName}")
+                    val inputStream = new java.io.FileInputStream(file)
+                    val input       = CharStreams.fromStream(inputStream)
+                    val lexer       = lang.lexer(input)
+                    val tokens      = new CommonTokenStream(lexer)
+                    val parser      = lang.parser(tokens)
+                    val tree        = lang.ast(parser)
+                    println(tree.toStringTree(parser))
+                  case _ => KernelLogger.error("File type not supported")
+                }
+              }
+            }
           case _ =>
             KernelLogger.error("not implemented.")
         }

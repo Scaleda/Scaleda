@@ -2,15 +2,16 @@ package top.scaleda
 package bluespec
 
 import idea.utils.Icons
+import kernel.language.LangBluespec
 
 import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
 
 import javax.swing.Icon
 
 final class BluespecFileType extends LanguageFileType(BluespecLanguage) {
-  override def getName: String = "Bluespec"
+  override def getName: String = LangBluespec.getName
 
-  override def getDescription: String = "Bluespec"
+  override def getDescription: String = LangBluespec.getDescription
 
   override def getDefaultExtension: String = BluespecFileType.DefaultExtension
 
@@ -18,7 +19,7 @@ final class BluespecFileType extends LanguageFileType(BluespecLanguage) {
 }
 
 object BluespecFileType {
-  private final val DefaultExtension = "bsv"
+  private final val DefaultExtension = LangBluespec.getDefaultExtension
   final val DefaultIcon = Icons.bluespec
   val instance = new BluespecFileType
 
