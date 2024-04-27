@@ -219,7 +219,7 @@ identifier : Identifier
            | identifier '.' identifier
 //           | identifier ('[' expression? ']')//undoc
            | identifier '[]';//undoc
-identifier_type : Identifier
+identifier_type : identifier
                 | 'Action'
                 | 'ActionValue'
                 | 'Rules'
