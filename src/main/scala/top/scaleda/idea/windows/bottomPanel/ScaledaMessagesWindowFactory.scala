@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
 
-class ScaledaMessagesWindowFactory extends ToolWindowFactory {
+final class ScaledaMessagesWindowFactory extends ToolWindowFactory {
   override def shouldBeAvailable(project: Project): Boolean = {
     YmlRootManager.getInstance(project).getRoots.nonEmpty
   }

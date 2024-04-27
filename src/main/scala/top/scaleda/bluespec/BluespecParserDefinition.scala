@@ -35,6 +35,15 @@ final class BluespecParserDefinition extends ParserDefinition {
 
   override def createFile(viewProvider: FileViewProvider): PsiFile =
     new BluespecPSIFileRoot(viewProvider)
+
+  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements = {
+    // TODO: Keywords should have a space between them
+    (left.getElementType, right.getElementType) match {
+      case _ => ParserDefinition.SpaceRequirements.MAY
+    }
+  }
+
+
 }
 
 //noinspection DuplicatedCode

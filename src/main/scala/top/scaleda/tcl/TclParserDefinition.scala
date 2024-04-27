@@ -37,6 +37,9 @@ final class TclParserDefinition extends ParserDefinition {
 
   override def createFile(viewProvider: FileViewProvider): PsiFile =
     new TclPSIFileRoot(viewProvider)
+
+  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
+    ParserDefinition.SpaceRequirements.MAY
 }
 
 //noinspection DuplicatedCode
@@ -53,13 +56,13 @@ object TclParserDefinition {
     vocabulary,
     TclParser.ruleNames
   )
-  val FILE = new IFileElementType(TclLanguage)
+  val FILE   = new IFileElementType(TclLanguage)
   val tokens = PSIElementTypeFactory.getTokenIElementTypes(TclLanguage)
   TclLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
     TclLanguage,
     TclLexer.COMMENT,
-    TclLexer.COMMENT_INLINE,
+    TclLexer.COMMENT_INLINE
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
     TclLanguage,

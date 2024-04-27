@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>top.scaleda</id>
     <name>Scaleda</name>
-    <version>0.1.1</version>
+    <version>0.1.4</version>
     <vendor>Scaleda</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>

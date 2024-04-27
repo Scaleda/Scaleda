@@ -7,7 +7,7 @@ import verilog.parser.VerilogLexer
 import com.intellij.formatting._
 import com.intellij.psi.codeStyle.CodeStyleSettings
 
-class VerilogFormattingModelBuilder extends FormattingModelBuilder {
+final class VerilogFormattingModelBuilder extends FormattingModelBuilder {
   override def createModel(formattingContext: FormattingContext): FormattingModel = {
     val settings       = formattingContext.getCodeStyleSettings
     val spacingBuilder = createSpacingBuilder(settings)
@@ -27,7 +27,7 @@ class VerilogFormattingModelBuilder extends FormattingModelBuilder {
     )
   }
 
-  def createSpacingBuilder(settings: CodeStyleSettings): SpacingBuilder = {
+  private def createSpacingBuilder(settings: CodeStyleSettings): SpacingBuilder = {
     new SpacingBuilder(settings, VerilogLanguage)
   }
 }

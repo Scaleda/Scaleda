@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
-import top.scaleda.idea.i18n.DynamicScaledaBundle;
+// import top.scaleda.idea.i18n.DynamicScaledaBundle;
 
 // don't extend DynamicScaledaBundle
 // META-INF\plugin.xml: <message-bundle>top.scaleda.idea.ScaledaBundle</message-bundle>

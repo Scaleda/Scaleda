@@ -38,6 +38,13 @@ final class VerilogParserDefinition extends ParserDefinition {
   override def createElement(node: ASTNode) = VerilogPsiNodeFactory.create(node)
 
   override def createFile(viewProvider: FileViewProvider): PsiFile = new VerilogPSIFileRoot(viewProvider)
+
+  override def spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements = {
+    // TODO: Keywords should have a space between them
+    (left.getElementType, right.getElementType) match {
+      case _ => ParserDefinition.SpaceRequirements.MAY
+    }
+  }
 }
 
 //noinspection DuplicatedCode
