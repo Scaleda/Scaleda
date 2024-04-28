@@ -1,8 +1,9 @@
 package top.scaleda
 package bluespec.structview
 
-import idea.utils.Icons
 import bluespec.psi.nodes.StructureViewNode
+import bluespec.psi.nodes.module.ModuleDefinitionPsiNode
+import idea.utils.Icons
 
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
@@ -24,13 +25,13 @@ class BluespecItemPresentation(val element: PsiElement) extends ItemPresentation
     // case _: clazz.ClassMethodPsiNode              => AllIcons.Nodes.Method
     // case _: parameter.ParameterDeclarationPsiNode     => AllIcons.Nodes.Parameter
     // case _: parameter.ParameterPortDeclarationPsiNode => AllIcons.Nodes.NewParameter
-    // case _: module.ModuleDeclarationPsiNode        => Icons.bluespec
+    case _: ModuleDefinitionPsiNode => Icons.bluespec
     // case _: signal.VariableIdentifierPsiNode       => Icons.verilogReg
     // case _: signal.NetIdentifierPsiNode            => Icons.verilogWire
     // case _: initial.InitialPsiNode                  => AllIcons.Nodes.ClassInitializer
     // case _: always.AlwaysConstructPsiNode          => Icons.verilogAlways
     // case _: task.TaskDeclarationPsiNode          => AllIcons.Actions.Execute
     // case _: function.FunctionDeclarationPsiNode      => AllIcons.Nodes.Function
-    case _                                  => AllIcons.General.TodoQuestion // should never reach!
+    case _ => AllIcons.General.TodoQuestion // should never reach!
   }
 }

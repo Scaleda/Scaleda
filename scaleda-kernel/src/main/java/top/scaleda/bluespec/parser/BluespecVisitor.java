@@ -167,6 +167,12 @@ public interface BluespecVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitModuleDef(BluespecParser.ModuleDefContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link BluespecParser#moduleIdentifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitModuleIdentifier(BluespecParser.ModuleIdentifierContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link BluespecParser#moduleProto}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

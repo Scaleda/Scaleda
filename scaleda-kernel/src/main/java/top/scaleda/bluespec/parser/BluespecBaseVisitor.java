@@ -200,6 +200,13 @@ public class BluespecBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitModuleIdentifier(BluespecParser.ModuleIdentifierContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitModuleProto(BluespecParser.ModuleProtoContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

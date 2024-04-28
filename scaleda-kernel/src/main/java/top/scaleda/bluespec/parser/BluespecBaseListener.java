@@ -329,6 +329,18 @@ public class BluespecBaseListener implements BluespecListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterModuleIdentifier(BluespecParser.ModuleIdentifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitModuleIdentifier(BluespecParser.ModuleIdentifierContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterModuleProto(BluespecParser.ModuleProtoContext ctx) { }
 	/**
 	 * {@inheritDoc}

@@ -15,7 +15,7 @@ class BluespecStructViewModel(root: bluespec.BluespecPSIFileRoot)
   /** For those PSI nodes they can show plus (+) symbol for they contain further elements.
     *
     *  - [[bluespec.BluespecPSIFileRoot]] -- File root
-    *  - [[module.ModuleDeclarationPsiNode]] -- Module declaration
+    *  - [[module.ModuleDefinitionPsiNode]] -- Module declaration
     *
     * @param element Tree element
     * @return
@@ -23,7 +23,7 @@ class BluespecStructViewModel(root: bluespec.BluespecPSIFileRoot)
   override def isAlwaysShowsPlus(element: StructureViewTreeElement): Boolean =
     element.getValue match {
       case _: bluespec.BluespecPSIFileRoot => true
-      case _: module.ModuleDeclarationPsiNode => true
+      case _: module.ModuleDefinitionPsiNode => true
       // case _: clazz.ClassDeclarationPsiNode  => true
       case _                           => false
     }

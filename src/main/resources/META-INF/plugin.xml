@@ -173,6 +173,9 @@
                                       implementationClass="top.scaleda.systemverilog.structview.SystemVerilogStructViewFactory"/>
         <!-- same as Verilog -->
         <formattingService implementation="top.scaleda.systemverilog.editor.formatter.SystemVerilogExternalFormatter"/>
+        <!-- same as Verilog -->
+        <lang.commenter language="SystemVerilog"
+                        implementationClass="top.scaleda.systemverilog.commenter.SystemVerilogCommenter"/>
     </extensions>
 
     <!-- Bluespec Support -->
@@ -189,6 +192,9 @@
                                        implementationClass="top.scaleda.bluespec.highlight.BluespecSyntaxHighlighterFactory"/>
         <lang.psiStructureViewFactory language="Bluespec"
                                       implementationClass="top.scaleda.bluespec.structview.BluespecStructViewFactory"/>
+        <!-- same as Verilog -->
+        <lang.commenter language="Bluespec"
+                        implementationClass="top.scaleda.bluespec.commenter.BluespecCommenter"/>
     </extensions>
 
     <!-- Settings -->

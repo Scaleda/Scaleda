@@ -35,9 +35,11 @@ class BluespecLexerSyntaxHighlighter extends SyntaxHighlighterBase {
       // case BluespecLexer.Dollar_identifier => Array(BLUESPEC_DOLLAR_IDENTIFIER)
       case n if BluespecKeywords.BLUESPEC_KEYWORDS.map(name => getTypeForLiteralName(name)).contains(n) =>
         Array(BLUESPEC_KEYWORD)
-      case BluespecLexer.StringLiteral => Array(BLUESPEC_STRING)
-      case BluespecLexer.Identifier    => Array(BLUESPEC_IDENTIFIER)
-      case _                           => Array()
+      case BluespecLexer.StringLiteral                          => Array(BLUESPEC_STRING)
+      case BluespecLexer.Identifier                             => Array(BLUESPEC_IDENTIFIER)
+      case BluespecLexer.CompilerDirective                      => Array(BLUESPEC_DIRECTIVE)
+      case BluespecLexer.IntLiteral | BluespecLexer.RealLiteral => Array(BLUESPEC_NUMBER)
+      case _                                                    => Array()
     }
   }
 }
@@ -58,18 +60,14 @@ object BluespecLexerSyntaxHighlighter {
   val BLUESPEC_COMMA     = createTextAttributesKey("BLUESPEC_COMMA", DLHC.COMMA)
 
   // Signals
-  val BLUESPEC_SIGNAL_NET       = createTextAttributesKey("BLUESPEC_SIGNAL_NET", DLHC.STATIC_FIELD)
-  val BLUESPEC_SIGNAL_REG       = createTextAttributesKey("BLUESPEC_SIGNAL_REG", DLHC.INSTANCE_FIELD)
-  val BLUESPEC_SIGNAL_PARAMETER = createTextAttributesKey("BLUESPEC_SIGNAL_PARAMETER", DLHC.PARAMETER)
+  val BLUESPEC_SIGNAL_NET = createTextAttributesKey("BLUESPEC_SIGNAL_NET", DLHC.STATIC_FIELD)
+  val BLUESPEC_SIGNAL_REG = createTextAttributesKey("BLUESPEC_SIGNAL_REG", DLHC.INSTANCE_FIELD)
+  val BLUESPEC_PARAMETER  = createTextAttributesKey("BLUESPEC_SIGNAL_PARAMETER", DLHC.PARAMETER)
 
   // Module
   val BLUESPEC_MODULE_IDENTIFIER = createTextAttributesKey("BLUESPEC_MODULE_IDENTIFIER", DLHC.CLASS_NAME)
   val BLUESPEC_MODULE_INSTANTIATION =
     createTextAttributesKey("BLUESPEC_MODULE_INSTANTIATION", DLHC.FUNCTION_DECLARATION)
-  val BLUESPEC_PORT_INPUT      = createTextAttributesKey("BLUESPEC_PORT_INPUT", BLUESPEC_SIGNAL_NET)
-  val BLUESPEC_PORT_INOUT      = createTextAttributesKey("BLUESPEC_PORT_INOUT", BLUESPEC_SIGNAL_NET)
-  val BLUESPEC_PORT_OUTPUT     = createTextAttributesKey("BLUESPEC_PORT_OUTPUT", BLUESPEC_SIGNAL_NET)
-  val BLUESPEC_PORT_OUTPUT_REG = createTextAttributesKey("BLUESPEC_PORT_OUTPUT_REG", BLUESPEC_SIGNAL_REG)
 
   // Comments
   val BLUESPEC_BLOCK_COMMENT =

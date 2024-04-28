@@ -268,6 +268,16 @@ public interface BluespecListener extends ParseTreeListener {
 	 */
 	void exitModuleDef(BluespecParser.ModuleDefContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link BluespecParser#moduleIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterModuleIdentifier(BluespecParser.ModuleIdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BluespecParser#moduleIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitModuleIdentifier(BluespecParser.ModuleIdentifierContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link BluespecParser#moduleProto}.
 	 * @param ctx the parse tree
 	 */

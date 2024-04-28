@@ -49,10 +49,10 @@ public class BluespecPsiNodeFactory {
     map.put(getRuleIElementType(BluespecParser.RULE_top), SourceTextPsiNode.class);
 
     // Module
-    /// Module keywords
-    // map.put(getRuleIElementType(BluespecParser.RULE_module_keyword), ModuleKeywordPsiNode.class);
+    /// Module identifier
+    map.put(getRuleIElementType(BluespecParser.RULE_moduleIdentifier), ModuleIdentifierPsiNode.class);
     /// Module declaration
-    map.put(getRuleIElementType(BluespecParser.RULE_moduleProto), ModuleDeclarationPsiNode.class);
+    map.put(getRuleIElementType(BluespecParser.RULE_moduleDef), ModuleDefinitionPsiNode.class);
     // map.put(getRuleIElementType(BluespecParser.RULE_module_header), ModuleHeadPsiNode.class);
     /// Module identifier
     // map.put(getRuleIElementType(BluespecParser.RULE_module_identifier), ModuleIdentifierPsiNode.class);
@@ -82,8 +82,8 @@ public class BluespecPsiNodeFactory {
     // map.put(getRuleIElementType(BluespecParser.RULE_param_assignment), ParamAssignmentPsiNode.class);
     // map.put(getRuleIElementType(BluespecParser.RULE_list_of_param_assignments), ListOfParamAssignmentsPsiNode.class);
 
-    /// Inside module, module or generate item
-    // map.put(getRuleIElementType(BluespecParser.RULE_module_item), ModuleItemPsiNode.class);
+    /// Inside module
+    map.put(getRuleIElementType(BluespecParser.RULE_moduleStmt), ModuleStmtPsiNode.class);
 
     // Class
     // map.put(getRuleIElementType(BluespecParser.RULE_class_identifier), ClassIdentifierPsiNode.class);
