@@ -29,7 +29,8 @@ case class ProjectConfig(
     ipFiles: Seq[String] = Seq(),
     ipPaths: Seq[String] = Seq(),
     exports: Option[ExportConfig] = None,
-    ips: Seq[IPInstance] = Seq()
+    ips: Seq[IPInstance] = Seq(),
+    cwd: Option[String] = None
 ) extends ConfigNode() {
   def targetsWithSim =
     targets.filter(t => t.tasks.exists(t => t.`type` == "simulation"))

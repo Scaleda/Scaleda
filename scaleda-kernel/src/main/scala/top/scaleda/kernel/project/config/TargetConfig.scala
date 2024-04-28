@@ -20,7 +20,8 @@ case class TargetConfig(
     topModule: Option[String] = None,
     constraints: Option[String] = None,
     options: Option[Map[String, String]] = None,
-    tasks: Array[TaskConfig] = Array()
+    tasks: Array[TaskConfig] = Array(),
+    cwd: Option[String] = None
     // override val source: String = "",
     // override val sources: Seq[String] = Seq(),
     // override val test: String = "",

@@ -32,6 +32,8 @@ abstract class ConfigNode() {
   val ipPaths: Seq[String]
   @JsonIgnore
   val ips: Seq[IPInstance]
+  @JsonIgnore
+  val cwd: Option[String]
 
   /** Get top module name
     * @return top module name, may not exist
@@ -164,4 +166,16 @@ abstract class ConfigNode() {
   // @JsonIgnore
   // def getAllIpInstances(projectBase: Option[String] = None): Map[String, Map[String, Any]] = {
   // }
+
+  @JsonIgnore
+  def getWorkingDirectory(implicit project: ScaledaProject): File = {
+    val base = project.projectBase match {
+      case Some(p) => new File(p)
+      case None    => new File(".")
+    }
+    cwd match {
+      case Some(p) => new File(parseAsAbsolutePath(p))
+      case None    => base
+    }
+  }
 }

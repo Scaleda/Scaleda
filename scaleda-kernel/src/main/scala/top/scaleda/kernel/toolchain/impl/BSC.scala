@@ -3,7 +3,7 @@ package top.scaleda.kernel.toolchain.impl
 import top.scaleda.kernel.project.ScaledaProject
 import top.scaleda.kernel.project.config.{TaskConfig, TaskType}
 import top.scaleda.kernel.shell.command.CommandDeps
-import top.scaleda.kernel.toolchain.executor.{Executor, SynthesisExecutor}
+import top.scaleda.kernel.toolchain.executor.{Executor, SimulationExecutor, SynthesisExecutor}
 import top.scaleda.kernel.toolchain.impl.PDS.{internalID, userFriendlyName}
 import top.scaleda.kernel.toolchain.{Toolchain, ToolchainProfile}
 import top.scaleda.kernel.utils.{KernelFileUtils, OS}
@@ -14,38 +14,77 @@ class BSC(executor: Executor) extends Toolchain(executor) {
   override def getInternalID: String = internalID
   override def getName: String       = userFriendlyName
 
-  override def synthesise(task: TaskConfig)(implicit manifest: ScaledaProject): Seq[CommandDeps] = {
+  def commonOptions(workingDir: File): Seq[String] = {
+    Seq(new File(executor.profile.path, "bsc").getAbsolutePath) ++
+      "+RTS -Ksize -RTS -steps-max-intervals 10000000".split(' ') ++
+      Seq("-verbose") ++
+      Seq(
+        "-bdir",
+        workingDir.getAbsolutePath,
+        "-fdir",
+        workingDir.getAbsolutePath,
+        "-info-dir",
+        workingDir.getAbsolutePath,
+        "-simdir",
+        workingDir.getAbsolutePath,
+        "-vdir",
+        workingDir.getAbsolutePath
+      )
+  }
+
+  override def simulate(task: TaskConfig)(implicit project: ScaledaProject): Seq[CommandDeps] = {
+    val simExecutor         = executor.asInstanceOf[SimulationExecutor]
+    val workingDir          = simExecutor.workingDir
+    val specifiedWorkingDir = task.getWorkingDirectory
+    val taskSourceSet       = task.getSourceSet
+    val source              = taskSourceSet.map(new File(_)).find(_.isFile)
+    val pathOptions = taskSourceSet.toSeq
+      .filter(_.nonEmpty)
+      .map(f => new File(f))
+      .filter(_.isDirectory)
+      .flatMap(p => Seq("-p", "+:" + p))
+    Seq(
+      CommandDeps(
+        args = commonOptions(workingDir) ++
+          project.projectBase.map(p => Seq("-p", "+:" + p)).getOrElse(Seq()) ++
+          Seq("-sim") ++
+          task.topModule.map(module => Seq("-g", module)).getOrElse(Seq()) ++
+          pathOptions ++
+          source.map(file => Seq("-u", file.getAbsolutePath)).getOrElse(Seq()),
+        path = workingDir.getAbsolutePath
+      ),
+      CommandDeps(
+        args = commonOptions(workingDir) ++
+          project.projectBase.map(p => Seq("-p", "+:" + p)).getOrElse(Seq()) ++
+          Seq("-sim") ++
+          task.topModule.map(module => Seq("-e", module)).getOrElse(Seq()) ++
+          pathOptions ++
+          Seq("-o", new File(workingDir, "sim.out").getAbsolutePath),
+        path = workingDir.getAbsolutePath
+      ),
+      CommandDeps(
+        args = Seq(new File(workingDir, "sim.out").getAbsolutePath),
+        path = specifiedWorkingDir.getAbsolutePath
+      )
+    )
+  }
+
+  override def synthesise(task: TaskConfig)(implicit project: ScaledaProject): Seq[CommandDeps] = {
     val synExecutor   = executor.asInstanceOf[SynthesisExecutor]
     val workingDir    = synExecutor.workingDir
     val taskSourceSet = task.getSourceSet
-    val sources       = KernelFileUtils.getAllSourceFiles(taskSourceSet, suffix = Set("bsv"))
     val source        = taskSourceSet.map(new File(_)).find(_.isFile)
-    // println(f"taskSourceSet: $taskSourceSet")
     Seq(
       CommandDeps(
-        args = Seq(new File(executor.profile.path, "bsc").getAbsolutePath) ++
-          "+RTS -Ksize -RTS -steps-max-intervals 10000000 -verilog".split(' ') ++
-          Seq("-verbose") ++
-          manifest.projectBase.map(p => Seq("-p", "+:" + p)).getOrElse(Seq()) ++
-          Seq(
-            "-bdir",
-            workingDir.getAbsolutePath,
-            "-fdir",
-            workingDir.getAbsolutePath,
-            "-info-dir",
-            workingDir.getAbsolutePath,
-            "-simdir",
-            workingDir.getAbsolutePath,
-            "-vdir",
-            workingDir.getAbsolutePath
-          ) ++
+        args = commonOptions(workingDir) ++
+          Seq("-verilog") ++
+          project.projectBase.map(p => Seq("-p", "+:" + p)).getOrElse(Seq()) ++
           task.topModule.map(module => Seq("-g", module)).getOrElse(Seq()) ++
           taskSourceSet.toSeq
             .filter(_.nonEmpty)
             .map(f => new File(f))
             .filter(_.isDirectory)
             .flatMap(p => Seq("-p", "+:" + p)) ++
-          // sources.flatMap(file => Seq("-u", file.getAbsolutePath)),
           source.map(file => Seq("-u", file.getAbsolutePath)).getOrElse(Seq()),
         path = workingDir.getAbsolutePath
       )
