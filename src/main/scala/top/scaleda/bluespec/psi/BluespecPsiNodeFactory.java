@@ -85,6 +85,8 @@ public class BluespecPsiNodeFactory {
     /// Inside module
     map.put(getRuleIElementType(BluespecParser.RULE_moduleStmt), ModuleStmtPsiNode.class);
 
+    map.put(getRuleIElementType(BluespecParser.RULE_typeIde), TypeIdePsiNode.class);
+
     // Class
     // map.put(getRuleIElementType(BluespecParser.RULE_class_identifier), ClassIdentifierPsiNode.class);
     // map.put(getRuleIElementType(BluespecParser.RULE_class_declaration), ClassDeclarationPsiNode.class);

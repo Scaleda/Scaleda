@@ -33,6 +33,7 @@ class BluespecStructViewElement(val element: PsiElement) extends StructureViewTr
           )
           .asScala
         modules
+      case _ => Seq()
     }
     children.foreach(t => treeElements.append(new BluespecStructViewElement(t)))
     treeElements.toArray

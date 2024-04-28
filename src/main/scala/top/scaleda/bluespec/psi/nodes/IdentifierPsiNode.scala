@@ -5,7 +5,7 @@ import bluespec.psi
 import bluespec.parser.BluespecLexer
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.{PsiElement, PsiNameIdentifierOwner}
 import com.intellij.util.IncorrectOperationException
 import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 
@@ -15,9 +15,9 @@ class IdentifierPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with PsiNameId
     getNameIdentifier.getText
   }
 
-  override def getNameIdentifier = getFirstChild.getFirstChild
+  override def getNameIdentifier: PsiElement = getFirstChild.getFirstChild
 
   @throws[IncorrectOperationException]
-  override def setName(s: String) =
+  override def setName(s: String): PsiElement =
     getFirstChild.replace(psi.BluespecPsiLeafNodeFactory.create(BluespecLexer.Identifier, s))
 }
