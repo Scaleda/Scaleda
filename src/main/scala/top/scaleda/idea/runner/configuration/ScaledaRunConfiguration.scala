@@ -3,7 +3,7 @@ package idea.runner.configuration
 
 import idea.ScaledaBundle
 import idea.project.io.YmlRootManager
-import idea.utils.ScaledaIdeaLogger
+import idea.utils.{Notification, ScaledaIdeaLogger}
 import idea.utils.notification.CreateTypicalNotification
 import idea.windows.bottomPanel.ConsoleService
 import kernel.shell.ScaledaRun
@@ -15,7 +15,9 @@ import com.intellij.execution.configurations.{LocatableConfigurationBase, RunPro
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
@@ -134,11 +136,11 @@ class ScaledaRunConfiguration(
       console.print(
         text,
         level match {
-          case LogLevel.Info => ConsoleViewContentType.NORMAL_OUTPUT
-          case LogLevel.Warn => ConsoleViewContentType.LOG_WARNING_OUTPUT
+          case LogLevel.Info  => ConsoleViewContentType.NORMAL_OUTPUT
+          case LogLevel.Warn  => ConsoleViewContentType.LOG_WARNING_OUTPUT
           case LogLevel.Error => ConsoleViewContentType.ERROR_OUTPUT
           case LogLevel.Fatal => ConsoleViewContentType.ERROR_OUTPUT
-          case _ => ConsoleViewContentType.SYSTEM_OUTPUT
+          case _              => ConsoleViewContentType.SYSTEM_OUTPUT
         }
       )
     })
@@ -146,11 +148,23 @@ class ScaledaRunConfiguration(
     val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
       ScaledaIdeaLogger.warn("cannot generate runtime", targetName, taskName, profileName, profileHost)
-      CreateTypicalNotification.makeAuthorizationNotification(
-        project,
-        ScaledaBundle.message("tasks.configuration.profile.state.auth", profileHost),
-        NotificationType.WARNING
-      )
+      if (profileHost.isEmpty) {
+        val notification = Notification.NOTIFICATION_GROUP.createNotification(
+          ScaledaBundle.message("notification.runner.error.execute.title"),
+          ScaledaBundle.message(
+            "notification.runner.error.execute.content.prefix",
+            ScaledaBundle.message("notification.runner.error.execute.content.default")
+          ),
+          Notification.levelMatch(LogLevel.Error)
+        )
+        notification.setSubtitle(ScaledaBundle.message("notification.runner.error.execute.subtitle"))
+      } else {
+        CreateTypicalNotification.makeAuthorizationNotification(
+          project,
+          ScaledaBundle.message("tasks.configuration.profile.state.auth", profileHost),
+          NotificationType.WARNING
+        )
+      }
       return null
     }
 
@@ -175,29 +189,32 @@ class ScaledaRunConfiguration(
 //      val causeCodeMessage = MessageListPanel.instance.flatMap(_.getCauseCode(rt.id))
 //
 //      // create notification
-//      val notification = Notification.NOTIFICATION_GROUP.createNotification(
-//        ScaledaBundle.message("notification.runner.error.execute.title"),
-//        ScaledaBundle.message(
-//          "notification.runner.error.execute.content.prefix",
-//          causeMessage
-//            .map(m => m.text)
-//            .getOrElse(ScaledaBundle.message("notification.runner.error.execute.content.default"))
-//        ),
-//        Notification.levelMatch(LogLevel.Error)
-//      )
-//      notification.setSubtitle(ScaledaBundle.message("notification.runner.error.execute.subtitle"))
-//      notification.setContextHelpAction(
-//        new AnAction(
-//          ScaledaBundle.message("notification.runner.error.execute.action.help.title"),
-//          ScaledaBundle.message("notification.runner.error.execute.action.help.description"),
-//          AllIcons.Actions.Help
-//        ) {
-//          override def actionPerformed(e: AnActionEvent) = {
-//            // TODO: Help dialog
-//            ScaledaIdeaLogger.warn("help", e)
-//          }
-//        }
-//      )
+    val notification = Notification.NOTIFICATION_GROUP.createNotification(
+      ScaledaBundle.message("notification.runner.error.execute.title"),
+      ScaledaBundle.message(
+        "notification.runner.error.execute.content.prefix",
+        // causeMessage
+        //   .map(m => m.text)
+        //   .getOrElse(ScaledaBundle.message("notification.runner.error.execute.content.default"))
+        ScaledaBundle.message("notification.runner.error.execute.content.default")
+      ),
+      Notification.levelMatch(LogLevel.Error)
+    )
+    notification.setSubtitle(ScaledaBundle.message("notification.runner.error.execute.subtitle"))
+    notification.setContextHelpAction(
+      new AnAction(
+        ScaledaBundle.message("notification.runner.error.execute.action.help.title"),
+        ScaledaBundle.message("notification.runner.error.execute.action.help.description"),
+        AllIcons.Actions.Help
+      ) {
+        override def actionPerformed(e: AnActionEvent) = {
+          // TODO: Help dialog
+          ScaledaIdeaLogger.warn("help", e)
+        }
+
+        override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.EDT
+      }
+    )
 //      causeMessage.foreach(m => {
 //        notification.addAction(
 //          new AnAction(ScaledaBundle.message("notification.runner.error.execute.action.message")) {

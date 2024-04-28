@@ -55,6 +55,8 @@ object Toolchain {
       new Yosys(executor), Yosys.supportedTask),
     MLFSP.internalID -> (MLFSP.userFriendlyName, (executor: Executor) =>
       new MLFSP(executor), MLFSP.supportedTask),
+    BSC.internalID -> (BSC.userFriendlyName, (executor: Executor) =>
+      new BSC(executor), BSC.supportedTask)
   )
 
   def toolchainIds = toolchains.keys.toArray

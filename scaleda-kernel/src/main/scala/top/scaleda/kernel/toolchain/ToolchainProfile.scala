@@ -3,7 +3,7 @@ package kernel.toolchain
 
 import kernel.net.remote.RemoteProfile
 import kernel.shell.command.CommandDeps
-import kernel.toolchain.impl.{IVerilog, MLFSP, Vivado, Yosys}
+import kernel.toolchain.impl.{BSC, IVerilog, MLFSP, Vivado, Yosys}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonInclude}
 
@@ -56,6 +56,7 @@ class ToolchainProfile(
       case IVerilog.internalID => Some(new IVerilog.Verifier(this))
       case Yosys.internalID    => Some(new Yosys.Verifier(this))
       case MLFSP.internalID    => Some(new MLFSP.Verifier(this))
+      case BSC.internalID      => Some(new BSC.Verifier(this))
       case _                   => None
     }
   }

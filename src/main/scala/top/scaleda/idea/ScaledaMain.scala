@@ -106,8 +106,8 @@ class ScaledaMain extends ProjectActivity {
     // val _ = ScaledaMessageTab(project)
 
     // invoke all toolchains
-    Seq(IVerilog, Vivado).foreach(KernelLogger.info("Load Toolchain object", _))
-    Seq(VivadoIdea, IVerilogIdea).foreach(KernelLogger.info("Load Toolchain Idea object", _))
+    // Seq(IVerilog, Vivado).foreach(KernelLogger.info("Load Toolchain object", _))
+    // Seq(VivadoIdea, IVerilogIdea).foreach(KernelLogger.info("Load Toolchain Idea object", _))
 
     runInEdt {
       // Attempt to load project
