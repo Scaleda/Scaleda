@@ -80,6 +80,7 @@ enum EventType {
     EVENT_TYPE_WHEEL = 3;
     EVENT_TYPE_CLICK = 4;
     EVENT_TYPE_ZOOM = 5;
+    EVENT_TYPE_VISIBLE = 6;
 }
 
 message RvcdInputEvent {

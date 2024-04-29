@@ -1,13 +1,24 @@
 package top.scaleda
 package idea.windows.bottomPanel.netviewer
 
-import idea.rvcd.{FrameBuffer, Rvcd, RvcdFrameBufferChannel}
-import idea.utils.ScaledaIdeaLogger
+import idea.rvcd.{FrameBuffer, Rvcd, RvcdFrameBufferChannel, RvcdService}
+import idea.utils.{OutputLogger, ScaledaIdeaLogger}
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.{
+  ActionManager,
+  ActionToolbar,
+  ActionUpdateThread,
+  AnAction,
+  AnActionEvent,
+  DefaultActionGroup
+}
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import io.grpc.ManagedChannel
 import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
+import top.scaleda.kernel.shell.ScaledaRunKernelHandler
+import top.scaleda.kernel.shell.command.{CommandDeps, CommandRunner}
 
 import java.awt.event.MouseEvent
 import java.awt.image.{BufferedImage, DataBufferUShort}
@@ -158,19 +169,24 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
       }
     }
   }
+
+  private def reConnect(): Unit = {
+    if (fbClient.isEmpty) {
+      val (c, s) = initFrameBufferHandler
+      fbClient = c
+      fbShutdown = s
+      resized = false
+    }
+    if (rpcClient.isEmpty) {
+      val (c, s) = initRpcHandler
+      rpcClient = c
+      rpcShutdown = s
+    }
+  }
+
   addFocusListener(new java.awt.event.FocusAdapter() {
     override def focusGained(e: java.awt.event.FocusEvent): Unit = {
-      if (fbClient.isEmpty) {
-        val (c, s) = initFrameBufferHandler
-        fbClient = c
-        fbShutdown = s
-        resized = false
-      }
-      if (rpcClient.isEmpty) {
-        val (c, s) = initRpcHandler
-        rpcClient = c
-        rpcShutdown = s
-      }
+      reConnect()
     }
   })
   canvas.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsAdapter() {
@@ -239,11 +255,83 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   })
   setContent(canvas)
 
+  private val launchRvcdRunnable: Runnable = () => {
+    CommandRunner.execute(
+      Seq(
+        CommandDeps(args = Seq(RvcdService.rvcdFile.getAbsolutePath, "--hidden"), description = "Start RVCD Instance")
+      ),
+      ScaledaRunKernelHandler
+    )
+  }
+  private var launchRvcdThread: Option[Thread] = None
+
+  private var windowVisible = true
+
+  val group = new DefaultActionGroup()
+  group.add(new AnAction(AllIcons.Actions.Execute) {
+    override def actionPerformed(e: AnActionEvent): Unit = {
+      launchRvcdThread = Some({
+        val t = new Thread(launchRvcdRunnable)
+        t.start()
+        t
+      })
+      windowVisible = false
+      Thread.sleep(500)
+      reConnect()
+    }
+    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
+
+    override def update(e: AnActionEvent): Unit = {
+      e.getPresentation.setEnabled(fbClient.isEmpty && !launchRvcdThread.exists(_.isAlive))
+      // e.getPresentation.setEnabled(fbClient.isEmpty && rpcClient.isEmpty)
+      // e.getPresentation.setEnabled(true)
+    }
+  })
+  group.add(new AnAction(AllIcons.Ide.Link) {
+    override def actionPerformed(e: AnActionEvent): Unit = {
+      reConnect()
+    }
+    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
+    override def update(e: AnActionEvent): Unit = {
+      e.getPresentation.setEnabled(fbClient.isEmpty || rpcClient.isEmpty)
+    }
+  })
+  group.add(new AnAction(AllIcons.Actions.ToggleVisibility) {
+    override def actionPerformed(e: AnActionEvent): Unit = {
+      windowVisible = !windowVisible
+      fbClient.foreach(
+        _.inputEvent(RvcdInputEvent().withType(EventType.EVENT_TYPE_VISIBLE).withData(if (windowVisible) 1 else 0))
+      )
+    }
+    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
+    override def update(e: AnActionEvent): Unit = {
+      e.getPresentation.setEnabled(fbClient.isDefined)
+      e.getPresentation.setPerformGroup(windowVisible)
+    }
+  })
+  val toolbar: ActionToolbar = {
+    ActionManager
+      .getInstance()
+      .createActionToolbar(
+        "NetView Toolbar", // ?
+        group,
+        false
+      )
+  }
+
+  setToolbar(toolbar.getComponent)
+  toolbar.setTargetComponent(this)
+
   override def dispose(): Unit = {
     fbShutdown.foreach(_())
     rpcShutdown.foreach(_())
     timer.stop()
+
     if (sendEventsThread.isAlive)
       sendEventsThread.interrupt()
+
+    if (launchRvcdThread.exists(_.isAlive))
+      launchRvcdThread.foreach(_.interrupt())
+    launchRvcdThread = None
   }
 }
