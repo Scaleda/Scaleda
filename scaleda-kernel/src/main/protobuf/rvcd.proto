@@ -21,6 +21,8 @@ service RvcdRpc {
     rpc RemoveClient (RvcdRemoveClient) returns (RvcdEmpty) {}
     // request frame
     rpc RequestFrame (RvcdEmpty) returns (RvcdFrame) {}
+    // input event
+    rpc InputEvent (RvcdInputEvent) returns (RvcdEmpty) {}
 }
 
 message RvcdEmpty {}
@@ -69,4 +71,20 @@ message RvcdFrame {
     uint32 width = 1;
     uint32 height = 2;
     bytes data = 3;
+}
+
+enum EventType {
+    EVENT_TYPE_NONE = 0;
+    EVENT_TYPE_RESIZE = 1;
+    EVENT_TYPE_POINTER_MOVEMENT = 2;
+    EVENT_TYPE_WHEEL = 3;
+    EVENT_TYPE_CLICK = 4;
+}
+
+message RvcdInputEvent {
+    EventType type = 1;
+    uint32 x = 2;
+    uint32 y = 3;
+    uint32 button = 4;
+    int32 delta = 5;
 }

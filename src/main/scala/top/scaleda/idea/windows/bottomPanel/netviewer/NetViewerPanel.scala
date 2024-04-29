@@ -1,11 +1,13 @@
 package top.scaleda
 package idea.windows.bottomPanel.netviewer
 
-import idea.rvcd.{FrameBuffer, RvcdFrameBufferChannel}
+import idea.rvcd.{FrameBuffer, Rvcd, RvcdFrameBufferChannel}
 import idea.utils.ScaledaIdeaLogger
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import io.grpc.ManagedChannel
+import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
 
 import java.awt.image.{BufferedImage, DataBufferUShort}
 import java.awt.{Color, Graphics}
@@ -14,23 +16,24 @@ import javax.swing.{JPanel, Timer}
 
 class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable {
 
-  // private def initHandler: (Option[RvcdRpcGrpc.RvcdRpcBlockingStub], Option[() => ManagedChannel]) = {
-  //   val (client, shutdown) = Rvcd()
-  //   (Some(client), Some(shutdown))
-  // }
-  private def initHandler: (Option[RvcdFrameBufferChannel], Option[() => Unit]) = {
+  private def initRpcHandler: (Option[RvcdRpcGrpc.RvcdRpcBlockingStub], Option[() => ManagedChannel]) = {
+    val (client, shutdown) = Rvcd()
+    (Some(client), Some(shutdown))
+  }
+
+  private def initFrameBufferHandler: (Option[RvcdFrameBufferChannel], Option[() => Unit]) = {
     try {
       val (client, shutdown) = RvcdFrameBufferChannel.unix()
       (Some(client), Some(shutdown))
     } catch {
-      case e: java.net.ConnectException => {
-        ScaledaIdeaLogger.warn("Failed to connect to Rvcd server: " + e.getMessage)
+      case e: java.net.ConnectException =>
+        ScaledaIdeaLogger.info("Failed to connect to Rvcd server: " + e.getMessage)
         (None, None)
-      }
     }
   }
 
-  private var (client, shutdown) = initHandler
+  private var (fbClient, fbShutdown)   = initFrameBufferHandler
+  private var (rpcClient, rpcShutdown) = initRpcHandler
 
   private val timer = new Timer(8, _ => canvas.repaint())
   timer.start()
@@ -40,7 +43,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   private val canvas = new JPanel() {
     override def paintComponent(g: Graphics): Unit = {
       // request frame
-      client match {
+      fbClient match {
         case Some(c) =>
           try {
             // val frame = c.requestFrame(new RvcdEmpty())
@@ -56,16 +59,14 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
             val img = if (frame.width > 0 && frame.height > 0 && frame.data.length > 0) {
               val img        = new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_USHORT_565_RGB)
               val byteBuffer = ByteBuffer.wrap(frame.data)
-              // ScaledaIdeaLogger.info(
-              //   s"frame ${frame.width}x${frame.height} data length: ${frame.data.size()}, " +
-              //     s"bytes: ${byteBuffer.array().slice(0, 10).map("%02X".format(_)).mkString(", ")}"
-              // )
-              val imgBuffer = img.getRaster.getDataBuffer.asInstanceOf[DataBufferUShort]
-              // System.arraycopy(shortBuffer.array(), 0, imgBuffer.getData, 0, shortBuffer.array().length)
+              val imgBuffer  = img.getRaster.getDataBuffer.asInstanceOf[DataBufferUShort]
               // manually copy
-              for (i <- 0 until imgBuffer.getSize) {
-                imgBuffer.setElem(i, byteBuffer.getShort())
-              }
+              // for (i <- 0 until imgBuffer.getSize) {
+              //   imgBuffer.setElem(i, byteBuffer.getShort())
+              // }
+              // copy from byte buffer to short buffer
+              val shortBuffer = imgBuffer.getData
+              byteBuffer.asShortBuffer().get(shortBuffer)
               img
             } else {
               // draw bitmap
@@ -91,7 +92,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
           } catch {
             case e: Exception =>
               ScaledaIdeaLogger.warn("Error requesting frame", e)
-              client = None
+              fbClient = None
           }
         case _ =>
       }
@@ -99,17 +100,59 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   }
   addFocusListener(new java.awt.event.FocusAdapter() {
     override def focusGained(e: java.awt.event.FocusEvent): Unit = {
-      if (client.isEmpty) {
-        val (c, s) = initHandler
-        client = c
-        shutdown = s
+      if (fbClient.isEmpty) {
+        val (c, s) = initFrameBufferHandler
+        fbClient = c
+        fbShutdown = s
+      }
+      if (rpcClient.isEmpty) {
+        val (c, s) = initRpcHandler
+        rpcClient = c
+        rpcShutdown = s
+      }
+    }
+  })
+  canvas.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsAdapter() {
+    override def ancestorResized(e: java.awt.event.HierarchyEvent): Unit = {
+      val size = canvas.getSize
+      // println(s"canvas resized: $size")
+      if (size.width > 0 && size.height > 0) {
+        val width  = size.width
+        val height = size.height
+        try {
+          rpcClient.foreach(
+            _.inputEvent(RvcdInputEvent().withType(EventType.EVENT_TYPE_RESIZE).withX(width).withY(height))
+          )
+        } catch {
+          case e: io.grpc.StatusRuntimeException =>
+            ScaledaIdeaLogger.warn("Failed to send resize event", e)
+            rpcClient = None
+        }
+      }
+    }
+  })
+  // canvas.addContainerListener()
+  canvas.addMouseListener(new java.awt.event.MouseAdapter() {
+    override def mouseClicked(e: java.awt.event.MouseEvent): Unit = {
+      println(s"mouseClicked: $e")
+      try {
+        rpcClient.foreach(
+          _.inputEvent(
+            RvcdInputEvent().withType(EventType.EVENT_TYPE_CLICK).withX(e.getX).withY(e.getY).withButton(e.getButton)
+          )
+        )
+      } catch {
+        case e: io.grpc.StatusRuntimeException =>
+          ScaledaIdeaLogger.warn("Failed to send click event", e)
+          rpcClient = None
       }
     }
   })
   setContent(canvas)
 
   override def dispose(): Unit = {
-    shutdown.foreach(_())
+    fbShutdown.foreach(_())
+    rpcShutdown.foreach(_())
     timer.stop()
   }
 }

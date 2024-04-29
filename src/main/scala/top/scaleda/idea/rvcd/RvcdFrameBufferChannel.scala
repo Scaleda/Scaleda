@@ -59,7 +59,7 @@ object RvcdFrameBufferChannel {
     socketChannel.connect(socketAddress)
   }
   private def createTcpSocketChannel() = {
-    val socketAddr = InetSocketAddress.createUnresolved("127.0.0.1", 5444)
+    val socketAddr = new InetSocketAddress("127.0.0.1", 5444)
     val socketChannel = SocketChannel
       .open(StandardProtocolFamily.INET);
     connectChannel(socketChannel, socketAddr)
