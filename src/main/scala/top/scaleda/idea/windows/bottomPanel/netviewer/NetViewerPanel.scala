@@ -1,13 +1,11 @@
 package top.scaleda
 package idea.windows.bottomPanel.netviewer
 
-import idea.rvcd.Rvcd
+import idea.rvcd.{FrameBuffer, RvcdTcpChannel}
 import idea.utils.ScaledaIdeaLogger
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import io.grpc.ManagedChannel
-import rvcd.rvcd.{RvcdEmpty, RvcdRpcGrpc}
 
 import java.awt.image.{BufferedImage, DataBufferUShort}
 import java.awt.{Color, Graphics}
@@ -16,9 +14,20 @@ import javax.swing.{JPanel, Timer}
 
 class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable {
 
-  private def initHandler: (Option[RvcdRpcGrpc.RvcdRpcBlockingStub], Option[() => ManagedChannel]) = {
-    val (client, shutdown) = Rvcd()
-    (Some(client), Some(shutdown))
+  // private def initHandler: (Option[RvcdRpcGrpc.RvcdRpcBlockingStub], Option[() => ManagedChannel]) = {
+  //   val (client, shutdown) = Rvcd()
+  //   (Some(client), Some(shutdown))
+  // }
+  private def initHandler: (Option[RvcdTcpChannel], Option[() => Unit]) = {
+    try {
+      val (client, shutdown) = RvcdTcpChannel()
+      (Some(client), Some(shutdown))
+    } catch {
+      case e: java.net.ConnectException => {
+        ScaledaIdeaLogger.warn("Failed to connect to Rvcd server: " + e.getMessage)
+        (None, None)
+      }
+    }
   }
 
   private var (client, shutdown) = initHandler
@@ -26,17 +35,27 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   private val timer = new Timer(100, _ => canvas.repaint())
   timer.start()
 
+  private var lastFrame: Option[FrameBuffer] = None
+
   private val canvas = new JPanel() {
     override def paintComponent(g: Graphics): Unit = {
       // request frame
       client match {
         case Some(c) =>
           try {
-            val frame = c.requestFrame(new RvcdEmpty())
-            val img = if (frame.width > 0 && frame.height > 0 && frame.data.size() > 0) {
+            // val frame = c.requestFrame(new RvcdEmpty())
+            c.requestFrame() match {
+              case Some(frame) =>
+                lastFrame = Some(frame)
+              case None =>
+            }
+            if (lastFrame.isEmpty) {
+              return
+            }
+            val frame = lastFrame.get
+            val img = if (frame.width > 0 && frame.height > 0 && frame.data.length > 0) {
               val img        = new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_USHORT_565_RGB)
-              val byteBuffer = ByteBuffer.wrap(frame.data.toByteArray)
-              // val shortBuffer = byteBuffer.asShortBuffer()
+              val byteBuffer = ByteBuffer.wrap(frame.data)
               // ScaledaIdeaLogger.info(
               //   s"frame ${frame.width}x${frame.height} data length: ${frame.data.size()}, " +
               //     s"bytes: ${byteBuffer.array().slice(0, 10).map("%02X".format(_)).mkString(", ")}"
@@ -78,15 +97,6 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
       }
     }
   }
-  // canvas.addFocusListener(new java.awt.event.FocusAdapter() {
-  //   override def focusGained(e: java.awt.event.FocusEvent): Unit = {
-  //     if (client.isEmpty) {
-  //       val (c, s) = initHandler
-  //       client = c
-  //       shutdown = s
-  //     }
-  //   }
-  // })
   addFocusListener(new java.awt.event.FocusAdapter() {
     override def focusGained(e: java.awt.event.FocusEvent): Unit = {
       if (client.isEmpty) {
