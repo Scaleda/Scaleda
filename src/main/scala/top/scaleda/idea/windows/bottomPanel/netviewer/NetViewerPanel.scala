@@ -208,18 +208,33 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   })
   canvas.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
     override def mouseWheelMoved(e: java.awt.event.MouseWheelEvent): Unit = {
-      var x = 0.0
-      var y = 0.0
-      if ((e.getModifiersEx & java.awt.event.InputEvent.SHIFT_DOWN_MASK) != 0) {
-        x = e.getPreciseWheelRotation * -50.0
+      if ((e.getModifiersEx & java.awt.event.InputEvent.CTRL_DOWN_MASK) != 0) {
+        var data  = 1000
+        val scale = 0.91
+        if (e.getPreciseWheelRotation > 0.01) {
+          data = (1000.0 * scale).toInt
+        } else if (e.getPreciseWheelRotation < 0.01) {
+          data = (1000.0 / scale).toInt
+        }
+        val event = RvcdInputEvent()
+          .withType(EventType.EVENT_TYPE_ZOOM)
+          .withData(data)
+        enqueueEvent(event)
       } else {
-        y = e.getPreciseWheelRotation * -50.0
+        var x = 0.0
+        var y = 0.0
+        if ((e.getModifiersEx & java.awt.event.InputEvent.SHIFT_DOWN_MASK) != 0) {
+          x = e.getPreciseWheelRotation * -50.0
+        } else {
+          y = e.getPreciseWheelRotation * -50.0
+        }
+        // println(s"Mouse wheel moved: x=$x, y=$y, e=$e")
+        val event = RvcdInputEvent()
+          .withType(EventType.EVENT_TYPE_WHEEL)
+          .withX(x.toInt)
+          .withY(y.toInt)
+        enqueueEvent(event)
       }
-      val event = RvcdInputEvent()
-        .withType(EventType.EVENT_TYPE_WHEEL)
-        .withX(x.toInt)
-        .withY(y.toInt)
-      enqueueEvent(event)
     }
   })
   setContent(canvas)
