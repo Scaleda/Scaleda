@@ -1,7 +1,7 @@
 package top.scaleda
 package idea.windows.bottomPanel.netviewer
 
-import idea.rvcd.{FrameBuffer, RvcdTcpChannel}
+import idea.rvcd.{FrameBuffer, RvcdFrameBufferChannel}
 import idea.utils.ScaledaIdeaLogger
 
 import com.intellij.openapi.Disposable
@@ -18,9 +18,9 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   //   val (client, shutdown) = Rvcd()
   //   (Some(client), Some(shutdown))
   // }
-  private def initHandler: (Option[RvcdTcpChannel], Option[() => Unit]) = {
+  private def initHandler: (Option[RvcdFrameBufferChannel], Option[() => Unit]) = {
     try {
-      val (client, shutdown) = RvcdTcpChannel()
+      val (client, shutdown) = RvcdFrameBufferChannel.unix()
       (Some(client), Some(shutdown))
     } catch {
       case e: java.net.ConnectException => {
@@ -32,7 +32,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
 
   private var (client, shutdown) = initHandler
 
-  private val timer = new Timer(100, _ => canvas.repaint())
+  private val timer = new Timer(8, _ => canvas.repaint())
   timer.start()
 
   private var lastFrame: Option[FrameBuffer] = None
