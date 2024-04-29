@@ -9,10 +9,12 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import io.grpc.ManagedChannel
 import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
 
+import java.awt.event.MouseEvent
 import java.awt.image.{BufferedImage, DataBufferUShort}
 import java.awt.{Color, Graphics}
 import java.nio.ByteBuffer
 import javax.swing.{JPanel, Timer}
+import scala.collection.mutable
 
 class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable {
 
@@ -35,7 +37,56 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   private var (fbClient, fbShutdown)   = initFrameBufferHandler
   private var (rpcClient, rpcShutdown) = initRpcHandler
 
-  private val timer = new Timer(8, _ => canvas.repaint())
+  private val eventQueue = mutable.Queue.empty[RvcdInputEvent]
+
+  private def enqueueEvent(event: RvcdInputEvent): Unit = {
+    eventQueue.synchronized {
+      eventQueue.enqueue(event)
+    }
+  }
+
+  private def sendEventsRpc(): Unit = {
+    if (eventQueue.nonEmpty) {
+      eventQueue.synchronized {
+        try {
+          rpcClient.foreach(_.inputEvent(eventQueue.dequeue()))
+        } catch {
+          case e: io.grpc.StatusRuntimeException =>
+            ScaledaIdeaLogger.warn("Failed to send event", e)
+            rpcClient = None
+        }
+      }
+    }
+  }
+
+  private def sendEventsSocket(): Unit = {
+    if (eventQueue.nonEmpty) {
+      eventQueue.synchronized {
+        try {
+          fbClient.foreach(_.inputEvent(eventQueue.dequeue()))
+        } catch {
+          case e: Exception =>
+            ScaledaIdeaLogger.warn("Failed to send event", e)
+            fbClient = None
+        }
+      }
+    }
+  }
+
+  private val sendEventsThread = new Thread(() => {
+    try {
+      while (true) {
+        // sendEventsRpc()
+        sendEventsSocket()
+        Thread.sleep(1)
+      }
+    } catch {
+      case _: InterruptedException =>
+    }
+  })
+  // sendEventsThread.start()
+
+  private val timer = new Timer(1, _ => canvas.repaint())
   timer.start()
 
   private var lastFrame: Option[FrameBuffer] = None
@@ -94,6 +145,9 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
               ScaledaIdeaLogger.warn("Error requesting frame", e)
               fbClient = None
           }
+
+          if (!sendEventsThread.isAlive)
+            sendEventsSocket()
         case _ =>
       }
     }
@@ -119,33 +173,40 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
       if (size.width > 0 && size.height > 0) {
         val width  = size.width
         val height = size.height
-        try {
-          rpcClient.foreach(
-            _.inputEvent(RvcdInputEvent().withType(EventType.EVENT_TYPE_RESIZE).withX(width).withY(height))
-          )
-        } catch {
-          case e: io.grpc.StatusRuntimeException =>
-            ScaledaIdeaLogger.warn("Failed to send resize event", e)
-            rpcClient = None
-        }
+        val event  = RvcdInputEvent().withType(EventType.EVENT_TYPE_RESIZE).withX(width).withY(height)
+        enqueueEvent(event)
       }
     }
   })
   // canvas.addContainerListener()
+  private def sendMouseEvent(e: java.awt.event.MouseEvent, eventType: EventType, data: Int): Unit = {
+    val event = RvcdInputEvent().withType(eventType).withX(e.getX).withY(e.getY).withButton(e.getButton).withData(data)
+    enqueueEvent(event)
+  }
   canvas.addMouseListener(new java.awt.event.MouseAdapter() {
-    override def mouseClicked(e: java.awt.event.MouseEvent): Unit = {
-      println(s"mouseClicked: $e")
-      try {
-        rpcClient.foreach(
-          _.inputEvent(
-            RvcdInputEvent().withType(EventType.EVENT_TYPE_CLICK).withX(e.getX).withY(e.getY).withButton(e.getButton)
-          )
-        )
-      } catch {
-        case e: io.grpc.StatusRuntimeException =>
-          ScaledaIdeaLogger.warn("Failed to send click event", e)
-          rpcClient = None
-      }
+    override def mousePressed(e: java.awt.event.MouseEvent): Unit = {
+      sendMouseEvent(e, EventType.EVENT_TYPE_CLICK, 1)
+    }
+    override def mouseReleased(e: java.awt.event.MouseEvent): Unit = {
+      sendMouseEvent(e, EventType.EVENT_TYPE_CLICK, 0)
+    }
+  })
+  canvas.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+    override def mouseMoved(e: java.awt.event.MouseEvent): Unit = {
+      val event = RvcdInputEvent().withType(EventType.EVENT_TYPE_POINTER_MOVEMENT).withX(e.getX).withY(e.getY)
+      enqueueEvent(event)
+    }
+
+    override def mouseDragged(e: MouseEvent): Unit = mouseMoved(e)
+  })
+  canvas.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+    override def mouseWheelMoved(e: java.awt.event.MouseWheelEvent): Unit = {
+      val y = e.getUnitsToScroll
+      val event = RvcdInputEvent()
+        .withType(EventType.EVENT_TYPE_WHEEL)
+        .withX(0)
+        .withY((if (y > 0) -1 else if (y < 0) 1 else 0) * 50)
+      enqueueEvent(event)
     }
   })
   setContent(canvas)
@@ -154,5 +215,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
     fbShutdown.foreach(_())
     rpcShutdown.foreach(_())
     timer.stop()
+    if (sendEventsThread.isAlive)
+      sendEventsThread.interrupt()
   }
 }

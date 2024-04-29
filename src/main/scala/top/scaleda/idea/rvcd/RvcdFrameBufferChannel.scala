@@ -3,6 +3,8 @@ package idea.rvcd
 
 import idea.utils.ScaledaIdeaLogger
 
+import rvcd.rvcd.RvcdInputEvent
+
 import java.net._
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
@@ -17,8 +19,8 @@ class RvcdFrameBufferChannel(socket: SocketChannel) {
     var r      = -1;
     do {
       r = socket.read(buf)
-      if (r > 0) cnt += r
-    } while (r > 0 && cnt < 4)
+      if (r >= 0) cnt += r
+    } while (r >= 0 && cnt < 4)
     if (cnt != 4) {
       val msg = s"Failed to read frame header, read $cnt bytes"
       throw new RuntimeException(msg)
@@ -40,8 +42,8 @@ class RvcdFrameBufferChannel(socket: SocketChannel) {
     r = -1;
     do {
       r = socket.read(buf2)
-      if (r > 0) cnt += r
-    } while (r > 0 && cnt < len)
+      if (r >= 0) cnt += r
+    } while (r >= 0 && cnt < len)
     if (cnt != len) {
       val msg = "Failed to read frame data, read 0x%x bytes, expected 0x%x bytes".format(cnt, len)
       throw new RuntimeException(msg)
@@ -50,12 +52,54 @@ class RvcdFrameBufferChannel(socket: SocketChannel) {
     }
     Some(FrameBuffer(width, height, data))
   }
+
+  def inputEvent(event: RvcdInputEvent): Unit = {
+    // val buffer = ByteBuffer.allocate(8)
+    // buffer.putInt(event.x)
+    // buffer.putInt(event.y)
+    // buffer.flip()
+    // socket.write(buffer)
+    val data = event.toByteArray
+    // println(s"Writing input event: ${data.map("%02X".format(_)).mkString(", ")}")
+    val len     = data.length
+    val lenData = ByteBuffer.allocate(4)
+    lenData.putInt(len)
+    lenData.flip()
+    val buffer = ByteBuffer.wrap(data)
+
+    // buffer.put(data)
+    // buffer.reset()
+    var n = 0;
+    var r = -1;
+    do {
+      r = socket.write(lenData)
+      if (r >= 0) n += r
+    } while (r >= 0 && n < 4)
+    if (n != 4) {
+      val msg = s"Failed to write input event length, wrote $n bytes"
+      throw new RuntimeException(msg)
+      // ScaledaIdeaLogger.warn(msg)
+    }
+    n = 0
+    r = -1
+    do {
+      r = socket.write(buffer)
+      if (r >= 0) n += r
+    } while (r >= 0 && n < len)
+    if (n != len) {
+      val msg = s"Failed to write input event, wrote $n bytes"
+      throw new RuntimeException(msg)
+      // ScaledaIdeaLogger.warn(msg)
+    }
+  }
 }
 
 object RvcdFrameBufferChannel {
   private def connectChannel(socketChannel: SocketChannel, socketAddress: SocketAddress): Unit = {
-    socketChannel.setOption[Integer](StandardSocketOptions.SO_RCVBUF, 2 * 1024 * 1024 / 4)
-    socketChannel.configureBlocking(true) // 将SocketChannel设置为阻塞模式
+    socketChannel.setOption[Integer](StandardSocketOptions.SO_RCVBUF, 32 * 1024 * 1024)
+    socketChannel.setOption[Integer](StandardSocketOptions.SO_SNDBUF, 32 * 1024 * 1)
+    // socketChannel.configureBlocking(true)  // blocking mode: r cannot be 0
+    socketChannel.configureBlocking(false)
     socketChannel.connect(socketAddress)
   }
   private def createTcpSocketChannel() = {

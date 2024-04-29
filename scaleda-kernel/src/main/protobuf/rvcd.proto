@@ -83,8 +83,8 @@ enum EventType {
 
 message RvcdInputEvent {
     EventType type = 1;
-    uint32 x = 2;
-    uint32 y = 3;
+    int32 x = 2;
+    int32 y = 3;
     uint32 button = 4;
-    int32 delta = 5;
+    uint32 data = 5;
 }
