@@ -36,6 +36,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
 
   private var (fbClient, fbShutdown)   = initFrameBufferHandler
   private var (rpcClient, rpcShutdown) = initRpcHandler
+  private var resized                  = false
 
   private val eventQueue = mutable.Queue.empty[RvcdInputEvent]
 
@@ -96,6 +97,11 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
       // request frame
       fbClient match {
         case Some(c) =>
+          if (!resized) {
+            resized = true
+            val sz = this.getSize
+            enqueueEvent(RvcdInputEvent().withType(EventType.EVENT_TYPE_RESIZE).withX(sz.width).withY(sz.height))
+          }
           try {
             // val frame = c.requestFrame(new RvcdEmpty())
             c.requestFrame() match {
@@ -158,6 +164,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
         val (c, s) = initFrameBufferHandler
         fbClient = c
         fbShutdown = s
+        resized = false
       }
       if (rpcClient.isEmpty) {
         val (c, s) = initRpcHandler
@@ -201,11 +208,17 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   })
   canvas.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
     override def mouseWheelMoved(e: java.awt.event.MouseWheelEvent): Unit = {
-      val y = e.getUnitsToScroll
+      var x = 0.0
+      var y = 0.0
+      if ((e.getModifiersEx & java.awt.event.InputEvent.SHIFT_DOWN_MASK) != 0) {
+        x = e.getPreciseWheelRotation * -50.0
+      } else {
+        y = e.getPreciseWheelRotation * -50.0
+      }
       val event = RvcdInputEvent()
         .withType(EventType.EVENT_TYPE_WHEEL)
-        .withX(0)
-        .withY((if (y > 0) -1 else if (y < 0) 1 else 0) * 50)
+        .withX(x.toInt)
+        .withY(y.toInt)
       enqueueEvent(event)
     }
   })
