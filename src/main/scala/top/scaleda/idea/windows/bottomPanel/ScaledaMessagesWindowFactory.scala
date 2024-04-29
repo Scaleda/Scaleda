@@ -9,6 +9,7 @@ import idea.windows.bottomPanel.message.MessageListPanel
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
+import top.scaleda.idea.windows.bottomPanel.netviewer.NetViewerPanel
 
 final class ScaledaMessagesWindowFactory extends ToolWindowFactory {
   override def shouldBeAvailable(project: Project): Boolean = {
@@ -26,6 +27,9 @@ final class ScaledaMessagesWindowFactory extends ToolWindowFactory {
 
     val messageTab = new MessageListPanel(project)
 
+    val netViewerPanel = new NetViewerPanel()
+
+    tabManager.addPanel(netViewerPanel, "netviewer")
     tabManager.addPanel(messageTab, ScaledaBundle.message("windows.tool.log.message.title"))
     tabManager.addConsoleTab(ScaledaBundle.message("windows.tool.log.console.title"), switchTo = false)
   }
