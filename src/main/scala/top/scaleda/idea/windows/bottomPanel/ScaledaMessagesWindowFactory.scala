@@ -5,13 +5,13 @@ import idea.ScaledaBundle
 import idea.project.io.YmlRootManager
 import idea.windows.bottomPanel.console.ConsoleTabManager
 import idea.windows.bottomPanel.message.MessageListPanel
+import idea.windows.bottomPanel.netviewer.NetViewerPanel
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.{ToolWindow, ToolWindowFactory}
-import top.scaleda.idea.windows.bottomPanel.netviewer.NetViewerPanel
 
-final class ScaledaMessagesWindowFactory extends ToolWindowFactory {
+class ScaledaMessagesWindowFactory extends ToolWindowFactory {
   override def shouldBeAvailable(project: Project): Boolean = {
     YmlRootManager.getInstance(project).getRoots.nonEmpty
   }

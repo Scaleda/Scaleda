@@ -134,8 +134,8 @@
                                  implementationClass="top.scaleda.verilog.references.VerilogFindUsagesProvider"/>
         <lineIndentProvider implementation="top.scaleda.verilog.editor.formatter.VerilogLineIndentProvider"/>
         <formattingService implementation="top.scaleda.verilog.editor.formatter.VerilogExternalFormatter"/>
-        <lang.formatter language="Verilog"
-                        implementationClass="top.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder"/>
+<!--        <lang.formatter language="Verilog"-->
+<!--                        implementationClass="top.scaleda.verilog.editor.formatter.VerilogFormattingModelBuilder"/>-->
         <internalFileTemplate name="Verilog Module"/>
         <colorSettingsPage implementation="top.scaleda.idea.settings.editor.VerilogColorSettingsPage" />
 
