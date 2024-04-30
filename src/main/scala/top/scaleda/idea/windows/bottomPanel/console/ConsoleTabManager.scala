@@ -15,26 +15,14 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
 
   private val contentFactory: ContentFactory = ContentFactory.getInstance()
 
-  //noinspection ScalaExtractStringToBundle,ScalaUnusedExpression
-  // private val contentStub = contentFactory.createContent(
-  //   new EmptyTabContentView().getContent,
-  //   "Stub",
-  //   false
-  // )
-
   contentManager.addContentManagerListener(this)
-  // contentManager.addContent(contentStub)
 
   /**
    * Add a console tab to the bottom panel
-   * Should be called only once!
    * @param name
    * @param switchTo
    */
   def addConsoleTab(@Nls name: String, switchTo: Boolean = true): Unit = {
-    // remove stub if exists
-    // if (contentManager.getContentCount == 1)
-    //   contentManager.removeContent(contentStub, false)
     val consoleTab = new ConsoleTab(project)
     Disposer.register(this, consoleTab)
     addPanel(consoleTab.getPanel, name, switchTo = switchTo)
@@ -56,6 +44,8 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
       false
     }
   }
+
+  Disposer.register(this, contentManager)
 
   override def dispose(): Unit = {}
 }
