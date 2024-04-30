@@ -72,6 +72,9 @@ public class TargetBasicPanel {
     mainPanel.add(label4, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     constraintsField = new TextFieldWithBrowseButton();
     mainPanel.add(constraintsField, new GridConstraints(1, 1, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+    label1.setLabelFor(nameField);
+    label2.setLabelFor(topModuleField);
+    label3.setLabelFor(toolchainField);
   }
 
   private static Method $$$cachedGetBundleMethod$$$ = null;
@@ -151,5 +154,4 @@ public class TargetBasicPanel {
   public JComponent $$$getRootComponent$$$() {
     return mainPanel;
   }
-
 }
