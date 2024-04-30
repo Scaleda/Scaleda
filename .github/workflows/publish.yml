@@ -52,6 +52,18 @@ jobs:
       - name: Build project
         run: sbt test
 
+      - name: Package scaleda-kernel Jar
+        run: |
+          sbt 'project kernel; assembly'
+
+      - name: Make plugin zip package
+        run: |
+          sbt packageArtifactZip
+
+      - name: Verify plugin compatibility
+        run: |
+          sbt runPluginVerifier
+
       - name: Compress target directories
         run: tar cf targets.tar target scaleda-kernel/target project/target
 
@@ -74,6 +86,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup Java (temurin@11)
         if: matrix.java == 'temurin@11'
