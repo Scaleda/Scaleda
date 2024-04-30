@@ -5,6 +5,10 @@ on:
     branches:
       - hexo-pages
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  JDK_JAVA_OPTIONS: -Xmx8g -Xms4g
+
 jobs:
   build:
     strategy:
