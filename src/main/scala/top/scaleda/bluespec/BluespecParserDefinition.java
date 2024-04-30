@@ -39,22 +39,32 @@ public class BluespecParserDefinition implements ParserDefinition {
 
   @Override
   public @NotNull IFileElementType getFileNodeType() {
-    return FILE;
+    return new IFileElementType(BluespecLanguage.INSTANCE());
   }
 
   @Override
   public @NotNull TokenSet getWhitespaceTokens() {
-    return WHITESPACE;
+    return PSIElementTypeFactory.createTokenSet(
+            BluespecLanguage.INSTANCE(),
+            BluespecLexer.Whitespace
+    );
   }
 
   @Override
   public @NotNull TokenSet getCommentTokens() {
-    return COMMENTS;
+    return PSIElementTypeFactory.createTokenSet(
+            BluespecLanguage.INSTANCE(),
+            BluespecLexer.BlockComment,
+            BluespecLexer.LineComment
+    );
   }
 
   @Override
   public @NotNull TokenSet getStringLiteralElements() {
-    return STRING;
+    return PSIElementTypeFactory.createTokenSet(
+            BluespecLanguage.INSTANCE(),
+            BluespecLexer.StringLiteral
+    );
   }
 
   @Override
@@ -72,19 +82,4 @@ public class BluespecParserDefinition implements ParserDefinition {
   public @NotNull PsiElement createElement(ASTNode node) {
     return BluespecPsiNodeFactory.create(node);
   }
-
-  private static final IFileElementType FILE = new IFileElementType(BluespecLanguage.INSTANCE());
-  private static final TokenSet COMMENTS = PSIElementTypeFactory.createTokenSet(
-          BluespecLanguage.INSTANCE(),
-          BluespecLexer.BlockComment,
-          BluespecLexer.LineComment
-  );
-  private static final TokenSet WHITESPACE = PSIElementTypeFactory.createTokenSet(
-          BluespecLanguage.INSTANCE(),
-          BluespecLexer.Whitespace
-  );
-  private static final TokenSet STRING = PSIElementTypeFactory.createTokenSet(
-          BluespecLanguage.INSTANCE(),
-          BluespecLexer.StringLiteral
-  );
 }

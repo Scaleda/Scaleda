@@ -43,22 +43,32 @@ public final class VerilogParserDefinition implements ParserDefinition {
 
   @Override
   public @NotNull IFileElementType getFileNodeType() {
-    return VerilogParserDefinition.FILE;
+    return new IFileElementType(VerilogLanguage.INSTANCE());
   }
 
   @Override
   public @NotNull TokenSet getWhitespaceTokens() {
-    return VerilogParserDefinition.WHITESPACE;
+    return PSIElementTypeFactory.createTokenSet(
+            VerilogLanguage.INSTANCE(),
+            VerilogLexer.White_space
+    );
   }
 
   @Override
   public @NotNull TokenSet getCommentTokens() {
-    return VerilogParserDefinition.COMMENTS;
+    return PSIElementTypeFactory.createTokenSet(
+            VerilogLanguage.INSTANCE(),
+            VerilogLexer.Block_comment,
+            VerilogLexer.One_line_comment
+    );
   }
 
   @Override
   public @NotNull TokenSet getStringLiteralElements() {
-    return VerilogParserDefinition.STRING;
+    return PSIElementTypeFactory.createTokenSet(
+            VerilogLanguage.INSTANCE(),
+            VerilogLexer.String
+    );
   }
 
   @Override
@@ -76,19 +86,4 @@ public final class VerilogParserDefinition implements ParserDefinition {
   public @NotNull PsiElement createElement(ASTNode node) {
     return VerilogPsiNodeFactory.create(node);
   }
-
-  private static final IFileElementType FILE = new IFileElementType(VerilogLanguage.INSTANCE());
-  private static final TokenSet COMMENTS = PSIElementTypeFactory.createTokenSet(
-          VerilogLanguage.INSTANCE(),
-          VerilogLexer.Block_comment,
-          VerilogLexer.One_line_comment
-  );
-  private static final TokenSet WHITESPACE = PSIElementTypeFactory.createTokenSet(
-          VerilogLanguage.INSTANCE(),
-          VerilogLexer.White_space
-  );
-  private static final TokenSet STRING = PSIElementTypeFactory.createTokenSet(
-          VerilogLanguage.INSTANCE(),
-          VerilogLexer.String
-  );
 }

@@ -33,7 +33,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
       // val (client, shutdown) = RvcdFrameBufferChannel.tcp()
       (Some(client), Some(shutdown))
     } catch {
-      case e: java.net.ConnectException =>
+      case e: java.net.SocketException =>
         ScaledaIdeaLogger.info("Failed to connect to Rvcd server: " + e.getMessage)
         (None, None)
     }

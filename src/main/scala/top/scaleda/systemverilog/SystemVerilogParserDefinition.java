@@ -39,22 +39,32 @@ public final class SystemVerilogParserDefinition implements ParserDefinition {
 
   @Override
   public @NotNull IFileElementType getFileNodeType() {
-    return SystemVerilogParserDefinition.FILE;
+    return new IFileElementType(SystemVerilogLanguage.INSTANCE());
   }
 
   @Override
   public @NotNull TokenSet getWhitespaceTokens() {
-    return SystemVerilogParserDefinition.WHITESPACE;
+    return PSIElementTypeFactory.createTokenSet(
+            SystemVerilogLanguage.INSTANCE(),
+            SystemVerilogLexer.WHITE_SPACE
+    );
   }
 
   @Override
   public @NotNull TokenSet getCommentTokens() {
-    return SystemVerilogParserDefinition.COMMENTS;
+    return PSIElementTypeFactory.createTokenSet(
+            SystemVerilogLanguage.INSTANCE(),
+            SystemVerilogLexer.BLOCK_COMMENT,
+            SystemVerilogLexer.LINE_COMMENT
+    );
   }
 
   @Override
   public @NotNull TokenSet getStringLiteralElements() {
-    return SystemVerilogParserDefinition.STRING;
+    return PSIElementTypeFactory.createTokenSet(
+            SystemVerilogLanguage.INSTANCE(),
+            SystemVerilogLexer.STRING_LITERAL
+    );
   }
 
   @Override
@@ -72,19 +82,4 @@ public final class SystemVerilogParserDefinition implements ParserDefinition {
   public @NotNull PsiElement createElement(ASTNode node) {
     return SystemVerilogPsiNodeFactory.create(node);
   }
-
-  private static final IFileElementType FILE = new IFileElementType(SystemVerilogLanguage.INSTANCE());
-  private static final TokenSet COMMENTS = PSIElementTypeFactory.createTokenSet(
-          SystemVerilogLanguage.INSTANCE(),
-          SystemVerilogLexer.BLOCK_COMMENT,
-          SystemVerilogLexer.LINE_COMMENT
-  );
-  private static final TokenSet WHITESPACE = PSIElementTypeFactory.createTokenSet(
-          SystemVerilogLanguage.INSTANCE(),
-          SystemVerilogLexer.WHITE_SPACE
-  );
-  private static final TokenSet STRING = PSIElementTypeFactory.createTokenSet(
-          SystemVerilogLanguage.INSTANCE(),
-          SystemVerilogLexer.STRING_LITERAL
-  );
 }
