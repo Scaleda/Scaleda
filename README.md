@@ -10,9 +10,9 @@ Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能 
  - Verilog 语言的基本语法功能（语法高亮、代码折叠、代码格式化、代码注释、代码导航等）；
  - Verilog 语言的简单代码补全；
  - Verilog 语言的代码检查（语法错误与语义错误，以及诸如端口缺失、多驱动等错误）；
- - 使用 Verible 的 Verilog、SystemVerilog 代码格式化；
+ - 使用 [Verible](https://github.com/chipsalliance/verible) 的 Verilog、SystemVerilog 代码格式化；
  - Verilog、SystemVerilog、Tcl、Bluespec SystemVerilog 语法解析高亮；
- - 自有工程和 IP 结构，支持调用 Vivado、iverilog、Yosys 等工具进行仿真、综合、实现等操作；
+ - 自有工程和 IP 结构，支持调用 Vivado、Quartus Prime、iverilog、Yosys 等工具进行仿真、综合、实现等操作；
  - 支持加载 Vivado 工程并调用其中的综合、实现等操作；
  - 内置波形查看器 [Rvcd](https://github.com/Scaleda/rvcd)、[Surfer](https://gitlab.com/surfer-project/surfer)；
  - 运行服务器模式以执行远程 EDA 任务；
