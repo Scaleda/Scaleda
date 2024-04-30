@@ -14,8 +14,18 @@ import io.grpc.ManagedChannel
 import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
 
 import java.awt.event.MouseEvent
-import java.awt.image.{BufferedImage, DataBufferUShort}
-import java.awt.{Color, Graphics}
+import java.awt.image.{
+  BufferedImage,
+  ColorModel,
+  ComponentColorModel,
+  DataBufferByte,
+  DataBufferInt,
+  DataBufferUShort,
+  DirectColorModel,
+  IndexColorModel,
+  Raster
+}
+import java.awt.{Color, Graphics, Point}
 import java.nio.ByteBuffer
 import javax.swing.{JPanel, Timer}
 import scala.collection.mutable
@@ -118,41 +128,51 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
               return
             }
             val frame = lastFrame.get
-            val img = if (frame.width > 0 && frame.height > 0 && frame.data.length > 0) {
-              val img        = new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_USHORT_565_RGB)
-              val byteBuffer = ByteBuffer.wrap(frame.data)
-              val imgBuffer  = img.getRaster.getDataBuffer.asInstanceOf[DataBufferUShort]
-              // manually copy
-              // for (i <- 0 until imgBuffer.getSize) {
-              //   imgBuffer.setElem(i, byteBuffer.getShort())
-              // }
-              // copy from byte buffer to short buffer
-              val shortBuffer = imgBuffer.getData
-              byteBuffer.asShortBuffer().get(shortBuffer)
-              img
-            } else {
-              // draw bitmap
-              val img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB)
-              val g2d = img.createGraphics()
-              g2d.setColor(Color.red)
-              g2d.fillRect(0, 0, 100, 100)
-              g2d.setColor(Color.green)
-              g2d.fillRect(10, 10, 80, 80)
-              g2d.setColor(Color.blue)
-              g2d.fillRect(20, 20, 60, 60)
-              g2d.setColor(Color.yellow)
-              g2d.fillRect(30, 30, 40, 40)
-              g2d.setColor(Color.orange)
-              g2d.fillRect(40, 40, 20, 20)
-              g2d.setColor(Color.pink)
-              g2d.fillRect(50, 50, 10, 10)
-              g2d.dispose()
-              img
-            }
+            val img        = new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_USHORT_565_RGB)
+            val byteBuffer = ByteBuffer.wrap(frame.data)
+            val imgBuffer  = img.getRaster.getDataBuffer.asInstanceOf[DataBufferUShort]
+            // copy from byte buffer to short buffer
+            val shortBuffer = imgBuffer.getData
+            byteBuffer.asShortBuffer().get(shortBuffer)
+
+            // test argb
+            // val pixelsLen = frame.width * frame.height
+            // println(s"Frame size: ${frame.width} x ${frame.height}, pixels: $pixelsLen, data len: ${frame.data.length}")
+            // // val img = new BufferedImage(
+            // //   frame.width,
+            // //   frame.height,
+            // //   BufferedImage.TYPE_4BYTE_ABGR_PRE,
+            // //   new ComponentColorModel(
+            // //     8,
+            // //     pixelsLen,
+            // //     frame.data,
+            // //     0,
+            // //     true
+            // //   )
+            // // )
+            // val buffer = ByteBuffer.wrap(frame.data)
+            // // val bufferInt = buffer.asIntBuffer()
+            // // val dataBuffer = new DataBufferByte(frame.data, frame.data.length)
+            // // val array      = bufferInt.array()
+            // // val array = Array[Int](pixelsLen)
+            // // buffer.asIntBuffer().get(array)
+            // // val dataBuffer = new DataBufferInt(array, array.length)
+            // val colorModel = ColorModel.getRGBdefault.asInstanceOf[DirectColorModel]
+            // // val raster = Raster.createPackedRaster(
+            // //   dataBuffer,
+            // //   frame.width,
+            // //   frame.height,
+            // //   frame.width,
+            // //   colorModel.getMasks,
+            // //   new Point(0, 0)
+            // // )
+            // val raster = colorModel.createCompatibleWritableRaster(frame.width, frame.height)
+            // buffer.asIntBuffer().get(raster.getDataBuffer.asInstanceOf[DataBufferInt].getData())
+            // val img = new BufferedImage(colorModel, raster, false, null)
             g.drawImage(img, 0, 0, null)
-            // repaint()
           } catch {
             case e: Exception =>
+              // e.printStackTrace()
               ScaledaIdeaLogger.warn("Error requesting frame", e)
               fbClient = None
           }

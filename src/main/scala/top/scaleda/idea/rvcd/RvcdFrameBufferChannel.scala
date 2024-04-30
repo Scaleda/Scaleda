@@ -12,7 +12,7 @@ import java.nio.channels.SocketChannel
 case class FrameBuffer(width: Int, height: Int, data: Array[Byte])
 
 class RvcdFrameBufferChannel(socket: SocketChannel) {
-  def requestFrame(): Option[FrameBuffer] = {
+  def requestFrame(bytesPerPixel: Int = 2): Option[FrameBuffer] = {
     val buffer = new Array[Byte](4)
     val buf    = ByteBuffer.wrap(buffer)
     var cnt    = 0
@@ -32,10 +32,10 @@ class RvcdFrameBufferChannel(socket: SocketChannel) {
     val width  = ((buffer(0) & 0xff) << 8) | (buffer(1) & 0xff)
     val height = ((buffer(2) & 0xff) << 8) | (buffer(3) & 0xff)
     // ScaledaIdeaLogger.info(s"Frame size: $width x $height")
-    if (width <= 0 || height <= 0) {
+    if (width <= 0 || height <= 0 || width > 8192 || height > 8192) {
       throw new RuntimeException(s"Invalid frame size: $width x $height")
     }
-    val len  = width * height * 2
+    val len  = width * height * bytesPerPixel
     val data = new Array[Byte](len)
     val buf2 = ByteBuffer.wrap(data)
     cnt = 0

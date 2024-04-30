@@ -26,6 +26,6 @@ public class ScaledaMessagesWindowFactory implements ToolWindowFactory {
     NetViewerPanel netViewerPanel = new NetViewerPanel();
     tabManager.addPanel(netViewerPanel, ScaledaBundle.message("windows.tool.log.waveform.title"), false);
     tabManager.addPanel(messageTab, ScaledaBundle.message("windows.tool.log.message.title"), false);
-    tabManager.addConsoleTab(ScaledaBundle.message("windows.tool.log.message.title"), true);
+    tabManager.addConsoleTab(ScaledaBundle.message("windows.tool.log.console.title"), true);
   }
 }
