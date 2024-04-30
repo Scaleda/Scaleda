@@ -14,7 +14,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  JDK_JAVA_OPTIONS: -Xmx10g -Xms8g
+  JDK_JAVA_OPTIONS: -Xmx16g -Xms16g
 
 jobs:
   build:
