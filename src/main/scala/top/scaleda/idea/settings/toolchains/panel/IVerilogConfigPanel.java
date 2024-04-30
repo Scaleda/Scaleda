@@ -5,7 +5,6 @@ import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.AnimatedIcon;
 import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.SeparatorWithText;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;

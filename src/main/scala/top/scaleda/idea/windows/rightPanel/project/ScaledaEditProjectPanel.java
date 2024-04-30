@@ -1,7 +1,6 @@
 package top.scaleda.idea.windows.rightPanel.project;
 
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.ui.SeparatorWithText;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;

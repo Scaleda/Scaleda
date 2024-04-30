@@ -1,6 +1,5 @@
 package top.scaleda.idea.windows.rightPanel.ip;
 
-import com.intellij.ui.SeparatorWithText;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
