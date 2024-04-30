@@ -46,7 +46,7 @@ class VerilogEnterAfterBeginHandler extends EnterHandlerDelegateAdapter {
     val pos = VerilogSemanticEditorPosition.createEditorPosition(editor, offset)
     pos.moveAtEndOfPreviousLine()
 
-    if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.K_begin))) {
+    if (pos.isAt(VerilogLanguage.INSTANCE.getTokenType(VerilogLexer.K_begin))) {
       if (VerilogBraceMatcherProvider.getUnmatchedBracesCount(editor, offset, file.getFileType) > 0) {
         val indentStringForEnd = VerilogLineIndentProvider.getIndentString(editor, pos.getStartOffset, 0)
         val document = editor.getDocument

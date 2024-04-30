@@ -30,6 +30,6 @@
 //   }
 //
 //   private def createSpacingBuilder(settings: CodeStyleSettings): SpacingBuilder = {
-//     new SpacingBuilder(settings, VerilogLanguage)
+//     new SpacingBuilder(settings, VerilogLanguage.INSTANCE)
 //   }
 // }

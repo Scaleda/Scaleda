@@ -10,7 +10,7 @@ import com.intellij.psi.FileViewProvider
 import javax.swing.Icon
 
 class BluespecPSIFileRoot(viewProvider: FileViewProvider)
-    extends PsiFileBase(viewProvider, BluespecLanguage)
+    extends PsiFileBase(viewProvider, BluespecLanguage.INSTANCE)
     with nodes.ScopeNode {
 
   override def getFileType: FileType =

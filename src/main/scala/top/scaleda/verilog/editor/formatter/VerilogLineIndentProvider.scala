@@ -29,11 +29,11 @@ class VerilogLineIndentProvider extends LineIndentProvider {
   override def getLineIndent(project: Project, editor: Editor, language: Language, offset: Int): String = {
     if (offset > 0) {
       val pos = VerilogSemanticEditorPosition.createEditorPosition(editor, offset - 1)
-      if (pos.isAt(VerilogLanguage.getTokenType(VerilogLexer.White_space))) { // This seems is needed to check if it is enter event
+      if (pos.isAt(VerilogLanguage.INSTANCE.getTokenType(VerilogLexer.White_space))) { // This seems is needed to check if it is enter event
         pos.moveAtEndOfPreviousLine()
         if (
           pos.isAtAnyOf(
-            VerilogLanguage.getTokenType(VerilogLexer.K_else) // TODO: add IF
+            VerilogLanguage.INSTANCE.getTokenType(VerilogLexer.K_else) // TODO: add IF
           )
         ) {
           return getIndentString(editor, pos.getStartOffset, 1)
@@ -43,7 +43,7 @@ class VerilogLineIndentProvider extends LineIndentProvider {
     null
   }
 
-  override def isSuitableFor(language: Language): Boolean = language.isInstanceOf[VerilogLanguage.type]
+  override def isSuitableFor(language: Language): Boolean = language.isInstanceOf[VerilogLanguage.INSTANCE.type]
 
 }
 

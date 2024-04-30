@@ -45,7 +45,7 @@ class VerilogTypedHandler extends TypedHandlerDelegate {
     }
 
     val task = if (c == 'd' && hasPrefix("end")) {
-      indentKeyword[SeqBlockPsiNode](file, VerilogLanguage.getTokenType(VerilogLexer.K_end)) _
+      indentKeyword[SeqBlockPsiNode](file, VerilogLanguage.INSTANCE.getTokenType(VerilogLexer.K_end)) _
     } else null
 
     if (task == null) {

@@ -15,7 +15,7 @@ class VerilogCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider
 
   override def getCodeSample(settingsType: LanguageCodeStyleSettingsProvider.SettingsType): String = ""
 
-  override def getLanguage: Language = VerilogLanguage
+  override def getLanguage: Language = VerilogLanguage.INSTANCE
 
   override def createCustomSettings(settings: CodeStyleSettings): CustomCodeStyleSettings = {
     new VerilogCodeStyleSettings(settings)

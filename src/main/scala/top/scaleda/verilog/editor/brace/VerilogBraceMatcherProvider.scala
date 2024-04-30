@@ -25,36 +25,36 @@ object VerilogBraceMatcherProvider {
   final val PAIRS: Array[BracePair] = Array(
     // {} [] ()
     new BracePair(
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Left_brace),
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_brace),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.Left_brace),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.Right_brace),
       false
     ),
     new BracePair(
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Left_bracket),
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_bracket),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.Left_bracket),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.Right_bracket),
       false
     ),
     new BracePair(
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Left_parenthes),
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.Right_parenthes),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.Left_parenthes),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.Right_parenthes),
       false
     ),
     // begin ... end
     new BracePair(
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_begin),
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_end),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.K_begin),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.K_end),
       true
     ),
     // case ... endcase
     new BracePair(
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_case),
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_endcase),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.K_case),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.K_endcase),
       true
     ),
     // module ... endmodule
     new BracePair(
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_module),
-      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage).get(VerilogLexer.K_endmodule),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.K_module),
+      PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage.INSTANCE).get(VerilogLexer.K_endmodule),
       true
     ),
   )
@@ -75,7 +75,7 @@ object VerilogBraceMatcherProvider {
     val highlighter = editor.getHighlighter
 
     var iterator = highlighter.createIterator(offset - 1)
-    if (iterator.getTokenType == VerilogLanguage.getTokenType(VerilogLexer.White_space)) iterator.retreat()
+    if (iterator.getTokenType == VerilogLanguage.INSTANCE.getTokenType(VerilogLexer.White_space)) iterator.retreat()
     val braceMatcher = BraceMatchingUtil.getBraceMatcher(fileType, iterator)
 
     if (!braceMatcher.isLBraceToken(iterator, chars, fileType)

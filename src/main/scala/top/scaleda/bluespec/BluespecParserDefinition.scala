@@ -14,10 +14,10 @@ import org.antlr.v4.runtime.Parser
 
 final class BluespecParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =
-    new ANTLRLexerAdaptor(BluespecLanguage, new BluespecLexer(null))
+    new ANTLRLexerAdaptor(BluespecLanguage.INSTANCE, new BluespecLexer(null))
 
   override def createParser(project: Project): PsiParser =
-    new ANTLRParserAdaptor(BluespecLanguage, new BluespecParser(null)) {
+    new ANTLRParserAdaptor(BluespecLanguage.INSTANCE, new BluespecParser(null)) {
       override def parse(parser: Parser, root: IElementType) = {
         parser.asInstanceOf[BluespecParser].top()
       }
@@ -54,21 +54,21 @@ object BluespecParserDefinition {
 //    .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
 //    .map(x => if (x._2 == null) "<INVALID>" else x._2)
 //    .toArray
-  PSIElementTypeFactory.defineLanguageIElementTypes(BluespecLanguage, vocabulary, BluespecParser.ruleNames)
-  val FILE   = new IFileElementType(BluespecLanguage)
-  val tokens = PSIElementTypeFactory.getTokenIElementTypes(BluespecLanguage)
+  PSIElementTypeFactory.defineLanguageIElementTypes(BluespecLanguage.INSTANCE, vocabulary, BluespecParser.ruleNames)
+  val FILE   = new IFileElementType(BluespecLanguage.INSTANCE)
+  val tokens = PSIElementTypeFactory.getTokenIElementTypes(BluespecLanguage.INSTANCE)
   // BluespecLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
-    BluespecLanguage,
+    BluespecLanguage.INSTANCE,
     BluespecLexer.BlockComment,
     BluespecLexer.LineComment
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
-    BluespecLanguage,
+    BluespecLanguage.INSTANCE,
     BluespecLexer.Whitespace
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
-    BluespecLanguage,
+    BluespecLanguage.INSTANCE,
     BluespecLexer.StringLiteral
   )
 }

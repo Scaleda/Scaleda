@@ -5,4 +5,7 @@ import kernel.language.LangSystemVerilog
 
 import com.intellij.lang.Language
 
-object SystemVerilogLanguage extends Language(LangSystemVerilog.getName)
+class SystemVerilogLanguage extends Language(LangSystemVerilog.getName)
+object SystemVerilogLanguage {
+  val INSTANCE = new SystemVerilogLanguage
+}

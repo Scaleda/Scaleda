@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class SystemVerilogPsiNodeFactory {
 
-  private static final Language LANGUAGE = SystemVerilogLanguage$.MODULE$;
+  private static final Language LANGUAGE = SystemVerilogLanguage$.MODULE$.INSTANCE();
 
   private static final Map<IElementType, Class<? extends ANTLRPsiNode>> map = new HashMap<>();
 

@@ -15,5 +15,5 @@ class SystemVerilogExternalFormatter extends VerilogExternalFormatter {
 
   override def getFileType: LanguageFileType = SystemVerilogFileType.instance
 
-  override def getLanguage: Language = SystemVerilogLanguage
+  override def getLanguage: Language = SystemVerilogLanguage.INSTANCE
 }

@@ -145,5 +145,5 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
     file.isInstanceOf[VerilogPSIFileRoot]
 
   def getFileType: LanguageFileType = VerilogFileType.instance
-  def getLanguage: Language        = VerilogLanguage
+  def getLanguage: Language        = VerilogLanguage.INSTANCE
 }

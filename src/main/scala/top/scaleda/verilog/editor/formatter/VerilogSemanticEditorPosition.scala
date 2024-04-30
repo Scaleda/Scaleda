@@ -45,7 +45,7 @@ final class VerilogSemanticEditorPosition private(val editor: Editor, val offset
   def getStartOffset: Int = if (!myIterator.atEnd) myIterator.getStart else -1
 
   def moveAtEndOfPreviousLine(): Unit = {
-    moveBeforeOptionalMix(VerilogLanguage.getTokenType(VerilogLexer.White_space))
+    moveBeforeOptionalMix(VerilogLanguage.INSTANCE.getTokenType(VerilogLexer.White_space))
     // should be enough
   }
 

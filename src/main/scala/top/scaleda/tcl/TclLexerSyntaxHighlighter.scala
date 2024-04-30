@@ -12,7 +12,7 @@ import top.scaleda.tcl.parser.TclLexer
 
 class TclLexerSyntaxHighlighter extends SyntaxHighlighterBase {
   override def getHighlightingLexer: Lexer =
-    new ANTLRLexerAdaptor(TclLanguage, new TclLexer(null))
+    new ANTLRLexerAdaptor(TclLanguage.INSTANCE, new TclLexer(null))
 
   override def getTokenHighlights(
       tokenType: IElementType

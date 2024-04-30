@@ -46,7 +46,7 @@ public class VerilogPsiLeafNodeFactory {
   }
 
   public static TokenIElementType getTokenIElementType(int tokenIndex) {
-    return PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage$.MODULE$)
+    return PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage$.MODULE$.INSTANCE())
         .get(tokenIndex);
   }
 

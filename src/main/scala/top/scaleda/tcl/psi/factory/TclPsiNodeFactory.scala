@@ -13,7 +13,7 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiNode
 import scala.collection.mutable
 
 object TclPsiNodeFactory {
-  private val LANGUAGE = TclLanguage
+  private val LANGUAGE = TclLanguage.INSTANCE
   private val ruleIElementTypeClassMap =
     new mutable.HashMap[IElementType, Class[_ <: ANTLRPsiNode]]
 

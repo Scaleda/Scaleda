@@ -15,7 +15,7 @@ object TclPsiLeafNodeFactory {
     new util.HashMap[IElementType, Class[_ <: ANTLRPsiLeafNode]]
 
   def getTokenIElementType(tokenIndex: Int) = PSIElementTypeFactory
-    .getTokenIElementTypes(TclLanguage)
+    .getTokenIElementTypes(TclLanguage.INSTANCE)
     .get(tokenIndex)
 
   def create(`type`: IElementType, text: CharSequence): ANTLRPsiLeafNode = {

@@ -9,7 +9,7 @@ import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
 
 import javax.swing.Icon
 
-final class VerilogFileType extends LanguageFileType(VerilogLanguage) {
+final class VerilogFileType extends LanguageFileType(VerilogLanguage.INSTANCE) {
   override def getName: String = LangVerilog.getName
 
   override def getDescription: String = "Verilog"

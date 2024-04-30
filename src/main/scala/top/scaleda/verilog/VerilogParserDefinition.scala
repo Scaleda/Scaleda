@@ -16,10 +16,10 @@ import org.antlr.v4.runtime.tree.ParseTree
 
 final class VerilogParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =
-    new ANTLRLexerAdaptor(VerilogLanguage, new VerilogLexer(null))
+    new ANTLRLexerAdaptor(VerilogLanguage.INSTANCE, new VerilogLexer(null))
 
   override def createParser(project: Project): PsiParser =
-    new ANTLRParserAdaptor(VerilogLanguage, new VerilogParser(null)) {
+    new ANTLRParserAdaptor(VerilogLanguage.INSTANCE, new VerilogParser(null)) {
       override def parse(parser: Parser, root: IElementType): ParseTree = {
         if (root.isInstanceOf[IFileElementType]) {
           parser.asInstanceOf[VerilogParser].source_text()
@@ -55,19 +55,19 @@ object VerilogParserDefinition {
 //    .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
 //    .map(x => if (x._2 == null) "<INVALID>" else x._2)
 //    .toArray
-  PSIElementTypeFactory.defineLanguageIElementTypes(VerilogLanguage, vocabulary, VerilogParser.ruleNames)
-  val FILE = new IFileElementType(VerilogLanguage)
+  PSIElementTypeFactory.defineLanguageIElementTypes(VerilogLanguage.INSTANCE, vocabulary, VerilogParser.ruleNames)
+  val FILE = new IFileElementType(VerilogLanguage.INSTANCE)
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
-    VerilogLanguage,
+    VerilogLanguage.INSTANCE,
     VerilogLexer.Block_comment,
     VerilogLexer.One_line_comment
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
-    VerilogLanguage,
+    VerilogLanguage.INSTANCE,
     VerilogLexer.White_space
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
-    VerilogLanguage,
+    VerilogLanguage.INSTANCE,
     VerilogLexer.String
   )
 }

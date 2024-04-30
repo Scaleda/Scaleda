@@ -56,7 +56,7 @@ public class VerilogCodeStylePanel extends CodeStyleAbstractPanel {
   private JComboBox myFormalIndent;
 
   VerilogCodeStylePanel(CodeStyleSettings currentSettings, CodeStyleSettings settings) {
-    super(VerilogLanguage$.MODULE$, currentSettings, settings);
+    super(VerilogLanguage$.MODULE$.INSTANCE(), currentSettings, settings);
     myPanel.setBorder(JBUI.Borders.empty(10));
     addPanelToWatch(myPanel);
 
@@ -85,9 +85,9 @@ public class VerilogCodeStylePanel extends CodeStyleAbstractPanel {
 
   @Override
   public void apply(CodeStyleSettings settings) throws ConfigurationException {
-    var indentOptions = settings.getLanguageIndentOptions(VerilogLanguage$.MODULE$);
+    var indentOptions = settings.getLanguageIndentOptions(VerilogLanguage$.MODULE$.INSTANCE());
     indentOptions.INDENT_SIZE = myIndentationSpaces.getValue();
-    settings.setRightMargin(VerilogLanguage$.MODULE$, myColumnLimit.getValue());
+    settings.setRightMargin(VerilogLanguage$.MODULE$.INSTANCE(), myColumnLimit.getValue());
 
     var verilogSettings = settings.getCustomSettings(VerilogCodeStyleSettings.class);
     verilogSettings.LINE_BREAK_PENALTY_$eq(myLineBreakPenalty.getValue());
@@ -135,9 +135,9 @@ public class VerilogCodeStylePanel extends CodeStyleAbstractPanel {
 
   @Override
   protected void resetImpl(CodeStyleSettings settings) {
-    var indentOptions = settings.getLanguageIndentOptions(VerilogLanguage$.MODULE$);
+    var indentOptions = settings.getLanguageIndentOptions(VerilogLanguage$.MODULE$.INSTANCE());
     myIndentationSpaces.setValue(indentOptions.INDENT_SIZE);
-    myColumnLimit.setValue(settings.getRightMargin(VerilogLanguage$.MODULE$));
+    myColumnLimit.setValue(settings.getRightMargin(VerilogLanguage$.MODULE$.INSTANCE()));
 
     var verilogSettings = settings.getCustomSettings(VerilogCodeStyleSettings.class);
     myLineBreakPenalty.setValue(verilogSettings.LINE_BREAK_PENALTY());

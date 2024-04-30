@@ -5,4 +5,7 @@ import kernel.language.LangBluespec
 
 import com.intellij.lang.Language
 
-object BluespecLanguage extends Language(LangBluespec.getName)
+class BluespecLanguage extends Language(LangBluespec.getName)
+object BluespecLanguage {
+  val INSTANCE = new BluespecLanguage
+}

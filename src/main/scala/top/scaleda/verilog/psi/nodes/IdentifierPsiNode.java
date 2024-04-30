@@ -41,7 +41,7 @@ public class IdentifierPsiNode extends ANTLRPsiNode implements PsiNameIdentifier
     public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
         ASTNode currentChild = this.getNode().getFirstChildNode();
         ASTNode newChild = new ANTLRPsiLeafNode(
-                PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage$.MODULE$)
+                PSIElementTypeFactory.getTokenIElementTypes(VerilogLanguage$.MODULE$.INSTANCE())
                         .get(VerilogLexer.Simple_identifier),
                 name
         );

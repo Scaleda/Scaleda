@@ -9,7 +9,7 @@ import top.scaleda.verilog.psi.nodes.ScopeNode
 import javax.swing.Icon
 
 class TclPSIFileRoot(viewProvider: FileViewProvider)
-    extends PsiFileBase(viewProvider, TclLanguage)
+    extends PsiFileBase(viewProvider, TclLanguage.INSTANCE)
     with ScopeNode {
 
   override def getFileType: FileType =

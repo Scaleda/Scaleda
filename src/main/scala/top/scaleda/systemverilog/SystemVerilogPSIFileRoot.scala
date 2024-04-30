@@ -10,7 +10,7 @@ import com.intellij.psi.FileViewProvider
 import javax.swing.Icon
 
 class SystemVerilogPSIFileRoot(viewProvider: FileViewProvider)
-    extends PsiFileBase(viewProvider, SystemVerilogLanguage)
+    extends PsiFileBase(viewProvider, SystemVerilogLanguage.INSTANCE)
     with ScopeNode {
 
   override def getFileType: FileType =

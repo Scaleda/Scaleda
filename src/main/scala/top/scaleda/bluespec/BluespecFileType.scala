@@ -8,7 +8,7 @@ import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
 
 import javax.swing.Icon
 
-final class BluespecFileType extends LanguageFileType(BluespecLanguage) {
+final class BluespecFileType extends LanguageFileType(BluespecLanguage.INSTANCE) {
   override def getName: String = LangBluespec.getName
 
   override def getDescription: String = LangBluespec.getDescription

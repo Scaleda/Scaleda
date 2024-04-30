@@ -19,7 +19,7 @@ import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, TokenIElementType}
   */
 class SystemVerilogLexerSyntaxHighlighter extends SyntaxHighlighterBase {
   override def getHighlightingLexer: Lexer =
-    new ANTLRLexerAdaptor(SystemVerilogLanguage, new SystemVerilogLexer(null))
+    new ANTLRLexerAdaptor(SystemVerilogLanguage.INSTANCE, new SystemVerilogLexer(null))
 
   override def getTokenHighlights(tokenType: IElementType): Array[TextAttributesKey] = {
     if (!tokenType.isInstanceOf[TokenIElementType]) return Array.empty

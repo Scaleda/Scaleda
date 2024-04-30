@@ -11,7 +11,7 @@ import org.antlr.intellij.adaptor.lexer.{ANTLRLexerAdaptor, TokenIElementType}
 
 class BluespecLexerSyntaxHighlighter extends SyntaxHighlighterBase {
   override def getHighlightingLexer: Lexer =
-    new ANTLRLexerAdaptor(BluespecLanguage, new BluespecLexer(null))
+    new ANTLRLexerAdaptor(BluespecLanguage.INSTANCE, new BluespecLexer(null))
 
   override def getTokenHighlights(
       tokenType: IElementType

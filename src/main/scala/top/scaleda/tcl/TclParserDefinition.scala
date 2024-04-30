@@ -15,10 +15,10 @@ import org.antlr.v4.runtime.Parser
 
 final class TclParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =
-    new ANTLRLexerAdaptor(TclLanguage, new TclLexer(null))
+    new ANTLRLexerAdaptor(TclLanguage.INSTANCE, new TclLexer(null))
 
   override def createParser(project: Project): PsiParser =
-    new ANTLRParserAdaptor(TclLanguage, new TclParser(null)) {
+    new ANTLRParserAdaptor(TclLanguage.INSTANCE, new TclParser(null)) {
       override def parse(parser: Parser, root: IElementType) = {
         // TODO: check this
         parser.asInstanceOf[TclParser].inicio()
@@ -51,25 +51,25 @@ object TclParserDefinition {
 //    .map(x => if (x._2 == null) "<INVALID>" else x._2)
 //    .toArray
   PSIElementTypeFactory.defineLanguageIElementTypes(
-    TclLanguage,
+    TclLanguage.INSTANCE,
     // tokenNames :+ "<INVALID>",
     vocabulary,
     TclParser.ruleNames
   )
-  val FILE   = new IFileElementType(TclLanguage)
-  val tokens = PSIElementTypeFactory.getTokenIElementTypes(TclLanguage)
+  val FILE   = new IFileElementType(TclLanguage.INSTANCE)
+  val tokens = PSIElementTypeFactory.getTokenIElementTypes(TclLanguage.INSTANCE)
   TclLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
-    TclLanguage,
+    TclLanguage.INSTANCE,
     TclLexer.COMMENT,
     TclLexer.COMMENT_INLINE
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
-    TclLanguage,
+    TclLanguage.INSTANCE,
     TclLexer.WS
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
-    TclLanguage,
+    TclLanguage.INSTANCE,
     TclLexer.CONST_STRING
   )
 }

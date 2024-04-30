@@ -14,10 +14,10 @@ import top.scaleda.systemverilog.psi.SystemVerilogPsiNodeFactory
 
 final class SystemVerilogParserDefinition extends ParserDefinition {
   override def createLexer(project: Project): Lexer =
-    new ANTLRLexerAdaptor(SystemVerilogLanguage, new SystemVerilogLexer(null))
+    new ANTLRLexerAdaptor(SystemVerilogLanguage.INSTANCE, new SystemVerilogLexer(null))
 
   override def createParser(project: Project): PsiParser =
-    new ANTLRParserAdaptor(SystemVerilogLanguage, new SystemVerilogParser(null)) {
+    new ANTLRParserAdaptor(SystemVerilogLanguage.INSTANCE, new SystemVerilogParser(null)) {
       override def parse(parser: Parser, root: IElementType) = {
         parser.asInstanceOf[SystemVerilogParser].source_text()
       }
@@ -52,21 +52,21 @@ object SystemVerilogParserDefinition {
 //    .map(x => (x, if (x._2 == null) vocabulary.getSymbolicName(x._1) else x._2))
 //    .map(x => if (x._2 == null) "<INVALID>" else x._2)
 //    .toArray
-  PSIElementTypeFactory.defineLanguageIElementTypes(SystemVerilogLanguage, vocabulary, SystemVerilogParser.ruleNames)
-  val FILE   = new IFileElementType(SystemVerilogLanguage)
-  val tokens = PSIElementTypeFactory.getTokenIElementTypes(SystemVerilogLanguage)
+  PSIElementTypeFactory.defineLanguageIElementTypes(SystemVerilogLanguage.INSTANCE, vocabulary, SystemVerilogParser.ruleNames)
+  val FILE   = new IFileElementType(SystemVerilogLanguage.INSTANCE)
+  val tokens = PSIElementTypeFactory.getTokenIElementTypes(SystemVerilogLanguage.INSTANCE)
   // SystemVerilogLogger.Log.info("tokens: " + tokens.toArray.mkString(", "))
   val COMMENTS = PSIElementTypeFactory.createTokenSet(
-    SystemVerilogLanguage,
+    SystemVerilogLanguage.INSTANCE,
     SystemVerilogLexer.BLOCK_COMMENT,
     SystemVerilogLexer.LINE_COMMENT
   )
   val WHITESPACE = PSIElementTypeFactory.createTokenSet(
-    SystemVerilogLanguage,
+    SystemVerilogLanguage.INSTANCE,
     SystemVerilogLexer.WHITE_SPACE
   )
   val STRING = PSIElementTypeFactory.createTokenSet(
-    SystemVerilogLanguage,
+    SystemVerilogLanguage.INSTANCE,
     SystemVerilogLexer.STRING_LITERAL
   )
 }

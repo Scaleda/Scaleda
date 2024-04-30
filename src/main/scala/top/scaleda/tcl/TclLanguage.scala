@@ -3,4 +3,7 @@ package tcl
 
 import com.intellij.lang.Language
 
-object TclLanguage extends Language("Tcl")
+class TclLanguage extends Language("Tcl")
+object TclLanguage {
+  val INSTANCE = new TclLanguage
+}

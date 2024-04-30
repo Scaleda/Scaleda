@@ -16,5 +16,5 @@ class BluespecExternalFormatter extends VerilogExternalFormatter {
 
   override def getFileType: LanguageFileType = bluespec.BluespecFileType.instance
 
-  override def getLanguage: Language = BluespecLanguage
+  override def getLanguage: Language = BluespecLanguage.INSTANCE
 }

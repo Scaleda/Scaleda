@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class BluespecPsiNodeFactory {
 
-  private static final Language LANGUAGE = BluespecLanguage$.MODULE$;
+  private static final Language LANGUAGE = BluespecLanguage$.MODULE$.INSTANCE();
 
   private static final Map<IElementType, Class<? extends ANTLRPsiNode>> map = new HashMap<>();
 

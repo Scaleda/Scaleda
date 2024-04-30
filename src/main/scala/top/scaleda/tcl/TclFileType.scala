@@ -8,7 +8,7 @@ import com.intellij.openapi.fileTypes.{FileType, LanguageFileType}
 
 import javax.swing.Icon
 
-final class TclFileType extends LanguageFileType(TclLanguage) {
+final class TclFileType extends LanguageFileType(TclLanguage.INSTANCE) {
   override def getName: String = LangTcl.getName
 
   override def getDescription: String = LangTcl.getDescription

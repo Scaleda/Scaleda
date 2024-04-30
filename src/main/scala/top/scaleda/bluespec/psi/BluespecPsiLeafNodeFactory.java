@@ -46,7 +46,7 @@ public class BluespecPsiLeafNodeFactory {
   }
 
   public static TokenIElementType getTokenIElementType(int tokenIndex) {
-    return PSIElementTypeFactory.getTokenIElementTypes(BluespecLanguage$.MODULE$)
+    return PSIElementTypeFactory.getTokenIElementTypes(BluespecLanguage$.MODULE$.INSTANCE())
             .get(tokenIndex);
   }
 
