@@ -22,6 +22,10 @@ import top.scaleda.tcl.parser.TclParser;
 import top.scaleda.tcl.psi.factory.TclPsiNodeFactory;
 
 public final class TclParserDefinition implements ParserDefinition {
+  public TclParserDefinition() {
+    PSIElementTypeFactory.defineLanguageIElementTypes(TclLanguage.INSTANCE(), TclParser.VOCABULARY, TclParser.ruleNames);
+  }
+
   @Override
   public @NotNull Lexer createLexer(Project project) {
     return new ANTLRLexerAdaptor(TclLanguage.INSTANCE(), new TclLexer(null));
@@ -39,22 +43,32 @@ public final class TclParserDefinition implements ParserDefinition {
 
   @Override
   public @NotNull IFileElementType getFileNodeType() {
-    return TclParserDefinition.FILE;
+    return new IFileElementType(TclLanguage.INSTANCE());
   }
 
   @Override
   public @NotNull TokenSet getWhitespaceTokens() {
-    return TclParserDefinition.WHITESPACE;
+    return PSIElementTypeFactory.createTokenSet(
+            TclLanguage.INSTANCE(),
+            TclLexer.WS
+    );
   }
 
   @Override
   public @NotNull TokenSet getCommentTokens() {
-    return TclParserDefinition.COMMENTS;
+    return PSIElementTypeFactory.createTokenSet(
+            TclLanguage.INSTANCE(),
+            TclLexer.COMMENT,
+            TclLexer.COMMENT_INLINE
+    );
   }
 
   @Override
   public @NotNull TokenSet getStringLiteralElements() {
-    return TclParserDefinition.STRING;
+    return PSIElementTypeFactory.createTokenSet(
+            TclLanguage.INSTANCE(),
+            TclLexer.CONST_STRING
+    );
   }
 
   @Override
@@ -71,19 +85,4 @@ public final class TclParserDefinition implements ParserDefinition {
   public @NotNull PsiElement createElement(ASTNode node) {
     return TclPsiNodeFactory.create(node);
   }
-
-  private static final IFileElementType FILE = new IFileElementType(TclLanguage.INSTANCE());
-  private static final TokenSet COMMENTS = PSIElementTypeFactory.createTokenSet(
-          TclLanguage.INSTANCE(),
-          TclLexer.COMMENT,
-          TclLexer.COMMENT_INLINE
-  );
-  private static final TokenSet WHITESPACE = PSIElementTypeFactory.createTokenSet(
-          TclLanguage.INSTANCE(),
-          TclLexer.WS
-  );
-  private static final TokenSet STRING = PSIElementTypeFactory.createTokenSet(
-          TclLanguage.INSTANCE(),
-          TclLexer.CONST_STRING
-  );
 }

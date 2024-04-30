@@ -22,6 +22,10 @@ import top.scaleda.verilog.parser.VerilogParser;
 import top.scaleda.verilog.psi.VerilogPsiNodeFactory;
 
 public final class VerilogParserDefinition implements ParserDefinition {
+  public VerilogParserDefinition() {
+    PSIElementTypeFactory.defineLanguageIElementTypes(VerilogLanguage.INSTANCE(), VerilogParser.VOCABULARY, VerilogParser.ruleNames);
+  }
+
   @Override
   public @NotNull Lexer createLexer(Project project) {
     return new ANTLRLexerAdaptor(VerilogLanguage.INSTANCE(), new VerilogLexer(null));

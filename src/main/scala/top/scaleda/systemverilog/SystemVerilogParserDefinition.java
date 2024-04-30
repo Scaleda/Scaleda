@@ -22,6 +22,10 @@ import top.scaleda.systemverilog.parser.SystemVerilogParser;
 import top.scaleda.systemverilog.psi.SystemVerilogPsiNodeFactory;
 
 public final class SystemVerilogParserDefinition implements ParserDefinition {
+  public SystemVerilogParserDefinition() {
+    PSIElementTypeFactory.defineLanguageIElementTypes(SystemVerilogLanguage.INSTANCE(), SystemVerilogParser.VOCABULARY, SystemVerilogParser.ruleNames);
+  }
+
   @Override
   public @NotNull Lexer createLexer(Project project) {
     return new ANTLRLexerAdaptor(SystemVerilogLanguage.INSTANCE(), new SystemVerilogLexer(null));

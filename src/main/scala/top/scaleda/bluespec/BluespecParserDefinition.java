@@ -22,6 +22,10 @@ import top.scaleda.bluespec.parser.BluespecParser;
 import top.scaleda.bluespec.psi.BluespecPsiNodeFactory;
 
 public class BluespecParserDefinition implements ParserDefinition {
+  public BluespecParserDefinition() {
+    PSIElementTypeFactory.defineLanguageIElementTypes(BluespecLanguage.INSTANCE(), BluespecParser.VOCABULARY, BluespecParser.ruleNames);
+  }
+
   @Override
   public @NotNull Lexer createLexer(Project project) {
     return new ANTLRLexerAdaptor(BluespecLanguage.INSTANCE(), new BluespecLexer(null));
