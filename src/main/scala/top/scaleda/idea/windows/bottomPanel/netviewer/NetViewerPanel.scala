@@ -13,19 +13,9 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import io.grpc.ManagedChannel
 import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
 
+import java.awt.Graphics
 import java.awt.event.MouseEvent
-import java.awt.image.{
-  BufferedImage,
-  ColorModel,
-  ComponentColorModel,
-  DataBufferByte,
-  DataBufferInt,
-  DataBufferUShort,
-  DirectColorModel,
-  IndexColorModel,
-  Raster
-}
-import java.awt.{Color, Graphics, Point}
+import java.awt.image.{BufferedImage, DataBufferUShort}
 import java.nio.ByteBuffer
 import javax.swing.{JPanel, Timer}
 import scala.collection.mutable
@@ -127,7 +117,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
             if (lastFrame.isEmpty) {
               return
             }
-            val frame = lastFrame.get
+            val frame      = lastFrame.get
             val img        = new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_USHORT_565_RGB)
             val byteBuffer = ByteBuffer.wrap(frame.data)
             val imgBuffer  = img.getRaster.getDataBuffer.asInstanceOf[DataBufferUShort]
@@ -285,21 +275,35 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   val group = new DefaultActionGroup()
   group.add(new AnAction(AllIcons.Actions.Execute) {
     override def actionPerformed(e: AnActionEvent): Unit = {
-      launchRvcdThread = Some({
-        val t = new Thread(launchRvcdRunnable)
-        t.start()
-        t
-      })
-      windowVisible = false
-      Thread.sleep(500)
-      reConnect()
+      if (launchRvcdThread.exists(_.isAlive)) {
+        // stop
+        launchRvcdThread.foreach(_.interrupt())
+        launchRvcdThread = None
+        fbShutdown.foreach(_())
+        fbShutdown = None
+        fbClient = None
+      } else {
+        launchRvcdThread = Some({
+          val t = new Thread(launchRvcdRunnable)
+          t.start()
+          t
+        })
+        windowVisible = false
+        new Thread(() => {
+          Thread.sleep(500)
+          reConnect()
+        }).start()
+      }
     }
     override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
 
     override def update(e: AnActionEvent): Unit = {
-      e.getPresentation.setEnabled(fbClient.isEmpty && !launchRvcdThread.exists(_.isAlive))
-      // e.getPresentation.setEnabled(fbClient.isEmpty && rpcClient.isEmpty)
-      // e.getPresentation.setEnabled(true)
+      if (launchRvcdThread.exists(_.isAlive)) {
+        e.getPresentation.setIcon(AllIcons.Actions.Cancel)
+      } else {
+        e.getPresentation.setIcon(AllIcons.Actions.Execute)
+        e.getPresentation.setEnabled(fbClient.isEmpty)
+      }
     }
   })
   group.add(new AnAction(AllIcons.Ide.Link) {

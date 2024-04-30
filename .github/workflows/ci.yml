@@ -14,7 +14,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  JDK_JAVA_OPTIONS: -Xmx16g -Xms16g
+#  JDK_JAVA_OPTIONS: -Xmx16g -Xms16g
 
 jobs:
   build:
@@ -57,16 +57,8 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
-      - name: Run sbt test
-        run: sbt test
-
-      - name: Package scaleda-kernel Jar
-        run: |
-          sbt 'project kernel; assembly'
-
-      - name: Make plugin zip package
-        run: |
-          sbt packageArtifactZip
+      - name: Run sbt
+        run: sbt 'test; project kernel; assembly; packageArtifactZip'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
