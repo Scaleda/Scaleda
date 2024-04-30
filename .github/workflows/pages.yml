@@ -14,7 +14,6 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        scala: [ 2.13.10 ]
         scala2: [ 2.13 ]
         java: [ temurin@17 ]
     runs-on: ubuntu-latest
@@ -65,10 +64,10 @@ jobs:
           key: ${{ runner.os }}-sbt-cache-v2-2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
       - name: Generate Scaladoc
         run: |
-          sbt ++${{ matrix.scala }} doc || echo "generate done"
+          sbt doc || echo "generate done"
       - name: Copy Scaladoc to static deploy files
         run: |
-          mv ./target/scala-${{ matrix.scala2 }}/api ./docs/public/ && echo "move api/ to docs/public/api/"
+          mv ./target/scala-2.13/api ./docs/public/ && echo "move api/ to docs/public/api/"
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
