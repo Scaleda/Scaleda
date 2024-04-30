@@ -10,7 +10,7 @@ import java.util.zip.ZipInputStream
 import scala.io.Source
 
 object ExtractAssets {
-  private val ASSET_VERSION   = 3 // Update me when newer assets are loaded
+  private val ASSET_VERSION   = 4 // Update me when newer assets are loaded
   private val ZIP_BUFFER_SIZE = 1024
 
   private val targetDirectory = Paths.getBinaryDir
