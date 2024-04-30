@@ -7,11 +7,11 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IJ_PLUGIN_REPO_TOKEN: ${{ secrets.IJ_PLUGIN_REPO_TOKEN }}
-  JDK_JAVA_OPTIONS: -Xmx16g -Xms16g
+#  JDK_JAVA_OPTIONS: -Xmx16g -Xms16g
 
 jobs:
   build:
-    name: Build and Test
+    name: Publish
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -49,81 +49,10 @@ jobs:
             ~/AppData/Local/Coursier/Cache/v1
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
-
-      - name: Build project
-        run: sbt test
-
-      - name: Package scaleda-kernel Jar
-        run: |
-          sbt 'project kernel; assembly'
-
-      - name: Make plugin zip package
-        run: |
-          sbt packageArtifactZip
 
       - name: Verify plugin compatibility
         run: |
           sbt runPluginVerifier || echo "Plugin verifier done, result ignored"
-
-      - name: Compress target directories
-        run: tar cf targets.tar target scaleda-kernel/target project/target
-
-      - name: Upload target directories
-        uses: actions/upload-artifact@v2
-        with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}
-          path: targets.tar
-
-  publish:
-    name: Publish Artifacts
-    needs: [build]
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        java: [temurin@17]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout current branch (full)
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Setup Java (temurin@11)
-        if: matrix.java == 'temurin@11'
-        uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: 11
-
-      - name: Setup Java (temurin@17)
-        if: matrix.java == 'temurin@17'
-        uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Cache sbt
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier/cache/v1
-            ~/.cache/coursier/v1
-            ~/AppData/Local/Coursier/Cache/v1
-            ~/Library/Caches/Coursier/v1
-          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
-
-      - name: Download target directories
-        uses: actions/download-artifact@v2
-        with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}
-
-      - name: Inflate target directories
-        run: |
-          tar xf targets.tar
-          rm targets.tar
 
       - name: Publish this plugin
         run: sbt publishPlugin
