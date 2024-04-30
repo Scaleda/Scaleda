@@ -4,7 +4,8 @@ import scala.io.Source
 
 val publicScalaVersion = "2.13.12"
 // val ideaVersion = "2023.1.3"
-val ideaVersion = "241.14494.240"
+// val ideaVersion = "241.14494.240"
+val ideaVersion = "2024.1.1"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
