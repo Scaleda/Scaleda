@@ -59,6 +59,10 @@ jobs:
       - name: Run sbt test
         run: sbt test
 
+      - name: Package scaleda-kernel Jar
+        run: |
+          sbt 'project kernel; assembly'
+
       - name: Make plugin zip package
         run: |
           sbt packageArtifactZip
@@ -68,4 +72,6 @@ jobs:
         with:
           name: Scaleda-${{ matrix.os }}-${{ matrix.java }}-${{ github.sha }}
           compression-level: 0
-          path: target/Scaleda-*.zip
+          path: |
+            target/Scaleda-*.zip
+            scaleda-kernel/target/scala-2.13/scaleda-kernel.jar
