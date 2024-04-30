@@ -2,23 +2,16 @@ package top.scaleda
 package idea.windows.bottomPanel.netviewer
 
 import idea.rvcd.{FrameBuffer, Rvcd, RvcdFrameBufferChannel, RvcdService}
-import idea.utils.{OutputLogger, ScaledaIdeaLogger}
+import idea.utils.ScaledaIdeaLogger
+import kernel.shell.ScaledaRunKernelHandler
+import kernel.shell.command.{CommandDeps, CommandRunner}
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.actionSystem.{
-  ActionManager,
-  ActionToolbar,
-  ActionUpdateThread,
-  AnAction,
-  AnActionEvent,
-  DefaultActionGroup
-}
+import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import io.grpc.ManagedChannel
 import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
-import top.scaleda.kernel.shell.ScaledaRunKernelHandler
-import top.scaleda.kernel.shell.command.{CommandDeps, CommandRunner}
 
 import java.awt.event.MouseEvent
 import java.awt.image.{BufferedImage, DataBufferUShort}
@@ -37,6 +30,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
   private def initFrameBufferHandler: (Option[RvcdFrameBufferChannel], Option[() => Unit]) = {
     try {
       val (client, shutdown) = RvcdFrameBufferChannel.unix()
+      // val (client, shutdown) = RvcdFrameBufferChannel.tcp()
       (Some(client), Some(shutdown))
     } catch {
       case e: java.net.ConnectException =>
@@ -165,6 +159,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
 
           if (!sendEventsThread.isAlive)
             sendEventsSocket()
+        // sendEventsRpc()
         case _ =>
       }
     }
@@ -313,7 +308,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
     ActionManager
       .getInstance()
       .createActionToolbar(
-        "NetView Toolbar", // ?
+        "NetView Toolbar",
         group,
         false
       )

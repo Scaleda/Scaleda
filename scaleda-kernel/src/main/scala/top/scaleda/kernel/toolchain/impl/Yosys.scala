@@ -22,23 +22,23 @@ class Yosys(executor: Executor) extends Toolchain(executor) {
     Seq(
       CommandDeps(
         args = (if (OS.isWindows) {
-          Seq(
-            new File(executor.profile.path, "run" + (if (OS.isWindows) ".bat" else ".sh")).getAbsolutePath,
-            new File(
-              new File(executor.profile.path, "bin"),
-              "yosys" + (if (OS.isWindows) ".exe" else "")
-            ).getAbsolutePath
-          )
-        }
-        else {
-          Seq(
-            new File(new File(executor.profile.path, "bin"), "yosys").getAbsolutePath
-          )
-        }) ++ Seq(
+                  Seq(
+                    new File(executor.profile.path, "run" + (if (OS.isWindows) ".bat" else ".sh")).getAbsolutePath,
+                    new File(
+                      new File(executor.profile.path, "bin"),
+                      "yosys" + (if (OS.isWindows) ".exe" else "")
+                    ).getAbsolutePath
+                  )
+                } else {
+                  Seq(
+                    new File(new File(executor.profile.path, "bin"), "yosys").getAbsolutePath
+                  )
+                }) ++ Seq(
           "-o",
-          new File(workingDir.getAbsolutePath, f"${synExecutor.topModule}.edif").getAbsolutePath,
-          "-S"
-        ) ++ sources.map(_.getAbsolutePath),
+          new File(workingDir.getAbsolutePath, f"${synExecutor.topModule}.edif").getAbsolutePath
+        ) ++
+          task.findTopModule.map(Seq("-r", _)).getOrElse(Seq.empty) ++
+          Seq("-S") ++ sources.map(_.getAbsolutePath),
         path = workingDir.getAbsolutePath
       )
     )
@@ -55,9 +55,9 @@ object Yosys {
   class Verifier(override val toolchainProfile: ToolchainProfile) extends ToolchainProfile.Verifier(toolchainProfile) {
 
     /** Generate command line(s) used to verify toolchain profile
-     *
-     * @return One or more than one command line(s)
-     */
+      *
+      * @return One or more than one command line(s)
+      */
     override def verifyCommandLine: Option[Seq[CommandDeps]] = {
       if (OS.isWindows) {
         Some(
@@ -67,16 +67,18 @@ object Yosys {
           )
         )
       } else {
-        Some(Seq(CommandDeps(args = Seq(new File(new File(toolchainProfile.path, "bin"), "yosys").getAbsolutePath, "-V"))))
+        Some(
+          Seq(CommandDeps(args = Seq(new File(new File(toolchainProfile.path, "bin"), "yosys").getAbsolutePath, "-V")))
+        )
       }
     }
 
     /** Parse toolchain version information from output of command lines of [[verifyCommandLine]]
-     *
-     * @param returnValues Return values of commands
-     * @param outputs      Output strings of commands
-     * @return
-     */
+      *
+      * @param returnValues Return values of commands
+      * @param outputs      Output strings of commands
+      * @return
+      */
     override def parseVersionInfo(returnValues: Seq[Int], outputs: Seq[String]): (Boolean, Option[String]) = {
       // if (outputs.exists(_.contains("Yosys"))) {
       //   (true, Some(outputs.find(_.contains("Yosys")).get))

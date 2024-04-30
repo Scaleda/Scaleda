@@ -96,8 +96,8 @@ class RvcdFrameBufferChannel(socket: SocketChannel) {
 
 object RvcdFrameBufferChannel {
   private def connectChannel(socketChannel: SocketChannel, socketAddress: SocketAddress): Unit = {
-    socketChannel.setOption[Integer](StandardSocketOptions.SO_RCVBUF, 32 * 1024 * 1024)
-    socketChannel.setOption[Integer](StandardSocketOptions.SO_SNDBUF, 32 * 1024 * 1)
+    socketChannel.setOption[Integer](StandardSocketOptions.SO_RCVBUF, 4 * 1024 * 1024)
+    socketChannel.setOption[Integer](StandardSocketOptions.SO_SNDBUF, 4 * 1024 * 1024 / 8)
     // socketChannel.configureBlocking(true)  // blocking mode: r cannot be 0
     socketChannel.configureBlocking(false)
     socketChannel.connect(socketAddress)
