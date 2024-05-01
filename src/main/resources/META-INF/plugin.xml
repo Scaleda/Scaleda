@@ -225,8 +225,7 @@
         <postStartupActivity implementation="top.scaleda.idea.project.ProjectOpenActivity" />
         <projectService serviceImplementation="top.scaleda.idea.project.io.YmlRootManager" />
         <moduleType id="SCALEDA_MODULE" implementationClass="top.scaleda.idea.project.ScaledaModuleType"/>
-        <newProjectWizard.language id="scaleda"
-                                   implementation="top.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+        <newProjectWizard.languageGenerator implementation="top.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
 
     </extensions>
 

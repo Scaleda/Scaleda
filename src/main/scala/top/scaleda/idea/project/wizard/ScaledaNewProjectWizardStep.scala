@@ -15,15 +15,15 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import kotlin.Unit.{INSTANCE => KUnit}
 
 /** Class for project wizard step, or call it configuration?
- * @param parent NewProjectWizardLanguageStep
- */
+  * @param parent NewProjectWizardLanguageStep
+  */
 class ScaledaNewProjectWizardStep(private val parent: NewProjectWizardStep)
-  extends AbstractNewProjectWizardStep(parent) {
+    extends AbstractNewProjectWizardStep(parent) {
   // basic info
-  // private val moduleNameProperty: GraphProperty[String] = getPropertyGraph.lazyProperty(() => parent.getName)
-  private val moduleNameProperty: GraphProperty[String] = getPropertyGraph.lazyProperty(() => parent.toString)
-  private def moduleName: String                        = moduleNameProperty.get()
-  private val projectRoot                               = getContext.getProjectDirectory.toAbsolutePath
+  private val moduleNameProperty: GraphProperty[String] =
+    getPropertyGraph.lazyProperty(() => parent.getContext.getProjectName)
+  private def moduleName: String = moduleNameProperty.get()
+  private val projectRoot        = getContext.getProjectDirectory.toAbsolutePath
 
   private val addSampleCode                                  = getPropertyGraph.property(false)
   private val sourceDirectoryProperty: GraphProperty[String] = getPropertyGraph.property("src")
