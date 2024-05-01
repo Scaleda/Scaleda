@@ -37,9 +37,10 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
       switchTo: Boolean = true,
       closeable: Boolean = true
   ): Unit = {
-    val content = contentFactory.createContent(panel, displayName, false)
+    val content = contentFactory.createContent(panel, displayName, true)
     content.setPreferredFocusableComponent(panel)
     content.setCloseable(closeable)
+    content.setPinnable(true)
     contentManager.addContent(content)
     if (switchTo) contentManager.setSelectedContent(content)
   }
