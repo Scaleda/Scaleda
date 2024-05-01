@@ -12,7 +12,7 @@ import top.scaleda.idea.windows.bottomPanel.console.ConsoleTabManager;
 import top.scaleda.idea.windows.bottomPanel.message.MessageListPanel;
 import top.scaleda.idea.windows.bottomPanel.netviewer.NetViewerPanel;
 
-public class ScaledaMessagesWindowFactory implements ToolWindowFactory {
+public class ScaledaToolWindowFactory implements ToolWindowFactory {
   @Override
   public boolean shouldBeAvailable(@NotNull Project project) {
     return YmlRootManager.getInstance(project).getRoots().nonEmpty();

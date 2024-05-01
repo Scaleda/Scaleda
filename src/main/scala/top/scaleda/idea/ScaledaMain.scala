@@ -28,14 +28,15 @@ class ScaledaMain extends ProjectActivity {
 
     // invoke Env backup
     val _ = EnvironmentUtils.Backup
-    runInEdt {
-      ToolWindowManager
-        .getInstance(project)
-        .getToolWindow("Scaleda Messages")
-        .activate(() => {
-          ScaledaIdeaLogger.debug("Scaleda Messages activated")
-        })
-    }
+    // when tool window not loaded, global logger not available...
+    // runInEdt {
+    //   ToolWindowManager
+    //     .getInstance(project)
+    //     .getToolWindow("Scaleda")
+    //     .activate(() => {
+    //       ScaledaIdeaLogger.debug("Scaleda Messages activated")
+    //     })
+    // }
     // register ScaledaIdeaLogger to console service
     ScaledaIdeaLogger.setConsoleService(project.getService(classOf[ConsoleService]))
 
