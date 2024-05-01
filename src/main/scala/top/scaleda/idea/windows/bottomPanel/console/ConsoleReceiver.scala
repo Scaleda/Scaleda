@@ -22,4 +22,6 @@ trait ConsoleReceiver {
    * Clear this receiver. For console it means clear the console, while for message list it means clear the list.
    */
   def clear(): Unit = {}
+
+  def getDisplayName: String
 }

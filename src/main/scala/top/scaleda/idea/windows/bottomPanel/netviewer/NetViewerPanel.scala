@@ -2,13 +2,15 @@ package top.scaleda
 package idea.windows.bottomPanel.netviewer
 
 import idea.rvcd.{FrameBuffer, Rvcd, RvcdFrameBufferChannel, RvcdService}
+import idea.utils.OutputLogger.StdErrToWarningHandler
 import idea.utils.ScaledaIdeaLogger
-import kernel.shell.ScaledaRunKernelHandler
+import idea.waveform.RvcdHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem._
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import io.grpc.ManagedChannel
 import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
@@ -20,7 +22,7 @@ import java.nio.ByteBuffer
 import javax.swing.{JPanel, Timer}
 import scala.collection.mutable
 
-class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable {
+class NetViewerPanel(project: Project) extends SimpleToolWindowPanel(false, true) with Disposable {
 
   private def initRpcHandler: (Option[RvcdRpcGrpc.RvcdRpcBlockingStub], Option[() => ManagedChannel]) = {
     val (client, shutdown) = Rvcd()
@@ -265,7 +267,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
       Seq(
         CommandDeps(args = Seq(RvcdService.rvcdFile.getAbsolutePath, "--hidden"), description = "Start RVCD Instance")
       ),
-      ScaledaRunKernelHandler
+      new StdErrToWarningHandler(project, RvcdHandler.getId, "Rvcd", switchTo = false)
     )
   }
   private var launchRvcdThread: Option[Thread] = None
@@ -282,6 +284,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
         fbShutdown.foreach(_())
         fbShutdown = None
         fbClient = None
+        lastFrame = None
       } else {
         launchRvcdThread = Some({
           val t = new Thread(launchRvcdRunnable)
@@ -295,7 +298,7 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
         }).start()
       }
     }
-    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
+    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.EDT
 
     override def update(e: AnActionEvent): Unit = {
       if (launchRvcdThread.exists(_.isAlive)) {

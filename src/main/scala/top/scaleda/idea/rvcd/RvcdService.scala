@@ -1,13 +1,15 @@
 package top.scaleda
 package idea.rvcd
 
-import idea.utils.ScaledaIdeaLogger
 import idea.utils.OutputLogger.StdErrToInfoHandler
+import idea.utils.ScaledaIdeaLogger
+import idea.waveform.RvcdHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 import kernel.utils.{OS, Paths}
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import rvcd.rvcd.RvcdEmpty
 
 import java.io.File
@@ -21,9 +23,10 @@ import scala.language.implicitConversions
 class RvcdService extends Disposable {
   import RvcdService._
 
-  private var myProject: Project = _
+  private var myProject: Option[Project] = None
   def setProject(project: Project): Unit = {
-    myProject = project
+    myProject = Some(project)
+    Disposer.register(project, this)
   }
 
   var (client, shutdown) = Rvcd()
@@ -42,18 +45,17 @@ class RvcdService extends Disposable {
         .fold(Seq())(_ ++ _) ++ Seq(waveform.getAbsolutePath)
       ScaledaIdeaLogger.info(s"Starting RVCD with command line: ${cmdLine.mkString(" ")}")
 
-      // run
-      await(
-        CommandRunner.executeAsync(
-          Seq(
-            CommandDeps(
-              args = cmdLine,
-              description = "Start RVCD Instance"
+      myProject match {
+        case None    => throw new RuntimeException("No project is set for RvcdService")
+        case Some(p) =>
+          // run
+          await(
+            CommandRunner.executeAsync(
+              Seq(CommandDeps(args = cmdLine, description = "Start RVCD Instance")),
+              new StdErrToInfoHandler(p, RvcdHandler.getId, "Rvcd")
             )
-          ),
-          new StdErrToInfoHandler(myProject)
-        )
-      )
+          )
+      }
     } else {
       client.openFileWith(
         rvcd.rvcd.RvcdOpenFileWith.of(waveform.getAbsolutePath, "", source.map(f => f.getAbsolutePath), None)
@@ -63,6 +65,7 @@ class RvcdService extends Disposable {
 
   override def dispose(): Unit = {
     shutdown()
+    myProject = null
   }
 }
 

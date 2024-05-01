@@ -64,7 +64,7 @@ class ScaledaRunProcessHandler(
   }
   override def getProcessInput: OutputStream = outputStream
 
-  private val outputLogger = OutputLogger(project)
+  private val outputLogger = OutputLogger.create(project, rt.id, rt.task.name)
 
   override def onShellCommand(command: CommandDeps): Unit =
     outputLogger.debug("cd", s"\"${command.path}\"", "&&", command.args.map(s => s"\"$s\"").mkString(" "))

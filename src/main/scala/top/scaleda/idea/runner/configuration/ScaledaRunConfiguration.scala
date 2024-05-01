@@ -3,18 +3,19 @@ package idea.runner.configuration
 
 import idea.ScaledaBundle
 import idea.project.io.YmlRootManager
-import idea.utils.{Notification, ScaledaIdeaLogger}
 import idea.utils.notification.CreateTypicalNotification
+import idea.utils.{Notification, ScaledaIdeaLogger}
 import idea.windows.bottomPanel.ConsoleService
+import idea.windows.bottomPanel.console.{ConsoleReceiver, ConsoleViewReceiver}
 import kernel.shell.ScaledaRun
 import kernel.toolchain.runner.ScaledaRuntime
+import kernel.utils.LogLevel
 import kernel.utils.serialise.JSONHelper
 
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
@@ -23,8 +24,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
-import top.scaleda.idea.windows.bottomPanel.console.ConsoleReceiver
-import top.scaleda.kernel.utils.LogLevel
 
 import scala.collection.mutable
 import scala.language.existentials
@@ -121,7 +120,7 @@ class ScaledaRunConfiguration(
   ): RunProfileState = {
     // clear console and msg list
     val consoleService = project.getService(classOf[ConsoleService])
-    consoleService.clear()
+    // consoleService.clear()
 
     val searchScope =
       ExecutionSearchScopes
@@ -130,20 +129,6 @@ class ScaledaRunConfiguration(
     val myConsoleBuilder =
       TextConsoleBuilderFactory.getInstance
         .createBuilder(project, searchScope)
-
-    val console = myConsoleBuilder.getConsole
-    consoleService.addListener((text: String, level: LogLevel.Value) => {
-      console.print(
-        text,
-        level match {
-          case LogLevel.Info  => ConsoleViewContentType.NORMAL_OUTPUT
-          case LogLevel.Warn  => ConsoleViewContentType.LOG_WARNING_OUTPUT
-          case LogLevel.Error => ConsoleViewContentType.ERROR_OUTPUT
-          case LogLevel.Fatal => ConsoleViewContentType.ERROR_OUTPUT
-          case _              => ConsoleViewContentType.SYSTEM_OUTPUT
-        }
-      )
-    })
 
     val runtimeOptional = generateRuntime
     if (runtimeOptional.isEmpty) {
@@ -170,7 +155,22 @@ class ScaledaRunConfiguration(
 
     val runtime = ScaledaRun.preprocess(runtimeOptional.get)
 
-    new ScaledaRunProfileState(project, runtime, console, afterExecution)
+    val console  = myConsoleBuilder.getConsole
+    val receiver = new ConsoleViewReceiver(console, runtime.task.name)
+    consoleService.clearById(runtime.id)
+    consoleService.addListener(receiver, runtime.id)
+
+    new ScaledaRunProfileState(
+      project,
+      runtime,
+      console,
+      (rt, returnValue, finishedAll, meetErrors) => {
+        // val consoleService = project.getService(classOf[ConsoleService])
+        // consoleService.removeListenerByKey(rt.task.name)
+        // consoleService.removeListener(receiver)
+        afterExecution(rt, returnValue, finishedAll, meetErrors)
+      }
+    )
   }
 
   private def afterExecution(
@@ -244,7 +244,9 @@ class ScaledaRunConfiguration(
 //      })
 //      notification.notify(project)
 //    }
-//    // remove message listeners
+    // remove message listeners
+    val consoleService = project.getService(classOf[ConsoleService])
+    consoleService.removeListenerByKey(rt.id)
 //    MessageListPanel.instance.foreach(_.detachFromLogger(rt.id))
 //    ScaledaMessageParser.removeParser(rt.id)
 //    if (!meetErrors) {

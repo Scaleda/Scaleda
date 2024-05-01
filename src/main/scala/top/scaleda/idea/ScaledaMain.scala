@@ -3,19 +3,18 @@ package idea
 
 import idea.rvcd.RvcdService
 import idea.settings.toolchains.ProfileDetectAction
-import idea.toolchain.{IVerilogIdea, VivadoIdea}
-import idea.utils.{AssetsInstallAction, Icons, RpcService, ScaledaIdeaLogger, runInEdt}
+import idea.utils.{AssetsInstallAction, RpcService, ScaledaIdeaLogger, runInEdt}
+import idea.windows.bottomPanel.ConsoleService
+import idea.windows.rightPanel.ScaledaReloadTasksAction
 import kernel.bin.ExtractAssets
 import kernel.toolchain.Toolchain
-import kernel.toolchain.impl._
-import kernel.utils.{EnvironmentUtils, KernelLogger}
+import kernel.utils.EnvironmentUtils
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import com.intellij.openapi.wm.{RegisterToolWindowTaskBuilder, ToolWindowAnchor, ToolWindowManager}
+import com.intellij.openapi.wm.ToolWindowManager
 import kotlin.coroutines.Continuation
-import top.scaleda.idea.windows.rightPanel.{ScaledaReloadTasksAction, ScaledaTasksPanel, ScaledaTasksService}
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -29,33 +28,16 @@ class ScaledaMain extends ProjectActivity {
 
     // invoke Env backup
     val _ = EnvironmentUtils.Backup
-
-    // Logging service, handling IDEA log output
-    // project.getService(classOf[ScaledaLoggingService])
-    // // Main service, init jinja and kernel log
-    // project.getService(classOf[ScaledaMainService])
-
-    // Setup windows...
-    // val toolWindowManager = ToolWindowManager.getInstance(project)
-    // toolWindowManager.invokeLater(() => {
-    //   val builder =
-    //     new RegisterToolWindowTaskBuilder(ScaledaRunWindowFactory.WINDOW_ID)
-    //   builder.icon = Icons.mainSmall
-    //   builder.contentFactory = new ScaledaRunWindowFactory
-    //   builder.anchor = ToolWindowAnchor.RIGHT
-    //   // builder.stripeTitle = ScaledaBundle.message("tasks.tool.window.title")
-    //   val toolWindow = toolWindowManager.registerToolWindow(builder.build())
-    // })
-    // toolWindowManager.invokeLater(() => {
-    //   val builder =
-    //     new RegisterToolWindowTaskBuilder(ScaledaToolWindowFactory.WINDOW_ID)
-    //   builder.icon = Icons.mainSmall
-    //   builder.contentFactory = new ScaledaToolWindowFactory
-    //   builder.anchor = ToolWindowAnchor.BOTTOM
-    //   builder.shouldBeAvailable = true
-    //
-    //   val messageWindow = toolWindowManager.registerToolWindow(builder.build())
-    // })
+    runInEdt {
+      ToolWindowManager
+        .getInstance(project)
+        .getToolWindow("Scaleda Messages")
+        .activate(() => {
+          println("Scaleda Messages activated")
+        })
+    }
+    // register ScaledaIdeaLogger to console service
+    ScaledaIdeaLogger.setConsoleService(project.getService(classOf[ConsoleService]))
 
     // Check assets
     if (!ExtractAssets.isInstalled) {
@@ -75,6 +57,8 @@ class ScaledaMain extends ProjectActivity {
       }
     }
 
+    project.getService(classOf[RvcdService]).setProject(project)
+
     val rpcService = project.getService(classOf[RpcService])
     rpcService.setProject(project)
     runInEdt {
@@ -91,34 +75,18 @@ class ScaledaMain extends ProjectActivity {
           true
         )
     }
-    // try {
-      project.getService(classOf[RvcdService]).setProject(project)
-    // } catch {
-    //   case e: Exception =>
-    //     MainLogger.error("Failed to start RVCD service", "grpc version is",
-    //       io.grpc.internal.GrpcUtil.getGrpcBuildVersion.toString,
-    //       // io.grpc.netty.shaded.io.netty.util.Version.identify().toString,
-    //       e)
-    //     e.printStackTrace()
-    // }
-
-    // invoke MessageTab instance
-    // val _ = ScaledaMessageTab(project)
-
-    // invoke all toolchains
-    // Seq(IVerilog, Vivado).foreach(KernelLogger.info("Load Toolchain object", _))
-    // Seq(VivadoIdea, IVerilogIdea).foreach(KernelLogger.info("Load Toolchain Idea object", _))
-
+    // Attempt to load project
     runInEdt {
-      // Attempt to load project
-      ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
+      ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, false)
     }
 
     // Toolchain detect
     if (Toolchain.profiles().isEmpty) {
-      ActionManager
-        .getInstance()
-        .tryToExecute(new ProfileDetectAction(project), null, null, null, true)
+      runInEdt {
+        ActionManager
+          .getInstance()
+          .tryToExecute(new ProfileDetectAction(project), null, null, null, false)
+      }
     }
     AnyRef
   }

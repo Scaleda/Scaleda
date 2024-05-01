@@ -27,7 +27,7 @@ object SurferHandler extends WaveformHandler {
           )
         )
       ),
-      new StdErrToInfoHandler(project)
+      new StdErrToInfoHandler(project, getId, "Surfer")
     )
   }
 }

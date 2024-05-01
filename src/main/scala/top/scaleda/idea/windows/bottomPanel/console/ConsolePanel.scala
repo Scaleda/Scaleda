@@ -14,37 +14,56 @@ import com.intellij.openapi.editor.actions.{ScrollToTheEndToolbarAction, ToggleU
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.Disposer
+import top.scaleda.idea.utils.runInEdt
 
 import scala.jdk.javaapi.CollectionConverters
 
 class ConsolePanel(
-    parent: Disposable,
-    project: Project
+    consoleTab: ConsoleTab,
+    project: Project,
+    id: String,
+    displayName: String
 ) extends SimpleToolWindowPanel(false, true) {
   // create a new console
   private val builder = TextConsoleBuilderFactory.getInstance().createBuilder(project)
   builder.setViewer(true)
   private val consoleView = builder.getConsole
 
+  def getConsoleTab: ConsoleTab = consoleTab
+
   // register to console service
-  val receiver: ConsoleReceiver = new ConsoleReceiver {
-    override def print(text: String, level: LogLevel.Value): Unit = consoleView.print(
-      text,
-      level match {
-        case Debug   => ConsoleViewContentType.LOG_DEBUG_OUTPUT
-        case Verbose => ConsoleViewContentType.LOG_VERBOSE_OUTPUT
-        case Info    => ConsoleViewContentType.LOG_INFO_OUTPUT
-        case Warn    => ConsoleViewContentType.LOG_WARNING_OUTPUT
-        case _       => ConsoleViewContentType.LOG_ERROR_OUTPUT
+  val receiver: ConsoleReceiver = new ConsoleViewReceiver(consoleView, displayName)
+  private val service           = project.getService(classOf[ConsoleService])
+
+  def registerConsoleReceiver(attach: Boolean): Unit = {
+    if (!attach) {
+      val runningId = service.queryRunningIdByDisplayName(displayName).filter(_ != id)
+      // foreach { activationId: String =>
+      //   {
+      //     case Some(activationId) =>
+      //       println(s"still running id $activationId, create new console tab")
+      //     // service.removeListenerByKey(activationId)
+      //     // getConsoleTab.getParent.removeConsoleTab(activationId)
+      //     case None =>
+      if (runningId.isEmpty) {
+        getConsoleTab.getParent.findConsoleTabByName(displayName) foreach { tab =>
+          if (!tab.getParent.removeConsoleTab(tab)) {
+            println(s"failed to remove console tab: $tab")
+          }
+        }
+      } else {
+        println(s"still running id ${runningId.mkString(", ")}, create new console tab")
       }
-    )
-    override def clear(): Unit = consoleView.clear()
+      //   }
+      // }
+    }
+    service.addListener(receiver, id)
   }
-  private val service = project.getService(classOf[ConsoleService])
-  service.addListener(receiver)
+
+  // registerConsoleReceiver(false)
 
   // dispose console when parent is disposed
-  Disposer.register(parent, consoleView)
+  Disposer.register(consoleTab, consoleView)
 
   val group = new DefaultActionGroup()
   consoleView.getComponent

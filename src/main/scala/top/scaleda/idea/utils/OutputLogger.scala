@@ -9,44 +9,58 @@ import com.intellij.openapi.project.Project
 import sourcecode.{File, Line, Name}
 import top.scaleda.idea.windows.bottomPanel.ConsoleService
 
-/**
- * Logger for all external running stuff.
- * Message logged here will be sent to (1) console and (2) message list.
- * @param project current project
- */
-class OutputLogger(project: Project) extends BasicLogger {
+/** Logger for all external running stuff.
+  * Message logged here will be sent to (1) console and (2) message list.
+  * @param project current project
+  */
+class OutputLogger(project: Project, id: String, displayName: String, switchTo: Boolean) extends BasicLogger {
+  private val service = project.getService(classOf[ConsoleService])
+  runInEdt {
+    service.getConsoleTabManager.foreach(_.addConsoleTab(id, displayName, switchTo = switchTo))
+  }
+
   override def logging[T](level: LogLevel.Value, xs: T*)(implicit
       line: Line,
       file: File,
       name: Name
   ): Unit = {
-    val args = xs.mkString(" ")
-    val msg  = args
-    val service = project.getService(classOf[ConsoleService])
-    service.print(s"$msg\n", level)
+    val args    = xs.mkString(" ")
+    val msg     = args
+    val success = service.print(s"$msg\n", level, id)
+    if (!success) {
+      // println(s"Failed to print to console: $key $msg")
+    }
   }
 }
 
 object OutputLogger {
-  def apply(project: Project): OutputLogger = new OutputLogger(project)
-  // def apply(): OutputLogger                 = new OutputLogger(ProjectNow.apply().get)
+  def create(project: Project, id: String, displayName: String, switchTo: Boolean = true): OutputLogger =
+    new OutputLogger(project, id, displayName, switchTo = switchTo)
 
-  class Handler(project: Project) extends ScaledaRunHandler {
-    override def onStdout(data: String): Unit = OutputLogger(project).info(data)
+  class Handler(project: Project, id: String, displayName: String, switchTo: Boolean = true) extends ScaledaRunHandler {
+    private val logger = new OutputLogger(project, id, displayName, switchTo)
 
-    override def onStderr(data: String): Unit = OutputLogger(project).warn(data)
+    override def onStdout(data: String): Unit = logger.info(data)
+
+    override def onStderr(data: String): Unit = logger.warn(data)
 
     override def onReturn(returnValue: Int, finishedAll: Boolean, meetErrors: Boolean): Unit =
-      OutputLogger(project).info(
+      logger.info(
         s"command done, returns $returnValue, finishedAll: $finishedAll, meerError: $meetErrors"
       )
   }
 
-  class StdErrToWarningHandler(project: Project) extends Handler(project) {
-    override def onStderr(data: String): Unit = OutputLogger(project).warn(data)
+  class StdErrToWarningHandler(project: Project, id: String, displayName: String, switchTo: Boolean = true)
+      extends Handler(project, id, displayName) {
+    private val logger = new OutputLogger(project, id, displayName, switchTo)
+
+    override def onStderr(data: String): Unit = logger.warn(data)
   }
 
-  class StdErrToInfoHandler(project: Project) extends Handler(project) {
-    override def onStderr(data: String): Unit = OutputLogger(project).info(data)
+  class StdErrToInfoHandler(project: Project, id: String, displayName: String, switchTo: Boolean = true)
+      extends Handler(project, id, displayName) {
+    private val logger = new OutputLogger(project, id, displayName, switchTo)
+
+    override def onStderr(data: String): Unit = logger.info(data)
   }
 }

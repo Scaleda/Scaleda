@@ -18,7 +18,7 @@ class RvcdLaunchAction extends AnAction {
               description = "Start RVCD Instance"
             )
           ),
-          new OutputLogger.StdErrToInfoHandler(event.getProject)
+          new OutputLogger.StdErrToInfoHandler(event.getProject, "Rvcd", "Rvcd")
         )
       },
       "rvcd-instance"

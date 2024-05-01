@@ -18,7 +18,7 @@ object GTKWaveHandler extends WaveformHandler {
   override def handle(project: Project, waveformPath: File, sourceFiles: Seq[File]): Unit = {
     CommandRunner.executeAsync(
       Seq(CommandDeps(Seq("gtkwave", waveformPath.getAbsolutePath))),
-      new StdErrToInfoHandler(project)
+      new StdErrToInfoHandler(project, getId, "GTKWave")
     )
   }
 }
