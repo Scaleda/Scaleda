@@ -74,7 +74,7 @@ class FuseDataProvider(sourceRoot: File) extends RemoteFuse {
 
   private def getAttrInner(request: PathRequest): GetAttrReply = {
     val file = getFile(request.path)
-    logger.info(s"getattr(${request.path}) <-> $file")
+    logger.debug(s"getattr(${request.path}) <-> $file")
     getAttrLocal(file)
   }
 

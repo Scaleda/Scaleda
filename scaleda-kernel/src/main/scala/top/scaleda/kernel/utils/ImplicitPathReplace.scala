@@ -23,7 +23,10 @@ class ImplicitPathReplace(
   }
   def doRegexReplace(src: String, skipInner: Boolean = false): String = {
     inner match {
-      case Some(i) if !skipInner => doRegexReplace(i.doRegexReplace(src))
+      case Some(i) if !skipInner => {
+        KernelLogger.info("inner replace", i)
+        doRegexReplace(i.doRegexReplace(src, skipInner = true), skipInner = true)
+      }
       case _ =>
         regexPatten
           .map(r => {

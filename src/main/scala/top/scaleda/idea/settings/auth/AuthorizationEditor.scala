@@ -75,6 +75,9 @@ class AuthorizationEditor extends SearchableConfigurable {
       v.setLocationRelativeTo(null)
       canApply = false
       // stuck here
+      // if (!v.isVisible) {
+      //   v.setVisible(true)
+      // }
       v.setVisible(true)
       v.getUserToken.foreach(dataModel.addElement)
       v.setUserToken(None)

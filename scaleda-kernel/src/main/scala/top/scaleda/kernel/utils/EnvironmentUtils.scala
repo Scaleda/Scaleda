@@ -16,9 +16,8 @@ object EnvironmentUtils {
   private object LoadManually {
     def run(): Unit = {
       try {
-        val s = Source.fromFile(new File(".env"))
+        val s     = Source.fromFile(new File(".env"))
         val lines = s.getLines()
-        s.close()
         for (line <- lines) {
           if (line.contains("=")) {
             val split = line.split('=')
@@ -27,9 +26,13 @@ object EnvironmentUtils {
             }
           }
         }
+        s.close()
       } catch {
+        case _: java.io.FileNotFoundException =>
+          KernelLogger.debug("no .env file found")
         case e: Throwable =>
-          KernelLogger.debug("cannot load extra .env file:", e)
+          KernelLogger.warn("cannot load extra .env file:", e)
+          e.printStackTrace()
       }
     }
   }

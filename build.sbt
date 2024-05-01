@@ -4,8 +4,8 @@ import scala.io.Source
 
 val publicScalaVersion = "2.13.12"
 // val ideaVersion = "2023.1.3"
-// val ideaVersion = "241.14494.240"
-val ideaVersion = "2024.1.1"
+val ideaVersion = "241.15989.150"
+// val ideaVersion = "2024.1.1"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
@@ -26,7 +26,12 @@ Global / intellijAttachSources := true
 val junitInterfaceVersion = "0.11"
 val jacksonVersion        = "2.17.0"
 
-val thisVersion = Source.fromFile(new File(".version")).getLines().toSeq.head.strip()
+val thisVersion = {
+  val versionSource = Source.fromFile(new File(".version"))
+  val result        = versionSource.getLines().toSeq.head.strip()
+  versionSource.close()
+  result
+}
 
 lazy val commonSettings = Seq(
   version := thisVersion,
@@ -54,16 +59,16 @@ lazy val commonSettings = Seq(
 )
 
 lazy val publicLibraryDependencies = Seq(
-  "com.novocode"                % "junit-interface"         % junitInterfaceVersion % Test,
+  "com.novocode" % "junit-interface" % junitInterfaceVersion % Test,
   //  "org.antlr"                   % "antlr4-intellij-adaptor" % "0.1" // imported with source code
-  "org.antlr"                   % "antlr4"                  % "4.13.1",
-  "org.antlr"                   % "antlr4-runtime"          % "4.13.1",
-  "io.circe"                   %% "circe-yaml"              % "1.15.0",
-  "com.github.scopt"           %% "scopt"                   % "4.1.0",
-  "ch.qos.logback"              % "logback-classic"         % "1.5.6",
-  "com.typesafe.scala-logging" %% "scala-logging"           % "3.9.5",
-  "org.scalactic"              %% "scalactic"               % "3.2.18",
-  "org.scalatest"              %% "scalatest"               % "3.2.18"              % "test",
+  "org.antlr"                   % "antlr4"          % "4.13.1",
+  "org.antlr"                   % "antlr4-runtime"  % "4.13.1",
+  "io.circe"                   %% "circe-yaml"      % "1.15.0",
+  "com.github.scopt"           %% "scopt"           % "4.1.0",
+  "ch.qos.logback"              % "logback-classic" % "1.5.6",
+  "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.5",
+  "org.scalactic"              %% "scalactic"       % "3.2.18",
+  "org.scalatest"              %% "scalatest"       % "3.2.18" % "test",
   // for logger
   "com.lihaoyi" %% "sourcecode" % "0.4.1",
   // for color print
@@ -130,15 +135,15 @@ lazy val scaleda = project
       xml.sinceBuild = (ThisBuild / intellijBuild).value
     },
     pluginVerifierOptions := pluginVerifierOptions.value.copy(
-      version = "1.365",                                          // use a specific verifier version
-      offline = true,                                             // forbid the verifier from reaching the internet
+      version = "1.365", // use a specific verifier version
+      offline = true,    // forbid the verifier from reaching the internet
       // overrideIDEs = Seq("IC", "IU").map(_ + "-" + ideaVersion),  // verify against specific products instead of 'intellijBuild'
-      failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES)     // only fail if deprecated APIs are used
+      failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
     ),
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
     // ANTLR IntelliJ Adapter
-    Compile / unmanagedSourceDirectories += baseDirectory.value / "antlr4-intellij-adaptor/src/main/java",
+    Compile / unmanagedSourceDirectories += baseDirectory.value / "antlr4-intellij-adaptor/src/main/java"
   )
   .enablePlugins(SbtIdeaPlugin)
 

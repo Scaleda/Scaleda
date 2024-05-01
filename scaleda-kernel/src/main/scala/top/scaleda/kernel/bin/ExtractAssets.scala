@@ -29,8 +29,10 @@ object ExtractAssets {
     val oldVersion = Source.fromFile(versionFile)
     val version    = oldVersion.getLines().mkString("").toInt
     oldVersion.close()
-    KernelLogger.info(f"Assets version ${version} found, packed version is ${ASSET_VERSION}")
-    if (version < ASSET_VERSION) return false
+    if (version < ASSET_VERSION) {
+      KernelLogger.info(f"Assets version $version found, packed version is $ASSET_VERSION")
+      return false
+    }
 
     // copy or extract files from resource
     install()

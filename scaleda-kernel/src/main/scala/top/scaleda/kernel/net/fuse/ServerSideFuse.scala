@@ -47,7 +47,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
           throw e
       }
     applyAttr(reply, stat)
-    logger.info(s"getattr($path): ${reply.r} mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
+    logger.debug(s"getattr($path): ${reply.r} mode=${Integer.toOctalString(stat.st_mode.intValue())} size=${stat.st_size
       .longValue()} uid=${stat.st_uid.get} gid=${stat.st_gid.get}")
     reply.r
   }
@@ -112,7 +112,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
       offset: Long,
       fi: FuseFileInfo
   ): Int = {
-    logger.info(s"server side readdir(path=$path, offset=$offset)")
+    logger.debug(s"server side readdir(path=$path, offset=$offset)")
     val reply = stub.readdir(ReaddirRequest(path = path, offset = math.max(0, offset.toInt - 2)))
     if (reply.r == 0) {
       if (reply.enableOffset) {
@@ -123,7 +123,7 @@ class ServerSideFuse(stub: RemoteFuseBlockingClient) extends FuseStubFS {
         for (i <- entries.indices) {
           val (name, attr) = entries(i)
           if (attr.r == 0) {
-            logger.info(s"applying entry $name")
+            logger.debug(s"applying entry $name")
             if (OS.isWindows) {
               // FIXME: buffer on windows may not so big... so slower
               filter.apply(buf, name, null, offsetNext)

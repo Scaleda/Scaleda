@@ -33,7 +33,8 @@ class ScaledaDatabase {
             KernelLogger.error("cannot close inner_connection when exit", e)
         }
     }
-    inner_connection.setAutoCommit(true)
+    if (inner_connection != null)
+      inner_connection.setAutoCommit(true)
   }
 
   doConnect()

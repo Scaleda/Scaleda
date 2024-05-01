@@ -343,7 +343,9 @@ class NetViewerPanel extends SimpleToolWindowPanel(false, true) with Disposable 
 
   override def dispose(): Unit = {
     fbShutdown.foreach(_())
+    fbShutdown = None
     rpcShutdown.foreach(_())
+    rpcShutdown = None
     timer.stop()
 
     if (sendEventsThread.isAlive)
