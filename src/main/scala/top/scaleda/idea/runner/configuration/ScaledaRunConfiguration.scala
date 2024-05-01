@@ -6,7 +6,7 @@ import idea.project.io.YmlRootManager
 import idea.utils.notification.CreateTypicalNotification
 import idea.utils.{Notification, ScaledaIdeaLogger}
 import idea.windows.bottomPanel.ConsoleService
-import idea.windows.bottomPanel.console.{ConsoleReceiver, ConsoleViewReceiver}
+import idea.windows.bottomPanel.console.ConsoleViewReceiver
 import kernel.shell.ScaledaRun
 import kernel.toolchain.runner.ScaledaRuntime
 import kernel.utils.LogLevel
@@ -164,12 +164,7 @@ class ScaledaRunConfiguration(
       project,
       runtime,
       console,
-      (rt, returnValue, finishedAll, meetErrors) => {
-        // val consoleService = project.getService(classOf[ConsoleService])
-        // consoleService.removeListenerByKey(rt.task.name)
-        // consoleService.removeListener(receiver)
-        afterExecution(rt, returnValue, finishedAll, meetErrors)
-      }
+      afterExecution
     )
   }
 

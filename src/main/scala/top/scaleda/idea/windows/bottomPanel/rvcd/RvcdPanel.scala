@@ -1,5 +1,5 @@
 package top.scaleda
-package idea.windows.bottomPanel.netviewer
+package idea.windows.bottomPanel.rvcd
 
 import idea.rvcd.{FrameBuffer, Rvcd, RvcdFrameBufferChannel, RvcdService}
 import idea.utils.OutputLogger.StdErrToWarningHandler
@@ -22,7 +22,7 @@ import java.nio.ByteBuffer
 import javax.swing.{JPanel, Timer}
 import scala.collection.mutable
 
-class NetViewerPanel(project: Project) extends SimpleToolWindowPanel(false, true) with Disposable {
+class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) with Disposable {
 
   private def initRpcHandler: (Option[RvcdRpcGrpc.RvcdRpcBlockingStub], Option[() => ManagedChannel]) = {
     val (client, shutdown) = Rvcd()

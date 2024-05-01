@@ -233,7 +233,8 @@
     <!-- Tool Windows -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Scaleda"
-                    anchor="bottom" factoryClass="top.scaleda.idea.windows.bottomPanel.ScaledaToolWindowFactory" />
+                    anchor="bottom" factoryClass="top.scaleda.idea.windows.bottomPanel.ScaledaToolWindowFactory"
+                    canCloseContents="true"/>
         <toolWindow id="Scaleda Tasks"
                     anchor="right" factoryClass="top.scaleda.idea.windows.rightPanel.ScaledaTasksWindowFactory" />
     </extensions>

@@ -3,7 +3,6 @@ package idea.windows.bottomPanel.message
 
 import idea.ScaledaBundle
 import idea.utils.runInEdt
-import idea.windows.bottomPanel.console.ConsoleTabManager
 import kernel.utils.LogLevel
 
 import com.intellij.icons.AllIcons

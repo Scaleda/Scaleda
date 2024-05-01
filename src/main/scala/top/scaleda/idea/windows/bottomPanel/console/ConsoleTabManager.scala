@@ -38,7 +38,7 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
       closeable: Boolean = true
   ): Unit = {
     val content = contentFactory.createContent(panel, displayName, true)
-    content.setPreferredFocusableComponent(panel)
+    content.setComponent(panel)
     content.setCloseable(closeable)
     content.setPinnable(true)
     contentManager.addContent(content)
@@ -54,7 +54,7 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
   }
 
   def removeConsoleTab(consoleTab: ConsoleTab): Boolean = {
-    contentManager.getContents.find(_.getPreferredFocusableComponent == consoleTab.getPanel) match {
+    contentManager.getContents.find(_.getComponent == consoleTab.getPanel) match {
       case None => false
       case Some(found) =>
         contentManager.removeContent(found, true)
@@ -64,15 +64,15 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
 
   def getConsoleTabById(id: String): Option[ConsoleTab] = {
     contentManager.getContents
-      .filter(_.getPreferredFocusableComponent.isInstanceOf[ConsolePanel])
-      .map(_.getPreferredFocusableComponent.asInstanceOf[ConsolePanel].getConsoleTab)
+      .filter(_.getComponent.isInstanceOf[ConsolePanel])
+      .map(_.getComponent.asInstanceOf[ConsolePanel].getConsoleTab)
       .find(_.getMessageId == id)
   }
 
   def findConsoleTabByName(name: String): Seq[ConsoleTab] = {
     contentManager.getContents
-      .filter(_.getPreferredFocusableComponent.isInstanceOf[ConsolePanel])
-      .map(_.getPreferredFocusableComponent.asInstanceOf[ConsolePanel])
+      .filter(_.getComponent.isInstanceOf[ConsolePanel])
+      .map(_.getComponent.asInstanceOf[ConsolePanel])
       .filter(_.getConsoleTab.getDisplayName == name)
       .map(_.getConsoleTab)
       .toSeq

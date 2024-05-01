@@ -10,7 +10,7 @@ import top.scaleda.idea.project.io.YmlRootManager;
 import top.scaleda.idea.utils.ScaledaIdeaLogger;
 import top.scaleda.idea.windows.bottomPanel.console.ConsoleTabManager;
 import top.scaleda.idea.windows.bottomPanel.message.MessageListPanel;
-import top.scaleda.idea.windows.bottomPanel.netviewer.NetViewerPanel;
+import top.scaleda.idea.windows.bottomPanel.rvcd.RvcdPanel;
 
 public class ScaledaToolWindowFactory implements ToolWindowFactory {
   @Override
@@ -25,10 +25,10 @@ public class ScaledaToolWindowFactory implements ToolWindowFactory {
     Disposer.register(service, tabManager);
     service.setConsoleTabManager(tabManager);
     MessageListPanel messageTab = new MessageListPanel(project);
-    NetViewerPanel netViewerPanel = new NetViewerPanel(project);
+    RvcdPanel rvcdPanel = new RvcdPanel(project);
     Disposer.register(tabManager, messageTab);
-    Disposer.register(tabManager, netViewerPanel);
-    tabManager.addPanel(netViewerPanel, ScaledaBundle.message("windows.tool.log.waveform.title"), false, false);
+    Disposer.register(tabManager, rvcdPanel);
+    tabManager.addPanel(rvcdPanel, ScaledaBundle.message("windows.tool.log.waveform.title"), false, false);
     tabManager.addPanel(messageTab, ScaledaBundle.message("windows.tool.log.message.title"), false, false);
     tabManager.addConsoleTab(ScaledaIdeaLogger.getId(), ScaledaBundle.message("windows.tool.log.console.title"), false, false);
   }
