@@ -23,5 +23,9 @@ trait ConsoleReceiver {
    */
   def clear(): Unit = {}
 
+  /**
+   * Get the display name of this receiver.
+   * @return
+   */
   def getDisplayName: String
 }

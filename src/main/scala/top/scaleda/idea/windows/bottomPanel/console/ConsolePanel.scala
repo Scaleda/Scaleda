@@ -34,13 +34,6 @@ class ConsolePanel(
   def registerConsoleReceiver(attach: Boolean): Unit = {
     if (!attach) {
       val runningId = service.queryRunningIdByDisplayName(displayName).filter(_ != id)
-      // foreach { activationId: String =>
-      //   {
-      //     case Some(activationId) =>
-      //       ScaledaIdeaLogger.debug(s"still running id $activationId, create new console tab")
-      //     // service.removeListenerByKey(activationId)
-      //     // getConsoleTab.getParent.removeConsoleTab(activationId)
-      //     case None =>
       if (runningId.isEmpty) {
         getConsoleTab.getParent.findConsoleTabByName(displayName) foreach { tab =>
           if (!tab.getParent.removeConsoleTab(tab)) {
@@ -50,13 +43,9 @@ class ConsolePanel(
       } else {
         ScaledaIdeaLogger.debug(s"still running id ${runningId.mkString(", ")}, create new console tab")
       }
-      //   }
-      // }
     }
     service.addListener(receiver, id)
   }
-
-  // registerConsoleReceiver(false)
 
   // dispose console when parent is disposed
   Disposer.register(consoleTab, consoleView)
