@@ -1,20 +1,16 @@
 package top.scaleda
 package idea.windows.bottomPanel.console
 
+import idea.utils.ScaledaIdeaLogger
 import idea.windows.bottomPanel.ConsoleService
-import kernel.utils.LogLevel
-import kernel.utils.LogLevel._
 
 import com.intellij.execution.actions.ClearConsoleAction
 import com.intellij.execution.filters.TextConsoleBuilderFactory
-import com.intellij.execution.ui.ConsoleViewContentType
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.{ActionManager, ActionToolbar, DefaultActionGroup}
 import com.intellij.openapi.editor.actions.{ScrollToTheEndToolbarAction, ToggleUseSoftWrapsToolbarAction}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.Disposer
-import top.scaleda.idea.utils.runInEdt
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -41,18 +37,18 @@ class ConsolePanel(
       // foreach { activationId: String =>
       //   {
       //     case Some(activationId) =>
-      //       println(s"still running id $activationId, create new console tab")
+      //       ScaledaIdeaLogger.debug(s"still running id $activationId, create new console tab")
       //     // service.removeListenerByKey(activationId)
       //     // getConsoleTab.getParent.removeConsoleTab(activationId)
       //     case None =>
       if (runningId.isEmpty) {
         getConsoleTab.getParent.findConsoleTabByName(displayName) foreach { tab =>
           if (!tab.getParent.removeConsoleTab(tab)) {
-            println(s"failed to remove console tab: $tab")
+            ScaledaIdeaLogger.debug(s"failed to remove console tab: $tab")
           }
         }
       } else {
-        println(s"still running id ${runningId.mkString(", ")}, create new console tab")
+        ScaledaIdeaLogger.debug(s"still running id ${runningId.mkString(", ")}, create new console tab")
       }
       //   }
       // }

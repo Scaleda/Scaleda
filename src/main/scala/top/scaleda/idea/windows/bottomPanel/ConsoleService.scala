@@ -1,6 +1,7 @@
 package top.scaleda
 package idea.windows.bottomPanel
 
+import idea.utils.ScaledaIdeaLogger
 import idea.windows.bottomPanel.console.{ConsoleReceiver, ConsoleTabManager}
 import kernel.utils.LogLevel
 
@@ -38,20 +39,20 @@ class ConsoleService(val project: Project) extends Disposable {
       // }
       listenersDirected.get(key) match {
         case Some(list) =>
-          println(s"addListener append: $receiver, key: $key")
+          ScaledaIdeaLogger.debug(s"addListener append: $receiver, key: $key")
           if (!list.add(receiver)) {
-            println(s"addListener failed to append: $receiver, key: $key")
+            ScaledaIdeaLogger.debug(s"addListener failed to append: $receiver, key: $key")
           }
         case None =>
-          println(s"addListener create list: $receiver, key: $key")
+          ScaledaIdeaLogger.debug(s"addListener create list: $receiver, key: $key")
           listenersDirected.put(key, mutable.HashSet(receiver))
       }
-      println(s"addListener created list: ${listenersDirected(key).mkString(", ")}")
+      ScaledaIdeaLogger.debug(s"addListener created list: ${listenersDirected(key).mkString(", ")}")
     }
   }
 
   def removeAllListeners(): Unit = synchronized {
-    println("removeAllListeners")
+    ScaledaIdeaLogger.debug("removeAllListeners")
     // listeners.clear()
     listenersDirected.clear()
   }
@@ -60,10 +61,10 @@ class ConsoleService(val project: Project) extends Disposable {
       // if (!listeners.remove(receiver)) {
       listenersDirected.find(_._2.exists(_ == receiver)).foreach { r =>
         r._2.remove(receiver)
-        println(s"removeListener in map: $receiver, key: ${r._1}")
+        ScaledaIdeaLogger.debug(s"removeListener in map: $receiver, key: ${r._1}")
       }
       // } else {
-      //   println("removeListener in list: " + receiver)
+      //   ScaledaIdeaLogger.debug("removeListener in list: " + receiver)
       // }
     }
   }
@@ -71,7 +72,7 @@ class ConsoleService(val project: Project) extends Disposable {
   def removeListenerByKey(key: String): Option[mutable.HashSet[ConsoleReceiver]] =
     synchronized {
       val r = listenersDirected.remove(key)
-      println(s"removeListenerByKey: $key, $r")
+      ScaledaIdeaLogger.debug(s"removeListenerByKey: $key, $r")
       r
     }
 
@@ -103,16 +104,16 @@ class ConsoleService(val project: Project) extends Disposable {
         }))
     }
     if (!success) {
-      println(s"Failed to print to console: [$key] $msg")
+      ScaledaIdeaLogger.debug(s"Failed to print to console: [$key] $msg")
       // key match {
       //   case Some(k) =>
-      println(
+      ScaledaIdeaLogger.debug(
         s"Listeners: ${listenersDirected.keys.mkString(", ")} " +
           s"(${listenersDirected.getOrElse(key, Seq()).mkString(", ")}) " +
           s"len ${listenersDirected.get(key).map(_.size).getOrElse(-1)}"
       )
       //   case None =>
-      //     println(s"Listeners: ${listeners.mkString(", ")}")
+      //     ScaledaIdeaLogger.debug(s"Listeners: ${listeners.mkString(", ")}")
       // }
     }
     success

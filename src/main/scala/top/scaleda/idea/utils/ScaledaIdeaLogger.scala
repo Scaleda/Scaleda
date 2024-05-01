@@ -1,7 +1,6 @@
 package top.scaleda
 package idea.utils
 
-import idea.ScaledaBundle
 import idea.windows.bottomPanel.ConsoleService
 import kernel.utils.{BasicLogger, LogLevel}
 

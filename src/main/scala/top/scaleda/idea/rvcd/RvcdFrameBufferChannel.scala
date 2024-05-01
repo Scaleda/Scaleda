@@ -60,7 +60,7 @@ class RvcdFrameBufferChannel(socket: SocketChannel) {
     // buffer.flip()
     // socket.write(buffer)
     val data = event.toByteArray
-    // println(s"Writing input event: ${data.map("%02X".format(_)).mkString(", ")}")
+    // ScaledaIdeaLogger.debug(s"Writing input event: ${data.map("%02X".format(_)).mkString(", ")}")
     val len     = data.length
     val lenData = ByteBuffer.allocate(4)
     lenData.putInt(len)

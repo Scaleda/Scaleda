@@ -1,11 +1,12 @@
 package top.scaleda
 package idea.windows.bottomPanel.console
 
+import idea.utils.ScaledaIdeaLogger
+
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.content.{ContentFactory, ContentManager, ContentManagerListener}
-import org.jetbrains.annotations.Nls
 
 import javax.swing.JPanel
 
@@ -20,11 +21,11 @@ class ConsoleTabManager(project: Project, contentManager: ContentManager)
   def addConsoleTab(id: String, displayName: String, switchTo: Boolean = true, closeable: Boolean = true): Unit = {
     getConsoleTabById(id) match {
       case Some(consoleTab) =>
-        println(s"attach to the existing console tab, key: $id")
+        ScaledaIdeaLogger.debug(s"attach to the existing console tab, key: $id")
         consoleTab.getPanel.registerConsoleReceiver(true)
         if (switchTo) setSelectedContent(consoleTab.getDisplayName)
       case None =>
-        println(s"create a new console tab for key: $id")
+        ScaledaIdeaLogger.debug(s"create a new console tab for key: $id")
         val consoleTab = new ConsoleTab(this, project, id, displayName)
         addPanel(consoleTab.getPanel, displayName, switchTo = switchTo, closeable = closeable)
     }

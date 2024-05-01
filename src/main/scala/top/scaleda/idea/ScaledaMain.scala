@@ -33,7 +33,7 @@ class ScaledaMain extends ProjectActivity {
         .getInstance(project)
         .getToolWindow("Scaleda Messages")
         .activate(() => {
-          println("Scaleda Messages activated")
+          ScaledaIdeaLogger.debug("Scaleda Messages activated")
         })
     }
     // register ScaledaIdeaLogger to console service

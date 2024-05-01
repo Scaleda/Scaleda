@@ -129,7 +129,7 @@ class NetViewerPanel(project: Project) extends SimpleToolWindowPanel(false, true
 
             // test argb
             // val pixelsLen = frame.width * frame.height
-            // println(s"Frame size: ${frame.width} x ${frame.height}, pixels: $pixelsLen, data len: ${frame.data.length}")
+            // ScaledaIdeaLogger.debug(s"Frame size: ${frame.width} x ${frame.height}, pixels: $pixelsLen, data len: ${frame.data.length}")
             // // val img = new BufferedImage(
             // //   frame.width,
             // //   frame.height,
@@ -199,7 +199,7 @@ class NetViewerPanel(project: Project) extends SimpleToolWindowPanel(false, true
   canvas.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsAdapter() {
     override def ancestorResized(e: java.awt.event.HierarchyEvent): Unit = {
       val size = canvas.getSize
-      // println(s"canvas resized: $size")
+      // ScaledaIdeaLogger.debug(s"canvas resized: $size")
       if (size.width > 0 && size.height > 0) {
         val width  = size.width
         val height = size.height
@@ -251,7 +251,7 @@ class NetViewerPanel(project: Project) extends SimpleToolWindowPanel(false, true
         } else {
           y = e.getPreciseWheelRotation * -50.0
         }
-        // println(s"Mouse wheel moved: x=$x, y=$y, e=$e")
+        // ScaledaIdeaLogger.debug(s"Mouse wheel moved: x=$x, y=$y, e=$e")
         val event = RvcdInputEvent()
           .withType(EventType.EVENT_TYPE_WHEEL)
           .withX(x.toInt)

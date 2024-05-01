@@ -1,11 +1,13 @@
 package top.scaleda
 package idea.utils.template
 
+import idea.utils.ScaledaIdeaLogger
+import verilog.VerilogFileType
+
 import com.intellij.ide.fileTemplates.{FileTemplate, FileTemplateManager}
 import com.intellij.openapi.util.Condition
 import com.intellij.util.SmartList
 import com.intellij.util.containers.ContainerUtil
-import top.scaleda.verilog.VerilogFileType
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
@@ -23,7 +25,7 @@ object VerilogFileTemplateUtil {
     val templates = new SmartList[FileTemplate]()
     templates.addAll(ContainerUtil.findAll(FileTemplateManager.getDefaultInstance.getInternalTemplates, filter))
     templates.addAll(ContainerUtil.findAll(FileTemplateManager.getDefaultInstance.getAllTemplates, filter))
-    println(templates)
+    ScaledaIdeaLogger.debug(templates)
     templates.asScala
   }
 

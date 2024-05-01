@@ -28,7 +28,7 @@ class OutputLogger(project: Project, id: String, displayName: String, switchTo: 
     val msg     = args
     val success = service.print(s"$msg\n", level, id)
     if (!success) {
-      // println(s"Failed to print to console: $key $msg")
+      // ScaledaIdeaLogger.debug(s"Failed to print to console: $key $msg")
     }
   }
 }
