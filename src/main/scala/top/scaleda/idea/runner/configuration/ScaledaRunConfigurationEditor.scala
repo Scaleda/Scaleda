@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities
 import scala.collection.mutable
 import scala.jdk.javaapi.CollectionConverters
 
+// FIXME: MAY STUCK WHEN REMOTE SERVER READY!!!
 class ScaledaRunConfigurationEditor(private val project: Project) extends SettingsEditor[ScaledaRunConfiguration] {
 
   case class ProfilePair(host: String, name: String) {
