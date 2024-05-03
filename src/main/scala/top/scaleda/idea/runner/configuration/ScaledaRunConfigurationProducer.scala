@@ -18,31 +18,37 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
       sourceElement: Ref[PsiElement]
   ): Boolean = {
     ScaledaIdeaLogger.debug("setupConfigurationFromContext config taskName:", configuration.taskName)
-    implicit val project: ScaledaProject = YmlRootManager.getInstance(context.getProject).getRoots.head.toScaledaProject
-    ProjectConfig.getConfig
-      .map(c => {
-        c.headTarget.foreach(t => configuration.targetName = t.name)
-        c.headTask.foreach(t => configuration.taskName = t.name)
-        true
-      })
-      .getOrElse({
-        ScaledaIdeaLogger.debug("cannot load config when setting up configurations")
-        false
-      })
+    YmlRootManager.getInstance(context.getProject).getRoots.headOption.map(_.toScaledaProject) map { implicit project =>
+      ProjectConfig.getConfig
+        .map(c => {
+          c.headTarget.foreach(t => configuration.targetName = t.name)
+          c.headTask.foreach(t => configuration.taskName = t.name)
+          true
+        })
+        .getOrElse({
+          ScaledaIdeaLogger.debug("cannot load config when setting up configurations")
+          false
+        })
+    } getOrElse {
+      false
+    }
   }
 
   override def isConfigurationFromContext(
       configuration: ScaledaRunConfiguration,
       context: ConfigurationContext
   ): Boolean = {
-    implicit val project: ScaledaProject = YmlRootManager.getInstance(context.getProject).getRoots.head.toScaledaProject
-    ProjectConfig.getConfig
-      .exists(c => {
-        c.targets
-          .find(_.name == configuration.targetName)
-          .map(target => target.tasks.find(_.name == configuration.taskName))
-          .exists(_.nonEmpty)
-      })
+    YmlRootManager.getInstance(context.getProject).getRoots.headOption.map(_.toScaledaProject) map { implicit project =>
+      ProjectConfig.getConfig
+        .exists(c => {
+          c.targets
+            .find(_.name == configuration.targetName)
+            .map(target => target.tasks.find(_.name == configuration.taskName))
+            .exists(_.nonEmpty)
+        })
+    } getOrElse {
+      false
+    }
   }
 
   override def getConfigurationFactory: ConfigurationFactory = new ScaledaRunConfigurationFactory(

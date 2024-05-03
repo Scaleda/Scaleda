@@ -103,11 +103,16 @@ class ScaledaRunConfiguration(
     new ScaledaRunConfigurationEditor(project)
 
   def generateRuntime: Option[ScaledaRuntime] =
-    ScaledaRun
-      .generateRuntimeFromName(targetName, taskName, profileName, profileHost)(project =
-        YmlRootManager.getInstance(project).getRoots.head.toScaledaProject // fixme
+    YmlRootManager
+      .getInstance(project)
+      .getRoots
+      .headOption
+      .map(_.toScaledaProject)
+      .flatMap(scaledaProject =>
+        ScaledaRun
+          .generateRuntimeFromName(targetName, taskName, profileName, profileHost)(project = scaledaProject)
+          .map(_.copy(extraEnvs = extraEnvs.toMap))
       )
-      .map(_.copy(extraEnvs = extraEnvs.toMap))
 
   /** Returns a [[RunProfileState]], which is actually used to run
     * @param ideaExecutor

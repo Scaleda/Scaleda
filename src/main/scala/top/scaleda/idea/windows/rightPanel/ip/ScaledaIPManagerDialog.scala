@@ -38,13 +38,14 @@ class ScaledaIPManagerDialog(project: Project) extends DialogWrapper(project) {
     if (mainPanel.editor != null) EditorFactory.getInstance.releaseEditor(mainPanel.editor)
 
     // Export IP information
-    val ips               = mainPanel.toIPInstances
-    implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
-    val newProjectConfig = ProjectConfig.getConfig.get.copy(ips = ips)
-    ProjectConfig.saveConfig(newProjectConfig, targetFile = new File(scaledaProject.configFile.get)) // TODO: can get?
+    val ips = mainPanel.toIPInstances
+    YmlRootManager.getInstance(project).getRoots.headOption.map(_.toScaledaProject) foreach { implicit scaledaProject =>
+      val newProjectConfig = ProjectConfig.getConfig.get.copy(ips = ips)
+      ProjectConfig.saveConfig(newProjectConfig, targetFile = new File(scaledaProject.configFile.get)) // TODO: can get?
 
-    // Re-generate, only update caches from ProjectConfig layer, and before this `ips` in ProjectConfig should be updated
-    KernelFileUtils.doUpdateStubCacheFromProject
+      // Re-generate, only update caches from ProjectConfig layer, and before this `ips` in ProjectConfig should be updated
+      KernelFileUtils.doUpdateStubCacheFromProject
+    }
 
     super.doOKAction()
   }

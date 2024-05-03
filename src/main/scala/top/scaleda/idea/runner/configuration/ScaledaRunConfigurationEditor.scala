@@ -2,10 +2,12 @@ package top.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
+import idea.project.io.YmlRootManager
 import idea.utils.ScaledaIdeaLogger
 import kernel.net.remote.RemoteProfile
 import kernel.net.user.ScaledaAuthorizationProvider
 import kernel.net.{RemoteClient, RemoteServer}
+import kernel.project.ScaledaProject
 import kernel.project.config.ProjectConfig
 import kernel.toolchain.Toolchain
 
@@ -17,11 +19,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{ComboBox, TextFieldWithBrowseButton}
 import com.intellij.ui.SimpleColoredComponent
 import com.intellij.util.ui.{FormBuilder, UIUtil}
-import top.scaleda.idea.project.io.YmlRootManager
-import top.scaleda.kernel.project.ScaledaProject
 
 import java.awt.event.{ItemEvent, KeyEvent, KeyListener}
-import javax.swing.SwingUtilities
+import javax.swing.{JComponent, SwingUtilities}
 import scala.collection.mutable
 import scala.jdk.javaapi.CollectionConverters
 
@@ -57,9 +57,14 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
 
   private val environmentVarsComponent = new EnvironmentVariablesComponent
 
-  implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
+  private def scaledaProject: Option[ScaledaProject] =
+    YmlRootManager.getInstance(project).getRoots.headOption.map(_.toScaledaProject)
 
-  ProjectConfig.getConfig.foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
+  private def withScaledaProject[T](f: ScaledaProject => T): Option[T] = scaledaProject.map(f)
+
+  withScaledaProject { implicit p =>
+    ProjectConfig.getConfig.foreach(c => c.targets.foreach(t => targetName.addItem(t.name)))
+  }
 
   private def maySetProfileToDefault(list: Seq[ProfilePair]): Unit = {
     defaultProfilePair.foreach(default =>
@@ -194,10 +199,12 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     if (e.getStateChange == ItemEvent.SELECTED) {
       val newTargetName = e.getItem.asInstanceOf[String]
       taskName.removeAllItems()
-      ProjectConfig.getConfig
-        .foreach(c =>
-          c.targets.find(_.name == newTargetName).foreach(t => t.tasks.foreach(t => taskName.addItem(t.name)))
-        )
+      withScaledaProject { implicit p =>
+        ProjectConfig.getConfig
+          .foreach(c =>
+            c.targets.find(_.name == newTargetName).foreach(t => t.tasks.foreach(t => taskName.addItem(t.name)))
+          )
+      }
     }
   })
 
@@ -218,8 +225,12 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     // Warning: because targetName has model data listener, should set targetName first!!
     targetName.setItem(s.targetName)
     taskName.removeAllItems()
-    ProjectConfig.getConfig
-      .foreach(c => c.targets.find(_.name == s.targetName).foreach(t => t.tasks.foreach(t => taskName.addItem(t.name))))
+    withScaledaProject { implicit p =>
+      ProjectConfig.getConfig
+        .foreach(c =>
+          c.targets.find(_.name == s.targetName).foreach(t => t.tasks.foreach(t => taskName.addItem(t.name)))
+        )
+    }
     taskName.setItem(s.taskName)
     environmentVarsComponent.setEnvs(CollectionConverters.asJava(s.extraEnvs))
     profileHost.setText(s.profileHost)
@@ -236,9 +247,9 @@ class ScaledaRunConfigurationEditor(private val project: Project) extends Settin
     s.profileHost = profileHost.getText
   }
 
-  override def createEditor() = panel
+  override def createEditor(): JComponent = panel
 
-  override def disposeEditor() = {
+  override def disposeEditor(): Unit = {
     super.disposeEditor()
     requestProfilesThreads.synchronized {
       requestProfilesThreads.foreach(t => {

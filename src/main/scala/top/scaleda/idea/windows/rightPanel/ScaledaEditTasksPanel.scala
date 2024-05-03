@@ -28,12 +28,18 @@ import javax.swing.tree.DefaultTreeModel
   */
 class ScaledaEditTasksPanel(project: Project, val scaledaRunRootNode: ScaledaTasksRootNode, setValid: Boolean => Unit)
     extends JPanel(new BorderLayout) {
-  implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
-  val model             = new DefaultTreeModel(scaledaRunRootNode)
+  private def scaledaProject: Option[ScaledaProject] =
+    YmlRootManager.getInstance(project).getRoots.headOption.map(_.toScaledaProject)
+
+  private def withScaledaProject[T](f: ScaledaProject => T): Option[T] = scaledaProject.map(f)
+
+  val model = new DefaultTreeModel(scaledaRunRootNode)
   // left side, tree
   private val tree = new Tree(model)
   tree.setCellRenderer(new ScaledaTasksTreeCellRenderer)
-  tree.addTreeSelectionListener(onItemSelected)
+  withScaledaProject { implicit p =>
+    tree.addTreeSelectionListener(onItemSelected)
+  }
   tree.setExpandsSelectedPaths(true) //?
   private val decorator =
     ToolbarDecorator
@@ -56,7 +62,7 @@ class ScaledaEditTasksPanel(project: Project, val scaledaRunRootNode: ScaledaTas
   splitter.setFirstComponent(treePanel)
   splitter.setSecondComponent(emptyPanel)
 
-  private def onItemSelected(e: TreeSelectionEvent): Unit = {
+  private def onItemSelected(e: TreeSelectionEvent)(implicit p: ScaledaProject): Unit = {
     // check which node is selected
     val rootNode   = tree.getSelectedNodes(classOf[ScaledaTasksRootNode], (_: ScaledaTasksRootNode) => true)
     val targetNode = tree.getSelectedNodes(classOf[ScaledaTasksTargetNode], (_: ScaledaTasksTargetNode) => true)

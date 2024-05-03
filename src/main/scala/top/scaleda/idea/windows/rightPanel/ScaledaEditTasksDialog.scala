@@ -23,22 +23,26 @@ class ScaledaEditTasksDialog(project: Project) extends DialogWrapper(project) {
   var mainPanel: ScaledaEditTasksPanel = _
 
   override def createCenterPanel(): JComponent = {
-    // TODO: if there're no project config?
-    implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
-    ProjectConfig.getConfig
-      .map(c => {
-        val rootNode = new ScaledaTasksRootNode(c)
-        if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(project, rootNode, setValid)
-        mainPanel
-      })
-      .orNull
+    YmlRootManager.getInstance(project).getRoots.headOption.map(_.toScaledaProject) map { implicit p =>
+      ProjectConfig.getConfig
+        .map(c => {
+          val rootNode = new ScaledaTasksRootNode(c)
+          if (mainPanel == null) mainPanel = new ScaledaEditTasksPanel(project, rootNode, setValid)
+          mainPanel
+        })
+        .orNull
+    } getOrElse {
+      null
+    }
   }
   override def doOKAction(): Unit = {
-    ProjectConfig.saveConfig(
-      mainPanel.scaledaRunRootNode.toProjectConfig,
-      targetFile = new File(YmlRootManager.getInstance(project).getRoots.head.toScaledaProject.configFile.get)
-    )
-    ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
+    YmlRootManager.getInstance(project).getRoots.headOption.map(_.toScaledaProject) map { implicit project =>
+      ProjectConfig.saveConfig(
+        mainPanel.scaledaRunRootNode.toProjectConfig,
+        targetFile = new File(project.configFile.get)
+      )
+      ActionManager.getInstance().tryToExecute(new ScaledaReloadTasksAction, null, null, null, true)
+    }
     super.doOKAction()
   }
 

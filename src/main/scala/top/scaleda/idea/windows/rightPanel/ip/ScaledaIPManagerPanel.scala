@@ -26,10 +26,16 @@ import javax.swing.event.{ChangeEvent, ChangeListener, DocumentEvent, ListSelect
 import scala.collection.mutable
 
 class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) extends JPanel(new BorderLayout) {
-  implicit val scaledaProject: ScaledaProject = YmlRootManager.getInstance(project).getRoots.head.toScaledaProject
-  private val projIP    = ProjectConfig.projectBasicIps.map(s => IP(s._1, library = false, s._2))
-  private val libIP     = ProjectConfig.libraryIps.map(s => IP(s._1, library = true, s._2))
-  private val ipList    = projIP ++ libIP
+  private def scaledaProject: Option[ScaledaProject] =
+    YmlRootManager.getInstance(project).getRoots.headOption.map(_.toScaledaProject)
+
+  private def withScaledaProject[T](f: ScaledaProject => T): Option[T] = scaledaProject.map(f)
+
+  private val projIP = withScaledaProject { implicit p =>
+    ProjectConfig.projectBasicIps.map(s => IP(s._1, library = false, s._2)).toSeq
+  } getOrElse Seq()
+  private val libIP  = ProjectConfig.libraryIps.map(s => IP(s._1, library = true, s._2))
+  private val ipList = projIP ++ libIP
   // Left side, list
   private val listModel      = new DefaultListModel[IPInstance]
   private val ipInstanceList = new JBList[IPInstance](listModel)
@@ -38,7 +44,9 @@ class ScaledaIPManagerPanel(val project: Project, setValid: Boolean => Unit) ext
   ipInstanceList.addListSelectionListener(onItemSelected)
   // load ip instances from ProjectConfig on initialization
   listModel.clear()
-  ProjectConfig.getConfig.get.ips.foreach(listModel.addElement)
+  withScaledaProject { implicit p =>
+    ProjectConfig.getConfig.get.ips.foreach(listModel.addElement)
+  }
 
   // Splitter
   val splitter = new Splitter(false, 0.3f)
