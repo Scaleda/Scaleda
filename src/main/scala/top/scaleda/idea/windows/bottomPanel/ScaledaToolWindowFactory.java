@@ -13,10 +13,10 @@ import top.scaleda.idea.windows.bottomPanel.message.MessageListPanel;
 import top.scaleda.idea.windows.bottomPanel.rvcd.RvcdPanel;
 
 public class ScaledaToolWindowFactory implements ToolWindowFactory {
-  @Override
-  public boolean shouldBeAvailable(@NotNull Project project) {
-    return YmlRootManager.getInstance(project).getRoots().nonEmpty();
-  }
+  // @Override
+  // public boolean shouldBeAvailable(@NotNull Project project) {
+  //   return YmlRootManager.getInstance(project).getRoots().nonEmpty();
+  // }
 
   @Override
   public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {

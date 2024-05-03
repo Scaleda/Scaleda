@@ -18,19 +18,26 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
       sourceElement: Ref[PsiElement]
   ): Boolean = {
     ScaledaIdeaLogger.debug("setupConfigurationFromContext config taskName:", configuration.taskName)
-    YmlRootManager.getInstance(context.getProject).getRoots.headOption.map(_.toScaledaProject) map { implicit project =>
-      ProjectConfig.getConfig
-        .map(c => {
-          c.headTarget.foreach(t => configuration.targetName = t.name)
-          c.headTask.foreach(t => configuration.taskName = t.name)
-          true
-        })
-        .getOrElse({
-          ScaledaIdeaLogger.debug("cannot load config when setting up configurations")
-          false
-        })
-    } getOrElse {
-      false
+    try {
+      YmlRootManager.getInstance(context.getProject).getRoots.headOption.map(_.toScaledaProject) map {
+        implicit project =>
+          ProjectConfig.getConfig
+            .map(c => {
+              c.headTarget.foreach(t => configuration.targetName = t.name)
+              c.headTask.foreach(t => configuration.taskName = t.name)
+              true
+            })
+            .getOrElse({
+              ScaledaIdeaLogger.debug("cannot load config when setting up configurations")
+              false
+            })
+      } getOrElse {
+        false
+      }
+    } catch {
+      case e: java.io.IOException =>
+        ScaledaIdeaLogger.warn("Error when setting up configuration from context", e)
+        false
     }
   }
 
@@ -38,16 +45,23 @@ class ScaledaRunConfigurationProducer extends LazyRunConfigurationProducer[Scale
       configuration: ScaledaRunConfiguration,
       context: ConfigurationContext
   ): Boolean = {
-    YmlRootManager.getInstance(context.getProject).getRoots.headOption.map(_.toScaledaProject) map { implicit project =>
-      ProjectConfig.getConfig
-        .exists(c => {
-          c.targets
-            .find(_.name == configuration.targetName)
-            .map(target => target.tasks.find(_.name == configuration.taskName))
-            .exists(_.nonEmpty)
-        })
-    } getOrElse {
-      false
+    try {
+      YmlRootManager.getInstance(context.getProject).getRoots.headOption.map(_.toScaledaProject) map {
+        implicit project =>
+          ProjectConfig.getConfig
+            .exists(c => {
+              c.targets
+                .find(_.name == configuration.targetName)
+                .map(target => target.tasks.find(_.name == configuration.taskName))
+                .exists(_.nonEmpty)
+            })
+      } getOrElse {
+        false
+      }
+    } catch {
+      case e: java.io.IOException =>
+        ScaledaIdeaLogger.warn("Error when checking configuration from context", e)
+        false
     }
   }
 

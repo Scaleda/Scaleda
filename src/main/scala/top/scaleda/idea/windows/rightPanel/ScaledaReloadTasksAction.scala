@@ -6,7 +6,8 @@ import idea.project.io.YmlRootManager
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
-import top.scaleda.idea.utils.ScaledaIdeaLogger
+import com.intellij.openapi.wm.ToolWindowManager
+import top.scaleda.idea.utils.{ScaledaIdeaLogger, runInEdt}
 import top.scaleda.idea.windows.rightPanel.treeNodes.{
   ScaledaTasksRootNode,
   ScaledaTasksTargetNode,
@@ -38,6 +39,12 @@ class ScaledaReloadTasksAction
 
     val ymlRoot = YmlRootManager.getInstance(project).getRoots
 
+    if (ymlRoot.isEmpty) {
+      ScaledaIdeaLogger.warn("No Scaleda project found")
+      // clear data
+      panel.getModel.setRoot(null)
+    }
+
     ymlRoot.flatMap(_.toProjectConfig).foreach { config =>
       ScaledaIdeaLogger.info(s"Loaded project config: ${config.name}")
     }
@@ -47,6 +54,19 @@ class ScaledaReloadTasksAction
     ymlRoot.flatMap(_.toProjectConfig.map(config => new ScaledaTasksRootNode(config))).foreach { root =>
       panel.getModel.setRoot(root)
     }
+
+    // // emit ScaledaToolWindow
+    // if (ymlRoot.nonEmpty) {
+    //   runInEdt {
+    //     ToolWindowManager
+    //       .getInstance(project)
+    //       .getToolWindow("Scaleda")
+    //       .show(() => {
+    //         ScaledaIdeaLogger.debug("Scaleda Messages activated")
+    //         println("Scaleda Messages activated")
+    //       })
+    //   }
+    // }
   }
 
   override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
