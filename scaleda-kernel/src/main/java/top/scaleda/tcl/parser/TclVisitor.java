@@ -137,6 +137,12 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLine_empty(TclParser.Line_emptyContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TclParser#line_package_decl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLine_package_decl(TclParser.Line_package_declContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TclParser#line}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

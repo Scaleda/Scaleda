@@ -22,15 +22,17 @@ import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
 
 class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaTasksTaskNode, setValid: => Unit)(implicit
-                                                                                           manifest: ScaledaProject
+    manifest: ScaledaProject
 ) extends JPanel
     with ScaledaEditPanelWrapper {
 
   private val toolchainType = taskConfig.getParent.asInstanceOf[ScaledaTasksTargetNode].toolchain
-  private val toolchain     = Toolchain.toolchains(toolchainType) // FIXME: null?
-  private val toolchainSupportedTaskList = TaskConfig.taskTypeList
-    .filter(f => toolchain._3.contains(f._2._2))
-    .toList
+  private val toolchain     = Toolchain.toolchains.get(toolchainType)
+  private val toolchainSupportedTaskList = toolchain map { t =>
+    TaskConfig.taskTypeList
+      .filter(f => t._3.contains(f._2._2))
+      .toList
+  } getOrElse List()
 
   // use border layout
   setLayout(new BorderLayout())
@@ -49,7 +51,10 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaTasksTaskNode, setValid
   // set text before listeners available
   panel.nameField.setText(taskConfig.name)
   panel.topModuleField.setText(taskConfig.topModule.getOrElse(""))
-  panel.typeField.setSelectedIndex(toolchainSupportedTaskList.zipWithIndex.filter(_._1._1 == taskConfig.`type`).head._2)
+
+  panel.typeField.setSelectedIndex(
+    toolchainSupportedTaskList.zipWithIndex.find(_._1._1 == taskConfig.`type`).map(_._2).getOrElse(0)
+  )
   panel.constraintsField.setText(taskConfig.constraints.getOrElse(""))
 
   panel.constraintsField.addBrowseFolderListener(

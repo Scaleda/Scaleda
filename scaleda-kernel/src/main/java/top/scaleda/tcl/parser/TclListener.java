@@ -218,6 +218,16 @@ public interface TclListener extends ParseTreeListener {
 	 */
 	void exitLine_empty(TclParser.Line_emptyContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link TclParser#line_package_decl}.
+	 * @param ctx the parse tree
+	 */
+	void enterLine_package_decl(TclParser.Line_package_declContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#line_package_decl}.
+	 * @param ctx the parse tree
+	 */
+	void exitLine_package_decl(TclParser.Line_package_declContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TclParser#line}.
 	 * @param ctx the parse tree
 	 */

@@ -150,9 +150,9 @@
                 extensions="tcl"/>
         <lang.parserDefinition language="Tcl"
                                implementationClass="top.scaleda.tcl.TclParserDefinition"/>
-        <!--        <lang.ast.factory language="Tcl" implementationClass="top.scaleda.tcl.TclASTFactory"/>-->
-        <!--        <lang.syntaxHighlighterFactory language="Tcl"-->
-        <!--                                       implementationClass="top.scaleda.tcl.TclSyntaxHighlighterFactory"/>-->
+        <lang.ast.factory language="Tcl" implementationClass="top.scaleda.tcl.TclASTFactory"/>
+        <lang.syntaxHighlighterFactory language="Tcl"
+                                       implementationClass="top.scaleda.tcl.TclSyntaxHighlighterFactory"/>
         <lang.commenter language="Tcl"
                         implementationClass="top.scaleda.tcl.commenter.TclCommenter"/>
     </extensions>

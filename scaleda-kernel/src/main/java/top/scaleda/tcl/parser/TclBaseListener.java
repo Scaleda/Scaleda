@@ -269,6 +269,18 @@ public class TclBaseListener implements TclListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLine_package_decl(TclParser.Line_package_declContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLine_package_decl(TclParser.Line_package_declContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLine(TclParser.LineContext ctx) { }
 	/**
 	 * {@inheritDoc}

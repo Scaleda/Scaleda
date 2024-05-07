@@ -36,7 +36,8 @@ class TclLexerSyntaxHighlighter extends SyntaxHighlighterBase {
           )
         )
       case n
-          if TclKeywords.TCL_KEYWORDS
+          if TclKeywords.
+            TCL_KEYWORDS
             .map(name => getTypeForLiteralName(name))
             .contains(n) =>
         Array(
