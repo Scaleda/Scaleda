@@ -15,5 +15,7 @@ public class ScaledaTasksWindowFactory implements ToolWindowFactory {
     contentManager.addContent(
             contentManager.getFactory().createContent(
                     panel, ScaledaBundle.message("tasks.tool.window.title"), false));
+
+    VivadoRunManager.handleVivadoProject(project, toolWindow.getContentManager());
   }
 }

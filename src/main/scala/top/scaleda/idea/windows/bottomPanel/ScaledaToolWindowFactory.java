@@ -6,7 +6,6 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
 import top.scaleda.idea.ScaledaBundle;
-import top.scaleda.idea.project.io.YmlRootManager;
 import top.scaleda.idea.utils.ScaledaIdeaLogger;
 import top.scaleda.idea.windows.bottomPanel.console.ConsoleTabManager;
 import top.scaleda.idea.windows.bottomPanel.message.MessageListPanel;

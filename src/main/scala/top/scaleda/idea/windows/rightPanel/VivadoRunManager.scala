@@ -36,7 +36,10 @@ object VivadoRunManager {
   def handleVivadoProject(project: Project, contentManager: ContentManager): Boolean = {
     // check if this project has a vivado project
     val projectBase = new File(project.getBasePath)
-    if (!(projectBase.exists() && projectBase.isDirectory)) return false
+    if (!(projectBase.exists() && projectBase.isDirectory)) {
+      ScaledaIdeaLogger.info("cannot find project base")
+      return false
+    }
 
     // list file, find *.xpr
     val xprFiles = projectBase.listFiles().filter(_.getName.endsWith(".xpr"))
@@ -169,6 +172,9 @@ object VivadoRunManager {
           contentManager.setSelectedContent(content)
         })
     })
+    if (vivadoProject.isEmpty) {
+      ScaledaIdeaLogger.info("cannot find vivado xpr project")
+    }
     vivadoProject.nonEmpty
   }
 }
