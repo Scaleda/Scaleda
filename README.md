@@ -17,7 +17,7 @@ Scaleda 目前计划增加的功能有：
  - 更加完善的 Verilog 语言支持：重构（Refactoring）、更多的代码检查（Inspection）等；
  - 完善自有工程结构：支持更多工具、支持更多操作。
 
-[这篇](./docs/INTRODUCTION.md) 文档对 Scaleda 的开发背景和基本功能进行了简单的介绍。
+[这篇](./docs/source/_posts/introduction.md)（[在线链接](https://scaleda.top/introduction)） 文档对 Scaleda 的开发背景和基本功能进行了简单的介绍。
 
 ## 安装
 
@@ -30,7 +30,7 @@ IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载
 在 [Releases](https://github.com/Scaleda/Scaleda/releases) 页面中，您可以找到最新的插件 zip 包，它的名字类似于 `Scaleda-0.1.0.zip`。
 
 启动 IDEA 后，选择 `File -> Settings -> Plugins -> Install Plugin from Disk...`，然后选择下载好的 zip 文件，点击 `OK` 即可安装插件。
-有关在 IDEA 中安装 Scaleda 的详细过程，请参考 [这篇](./docs/INSTALLATION.md) 文档。
+有关在 IDEA 中安装 Scaleda 的详细过程，请参考 [这篇](./docs/source/_posts/installation.md)（[在线链接](https://scaleda.top/installation)） 文档。
 
 ### 从源码编译
 
@@ -61,7 +61,7 @@ PDF 版本的使用手册可以在 [这里](./docs/scaleda-manual.pdf) 下载。
 ## 项目结构
 
 这里介绍 Scaleda 这个项目的结构，而不是「使用 Scaleda 开发的 FPGA 项目」的结构。
-对于后者，请参考 [这篇](docs/source/_posts/project) 文档。
+对于后者，请参考 [这篇](docs/source/_posts/project.md)（[在线链接](https://scaleda.top/project)） 文档。
 
 Scaleda 是一个使用 Scala 和 Java 开发的 IDEA 插件，其源码的结构如下：
 
