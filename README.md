@@ -2,6 +2,8 @@
 
 ## 概述
 
+[<img src="README.assets/icon-with-name.svg" alt="Scaleda icon" style="zoom:30%;" />](https://plugins.jetbrains.com/plugin/21863)
+
 Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能 IntelliJ IDEA 增加包括 HDL 工程管理、HDL 语言支持、FPGA 工具调用等功能，从而将 IJ 打造成为灵活而强大的 FPGA 开发工具。
 目前，Scaleda 已支持的功能包括：
 
@@ -21,8 +23,10 @@ Scaleda 目前计划增加的功能有：
 
 ## 安装
 
-Scaleda 目前支持 **2023.1 及以上版本** 的 IJ 平台，包括 IDEA Community Edition 和 IDEA Ultimate Edition。
-您可以选择直接下载编译好的插件 zip 包，或者自行编译插件。
+Scaleda 目前支持 **2024.1.1 及以上版本** 的 IJ 平台，包括 IDEA Community Edition 和 IDEA Ultimate Edition。
+您可以选择在插件市场搜索「Scaleda」，或直接下载编译好的插件 zip 包，或者自行编译插件。
+
+[访问插件市场：![JetBrains Plugin Downloads](https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff)](https://plugins.jetbrains.com/plugin/21863)
 
 ### 直接下载 zip 文件来安装
 
@@ -51,7 +55,7 @@ $ sbt compile
 $ sbt packageArtifactZip
 ```
 
-打包完成后，你可以在 `target/scala-2.12/` 目录下找到打包好的 zip 文件。
+打包完成后，你可以在 `target/scala-2.13/` 目录下找到打包好的 zip 文件。
 您可以用上节的方法安装插件。
 
 ## 使用手册
