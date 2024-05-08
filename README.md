@@ -10,12 +10,16 @@ Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能 
  - Verilog 语言的基本语法功能（语法高亮、代码折叠、代码格式化、代码注释、代码导航等）；
  - Verilog 语言的简单代码补全；
  - Verilog 语言的代码检查（语法错误与语义错误，以及诸如端口缺失、多驱动等错误）；
- - 自有工程结构，支持调用 Vivado、iverilog 等工具进行仿真、综合、实现等操作；
+ - 使用 Verible 的 Verilog、SystemVerilog 代码格式化；
+ - Verilog、SystemVerilog、Tcl、Bluespec SystemVerilog 语法解析高亮；
+ - 自有工程和 IP 结构，支持调用 Vivado、iverilog、Yosys 等工具进行仿真、综合、实现等操作；
  - 支持加载 Vivado 工程并调用其中的综合、实现等操作；
+ - 内置波形查看器 [Rvcd](https://github.com/Scaleda/rvcd)、[Surfer](https://gitlab.com/surfer-project/surfer)；
+ - 运行服务器模式以执行远程 EDA 任务；
 
 ![使用 Scaleda 进行 Verilog 开发](docs/source/images/main-screenshot.png)
 
-Scaleda 目前计划增加的功能有：
+Scaleda 正在计划增加的功能有：
  - 更加完善的 Verilog 语言支持：重构（Refactoring）、更多的代码检查（Inspection）等；
  - 完善自有工程结构：支持更多工具、支持更多操作。
 
@@ -74,6 +78,7 @@ Scaleda 是一个使用 Scala 和 Java 开发的 IDEA 插件，其源码的结�
 Scaleda 的「内核」部分包括工具链（如 Vivado）的调用、工程结构的定义等功能。
 内核被设计为一个可以独立于 IJ 平台运行的命令行程序。
 内核位于 `scaleda-kernel` 目录下，作为一个 sbt 子项目存在。
+运行 `sbt 'project kernel; run'` 或执行编译好的 `java -jar scaleda-kernel.jar --help` 以查看内核使用帮助。
 
 ### 插件部分
 
@@ -87,6 +92,7 @@ Scaleda 参考和使用了诸多开源项目，包括但不限于：
 
  - [ANTLR](https://github.com/antlr/antlr4)、[ANTLR IntelliJ Adapter](https://github.com/antlr/antlr4-intellij-adaptor)
  - [JetBrains Verilog Plugin](https://github.com/MrTsepa/jetbrains-verilog-plugin/)
+ - [Verilog-HDL/SystemVerilog/Bluespec SystemVerilog](https://github.com/mshr-h/vscode-verilog-hdl-support)
 
 ## 开源协议与鸣谢
 
