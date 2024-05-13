@@ -14,7 +14,7 @@ class BSC(executor: Executor) extends Toolchain(executor) {
   override def getInternalID: String = internalID
   override def getName: String       = userFriendlyName
 
-  def commonOptions(workingDir: File): Seq[String] = {
+  private def commonOptions(workingDir: File): Seq[String] = {
     Seq(new File(executor.profile.path, "bsc").getAbsolutePath) ++
       "+RTS -Ksize -RTS -steps-max-intervals 10000000".split(' ') ++
       Seq("-verbose") ++
