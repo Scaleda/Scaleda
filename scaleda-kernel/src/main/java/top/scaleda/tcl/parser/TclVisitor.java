@@ -11,143 +11,17 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	/**
-	 * Visit a parse tree produced by {@link TclParser#inicio}.
+	 * Visit a parse tree produced by {@link TclParser#source_text}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInicio(TclParser.InicioContext ctx);
+	T visitSource_text(TclParser.Source_textContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#identificator}.
+	 * Visit a parse tree produced by {@link TclParser#commandArg}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIdentificator(TclParser.IdentificatorContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#puts}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPuts(TclParser.PutsContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#gets}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitGets(TclParser.GetsContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#source}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSource(TclParser.SourceContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#declaracion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeclaracion(TclParser.DeclaracionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#func_internal}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunc_internal(TclParser.Func_internalContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#func_arg}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunc_arg(TclParser.Func_argContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#func_args}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunc_args(TclParser.Func_argsContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#func_call}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunc_call(TclParser.Func_callContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#func_proc}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunc_proc(TclParser.Func_procContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#agrup}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAgrup(TclParser.AgrupContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#aux_agrup}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAux_agrup(TclParser.Aux_agrupContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#aux_array}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAux_array(TclParser.Aux_arrayContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#param_func}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParam_func(TclParser.Param_funcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#aux_param}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAux_param(TclParser.Aux_paramContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#asignacion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAsignacion(TclParser.AsignacionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#indice}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIndice(TclParser.IndiceContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#val_indice}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVal_indice(TclParser.Val_indiceContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#const}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitConst(TclParser.ConstContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#line_empty}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLine_empty(TclParser.Line_emptyContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#line_package_decl}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLine_package_decl(TclParser.Line_package_declContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link TclParser#line}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLine(TclParser.LineContext ctx);
+	T visitCommandArg(TclParser.CommandArgContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TclParser#expr}.
 	 * @param ctx the parse tree
@@ -155,111 +29,243 @@ public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpr(TclParser.ExprContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#expresion}.
+	 * Visit a parse tree produced by {@link TclParser#commandName}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpresion(TclParser.ExpresionContext ctx);
+	T visitCommandName(TclParser.CommandNameContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_or}.
+	 * Visit a parse tree produced by {@link TclParser#commandEmpty}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_or(TclParser.Exp_orContext ctx);
+	T visitCommandEmpty(TclParser.CommandEmptyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_and}.
+	 * Visit a parse tree produced by {@link TclParser#command}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_and(TclParser.Exp_andContext ctx);
+	T visitCommand(TclParser.CommandContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_ig}.
+	 * Visit a parse tree produced by {@link TclParser#commandLine}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_ig(TclParser.Exp_igContext ctx);
+	T visitCommandLine(TclParser.CommandLineContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_rel}.
+	 * Visit a parse tree produced by {@link TclParser#ifCond}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_rel(TclParser.Exp_relContext ctx);
+	T visitIfCond(TclParser.IfCondContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_add}.
+	 * Visit a parse tree produced by {@link TclParser#ifBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_add(TclParser.Exp_addContext ctx);
+	T visitIfBody(TclParser.IfBodyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_mul}.
+	 * Visit a parse tree produced by {@link TclParser#elseBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_mul(TclParser.Exp_mulContext ctx);
+	T visitElseBody(TclParser.ElseBodyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_pot}.
+	 * Visit a parse tree produced by {@link TclParser#if}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_pot(TclParser.Exp_potContext ctx);
+	T visitIf(TclParser.IfContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#exp_una}.
+	 * Visit a parse tree produced by {@link TclParser#elsePart}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExp_una(TclParser.Exp_unaContext ctx);
+	T visitElsePart(TclParser.ElsePartContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#term}.
+	 * Visit a parse tree produced by {@link TclParser#elseif}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTerm(TclParser.TermContext ctx);
+	T visitElseif(TclParser.ElseifContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#op_ig}.
+	 * Visit a parse tree produced by {@link TclParser#switchExpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOp_ig(TclParser.Op_igContext ctx);
+	T visitSwitchExpr(TclParser.SwitchExprContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#op_rel}.
+	 * Visit a parse tree produced by {@link TclParser#switchMatch}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOp_rel(TclParser.Op_relContext ctx);
+	T visitSwitchMatch(TclParser.SwitchMatchContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#op_add}.
+	 * Visit a parse tree produced by {@link TclParser#switchBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOp_add(TclParser.Op_addContext ctx);
+	T visitSwitchBody(TclParser.SwitchBodyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#op_mul}.
+	 * Visit a parse tree produced by {@link TclParser#switchDefaultBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOp_mul(TclParser.Op_mulContext ctx);
+	T visitSwitchDefaultBody(TclParser.SwitchDefaultBodyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#op_una}.
+	 * Visit a parse tree produced by {@link TclParser#switch}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOp_una(TclParser.Op_unaContext ctx);
+	T visitSwitch(TclParser.SwitchContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#comm_str}.
+	 * Visit a parse tree produced by {@link TclParser#whileBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitComm_str(TclParser.Comm_strContext ctx);
+	T visitWhileBody(TclParser.WhileBodyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#unknown_str}.
+	 * Visit a parse tree produced by {@link TclParser#whileCond}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitUnknown_str(TclParser.Unknown_strContext ctx);
+	T visitWhileCond(TclParser.WhileCondContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TclParser#func_name}.
+	 * Visit a parse tree produced by {@link TclParser#while}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFunc_name(TclParser.Func_nameContext ctx);
+	T visitWhile(TclParser.WhileContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#forInit}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForInit(TclParser.ForInitContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#forCond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForCond(TclParser.ForCondContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#forIncr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForIncr(TclParser.ForIncrContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#forBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForBody(TclParser.ForBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#for}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFor(TclParser.ForContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#foreachVar}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForeachVar(TclParser.ForeachVarContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#foreachList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForeachList(TclParser.ForeachListContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#foreachBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForeachBody(TclParser.ForeachBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#foreach}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForeach(TclParser.ForeachContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#procIdentifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcIdentifier(TclParser.ProcIdentifierContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#procArg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcArg(TclParser.ProcArgContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#procArgDef}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcArgDef(TclParser.ProcArgDefContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#procBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcBody(TclParser.ProcBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#proc}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProc(TclParser.ProcContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#packageIdentifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPackageIdentifier(TclParser.PackageIdentifierContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#packageVersion}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPackageVersion(TclParser.PackageVersionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#packageRequire}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPackageRequire(TclParser.PackageRequireContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#packageProvide}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPackageProvide(TclParser.PackageProvideContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#package}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPackage(TclParser.PackageContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#namespaceIdentifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNamespaceIdentifier(TclParser.NamespaceIdentifierContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#namespace}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNamespace(TclParser.NamespaceContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#regexp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRegexp(TclParser.RegexpContext ctx);
 }

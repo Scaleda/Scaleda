@@ -1,79 +1,267 @@
 grammar Tcl;
 
-inicio : (line (';')*)* EOF ;
+source_text
+    : commandLine* EOF
+    ;
 
-identificator :  '$' IDENTIFICADOR indice | '${' IDENTIFICADOR '}' indice ;
+Identifier
+    : '$'? ([a-zA-Z_:] [a-zA-Z0-9_():]* | '{' [a-zA-Z_:] [a-zA-Z0-9_():]* '}')
+    ;
 
-puts	:	'puts' asignacion  ;
-gets	:	'gets' 'stdin' ;
-source	:	'source' COMM_STR ;
-declaracion	:	'set' IDENTIFICADOR asignacion  ;
-func_internal   : gets | source | puts | declaracion;
+Text
+    : [a-z0-9A-Z_\-./\\,()@]+ SpecialChars*
+    ;
 
-func_arg  : comm_str | identificator | const | UNKNOW_STR | '[' line ']' |'{[' line ']}';
-func_args : (func_arg)*;
-func_call : func_name func_args ;
+SpecialChars
+    : [\-]
+    ;
 
-func_proc   : func_call | func_internal ;
+commandArg
+    : SpecialChars? Text
+    ;
 
-agrup	:	'[' aux_agrup  ;
-aux_agrup	:	expr ']' | IDENTIFICADOR param_func ']' | gets ']' | 'array' aux_array  ;
-aux_array	:	'size' IDENTIFICADOR ']' | 'exists' IDENTIFICADOR ']'  ;
+fragment ESC
+    : '\\"' | '\\\\'
+    ;
 
-param_func	:	'{'? aux_param ;
-aux_param	:	asignacion '}'? param_func? | expr '}'? param_func  ;
+String
+    :'"' (ESC|.)*? '"'
+    ;
 
-asignacion	:	const | '$' identificator | agrup | comm_str | unknown_str  ;
 
-indice	:	'(' val_indice ')' ;
-val_indice	:	const | agrup | '$' identificator ;
+OneLineComment
+   : '#' .*? ('\n'|'\r\n'|EOF) -> channel (HIDDEN)
+   ;
 
-const	:	CONST_STRING | CONST_INTEGER | CONST_DOUBLE  ;
+EmptyLine
+   : [\r?\n]+
+   ;
 
-//line : puts | gets | declaracion | source | func_call | '\n' | '\r\n';
-line_empty  : NEWLINE{} ;
+WhiteSpace
+   : [ \t] + -> channel (HIDDEN)
+   ;
 
-PACKAGE_NAME : '::' (IDENTIFICADOR ':'?':'*)+ ;
+OperatorAB
+    : '+'
+    | '-'
+    | '*'
+    | '/'
+    | '%'
+    | '=='
+    | '!='
+    | '<'
+    | '>'
+    | '<='
+    | '>='
+    | '&&'
+    | '||'
+    | '<<'
+    | '>>'
+    | '&'
+    | '|'
+    | '^'
+    ;
 
-line_package_decl : 'package' 'require' PACKAGE_NAME ;
+OperatorA
+    : '!'
+    | '~'
+    ;
 
-line : line_empty | func_proc | line_package_decl | '{' | '}' ;
 
-expr	:	'expr' '{' expresion '}'  ;
+expr
+    : Identifier expr?
+//    | Decimal
+    | String
+    | commandArg
+    | Text
+    | expr OperatorAB expr
+    | OperatorA expr
+    | expr '?' expr ':' expr
+    | '(' expr ')'
+    | '{' expr '}'
+    | '[' command ';'? ']'
+    | '[' expr ']'
+    ;
 
-expresion	:	exp_or  ;
-exp_or	:	exp_or '||' exp_and | exp_and  ;
-exp_and	:	exp_and '&&' exp_ig | exp_ig  ;
-exp_ig	:	exp_ig op_ig exp_rel | exp_rel  ;
-exp_rel	:	exp_rel op_rel exp_add | exp_add  ;
-exp_add	:	exp_add op_add exp_mul | exp_mul  ;
-exp_mul	:	exp_mul op_mul exp_pot | exp_pot  ;
-exp_pot	:	exp_pot '**' exp_una | exp_una  ;
-exp_una	:	op_una exp_una | term  ;
-term	:	'$' identificator | agrup | const | '(' exp_or ')'  ;
+//BadCharacter
+//   : . -> channel (HIDDEN)
+//   ;
 
-op_ig	:	'eq' | '==' | 'ne' | '!='  ;
-op_rel	:	'>' | '<' | '>=' | '<='  ;
-op_add	:	'+' | '-'  ;
-op_mul	:	'*' | '/' | '%'  ;
-op_una	:	'-' | '!'  ;
+commandName
+    : Identifier
+    ;
 
-CONST_INTEGER	:	'-'?[0-9]+  ;
-CONST_DOUBLE	:	[0-9]+ '.' [0-9]+  ;
-CONST_STRING	:	'"' ~[\r\n"]* '"'  ;
+commandEmpty
+    : EmptyLine{}
+    ;
 
-comm_str    : COMM_STR | IDENTIFICADOR;
-unknown_str : COMM_STR | IDENTIFICADOR | UNKNOW_STR;
-func_name   : IDENTIFICADOR ;
+command
+    : commandName expr*
+    | expr+
+    | commandEmpty
+    | if
+    | switch
+    | while
+    | for
+    | foreach
+    | proc
+    | package
+    | namespace
+    | regexp
+    ;
 
-IDENTIFICADOR	:	[a-zA-Z_][a-zA-Z0-9_]*  ;
-COMM_STR        :   [a-zA-Z0-9_.\-]+ ;
+commandLine
+    : command EmptyLine*
+    | ';'
+    ;
 
-UNKNOW_STR      :   ~[ \t\r\n[\];]+ ;
+ifCond
+    : expr
+    ;
 
-NEWLINE : [\r?\n]+ ;
-WS	:	[ \t\r\n]+	->	channel (HIDDEN)  ;
-COMMENT	:	'#' ~[\r\n]*	->	channel (HIDDEN)  ;
-COMMENT_INLINE	:	';' ~[\r\n]*	->	channel (HIDDEN)  ;
+ifBody
+    : commandLine EmptyLine?
+    ;
 
-BAD_CHAR    : . ;
+elseBody
+    : commandLine
+    ;
+
+if
+    : 'if' ifCond EmptyLine* '{' EmptyLine* ifBody* '}' EmptyLine* (elsePart? | elseif)
+    ;
+
+elsePart
+    : 'else' EmptyLine* '{' EmptyLine* elseBody* '}'
+    ;
+
+elseif
+    : 'elseif' ifCond EmptyLine* '{' EmptyLine* ifBody* '}' EmptyLine* (elsePart? | elseif)
+    ;
+
+switchExpr
+    : expr
+    ;
+
+switchMatch
+    : expr
+    ;
+
+switchBody
+    : commandLine
+    ;
+
+switchDefaultBody
+    : commandLine
+    ;
+
+switch
+    : 'switch' switchExpr '{' EmptyLine*
+        ( switchMatch '{' EmptyLine* switchBody* '}' EmptyLine* )+
+        ( 'default' '{' EmptyLine* switchDefaultBody* '}' )? EmptyLine* '}'
+    ;
+
+whileBody
+    : commandLine
+    ;
+
+whileCond
+    : expr
+    ;
+
+while
+    : 'while' EmptyLine* whileCond EmptyLine* '{' EmptyLine*
+        whileBody* EmptyLine* '}'
+    ;
+
+forInit
+    : expr
+    ;
+
+forCond
+    : expr
+    ;
+
+forIncr
+    : expr
+    ;
+
+forBody
+    : commandLine
+    ;
+
+for
+    : 'for' EmptyLine* forInit EmptyLine* forCond EmptyLine* forIncr EmptyLine* '{'
+         forBody* EmptyLine* '}'
+    ;
+
+foreachVar
+    : Identifier
+    ;
+
+foreachList
+    : expr
+    ;
+
+foreachBody
+    : commandLine
+    ;
+
+foreach
+    : 'foreach' EmptyLine* foreachVar EmptyLine* foreachList '{'
+        foreachBody* EmptyLine* '}'
+    ;
+
+procIdentifier
+    : Identifier
+    ;
+
+procArg
+    : Identifier
+    ;
+
+procArgDef
+    : '{' procArg Text '}'
+    ;
+
+procBody
+    : commandLine
+    ;
+
+proc
+    : 'proc' EmptyLine* procIdentifier EmptyLine* '{' (procArg | procArgDef)* '}' EmptyLine*
+        '{' procBody* EmptyLine* '}'
+    ;
+
+packageIdentifier
+    : Identifier
+    ;
+
+packageVersion
+    : Text
+    ;
+
+packageRequire
+    : 'package' 'require' packageIdentifier packageVersion?
+    ;
+
+packageProvide
+    : 'package' 'provide' packageIdentifier packageVersion?
+    ;
+
+package
+    : packageRequire
+    | packageProvide
+    ;
+
+namespaceIdentifier
+    : Identifier
+    ;
+
+namespace
+    : 'namespace' EmptyLine* 'eval' EmptyLine* namespaceIdentifier EmptyLine* '{' EmptyLine* commandLine* '}'
+    ;
+
+regexp
+    : 'regexp' .*? (EmptyLine | ';')
+    ;

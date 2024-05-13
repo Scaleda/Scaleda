@@ -3,7 +3,7 @@ package tcl.psi.factory
 
 import tcl.TclLanguage
 import tcl.parser.TclParser
-import tcl.psi.factory.nodes.{IdentifierPsiNode, InicioPsiNode}
+import tcl.psi.factory.nodes.{IdentifierPsiNode, SourceTextPsiNode}
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.tree.IElementType
@@ -38,7 +38,7 @@ object TclPsiNodeFactory {
   //   classOf[IdentifierPsiNode]
   // )
   ruleIElementTypeClassMap.put(
-    getRuleIElementType(TclParser.RULE_inicio),
-    classOf[InicioPsiNode]
+    getRuleIElementType(TclParser.RULE_source_text),
+    classOf[SourceTextPsiNode]
   )
 }

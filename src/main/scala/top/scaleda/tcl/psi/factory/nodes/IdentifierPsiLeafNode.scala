@@ -7,7 +7,7 @@ import org.antlr.intellij.adaptor.psi.ANTLRPsiLeafNode
 
 class IdentifierPsiLeafNode(text: CharSequence)
     extends ANTLRPsiLeafNode(
-      TclPsiLeafNodeFactory.getTokenIElementType(TclLexer.IDENTIFICADOR),
+      TclPsiLeafNodeFactory.getTokenIElementType(TclLexer.Identifier),
       text
     ) {
   override def getName: String = {

@@ -21,14 +21,14 @@ class TclLexerSyntaxHighlighter extends SyntaxHighlighterBase {
     val t = tokenIElementType.getANTLRTokenType
     import TclLexerSyntaxHighlighter._
     t match {
-      case TclLexer.COMMENT | TclLexer.COMMENT_INLINE =>
+      case TclLexer.OneLineComment =>
         Array(
           createTextAttributesKey(
             "TCL_COMMENT",
             DefaultLanguageHighlighterColors.LINE_COMMENT
           )
         )
-      case TclLexer.CONST_INTEGER | TclLexer.CONST_DOUBLE =>
+      case TclLexer.Text =>
         Array(
           createTextAttributesKey(
             "TCL_NUMBER",
@@ -46,14 +46,14 @@ class TclLexerSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.KEYWORD
           )
         )
-      case TclLexer.CONST_STRING =>
+      case TclLexer.String =>
         Array(
           createTextAttributesKey(
             "TCL_STRING",
             DefaultLanguageHighlighterColors.STRING
           )
         )
-      case TclLexer.IDENTIFICADOR =>
+      case TclLexer.Identifier =>
         Array(
           createTextAttributesKey(
             "TCL_IDENTIFICADOR",

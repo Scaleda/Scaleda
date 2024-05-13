@@ -8,235 +8,25 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface TclListener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link TclParser#inicio}.
+	 * Enter a parse tree produced by {@link TclParser#source_text}.
 	 * @param ctx the parse tree
 	 */
-	void enterInicio(TclParser.InicioContext ctx);
+	void enterSource_text(TclParser.Source_textContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#inicio}.
+	 * Exit a parse tree produced by {@link TclParser#source_text}.
 	 * @param ctx the parse tree
 	 */
-	void exitInicio(TclParser.InicioContext ctx);
+	void exitSource_text(TclParser.Source_textContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#identificator}.
+	 * Enter a parse tree produced by {@link TclParser#commandArg}.
 	 * @param ctx the parse tree
 	 */
-	void enterIdentificator(TclParser.IdentificatorContext ctx);
+	void enterCommandArg(TclParser.CommandArgContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#identificator}.
+	 * Exit a parse tree produced by {@link TclParser#commandArg}.
 	 * @param ctx the parse tree
 	 */
-	void exitIdentificator(TclParser.IdentificatorContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#puts}.
-	 * @param ctx the parse tree
-	 */
-	void enterPuts(TclParser.PutsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#puts}.
-	 * @param ctx the parse tree
-	 */
-	void exitPuts(TclParser.PutsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#gets}.
-	 * @param ctx the parse tree
-	 */
-	void enterGets(TclParser.GetsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#gets}.
-	 * @param ctx the parse tree
-	 */
-	void exitGets(TclParser.GetsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#source}.
-	 * @param ctx the parse tree
-	 */
-	void enterSource(TclParser.SourceContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#source}.
-	 * @param ctx the parse tree
-	 */
-	void exitSource(TclParser.SourceContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#declaracion}.
-	 * @param ctx the parse tree
-	 */
-	void enterDeclaracion(TclParser.DeclaracionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#declaracion}.
-	 * @param ctx the parse tree
-	 */
-	void exitDeclaracion(TclParser.DeclaracionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#func_internal}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_internal(TclParser.Func_internalContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#func_internal}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_internal(TclParser.Func_internalContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#func_arg}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_arg(TclParser.Func_argContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#func_arg}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_arg(TclParser.Func_argContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#func_args}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_args(TclParser.Func_argsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#func_args}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_args(TclParser.Func_argsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#func_call}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_call(TclParser.Func_callContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#func_call}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_call(TclParser.Func_callContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#func_proc}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_proc(TclParser.Func_procContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#func_proc}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_proc(TclParser.Func_procContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#agrup}.
-	 * @param ctx the parse tree
-	 */
-	void enterAgrup(TclParser.AgrupContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#agrup}.
-	 * @param ctx the parse tree
-	 */
-	void exitAgrup(TclParser.AgrupContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#aux_agrup}.
-	 * @param ctx the parse tree
-	 */
-	void enterAux_agrup(TclParser.Aux_agrupContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#aux_agrup}.
-	 * @param ctx the parse tree
-	 */
-	void exitAux_agrup(TclParser.Aux_agrupContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#aux_array}.
-	 * @param ctx the parse tree
-	 */
-	void enterAux_array(TclParser.Aux_arrayContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#aux_array}.
-	 * @param ctx the parse tree
-	 */
-	void exitAux_array(TclParser.Aux_arrayContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#param_func}.
-	 * @param ctx the parse tree
-	 */
-	void enterParam_func(TclParser.Param_funcContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#param_func}.
-	 * @param ctx the parse tree
-	 */
-	void exitParam_func(TclParser.Param_funcContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#aux_param}.
-	 * @param ctx the parse tree
-	 */
-	void enterAux_param(TclParser.Aux_paramContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#aux_param}.
-	 * @param ctx the parse tree
-	 */
-	void exitAux_param(TclParser.Aux_paramContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#asignacion}.
-	 * @param ctx the parse tree
-	 */
-	void enterAsignacion(TclParser.AsignacionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#asignacion}.
-	 * @param ctx the parse tree
-	 */
-	void exitAsignacion(TclParser.AsignacionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#indice}.
-	 * @param ctx the parse tree
-	 */
-	void enterIndice(TclParser.IndiceContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#indice}.
-	 * @param ctx the parse tree
-	 */
-	void exitIndice(TclParser.IndiceContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#val_indice}.
-	 * @param ctx the parse tree
-	 */
-	void enterVal_indice(TclParser.Val_indiceContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#val_indice}.
-	 * @param ctx the parse tree
-	 */
-	void exitVal_indice(TclParser.Val_indiceContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#const}.
-	 * @param ctx the parse tree
-	 */
-	void enterConst(TclParser.ConstContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#const}.
-	 * @param ctx the parse tree
-	 */
-	void exitConst(TclParser.ConstContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#line_empty}.
-	 * @param ctx the parse tree
-	 */
-	void enterLine_empty(TclParser.Line_emptyContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#line_empty}.
-	 * @param ctx the parse tree
-	 */
-	void exitLine_empty(TclParser.Line_emptyContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#line_package_decl}.
-	 * @param ctx the parse tree
-	 */
-	void enterLine_package_decl(TclParser.Line_package_declContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#line_package_decl}.
-	 * @param ctx the parse tree
-	 */
-	void exitLine_package_decl(TclParser.Line_package_declContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TclParser#line}.
-	 * @param ctx the parse tree
-	 */
-	void enterLine(TclParser.LineContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TclParser#line}.
-	 * @param ctx the parse tree
-	 */
-	void exitLine(TclParser.LineContext ctx);
+	void exitCommandArg(TclParser.CommandArgContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TclParser#expr}.
 	 * @param ctx the parse tree
@@ -248,183 +38,403 @@ public interface TclListener extends ParseTreeListener {
 	 */
 	void exitExpr(TclParser.ExprContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#expresion}.
+	 * Enter a parse tree produced by {@link TclParser#commandName}.
 	 * @param ctx the parse tree
 	 */
-	void enterExpresion(TclParser.ExpresionContext ctx);
+	void enterCommandName(TclParser.CommandNameContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#expresion}.
+	 * Exit a parse tree produced by {@link TclParser#commandName}.
 	 * @param ctx the parse tree
 	 */
-	void exitExpresion(TclParser.ExpresionContext ctx);
+	void exitCommandName(TclParser.CommandNameContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_or}.
+	 * Enter a parse tree produced by {@link TclParser#commandEmpty}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_or(TclParser.Exp_orContext ctx);
+	void enterCommandEmpty(TclParser.CommandEmptyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_or}.
+	 * Exit a parse tree produced by {@link TclParser#commandEmpty}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_or(TclParser.Exp_orContext ctx);
+	void exitCommandEmpty(TclParser.CommandEmptyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_and}.
+	 * Enter a parse tree produced by {@link TclParser#command}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_and(TclParser.Exp_andContext ctx);
+	void enterCommand(TclParser.CommandContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_and}.
+	 * Exit a parse tree produced by {@link TclParser#command}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_and(TclParser.Exp_andContext ctx);
+	void exitCommand(TclParser.CommandContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_ig}.
+	 * Enter a parse tree produced by {@link TclParser#commandLine}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_ig(TclParser.Exp_igContext ctx);
+	void enterCommandLine(TclParser.CommandLineContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_ig}.
+	 * Exit a parse tree produced by {@link TclParser#commandLine}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_ig(TclParser.Exp_igContext ctx);
+	void exitCommandLine(TclParser.CommandLineContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_rel}.
+	 * Enter a parse tree produced by {@link TclParser#ifCond}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_rel(TclParser.Exp_relContext ctx);
+	void enterIfCond(TclParser.IfCondContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_rel}.
+	 * Exit a parse tree produced by {@link TclParser#ifCond}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_rel(TclParser.Exp_relContext ctx);
+	void exitIfCond(TclParser.IfCondContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_add}.
+	 * Enter a parse tree produced by {@link TclParser#ifBody}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_add(TclParser.Exp_addContext ctx);
+	void enterIfBody(TclParser.IfBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_add}.
+	 * Exit a parse tree produced by {@link TclParser#ifBody}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_add(TclParser.Exp_addContext ctx);
+	void exitIfBody(TclParser.IfBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_mul}.
+	 * Enter a parse tree produced by {@link TclParser#elseBody}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_mul(TclParser.Exp_mulContext ctx);
+	void enterElseBody(TclParser.ElseBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_mul}.
+	 * Exit a parse tree produced by {@link TclParser#elseBody}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_mul(TclParser.Exp_mulContext ctx);
+	void exitElseBody(TclParser.ElseBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_pot}.
+	 * Enter a parse tree produced by {@link TclParser#if}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_pot(TclParser.Exp_potContext ctx);
+	void enterIf(TclParser.IfContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_pot}.
+	 * Exit a parse tree produced by {@link TclParser#if}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_pot(TclParser.Exp_potContext ctx);
+	void exitIf(TclParser.IfContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#exp_una}.
+	 * Enter a parse tree produced by {@link TclParser#elsePart}.
 	 * @param ctx the parse tree
 	 */
-	void enterExp_una(TclParser.Exp_unaContext ctx);
+	void enterElsePart(TclParser.ElsePartContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#exp_una}.
+	 * Exit a parse tree produced by {@link TclParser#elsePart}.
 	 * @param ctx the parse tree
 	 */
-	void exitExp_una(TclParser.Exp_unaContext ctx);
+	void exitElsePart(TclParser.ElsePartContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#term}.
+	 * Enter a parse tree produced by {@link TclParser#elseif}.
 	 * @param ctx the parse tree
 	 */
-	void enterTerm(TclParser.TermContext ctx);
+	void enterElseif(TclParser.ElseifContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#term}.
+	 * Exit a parse tree produced by {@link TclParser#elseif}.
 	 * @param ctx the parse tree
 	 */
-	void exitTerm(TclParser.TermContext ctx);
+	void exitElseif(TclParser.ElseifContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#op_ig}.
+	 * Enter a parse tree produced by {@link TclParser#switchExpr}.
 	 * @param ctx the parse tree
 	 */
-	void enterOp_ig(TclParser.Op_igContext ctx);
+	void enterSwitchExpr(TclParser.SwitchExprContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#op_ig}.
+	 * Exit a parse tree produced by {@link TclParser#switchExpr}.
 	 * @param ctx the parse tree
 	 */
-	void exitOp_ig(TclParser.Op_igContext ctx);
+	void exitSwitchExpr(TclParser.SwitchExprContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#op_rel}.
+	 * Enter a parse tree produced by {@link TclParser#switchMatch}.
 	 * @param ctx the parse tree
 	 */
-	void enterOp_rel(TclParser.Op_relContext ctx);
+	void enterSwitchMatch(TclParser.SwitchMatchContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#op_rel}.
+	 * Exit a parse tree produced by {@link TclParser#switchMatch}.
 	 * @param ctx the parse tree
 	 */
-	void exitOp_rel(TclParser.Op_relContext ctx);
+	void exitSwitchMatch(TclParser.SwitchMatchContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#op_add}.
+	 * Enter a parse tree produced by {@link TclParser#switchBody}.
 	 * @param ctx the parse tree
 	 */
-	void enterOp_add(TclParser.Op_addContext ctx);
+	void enterSwitchBody(TclParser.SwitchBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#op_add}.
+	 * Exit a parse tree produced by {@link TclParser#switchBody}.
 	 * @param ctx the parse tree
 	 */
-	void exitOp_add(TclParser.Op_addContext ctx);
+	void exitSwitchBody(TclParser.SwitchBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#op_mul}.
+	 * Enter a parse tree produced by {@link TclParser#switchDefaultBody}.
 	 * @param ctx the parse tree
 	 */
-	void enterOp_mul(TclParser.Op_mulContext ctx);
+	void enterSwitchDefaultBody(TclParser.SwitchDefaultBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#op_mul}.
+	 * Exit a parse tree produced by {@link TclParser#switchDefaultBody}.
 	 * @param ctx the parse tree
 	 */
-	void exitOp_mul(TclParser.Op_mulContext ctx);
+	void exitSwitchDefaultBody(TclParser.SwitchDefaultBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#op_una}.
+	 * Enter a parse tree produced by {@link TclParser#switch}.
 	 * @param ctx the parse tree
 	 */
-	void enterOp_una(TclParser.Op_unaContext ctx);
+	void enterSwitch(TclParser.SwitchContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#op_una}.
+	 * Exit a parse tree produced by {@link TclParser#switch}.
 	 * @param ctx the parse tree
 	 */
-	void exitOp_una(TclParser.Op_unaContext ctx);
+	void exitSwitch(TclParser.SwitchContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#comm_str}.
+	 * Enter a parse tree produced by {@link TclParser#whileBody}.
 	 * @param ctx the parse tree
 	 */
-	void enterComm_str(TclParser.Comm_strContext ctx);
+	void enterWhileBody(TclParser.WhileBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#comm_str}.
+	 * Exit a parse tree produced by {@link TclParser#whileBody}.
 	 * @param ctx the parse tree
 	 */
-	void exitComm_str(TclParser.Comm_strContext ctx);
+	void exitWhileBody(TclParser.WhileBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#unknown_str}.
+	 * Enter a parse tree produced by {@link TclParser#whileCond}.
 	 * @param ctx the parse tree
 	 */
-	void enterUnknown_str(TclParser.Unknown_strContext ctx);
+	void enterWhileCond(TclParser.WhileCondContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#unknown_str}.
+	 * Exit a parse tree produced by {@link TclParser#whileCond}.
 	 * @param ctx the parse tree
 	 */
-	void exitUnknown_str(TclParser.Unknown_strContext ctx);
+	void exitWhileCond(TclParser.WhileCondContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TclParser#func_name}.
+	 * Enter a parse tree produced by {@link TclParser#while}.
 	 * @param ctx the parse tree
 	 */
-	void enterFunc_name(TclParser.Func_nameContext ctx);
+	void enterWhile(TclParser.WhileContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TclParser#func_name}.
+	 * Exit a parse tree produced by {@link TclParser#while}.
 	 * @param ctx the parse tree
 	 */
-	void exitFunc_name(TclParser.Func_nameContext ctx);
+	void exitWhile(TclParser.WhileContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#forInit}.
+	 * @param ctx the parse tree
+	 */
+	void enterForInit(TclParser.ForInitContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#forInit}.
+	 * @param ctx the parse tree
+	 */
+	void exitForInit(TclParser.ForInitContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#forCond}.
+	 * @param ctx the parse tree
+	 */
+	void enterForCond(TclParser.ForCondContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#forCond}.
+	 * @param ctx the parse tree
+	 */
+	void exitForCond(TclParser.ForCondContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#forIncr}.
+	 * @param ctx the parse tree
+	 */
+	void enterForIncr(TclParser.ForIncrContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#forIncr}.
+	 * @param ctx the parse tree
+	 */
+	void exitForIncr(TclParser.ForIncrContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#forBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterForBody(TclParser.ForBodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#forBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitForBody(TclParser.ForBodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#for}.
+	 * @param ctx the parse tree
+	 */
+	void enterFor(TclParser.ForContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#for}.
+	 * @param ctx the parse tree
+	 */
+	void exitFor(TclParser.ForContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#foreachVar}.
+	 * @param ctx the parse tree
+	 */
+	void enterForeachVar(TclParser.ForeachVarContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#foreachVar}.
+	 * @param ctx the parse tree
+	 */
+	void exitForeachVar(TclParser.ForeachVarContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#foreachList}.
+	 * @param ctx the parse tree
+	 */
+	void enterForeachList(TclParser.ForeachListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#foreachList}.
+	 * @param ctx the parse tree
+	 */
+	void exitForeachList(TclParser.ForeachListContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#foreachBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterForeachBody(TclParser.ForeachBodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#foreachBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitForeachBody(TclParser.ForeachBodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#foreach}.
+	 * @param ctx the parse tree
+	 */
+	void enterForeach(TclParser.ForeachContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#foreach}.
+	 * @param ctx the parse tree
+	 */
+	void exitForeach(TclParser.ForeachContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#procIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterProcIdentifier(TclParser.ProcIdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#procIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitProcIdentifier(TclParser.ProcIdentifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#procArg}.
+	 * @param ctx the parse tree
+	 */
+	void enterProcArg(TclParser.ProcArgContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#procArg}.
+	 * @param ctx the parse tree
+	 */
+	void exitProcArg(TclParser.ProcArgContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#procArgDef}.
+	 * @param ctx the parse tree
+	 */
+	void enterProcArgDef(TclParser.ProcArgDefContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#procArgDef}.
+	 * @param ctx the parse tree
+	 */
+	void exitProcArgDef(TclParser.ProcArgDefContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#procBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterProcBody(TclParser.ProcBodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#procBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitProcBody(TclParser.ProcBodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#proc}.
+	 * @param ctx the parse tree
+	 */
+	void enterProc(TclParser.ProcContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#proc}.
+	 * @param ctx the parse tree
+	 */
+	void exitProc(TclParser.ProcContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#packageIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterPackageIdentifier(TclParser.PackageIdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#packageIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitPackageIdentifier(TclParser.PackageIdentifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#packageVersion}.
+	 * @param ctx the parse tree
+	 */
+	void enterPackageVersion(TclParser.PackageVersionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#packageVersion}.
+	 * @param ctx the parse tree
+	 */
+	void exitPackageVersion(TclParser.PackageVersionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#packageRequire}.
+	 * @param ctx the parse tree
+	 */
+	void enterPackageRequire(TclParser.PackageRequireContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#packageRequire}.
+	 * @param ctx the parse tree
+	 */
+	void exitPackageRequire(TclParser.PackageRequireContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#packageProvide}.
+	 * @param ctx the parse tree
+	 */
+	void enterPackageProvide(TclParser.PackageProvideContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#packageProvide}.
+	 * @param ctx the parse tree
+	 */
+	void exitPackageProvide(TclParser.PackageProvideContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#package}.
+	 * @param ctx the parse tree
+	 */
+	void enterPackage(TclParser.PackageContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#package}.
+	 * @param ctx the parse tree
+	 */
+	void exitPackage(TclParser.PackageContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#namespaceIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterNamespaceIdentifier(TclParser.NamespaceIdentifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#namespaceIdentifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitNamespaceIdentifier(TclParser.NamespaceIdentifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#namespace}.
+	 * @param ctx the parse tree
+	 */
+	void enterNamespace(TclParser.NamespaceContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#namespace}.
+	 * @param ctx the parse tree
+	 */
+	void exitNamespace(TclParser.NamespaceContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#regexp}.
+	 * @param ctx the parse tree
+	 */
+	void enterRegexp(TclParser.RegexpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#regexp}.
+	 * @param ctx the parse tree
+	 */
+	void exitRegexp(TclParser.RegexpContext ctx);
 }

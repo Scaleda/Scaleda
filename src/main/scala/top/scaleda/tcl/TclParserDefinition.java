@@ -36,7 +36,7 @@ public final class TclParserDefinition implements ParserDefinition {
     return new ANTLRParserAdaptor(TclLanguage.INSTANCE(), new TclParser(null)) {
       @Override
       protected ParseTree parse(Parser parser, IElementType root) {
-        return ((TclParser) parser).inicio();
+        return ((TclParser) parser).source_text();
       }
     };
   }
@@ -50,7 +50,7 @@ public final class TclParserDefinition implements ParserDefinition {
   public @NotNull TokenSet getWhitespaceTokens() {
     return PSIElementTypeFactory.createTokenSet(
             TclLanguage.INSTANCE(),
-            TclLexer.WS
+            TclLexer.WhiteSpace
     );
   }
 
@@ -58,8 +58,7 @@ public final class TclParserDefinition implements ParserDefinition {
   public @NotNull TokenSet getCommentTokens() {
     return PSIElementTypeFactory.createTokenSet(
             TclLanguage.INSTANCE(),
-            TclLexer.COMMENT,
-            TclLexer.COMMENT_INLINE
+            TclLexer.OneLineComment
     );
   }
 
@@ -67,7 +66,7 @@ public final class TclParserDefinition implements ParserDefinition {
   public @NotNull TokenSet getStringLiteralElements() {
     return PSIElementTypeFactory.createTokenSet(
             TclLanguage.INSTANCE(),
-            TclLexer.CONST_STRING
+            TclLexer.String
     );
   }
 

@@ -35,7 +35,7 @@ object TclPsiLeafNodeFactory {
     create(getTokenIElementType(tokenIndex), charSequence)
 
   tokenIElementTypeClassMap.put(
-    getTokenIElementType(TclLexer.IDENTIFICADOR),
+    getTokenIElementType(TclLexer.Identifier),
     classOf[IdentifierPsiLeafNode]
   )
 }

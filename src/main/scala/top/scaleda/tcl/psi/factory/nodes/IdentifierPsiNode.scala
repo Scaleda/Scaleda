@@ -18,5 +18,5 @@ class IdentifierPsiNode(node: ASTNode) extends ANTLRPsiNode(node) with PsiNameId
   override def getNameIdentifier = getFirstChild.getFirstChild
 
   @throws[IncorrectOperationException]
-  override def setName(s: String) = getFirstChild.replace(TclPsiLeafNodeFactory.create(TclParser.IDENTIFICADOR, s))
+  override def setName(s: String) = getFirstChild.replace(TclPsiLeafNodeFactory.create(TclParser.Identifier, s))
 }

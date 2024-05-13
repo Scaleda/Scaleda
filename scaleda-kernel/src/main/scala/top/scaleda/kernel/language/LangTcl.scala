@@ -12,5 +12,5 @@ object LangTcl extends AbstractLanguage {
 
   override def parser(tokenStream: TokenStream): Parser = new TclParser(tokenStream)
 
-  override def ast(parser: Parser): ParserRuleContext = parser.asInstanceOf[TclParser].inicio()
+  override def ast(parser: Parser): ParserRuleContext = parser.asInstanceOf[TclParser].source_text()
 }
