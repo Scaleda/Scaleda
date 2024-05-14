@@ -8,11 +8,7 @@ Identifier
     ;
 
 Text
-    : [a-z0-9A-Z_\-./\\,()@]+ SpecialChars*
-    ;
-
-SpecialChars
-    : [\-]
+    : [\-]? [a-z0-9A-Z_\-./\\,()@]+
     ;
 
 fragment ESC
@@ -36,7 +32,7 @@ WhiteSpace
    : [ \t] + -> channel (HIDDEN)
    ;
 
-OperatorAB
+operatorAB
     : '+'
     | '-'
     | '*'
@@ -57,7 +53,7 @@ OperatorAB
     | '^'
     ;
 
-OperatorA
+operatorA
     : '!'
     | '~'
     ;
@@ -71,7 +67,7 @@ source_text
     ;
 
 commandArg
-    : SpecialChars? Text
+    : Text
     ;
 
 expr
@@ -80,8 +76,8 @@ expr
     | matchPattern
     | commandArg
     | Text
-    | expr OperatorAB expr
-    | OperatorA expr
+    | expr operatorAB expr
+    | operatorA expr
     | expr '?' expr ':' expr
     | '(' expr ')'
     | '{' expr '}'

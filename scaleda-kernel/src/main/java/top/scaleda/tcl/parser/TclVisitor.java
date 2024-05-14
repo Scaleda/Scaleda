@@ -11,6 +11,24 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface TclVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link TclParser#operatorAB}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperatorAB(TclParser.OperatorABContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#operatorA}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperatorA(TclParser.OperatorAContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TclParser#matchPattern}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMatchPattern(TclParser.MatchPatternContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TclParser#source_text}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

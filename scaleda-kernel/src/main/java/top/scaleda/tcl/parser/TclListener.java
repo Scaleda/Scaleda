@@ -8,6 +8,36 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface TclListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link TclParser#operatorAB}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperatorAB(TclParser.OperatorABContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#operatorAB}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperatorAB(TclParser.OperatorABContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#operatorA}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperatorA(TclParser.OperatorAContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#operatorA}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperatorA(TclParser.OperatorAContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TclParser#matchPattern}.
+	 * @param ctx the parse tree
+	 */
+	void enterMatchPattern(TclParser.MatchPatternContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TclParser#matchPattern}.
+	 * @param ctx the parse tree
+	 */
+	void exitMatchPattern(TclParser.MatchPatternContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TclParser#source_text}.
 	 * @param ctx the parse tree
 	 */
