@@ -10,4 +10,19 @@ case class SimulationExecutor(
     override val topModule: String,
     vcdFile: File,
     override val profile: ToolchainProfile
-) extends Executor(profile)
+) extends Executor(profile) {
+  /** Collect constraints from dirs
+    *
+    * @param suffixing filter
+    * @return
+    */
+  override def collectConstraintFiles(suffixing: Set[String]): Executor = {
+    val executor = super.collectConstraintFiles(suffixing)
+    SimulationExecutor(
+      workingDir = executor.workingDir,
+      topModule = executor.topModule,
+      vcdFile = vcdFile,
+      profile = executor.profile
+    )
+  }
+}

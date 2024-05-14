@@ -11,4 +11,21 @@ case class ImplementExecutor(
     override val topModule: String = "",
     override val constraints: Seq[File] = Seq(),
     override val constraintsDir: Seq[File] = Seq()
-) extends Executor(profile)
+) extends Executor(profile) {
+
+  /** Collect constraints from dirs
+    *
+    * @param suffixing filter
+    * @return
+    */
+  override def collectConstraintFiles(suffixing: Set[String]): Executor = {
+    val executor = super.collectConstraintFiles(suffixing)
+    ImplementExecutor(
+      workingDir = executor.workingDir,
+      profile = executor.profile,
+      topModule = executor.topModule,
+      constraints = executor.constraints,
+      constraintsDir = executor.constraintsDir
+    )
+  }
+}
