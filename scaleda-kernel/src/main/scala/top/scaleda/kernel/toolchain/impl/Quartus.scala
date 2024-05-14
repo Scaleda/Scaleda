@@ -240,8 +240,14 @@ object Quartus extends ToolchainPresetProvider {
     KernelLogger.debug("rt", rt)
 
     val templateContext = generateContext(rt)
-    rt =
-      rt.copy(context = rt.context ++ Map("sourceVerilogFiles" -> templateContext.sourceVerilogList.map(new File(_))))
+    val sourceFiles     = templateContext.sourceVerilogList.map(new File(_))
+    rt = rt.copy(context =
+      rt.context ++
+        Map(
+          "sourceVerilogFiles" -> sourceFiles,
+          "sourceFiles"        -> sourceFiles
+        )
+    )
 
     val useContext       = Serialization.getCCParams(templateContext)
     val templateRenderer = new TemplateRenderer(rt)(replace)

@@ -24,7 +24,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
+import top.scaleda.idea.application.config.ScaledaIdeaConfig
+import top.scaleda.idea.rvcd.RvcdService
+import top.scaleda.idea.waveform.{RvcdHandler, WaveformHandler}
+import top.scaleda.kernel.project.config.TaskType
+import top.scaleda.kernel.toolchain.executor.SimulationExecutor
 
+import java.io.File
 import scala.collection.mutable
 import scala.language.existentials
 
@@ -249,41 +255,43 @@ class ScaledaRunConfiguration(
     consoleService.removeListenerByKey(rt.id)
 //    MessageListPanel.instance.foreach(_.detachFromLogger(rt.id))
 //    ScaledaMessageParser.removeParser(rt.id)
-//    if (!meetErrors) {
-//      rt.task.taskType match {
-//        // Only call waveform when simulate
-//        case TaskType.Simulation =>
-//          val config = ScaledaIdeaConfig.getConfig
-//          val doHandleWaveform = () =>
-//            WaveformHandler(config.waveformHandler).foreach(
-//              _.handle(
-//                project,
-//                rt.executor.asInstanceOf[SimulationExecutor].vcdFile,
-//                rt.context.get("sourceFiles").map(_.asInstanceOf[Seq[File]]).getOrElse(Seq())
-//              )
-//            )
-//          if (config.autoOpenWaveform) doHandleWaveform()
-//          else if (config.notifyWaveformUpdate) {
-//            val notification =
-//              Notification.NOTIFICATION_GROUP.createNotification(
-//                ScaledaBundle.message("notification.runner.ok.simulation"),
-//                ScaledaBundle.message("notification.runner.ok.simulation.waveform"),
-//                NotificationType.INFORMATION
-//              )
-//            val action = if (config.waveformHandler == RvcdHandler.getId && RvcdService.hasInstance) {
-//              new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.reload")) {
-//                override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
-//              }
-//            } else {
-//              new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.open")) {
-//                override def actionPerformed(e: AnActionEvent) = doHandleWaveform()
-//              }
-//            }
-//            notification.addAction(action)
-//            notification.notify(project)
-//          }
-//        case _ =>
-//      }
-//    }
+    if (!meetErrors) {
+      rt.task.taskType match {
+        // Only call waveform when simulate
+        case TaskType.Simulation =>
+          val config = ScaledaIdeaConfig.getConfig
+          val doHandleWaveform = () =>
+            WaveformHandler(config.waveformHandler).foreach(
+              _.handle(
+                project,
+                rt.executor.asInstanceOf[SimulationExecutor].vcdFile,
+                rt.context.get("sourceFiles").map(_.asInstanceOf[Seq[File]]).getOrElse(Seq())
+              )
+            )
+          if (config.autoOpenWaveform) doHandleWaveform()
+          else if (config.notifyWaveformUpdate) {
+            val notification =
+              Notification.NOTIFICATION_GROUP.createNotification(
+                ScaledaBundle.message("notification.runner.ok.simulation"),
+                ScaledaBundle.message("notification.runner.ok.simulation.waveform"),
+                NotificationType.INFORMATION
+              )
+            val action = if (config.waveformHandler == RvcdHandler.getId && RvcdService.hasInstance) {
+              new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.reload")) {
+                override def actionPerformed(e: AnActionEvent): Unit   = doHandleWaveform()
+                override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
+              }
+            } else {
+              new AnAction(ScaledaBundle.message("notification.runner.ok.simulation.action.open")) {
+                override def actionPerformed(e: AnActionEvent): Unit   = doHandleWaveform()
+                override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
+              }
+            }
+            notification.addAction(action)
+            notification.notify(project)
+          }
+        case _ =>
+      }
+    }
   }
 }
