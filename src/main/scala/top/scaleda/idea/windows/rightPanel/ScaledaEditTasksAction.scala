@@ -23,5 +23,5 @@ class ScaledaEditTasksAction
     val _r = new ScaledaEditTasksDialog(e.getProject).showAndGet()
   }
 
-  override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.EDT
+  override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
 }

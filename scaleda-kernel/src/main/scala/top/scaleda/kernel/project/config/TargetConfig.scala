@@ -18,7 +18,7 @@ case class TargetConfig(
     name: String = "",
     toolchain: String = "iverilog", // tricky
     topModule: Option[String] = None,
-    constraints: Option[String] = None,
+    constraintPaths: Seq[String] = Seq(),
     options: Option[Map[String, String]] = None,
     tasks: Array[TaskConfig] = Array(),
     cwd: Option[String] = None

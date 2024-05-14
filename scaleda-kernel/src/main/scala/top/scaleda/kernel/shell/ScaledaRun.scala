@@ -91,8 +91,9 @@ object ScaledaRun {
       target: TargetConfig,
       task: TaskConfig,
       profile: ToolchainProfile,
-      projectBase: File
+      project: ScaledaProject
   ): Executor = {
+    val projectBase    = project.projectBase.get
     val workingDirName = target.name + "-" + task.name
     task.taskType match {
       case TaskType.Simulation =>
@@ -105,37 +106,63 @@ object ScaledaRun {
           vcdFile = new File(workingPlace, testbench + "_waveform.vcd"),
           profile = profile
         )
-      case TaskType.Synthesis =>
-        SynthesisExecutor(
-          workingDir = new File(new File(projectBase, ".synth"), workingDirName),
-          topModule = task.findTopModule.get,
-          profile = profile
-        )
-      case TaskType.Implement =>
+      // ~FIX ME~: constraints collection
+      case TaskType.Synthesis | TaskType.Implement | TaskType.Programming =>
         val selectedConstraints = task.getConstraints
-        val singleFile: Option[File] = selectedConstraints.flatMap(path => {
-          val file = new File(projectBase, path)
-          if (file.exists() && file.isFile) Some(file)
-          else None
-        })
-        val singleDir: Option[File] = selectedConstraints.flatMap(path => {
+        // val singleFiles: Seq[File] = selectedConstraints.flatMap(path => {
+        //   val file = new File(projectBase, path)
+        //   if (file.exists() && file.isFile) Some(file)
+        //   else None
+        // })
+        val singleFiles = task.getConstraintFiles(project).toSeq
+        KernelLogger.info(
+          "selectedConstraints",
+          selectedConstraints,
+          "task",
+          task.constraintPaths,
+          "singleFiles",
+          singleFiles
+        )
+        val singleDirs: Seq[File] = selectedConstraints.flatMap(path => {
           val file = new File(projectBase, path)
           if (file.exists() && file.isDirectory) Some(file)
           else None
         })
-        ImplementExecutor(
-          workingDir = new File(new File(projectBase, ".impl"), workingDirName),
-          topModule = task.findTopModule.get,
-          profile = profile,
-          // in `handlePreset`, constraintsDir will be scanned to add constraints
-          constraints = singleFile.map(Seq(_)).getOrElse(Seq()),
-          constraintsDir = singleDir
-        )
-      case TaskType.Programming =>
-        ProgrammingExecutor(
-          workingDir = new File(new File(projectBase, ".impl"), workingDirName),
-          profile = profile
-        )
+        task.taskType match {
+          case TaskType.Synthesis =>
+            SynthesisExecutor(
+              workingDir = new File(new File(projectBase, ".synth"), workingDirName),
+              topModule = task.findTopModule.get,
+              profile = profile,
+              constraints = singleFiles,
+              constraintsDir = singleDirs
+            )
+          // }
+          // if (task.taskType == TaskType.Implement)
+          case TaskType.Implement =>
+            ImplementExecutor(
+              workingDir = new File(new File(projectBase, ".impl"), workingDirName),
+              topModule = task.findTopModule.get,
+              profile = profile,
+              // in `handlePreset`, constraintsDir will be scanned to add constraints
+              // constraints = singleFile.map(Seq(_)).getOrElse(Seq()),
+              // constraintsDir = singleDir
+              // constraints = task.getConstraintFiles(project).toSeq,
+              constraints = singleFiles,
+              constraintsDir = singleDirs
+            )
+          case TaskType.Programming =>
+            // else
+            ProgrammingExecutor(
+              // TODO: should use .prog dir?
+              workingDir = new File(new File(projectBase, ".impl"), workingDirName),
+              profile = profile,
+              topModule = task.findTopModule.get,
+              // constraints = singleFile.map(Seq(_)).getOrElse(Seq()),
+              constraints = singleFiles,
+              constraintsDir = singleDirs
+            )
+        }
     }
   }
 
@@ -202,8 +229,8 @@ object ScaledaRun {
             s"${target.toolchain}-${target.name}-${task.name}-${new Date()}"
           // )
 
+          val executor    = ScaledaRun.generateExecutor(target, task, profile.get, project)
           val projectBase = new File(project.projectBase.get)
-          val executor    = ScaledaRun.generateExecutor(target, task, profile.get, projectBase)
           val runtime = ScaledaRuntime(
             id = runtimeId,
             target = target,

@@ -46,7 +46,7 @@ object Toolchain {
     */
   val toolchains: Map[String, (String, Executor => Toolchain, Set[TaskType.Value])] = Map(
     Vivado.internalID -> (Vivado.userFriendlyName, (executor: Executor) => new Vivado(executor), Vivado.supportedTask),
-//    Quartus.internalID -> (Quartus.userFriendlyName, (executor: Executor) => new Quartus(executor), Quartus.supportedTask),
+    Quartus.internalID -> (Quartus.userFriendlyName, (executor: Executor) => new Quartus(executor), Quartus.supportedTask),
 //    PDS.internalID -> (PDS.userFriendlyName, (executor: Executor) => new PDS(executor), PDS.supportedTask),
 //    Verilator.internalID -> (Verilator.userFriendlyName, (executor: Executor) => new Verilator(executor), Verilator.supportedTask),
     IVerilog.internalID -> (IVerilog.userFriendlyName, (executor: Executor) =>
@@ -65,7 +65,8 @@ object Toolchain {
 
   def toolchainPresetHandler: Map[String, ToolchainPresetProvider] = Map(
     Vivado.internalID   -> Vivado,
-    IVerilog.internalID -> IVerilog
+    IVerilog.internalID -> IVerilog,
+    Quartus.internalID -> Quartus
   )
 
   def projectDetectors: Seq[(String, BasicProjectDetector)] = Seq(

@@ -12,16 +12,17 @@ import kernel.utils.KernelFileUtils
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.ui.{DocumentAdapter, SimpleColoredComponent}
+import org.jdesktop.swingx.prompt.PromptSupport
 import top.scaleda.idea.windows.rightPanel.treeNodes.ScaledaTasksTargetNode
 
-import java.awt.BorderLayout
+import java.awt.{BorderLayout, Color, Font}
 import java.awt.event.ItemEvent
 import javax.swing.JPanel
 import javax.swing.event.DocumentEvent
 import scala.collection.mutable.ListBuffer
 
 class ScaledaEditTargetPanelWrapper(val targetConfig: ScaledaTasksTargetNode, setValid: => Unit)(implicit
-                                                                                                 manifest: ScaledaProject
+    manifest: ScaledaProject
 ) extends JPanel
     with ScaledaEditPanelWrapper {
   val inner = new TargetBasicPanel
@@ -43,7 +44,19 @@ class ScaledaEditTargetPanelWrapper(val targetConfig: ScaledaTasksTargetNode, se
 
   inner.nameField.setText(targetConfig.name)
   inner.topModuleField.setText(targetConfig.topModule.getOrElse(""))
-  inner.constraintsField.setText(targetConfig.constraints.getOrElse(""))
+  //noinspection DuplicatedCode
+  if (targetConfig.constraintsEditable)
+    inner.constraintsField.setText(targetConfig.constraints.headOption.getOrElse(""))
+  else {
+    inner.constraintsField.setEnabled(false)
+    inner.constraintsField.setText(ScaledaBundle.message("windows.edit.edit_config_file"))
+    // PromptSupport.setPrompt(
+    //   ScaledaBundle.message("windows.edit.edit_config_file"),
+    //   inner.constraintsField.getTextField
+    // )
+    // PromptSupport.setFontStyle(Font.ITALIC, inner.constraintsField.getTextField)
+    // PromptSupport.setBackground(new Color(0, 0, 0, 0), inner.constraintsField.getTextField)
+  }
   inner.toolchainField.setSelectedIndex(
     Toolchain.toolchains.zipWithIndex.filter(_._1._1 == targetConfig.toolchain).head._2
   ) // FIXME: if not exist?
@@ -81,8 +94,11 @@ class ScaledaEditTargetPanelWrapper(val targetConfig: ScaledaTasksTargetNode, se
 
   inner.constraintsField.getTextField.getDocument.addDocumentListener(new DocumentAdapter {
     override def textChanged(e: DocumentEvent): Unit = {
-      targetConfig.constraints =
-        if (inner.constraintsField.getText.nonEmpty) Some(inner.constraintsField.getText) else None
+      if (targetConfig.constraintsEditable)
+        targetConfig.constraints =
+          if (inner.constraintsField.getText.nonEmpty)
+            Seq(inner.constraintsField.getText)
+          else Seq()
       checkValue
     }
   })

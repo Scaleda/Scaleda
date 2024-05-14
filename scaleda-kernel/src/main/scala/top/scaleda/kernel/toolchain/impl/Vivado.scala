@@ -124,7 +124,7 @@ object Vivado
     }
   }
 
-  case class TemplateContext(
+  private case class TemplateContext(
       top: String, // Top module, if sim == true, then it is testbench; otherwise, it is topmodule
       workDir: String,
       part: String,
@@ -151,14 +151,15 @@ object Vivado
     val sim   = taskConfig.taskType == Simulation
     val synth = taskConfig.taskType == Synthesis
     val impl  = taskConfig.taskType == Implement
-    var topOptional =
-      if (sim) Some(executor.asInstanceOf[SimulationExecutor].topModule)
-      else if (synth) Some(executor.asInstanceOf[SynthesisExecutor].topModule)
-      else if (impl) Some(executor.asInstanceOf[ImplementExecutor].topModule)
-      else None
+    // var topOptional =
+    //   if (sim) Some(executor.asInstanceOf[SimulationExecutor].topModule)
+    //   else if (synth) Some(executor.asInstanceOf[SynthesisExecutor].topModule)
+    //   else if (impl) Some(executor.asInstanceOf[ImplementExecutor].topModule)
+    //   else None
+    var topOptional = Option(executor.topModule)
 
     // FIXME: this may got None...why?
-    if (topOptional.isEmpty)
+    if (topOptional.get.isEmpty)
       topOptional = taskConfig.findTopModule
     if (topOptional.isEmpty) {
       KernelLogger.warn(
@@ -207,7 +208,8 @@ object Vivado
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
-    val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
+    // val xdcList = if (impl) executor.asInstanceOf[ImplementExecutor].constraints.map(_.getAbsolutePath) else Seq()
+    val xdcList = taskConfig.getConstraintFiles(manifest).toSeq.map(_.getAbsolutePath)
     val ipList = KernelFileUtils
       .getAllSourceFiles(
         taskConfig.getIpFiles ++ taskConfig.getAllIps
@@ -250,7 +252,8 @@ object Vivado
 
     override def context: Map[String, Any] =
       // Serialization.getCCParams(generateContext(rt))
-      ???
+      // ??? FIXME: need test...
+      Map()
   }
 
   override def detectProfiles = async {
@@ -319,27 +322,29 @@ object Vivado
     // paths in vivado do not supports spaces, spaces should be replaced as \x20
     // val dataReplace = new RegexReplace(" ", Seq("\\x20"))
 
-    rt.task.taskType match {
-      case Implement =>
-        // load constraints from dir
-        val executor = rt.executor.asInstanceOf[ImplementExecutor]
-        executor.constraintsDir
-          .flatMap(dir => {
-            if (dir.exists() && dir.isDirectory) {
-              val constraints = KernelFileUtils.scanDirectory(directory = dir, suffixing = Set("xdc"))
-              Some(executor.copy(constraints = executor.constraints ++ constraints, constraintsDir = None))
-            } else None
-          })
-          .foreach(executorNew => rt = rt.copy(executor = executorNew))
-      case _ =>
-    }
-    val targetAction = Set("all") ++ (rt.executor match {
-      case _: SimulationExecutor  => Set("simulation")
-      case _: SynthesisExecutor   => Set("synthesis")
-      case _: ImplementExecutor   => Set("implement")
-      case _: ProgrammingExecutor => Set("programming")
-      case _                      => Set()
-    })
+    // rt.task.taskType match {
+    //   case Implement =>
+    // load constraints from dir
+    // val executor = rt.executor //.asInstanceOf[ImplementExecutor]
+    // val newConstraints = executor.constraintsDir
+    //   .map(dir => {
+    //     if (dir.exists() && dir.isDirectory)
+    //       KernelFileUtils.scanDirectory(directory = dir, suffixing = Set("xdc"))
+    //     else Seq()
+    //   })
+    //   .reduce(_ ++ _)
+    // val executorNew = executor.copy(constraints = executor.constraints ++ newConstraints, constraintsDir = Seq())
+    rt = rt.copy(executor = rt.executor.collectConstraintFiles(Set("xdc")))
+    //   case _ =>
+    // }
+    // val targetAction = Set("all") ++ (rt.executor match {
+    //   case _: SimulationExecutor  => Set("simulation")
+    //   case _: SynthesisExecutor   => Set("synthesis")
+    //   case _: ImplementExecutor   => Set("implement")
+    //   case _: ProgrammingExecutor => Set("programming")
+    //   case _                      => Set()
+    // })
+    val targetAction        = Set("all") + rt.task.`type`
     val targetTemplateFiles = KernelFileUtils.handleIpInstances(rt.task, rt.executor.workingDir, targetAction)
     if (rt.profile.isRemoteProfile) {
       // remove old vivado project if exists and only for remote

@@ -14,8 +14,9 @@ import scala.collection.mutable.ArrayBuffer
 abstract class ConfigNode() {
   @JsonIgnore
   val topModule: Option[String]
+  // cannot be `constraints`... why???
   @JsonIgnore
-  val constraints: Option[String]
+  val constraintPaths: Seq[String]
   @JsonIgnore
   var parentNode: Option[ConfigNode] = None
   @JsonIgnore
@@ -52,10 +53,31 @@ abstract class ConfigNode() {
     * @return constraints file or directories
     */
   @JsonIgnore
-  def getConstraints: Option[String] = constraints match {
-    case Some(str) => Some(str)
-    case None      => parentNode.flatMap(_.getConstraints)
-  }
+  def getConstraints: Seq[String] =
+    constraintPaths ++ parentNode.map(_.getConstraints).getOrElse(Seq())
+
+  @JsonIgnore
+  def getConstraintFiles(project: ScaledaProject): Set[File] =
+    constraintPaths
+      .map(p => {
+        val f1 = new File(p)
+        if (f1.exists()) Some(f1)
+        else {
+          val f2 = new File(project.projectBase.getOrElse(""), p)
+          if (f2.exists()) Some(f2)
+          else None
+        }
+      })
+      .map {
+        case Some(file) =>
+          if (file.isDirectory)
+            file.listFiles().toSeq
+          else Seq(file)
+        case None => Seq()
+      }
+      .reduceOption(_ ++ _)
+      .getOrElse(Seq())
+      .toSet ++ parentNode.map(_.getConstraintFiles(project)).getOrElse(Set())
 
   /** Get all source set based on project base, with folders and files mixed
     * @return sources in absolute path

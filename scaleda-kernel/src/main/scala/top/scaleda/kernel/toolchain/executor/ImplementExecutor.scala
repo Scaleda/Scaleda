@@ -8,7 +8,7 @@ import java.io.File
 case class ImplementExecutor(
     override val workingDir: File = new File(".impl"),
     override val profile: ToolchainProfile,
-    topModule: String,
-    constraints: Seq[File] = Seq(),
-    constraintsDir: Option[File] = None
+    override val topModule: String = "",
+    override val constraints: Seq[File] = Seq(),
+    override val constraintsDir: Seq[File] = Seq()
 ) extends Executor(profile)

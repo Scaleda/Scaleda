@@ -13,21 +13,21 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
   * @param topModule Top module, if [[None]] then inherited
   * @param custom Use custom execution policy (tcl)
   * @param tcl Path to Tcl script
-  * @param constraints Path to constraints file or directory, if [[None]] then inherited
+  * @param constraintPaths Path to constraints file or directory, if [[None]] then inherited
   */
 @JsonInclude(Include.NON_EMPTY)
 case class TaskConfig(
     name: String = "",
     `type`: String = "simulation", //tricky
     topModule: Option[String] = None,
-    constraints: Option[String] = None,
+    constraintPaths: Seq[String] = Seq(),
     // FIXME: this field always dumped...
     custom: Boolean = false,
     tcl: Option[String] = None,
     // force to use remote host
     host: Option[String] = None,
     // specify working dir
-    cwd: Option[String] = None,
+    cwd: Option[String] = None
     // override val source: String = "",
     // override val sources: Seq[String] = Seq(),
     // override val test: String = "",

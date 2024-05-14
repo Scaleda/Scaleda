@@ -170,8 +170,9 @@ object CommandRunner {
       // To ensure output & error are got for the last time
       flushStream(r.stdOut, handler.onStdout, extraOutput = !isRemote)
       flushStream(r.stdErr, handler.onStderr, extraOutput = !isRemote)
+      var returnValue = -1
       try {
-        val returnValue = r.returnValue.value.get.get
+        returnValue = r.returnValue.value.get.get
         if (returnValue != handler.expectedReturnValue) meetErrors = true
         handler.onReturn(returnValue, commands.last == command, meetErrors)
         step += 1
@@ -180,7 +181,7 @@ object CommandRunner {
           KernelLogger.warn("Exception", e, "when executing command", command)
           throw e
       }
-      KernelLogger.info("execute done", commandDisplay)
+      KernelLogger.info("execute done with value", returnValue, commandDisplay)
     })
   }
 

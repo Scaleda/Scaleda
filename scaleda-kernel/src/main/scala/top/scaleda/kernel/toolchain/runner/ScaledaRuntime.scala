@@ -18,18 +18,18 @@ import java.io.File
   * @param context immutable context data
   */
 case class ScaledaRuntime(
-                           id: String,
-                           target: TargetConfig,
-                           task: TaskConfig,
-                           profile: ToolchainProfile,
-                           executor: Executor,
-                           projectBase: File, // = new File(ProjectConfig.projectBase.get),
-                           extraEnvs: Map[String, String] = Map(),
-                           // used in preset and message handler
-                           context: Map[String, Any] = Map(),
-                           // mark, only run preset once
-                           stage: ScaledaRunStage.Value = ScaledaRunStage.Prepare,
-                           project: ScaledaProject
+    id: String,
+    target: TargetConfig,
+    task: TaskConfig,
+    profile: ToolchainProfile,
+    executor: Executor,
+    projectBase: File, // = new File(ProjectConfig.projectBase.get),
+    extraEnvs: Map[String, String] = Map(),
+    // used in preset and message handler
+    context: Map[String, Any] = Map(),
+    // mark, only run preset once
+    stage: ScaledaRunStage.Value = ScaledaRunStage.Prepare,
+    project: ScaledaProject
 )
 
 //noinspection ScalaFileName

@@ -55,7 +55,21 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaTasksTaskNode, setValid
   panel.typeField.setSelectedIndex(
     toolchainSupportedTaskList.zipWithIndex.find(_._1._1 == taskConfig.`type`).map(_._2).getOrElse(0)
   )
-  panel.constraintsField.setText(taskConfig.constraints.getOrElse(""))
+  //noinspection DuplicatedCode
+  if (taskConfig.constraintsEditable)
+    panel.constraintsField.setText(taskConfig.constraints.headOption.getOrElse(""))
+  else {
+    panel.constraintsField.setEnabled(false)
+    panel.constraintsField.setText(ScaledaBundle.message("windows.edit.edit_config_file"))
+    // PromptSupport.setPrompt(
+    //   ScaledaBundle.message("windows.edit.edit_config_file"),
+    //   panel.constraintsField.getTextField
+    // )
+    // PromptSupport.setFontStyle(Font.ITALIC, panel.constraintsField.getTextField)
+    // PromptSupport.setBackground(new Color(0, 0, 0, 0), panel.constraintsField.getTextField)
+  }
+
+  panel.constraintsField.setEnabled(taskConfig.constraintsEditable)
 
   panel.constraintsField.addBrowseFolderListener(
     new ProjectBrowserListener(FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor())
@@ -68,8 +82,11 @@ class ScaledaEditTaskPanelWrapper(val taskConfig: ScaledaTasksTaskNode, setValid
     override def textChanged(e: DocumentEvent): Unit = {
       taskConfig.name = panel.nameField.getText
       taskConfig.topModule = if (!panel.topModuleField.getText.isBlank) Some(panel.topModuleField.getText) else None
-      taskConfig.constraints =
-        if (!panel.constraintsField.getText.isBlank) Some(panel.constraintsField.getText) else None
+      if (taskConfig.constraintsEditable)
+        taskConfig.constraints =
+          if (!panel.constraintsField.getText.isBlank)
+            Seq(panel.constraintsField.getText)
+          else Seq()
       checkValue
     }
   })

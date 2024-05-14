@@ -8,10 +8,11 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
-class ScaledaTasksDummyRootNode(roots: Seq[ScaledaTasksRootNode] = Seq[ScaledaTasksRootNode]()) extends ScaledaTasksTreeNode("Dummy Root") {
-  override val icon: Icon                  = null
-  override var topModule: Option[String]   = None
-  override var constraints: Option[String] = None
+class ScaledaTasksDummyRootNode(roots: Seq[ScaledaTasksRootNode] = Seq[ScaledaTasksRootNode]())
+    extends ScaledaTasksTreeNode("Dummy Root") {
+  override val icon: Icon                = null
+  override var topModule: Option[String] = None
+  override var constraints: Seq[String]  = Seq()
 
   val rootNodes: mutable.ArrayBuffer[ScaledaTasksRootNode] = ArrayBuffer.from(roots)
   rootNodes.foreach(_.parent = Some(this))

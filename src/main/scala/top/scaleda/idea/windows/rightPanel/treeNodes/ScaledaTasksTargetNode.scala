@@ -34,7 +34,7 @@ class ScaledaTasksTargetNode(val target: TargetConfig) extends ScaledaTasksTreeN
   )
 
   override var topModule: Option[String]   = target.topModule
-  override var constraints: Option[String] = target.constraints
+  override var constraints: Seq[String]    = target.constraintPaths
   var toolchain: String                    = target.toolchain
   var options: Option[Map[String, String]] = target.options
 
@@ -55,7 +55,7 @@ class ScaledaTasksTargetNode(val target: TargetConfig) extends ScaledaTasksTreeN
     (toolchain match {
       case Vivado.internalID =>
         options.nonEmpty &&
-        options.get.contains("part")
+          options.get.contains("part")
       // todo: add more?
       case _ => true
     }) && (tasks.isEmpty || tasks.forall(_.validate))

@@ -28,22 +28,23 @@ class ScaledaTasksTaskNode(val task: TaskConfig) extends ScaledaTasksTreeNode(ta
 
   override def children(): util.Enumeration[_ <: TreeNode] = null
 
-  override var topModule: Option[String]   = task.topModule
-  override var constraints: Option[String] = task.constraints
-  var `type`: String                       = task.`type`
+  override var topModule: Option[String] = task.topModule
+  override var constraints: Seq[String]  = task.constraintPaths
+  var `type`: String                     = task.`type`
 
   def toTaskConfig: TaskConfig = TaskConfig(
     name = name,
     `type` = `type`,
-    topModule = topModule
+    topModule = topModule,
+    constraintPaths = constraints
   )
 
   override def validate: Boolean = {
     KernelFileUtils.isLegalName(name) &&
-      findTopModule.isDefined &&
-      (`type` match {
-        case "implementation" => findConstraints.isDefined
-        case _ => true
-      })
+    findTopModule.isDefined &&
+    (`type` match {
+      case "implementation" => findConstraints.isDefined
+      case _                => true
+    })
   }
 }

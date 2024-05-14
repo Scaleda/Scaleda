@@ -13,7 +13,7 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class ScaledaTasksRootNode(val projectConfig: ProjectConfig) extends ScaledaTasksTreeNode(projectConfig.name) {
-  var parent: Option[ScaledaTasksDummyRootNode] = None
+  var parent: Option[ScaledaTasksDummyRootNode]            = None
   override val icon: Icon                                  = Icons.mainSmall
   override def getChildAt(i: Int): TreeNode                = targets(i)
   override def getChildCount: Int                          = targets.size
@@ -23,14 +23,15 @@ class ScaledaTasksRootNode(val projectConfig: ProjectConfig) extends ScaledaTask
   override def isLeaf: Boolean                             = false
   override def children(): util.Enumeration[_ <: TreeNode] = enumeration(targets.asJava)
 
-  override var topModule: Option[String]   = projectConfig.topModule
-  override var constraints: Option[String] = projectConfig.constraints
-  var `type`: String                       = projectConfig.`type`
-  var source: String                       = projectConfig.source
+  override var topModule: Option[String] = projectConfig.topModule
+  override var constraints: Seq[String]  = projectConfig.constraintPaths
+  var `type`: String                     = projectConfig.`type`
+  var source: String                     = projectConfig.source
   // TODO: configure ProjectConfig.sources
   var test: String = projectConfig.test
 
-  var targets: mutable.Buffer[ScaledaTasksTargetNode] = projectConfig.targets.map(new ScaledaTasksTargetNode(_)).toBuffer
+  var targets: mutable.Buffer[ScaledaTasksTargetNode] =
+    projectConfig.targets.map(new ScaledaTasksTargetNode(_)).toBuffer
   targets.foreach(_.parent = Some(this))
 
   /** Re-generate project configuration
@@ -46,7 +47,7 @@ class ScaledaTasksRootNode(val projectConfig: ProjectConfig) extends ScaledaTask
     test = test,
     // tests
     topModule = topModule,
-    constraints = constraints,
+    constraintPaths = constraints,
     targets = targets.map(_.toTargetConfig).toArray
   )
 

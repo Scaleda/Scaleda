@@ -24,7 +24,7 @@ case class ProjectConfig(
     test: String = "test/",
     tests: Seq[String] = Seq(),
     topModule: Option[String] = None,
-    constraints: Option[String] = None,
+    constraintPaths: Seq[String] = Seq(),
     targets: Array[TargetConfig] = Array(),
     ipFiles: Seq[String] = Seq(),
     ipPaths: Seq[String] = Seq(),

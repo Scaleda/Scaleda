@@ -1,0 +1,41 @@
+---
+name: flow_light
+version: 0.1
+type: rtl
+source: src
+test: test
+targets:
+  - name: iverilog
+    toolchain: iverilog
+    tasks:
+      - name: iverilog test
+        type: simulation
+        topModule: flow_light_tb
+  - name: vivado
+    toolchain: vivado
+    options:
+      part: xc7z010clg400-2
+    tasks:
+      - name: vivado-sim
+        type: simulation
+        topModule: flow_light_tb
+      - name: vivado-prog
+        type: programming
+        topModule: flow_light_top
+        ipFiles:
+          - ip/processing_system7_0.xci
+        constraintPaths:
+          - constraints/flow_light_top.xdc
+  - name: quartus
+    toolchain: quartus
+    topModule: flow_light_top_altera
+    options:
+      part: 10AX115N4F40E3SGE3
+      family: Arria 10
+    constraintPaths:
+      - constraints/altera_constraints.sdc
+    tasks:
+      - name: syn
+        type: synthesis
+      - name: prog
+        type: programming
