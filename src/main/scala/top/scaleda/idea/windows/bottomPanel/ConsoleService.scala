@@ -2,6 +2,7 @@ package top.scaleda
 package idea.windows.bottomPanel
 
 import idea.utils.ScaledaIdeaLogger
+import idea.waveform.RvcdHandler
 import idea.windows.bottomPanel.console.{ConsoleReceiver, ConsoleTabManager}
 import idea.windows.bottomPanel.message.MessageListService
 import kernel.utils.LogLevel
@@ -75,7 +76,7 @@ class ConsoleService(val project: Project) extends Disposable {
           success = true
         }))
     }
-    if (key != ScaledaIdeaLogger.getId)
+    if (key != ScaledaIdeaLogger.getId && key != RvcdHandler.getId)
       Option(project.getService(classOf[MessageListService])).foreach(_.print(msg, level))
 
     if (!success) {

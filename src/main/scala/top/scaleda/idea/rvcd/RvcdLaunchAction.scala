@@ -2,6 +2,7 @@ package top.scaleda
 package idea.rvcd
 
 import idea.utils.OutputLogger
+import idea.waveform.RvcdHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
@@ -18,7 +19,7 @@ class RvcdLaunchAction extends AnAction {
               description = "Start RVCD Instance"
             )
           ),
-          new OutputLogger.StdErrToInfoHandler(event.getProject, "Rvcd", "Rvcd")
+          new OutputLogger.StdErrToInfoHandler(event.getProject, RvcdHandler.getId, "Rvcd")
         )
       },
       "rvcd-instance"
