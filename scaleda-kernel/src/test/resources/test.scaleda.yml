@@ -37,5 +37,6 @@ targets:
     tasks:
       - name: syn
         type: synthesis
+        custom: true
       - name: prog
         type: programming

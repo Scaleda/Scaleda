@@ -22,7 +22,7 @@ case class TaskConfig(
     topModule: Option[String] = None,
     constraintPaths: Seq[String] = Seq(),
     // FIXME: this field always dumped...
-    custom: Boolean = false,
+    custom: Option[Boolean] = None,
     tcl: Option[String] = None,
     // force to use remote host
     host: Option[String] = None,

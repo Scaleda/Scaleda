@@ -14,11 +14,16 @@ class KernelTests extends AnyFlatSpec with should.Matchers {
     // }
   }
 
-  it should "read project config" in {
+  private def getTestConfig = {
     // read from resources/test.scaleda.yml
     val ymlStream = getClass.getClassLoader.getResourceAsStream("test.scaleda.yml")
     val ymlContent = ymlStream.readAllBytes()
     val config = YAMLHelper(new String(ymlContent), classOf[ProjectConfig])
+    config
+  }
+
+  it should "read project config" in {
+    val config = getTestConfig
     // println(config)
     // println(config.targets.find(_.toolchain == "vivado").get.tasks.find(_.`type` == "programming").get.constraints)
     val target = config.targets.find(_.toolchain == "quartus").get
@@ -26,5 +31,12 @@ class KernelTests extends AnyFlatSpec with should.Matchers {
     println(target.constraintPaths)
     println(target.findTopModule)
     println(target.topModule)
+  }
+
+  it should "check dump project config" in {
+    val config = getTestConfig
+    val yml = YAMLHelper(config)
+    println(yml)
+    yml.contains("custom: false") should not be true
   }
 }

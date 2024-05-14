@@ -47,12 +47,12 @@ trait VivadoTargetParser extends BasicTargetParser {
       )
     val part = o.options.find(_.Name == "Part").get.Val
     require(o.Version == "7")
-    val synthTask = new TaskConfig(name = "Synth", `type` = "synthesis", custom = false)
+    val synthTask = new TaskConfig(name = "Synth", `type` = "synthesis", custom = None)
     val simTask = new TaskConfig(
       name = "Simulation",
       `type` = "simulation",
       topModule = Some(simTop),
-      custom = false
+      custom = None
     )
     val relativeSources =
       sources.map(p => KernelFileUtils.toProjectRelativePath(p).getOrElse(p))

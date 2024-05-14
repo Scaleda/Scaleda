@@ -28,7 +28,7 @@ object ScaledaRun {
     implicit val manifest: ScaledaProject = rt.project
     if (!rt.executor.workingDir.exists() && !rt.executor.workingDir.mkdirs())
       KernelLogger.warn("Cannot create working directory!")
-    if (!rt.task.custom && rt.stage == ScaledaRunStage.Prepare) {
+    if (!rt.task.custom.getOrElse(false) && rt.stage == ScaledaRunStage.Prepare) {
       // fetch remote system info
       val remoteInfo =
         if (rt.profile.isRemoteProfile) {
