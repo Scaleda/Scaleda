@@ -147,7 +147,7 @@
                 name="Tcl"
                 implementationClass="top.scaleda.tcl.TclFileType"
                 language="Tcl"
-                extensions="tcl"/>
+                extensions="tcl;xdc;sdc"/>
         <lang.parserDefinition language="Tcl"
                                implementationClass="top.scaleda.tcl.TclParserDefinition"/>
         <lang.ast.factory language="Tcl" implementationClass="top.scaleda.tcl.TclASTFactory"/>

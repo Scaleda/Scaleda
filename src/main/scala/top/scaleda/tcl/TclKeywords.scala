@@ -192,6 +192,7 @@ object TclKeywords {
       "close_vcd",
       "save_wave_config",
       "close_sim",
+      "set_false_path",
       // quartus
       "set_global_assignment",
       "set_instance_assignment",
@@ -199,6 +200,7 @@ object TclKeywords {
       "export_assignments",
       "project_new",
       "project_open",
-      "project_close"
+      "project_close",
+      "create_clock",
     )
 }

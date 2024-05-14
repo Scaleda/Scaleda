@@ -62,6 +62,10 @@ OperatorA
     | '~'
     ;
 
+matchPattern
+    : '*'
+    ;
+
 source_text
     : commandLine* EOF
     ;
@@ -73,6 +77,7 @@ commandArg
 expr
     : Identifier expr?
     | String
+    | matchPattern
     | commandArg
     | Text
     | expr OperatorAB expr
@@ -265,6 +270,7 @@ commandName
     | 'close_vcd'
     | 'save_wave_config'
     | 'close_sim'
+    | 'set_false_path'
     // quartus
     | 'set_global_assignment'
     | 'set_instance_assignment'
@@ -273,6 +279,7 @@ commandName
     | 'project_new'
     | 'project_open'
     | 'project_close'
+    | 'create_clock'
     ;
 
 commandEmpty
