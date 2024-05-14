@@ -75,9 +75,8 @@ class ConsoleService(val project: Project) extends Disposable {
           success = true
         }))
     }
-    Option(project.getService(classOf[MessageListService])) foreach {
-      _.print(msg, level)
-    }
+    if (key != ScaledaIdeaLogger.getId)
+      Option(project.getService(classOf[MessageListService])).foreach(_.print(msg, level))
 
     if (!success) {
       ScaledaIdeaLogger.debug(s"Failed to print to console: [$key] $msg")
