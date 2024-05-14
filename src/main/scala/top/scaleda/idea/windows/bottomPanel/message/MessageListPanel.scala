@@ -22,9 +22,9 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
   private val service = project.getService(classOf[MessageListService])
   service.registerMessageTab(this)
 
-  private var sortByLevel   = false // false = sort by time; true = sort by level
-  private val dataModel     = new DefaultListModel[ScaledaMessage]()
-  private val messages = ArrayBuffer[ScaledaMessage]()
+  private var sortByLevel = false // false = sort by time; true = sort by level
+  private val dataModel   = new DefaultListModel[ScaledaMessage]()
+  private val messages    = ArrayBuffer[ScaledaMessage]()
 
   private val allLevels = Seq(
     LogLevel.Debug,
@@ -40,14 +40,15 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
   private def findRenderer(toolchainType: String) =
     ScaledaMessageRenderer.getRendererMap.getOrElse(toolchainType, ScaledaMessageRendererDefault)
 
-
   private val clearMessageListAction = new AnAction(
     ScaledaBundle.message("windows.message.action.clear.short"),
     ScaledaBundle.message("windows.message.action.clear"),
     AllIcons.Actions.GC
   ) {
     override def actionPerformed(e: AnActionEvent): Unit = {
-      dataModel.clear()
+      dataModel.synchronized {
+        dataModel.clear()
+      }
       messages.synchronized {
         messages.clear()
       }
@@ -56,20 +57,22 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
     override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
   }
 
-
-  /**
-   * Refill data from [[messages]] to [[dataModel]]
-   */
+  /** Refill data from [[messages]] to [[dataModel]]
+    */
   private def refillData(): Unit = {
     val renderer = findRenderer(service.getCurrentRuntime.map(_.target.toolchain).orNull)
     listComponent.setCellRenderer(renderer)
-    dataModel.clear()
-    dataModel.addAll(CollectionConverters.asJava(messages.filter(m => enabledLevel.contains(m.level))))
+    val newMessages = messages.synchronized {
+      messages.filter(m => enabledLevel.contains(m.level))
+    }
+    dataModel.synchronized {
+      dataModel.clear()
+      dataModel.addAll(CollectionConverters.asJava(newMessages))
+    }
   }
 
-  /**
-   * Sort data already in [[dataModel]]
-   */
+  /** Sort data already in [[dataModel]]
+    */
   private def sortData(): Unit = {
     val data = dataModel.toArray.map(_.asInstanceOf[ScaledaMessage])
     data.sortInPlaceWith((a, b) =>
@@ -80,8 +83,10 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
         a.time.toEpochMilli < b.time.toEpochMilli
       }
     )
-    dataModel.clear()
-    dataModel.addAll(CollectionConverters.asJava(data))
+    dataModel.synchronized {
+      dataModel.clear()
+      dataModel.addAll(CollectionConverters.asJava(data))
+    }
   }
 
   private val toggleSortAction = new ToggleAction(
@@ -97,15 +102,14 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
     override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
   }
 
-
   private val filterLevelActions = allLevels.map(level => {
     val levelIcons = Map(
-      LogLevel.Debug -> AllIcons.General.Note,
+      LogLevel.Debug   -> AllIcons.General.Note,
       LogLevel.Verbose -> AllIcons.Debugger.Db_muted_field_breakpoint,
-      LogLevel.Info -> AllIcons.General.Information,
-      LogLevel.Warn -> AllIcons.General.Warning,
-      LogLevel.Error -> AllIcons.General.Error,
-      LogLevel.Fatal -> AllIcons.Ide.FatalError
+      LogLevel.Info    -> AllIcons.General.Information,
+      LogLevel.Warn    -> AllIcons.General.Warning,
+      LogLevel.Error   -> AllIcons.General.Error,
+      LogLevel.Fatal   -> AllIcons.Ide.FatalError
     )
     val icon = levelIcons(level)
     //noinspection ReferencePassedToNls
@@ -126,7 +130,8 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
     }
   })
 
-  /*** DRAWING UI ***/
+  /** * DRAWING UI **
+    */
   private val group = new DefaultActionGroup()
   group.add(clearMessageListAction)
   group.add(toggleSortAction)
@@ -142,7 +147,7 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
   panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS))
 
   private val listComponent = new JBList[ScaledaMessage](dataModel)
-  private val scrollbar = new JBScrollPane()
+  private val scrollbar     = new JBScrollPane()
   listComponent.setAutoscrolls(false)
   listComponent.setCellRenderer(ScaledaMessageRendererDefault) // stub, will be replaced in [[refillData]]
   scrollbar.setViewportView(listComponent)
@@ -154,7 +159,7 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
     messages.synchronized {
       messages.append(message)
     }
-    runInEdt{
+    runInEdt {
       refillData()
       sortData()
     }
@@ -165,7 +170,6 @@ class MessageListPanel(project: Project) extends SimpleToolWindowPanel(false, tr
       ActionManager.getInstance().tryToExecute(clearMessageListAction, null, null, null, true)
     }
   }
-
 
   override def dispose(): Unit = {
     // TODO
