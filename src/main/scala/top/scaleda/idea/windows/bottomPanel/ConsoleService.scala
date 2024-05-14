@@ -3,12 +3,12 @@ package idea.windows.bottomPanel
 
 import idea.utils.ScaledaIdeaLogger
 import idea.windows.bottomPanel.console.{ConsoleReceiver, ConsoleTabManager}
+import idea.windows.bottomPanel.message.MessageListService
 import kernel.utils.LogLevel
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import top.scaleda.idea.windows.bottomPanel.message.MessageListService
 
 import scala.collection.mutable
 
