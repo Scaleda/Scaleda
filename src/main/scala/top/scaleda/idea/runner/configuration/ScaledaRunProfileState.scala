@@ -42,11 +42,13 @@ class ScaledaRunProfileState(
 
 
     // message parser
-    val consoleService = project.getService(classOf[MessageListService])
-    ToolchainIdea.toolchainMessageParser
-      .get(runtime.target.toolchain)
-      .foreach(parserProvider => consoleService.registerParser(parserProvider.messageParser))
-    consoleService.registerRuntime(runtime)
+    Option(project.getService(classOf[MessageListService])) foreach { messageListService =>
+      messageListService.clear()
+      ToolchainIdea.toolchainMessageParser
+        .get(runtime.target.toolchain)
+        .foreach(parserProvider => messageListService.registerParser(parserProvider.messageParser))
+      messageListService.registerRuntime(runtime)
+    }
 
     // setup exception handler
     thread.setUncaughtExceptionHandler((_thread: Thread, throwable: Throwable) => {

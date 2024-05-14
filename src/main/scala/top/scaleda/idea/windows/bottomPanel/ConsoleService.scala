@@ -8,6 +8,7 @@ import kernel.utils.LogLevel
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import top.scaleda.idea.windows.bottomPanel.message.MessageListService
 
 import scala.collection.mutable
 
@@ -74,6 +75,10 @@ class ConsoleService(val project: Project) extends Disposable {
           success = true
         }))
     }
+    Option(project.getService(classOf[MessageListService])) foreach {
+      _.print(msg, level)
+    }
+
     if (!success) {
       ScaledaIdeaLogger.debug(s"Failed to print to console: [$key] $msg")
       ScaledaIdeaLogger.debug(
