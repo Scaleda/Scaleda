@@ -11,7 +11,7 @@
 <!--                instance="org.nixos.idea.lsp.NixLspSettingsConfigurable"/>-->
 
         <platform.lsp.serverSupportProvider
-                implementation="top.scaleda.idea.lsp.verible.VeribleLspServerSupportProvider"/>
+                implementation="top.scaleda.idea.lsp.ScaledaLspServerSupportProvider"/>
 
     </extensions>
 </idea-plugin>

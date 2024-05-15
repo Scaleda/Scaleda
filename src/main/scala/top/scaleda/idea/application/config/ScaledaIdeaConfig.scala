@@ -17,6 +17,7 @@ case class ScaledaIdeaConfig(
     waveformHandler: String = RvcdHandler.getId
 )
 
+// TODO: use IDEA PersistentStateComponent instead
 object ScaledaIdeaConfig {
   private val configFile = new File(Paths.getGlobalConfigDir, "config.yml")
   def getConfig: ScaledaIdeaConfig = {
