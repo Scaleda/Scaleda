@@ -32,7 +32,18 @@ object LspServers {
     override def displayName: String = "Verible"
   }
 
+  object SvlsLspServerDescriptor extends LspServer {
+    override def supportedFile(file: VirtualFile): Boolean =
+      file.getFileType.isInstanceOf[VerilogFileType] ||
+        file.getFileType.isInstanceOf[SystemVerilogFileType]
+
+    override def commandLine(): GeneralCommandLine = new GeneralCommandLine("svls")
+
+    override def displayName: String = "Svls"
+  }
+
   val servers: Seq[LspServer] = Seq(
-    VeribleLspServerDescriptor
+    VeribleLspServerDescriptor,
+    SvlsLspServerDescriptor
   )
 }
