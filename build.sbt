@@ -9,7 +9,7 @@ val ideaVersion = "241.15989.150"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
-ThisBuild / intellijPlatform := IntelliJPlatform.IdeaCommunity
+ThisBuild / intellijPlatform := IntelliJPlatform.IdeaUltimate
 ThisBuild / intellijBuild := ideaVersion
 
 // ThisBuild / githubWorkflowTargetTags += "v*.*.*"
@@ -55,6 +55,10 @@ lazy val commonSettings = Seq(
   assembly / mainClass := Some("top.scaleda.kernel.shell.ScaledaShellMain"),
   commands += Command.command("assemblyTrulyFatJar") { state =>
     """set assembly / fullClasspath := (Compile / fullClasspath).value""" :: "assembly" :: state
+  },
+  patchPluginXml := pluginXmlOptions { xml =>
+    xml.version = version.value
+    xml.sinceBuild = ideaVersion
   }
 )
 
