@@ -60,7 +60,7 @@ jobs:
           cp scaleda-kernel/target/scala-2.13/scaleda-kernel.jar target/scaleda-kernel.jar
 
       - name: Upload binaries to Release
-        uses: actions/upload-release-asset@v2
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/*.{zip,jar}
