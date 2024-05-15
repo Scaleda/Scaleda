@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>top.scaleda</id>
     <name><![CDATA[Scaleda: Verilog/SystemVerilog/VCD/Vivado/Quartus]]></name>
-    <version>0.1.8</version>
+    <version>0.2.0</version>
     <vendor>Scaleda</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
