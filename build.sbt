@@ -10,8 +10,8 @@ val ideaVersion = "2024.1.1"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
-// ThisBuild / intellijPlatform := IntelliJPlatform.IdeaUltimate
-ThisBuild / intellijPlatform := IntelliJPlatform.CLion
+ThisBuild / intellijPlatform := IntelliJPlatform.IdeaUltimate
+// ThisBuild / intellijPlatform := IntelliJPlatform.CLion
 ThisBuild / intellijBuild := ideaVersion
 
 // ThisBuild / githubWorkflowTargetTags += "v*.*.*"
