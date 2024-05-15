@@ -1,10 +1,28 @@
 # Scaleda：将 IntelliJ IDEA 打造为 FPGA 开发工具
 
-## 概述
-
 [<img src="README.assets/icon-with-name.svg" alt="Scaleda icon" style="zoom:30%;" />](https://plugins.jetbrains.com/plugin/21863)
 
-Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能 IntelliJ IDEA 增加包括 HDL 工程管理、HDL 语言支持、FPGA 工具调用等功能，从而将 IJ 打造成为灵活而强大的 FPGA 开发工具。
+[English](README.en.md)
+
+![使用 Scaleda 进行 Verilog 开发](docs/source/images/main-screenshot.png)
+
+## 概述
+
+Scaleda is an extensible FPGA EDA support tool based on the IntelliJ platform, featuring HDL project management, HDL language support, FPGA tool invocation, and more. It aims to transform IntelliJ IDEA into a flexible and powerful FPGA development tool. Currently, Scaleda supports the following features:
+
+ - Basic syntax features for Verilog language (syntax highlighting, code folding, code formatting, code commenting, code navigation, etc.);
+ - Simple code completion for Verilog language;
+ - Code inspection for Verilog (syntax errors and semantic errors, as well as errors such as missing ports, multiple drivers, etc.);
+ - Verilog and SystemVerilog code formatting using [Verible](https://github.com/chipsalliance/verible);
+ - Syntax parsing and highlighting for Verilog, SystemVerilog, Tcl, Bluespec SystemVerilog;
+ - Proprietary project and IP structure, supporting the invocation of tools like Vivado, Quartus Prime, iverilog, and Yosys for simulation, synthesis, and implementation;
+ - Support for loading Vivado projects and invoking synthesis and implementation operations within them;
+ - Built-in waveform viewers [Rvcd](https://github.com/Scaleda/rvcd) and [Surfer](https://gitlab.com/surfer-project/surfer);
+ - Running in server mode to execute remote EDA tasks.
+ - Verible, [Svls](https://github.com/dalance/svls), or custom language server (LSP) support;
+ - i18n support.
+
+Scaleda 是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具，具有 HDL 项目管理、HDL 语言支持、FPGA 工具调用等功能，将 IJ 打造成为灵活而强大的 FPGA 开发工具。
 目前，Scaleda 已支持的功能包括：
 
  - Verilog 语言的基本语法功能（语法高亮、代码折叠、代码格式化、代码注释、代码导航等）；
@@ -16,21 +34,19 @@ Scaleda 是一款 IntelliJ IDEA（下文简称 IJ）平台上的插件，它能 
  - 支持加载 Vivado 工程并调用其中的综合、实现等操作；
  - 内置波形查看器 [Rvcd](https://github.com/Scaleda/rvcd)、[Surfer](https://gitlab.com/surfer-project/surfer)；
  - 运行服务器模式以执行远程 EDA 任务；
+ - Verible、[Svls](https://github.com/dalance/svls)或自定义语言服务器（LSP）支持；
+ - 国际化多显示语言支持；
 
-![使用 Scaleda 进行 Verilog 开发](docs/source/images/main-screenshot.png)
-
-Scaleda 正在计划增加的功能有：
- - 更加完善的 Verilog 语言支持：重构（Refactoring）、更多的代码检查（Inspection）等；
- - 完善自有工程结构：支持更多工具、支持更多操作。
-
-[这篇](./docs/source/_posts/introduction.md)（[在线链接](https://scaleda.top/introduction)） 文档对 Scaleda 的开发背景和基本功能进行了简单的介绍。
+[这篇](https://scaleda.top/introduction) 文档对 Scaleda 的开发背景和基本功能进行了简单的介绍。
 
 ## 安装
 
-Scaleda 目前支持 **2024.1.1 及以上版本** 的 IJ 平台，包括 IDEA Community Edition 和 IDEA Ultimate Edition。
+Scaleda 目前支持 **2024.1.1 及以上版本** 的除了 Gateway 以外的 IJ 平台，包括 IDEA Community Edition 和 IDEA Ultimate Edition 等。
 您可以选择在插件市场搜索「Scaleda」，或直接下载编译好的插件 zip 包，或者自行编译插件。
 
 [访问插件市场：![JetBrains Plugin Downloads](https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff)](https://plugins.jetbrains.com/plugin/21863)
+
+服务器端程序请访问 [Github Release](https://github.com/Scaleda/Scaleda/releases)。
 
 ### 直接下载 zip 文件来安装
 
@@ -93,6 +109,8 @@ Scaleda 参考和使用了诸多开源项目，包括但不限于：
  - [ANTLR](https://github.com/antlr/antlr4)、[ANTLR IntelliJ Adapter](https://github.com/antlr/antlr4-intellij-adaptor)
  - [JetBrains Verilog Plugin](https://github.com/MrTsepa/jetbrains-verilog-plugin/)
  - [Verilog-HDL/SystemVerilog/Bluespec SystemVerilog](https://github.com/mshr-h/vscode-verilog-hdl-support)
+ - [Verible](https://github.com/chipsalliance/verible)
+ - [Svls](https://github.com/dalance/svls)
 
 ## 开源协议与鸣谢
 

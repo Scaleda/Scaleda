@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>top.scaleda</id>
-    <name>Scaleda</name>
+    <name>Scaleda: Verilog/SystemVerilog/VCD/Vivado/Quartus</name>
     <version>0.1.8</version>
     <vendor>Scaleda</vendor>
 
