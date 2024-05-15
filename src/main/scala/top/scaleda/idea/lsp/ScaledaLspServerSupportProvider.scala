@@ -2,13 +2,13 @@ package top.scaleda
 package idea.lsp
 
 import idea.application.config.ScaledaIdeaConfig
+import idea.settings.lsp.LspConfigSetting
 import systemverilog.SystemVerilogFileType
 import verilog.VerilogFileType
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerSupportProvider
-import top.scaleda.idea.settings.lsp.LspConfigSetting
 
 class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
   override def fileOpened(
