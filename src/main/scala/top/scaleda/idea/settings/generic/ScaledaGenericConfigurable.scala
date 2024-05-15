@@ -31,18 +31,16 @@ class ScaledaGenericConfigurable extends SearchableConfigurable {
   }
   reset()
 
-  private val mainPanel = new JPanel()
-  mainPanel.add(
-    FormBuilder
-      .createFormBuilder()
-      // .setAlignLabelOnRight(false)
-      // .setHorizontalGap(UIUtil.DEFAULT_HGAP)
-      // .setVerticalGap(UIUtil.DEFAULT_VGAP)
-      .addLabeledComponent(ScaledaBundle.message("settings.generic.auto_open_waveform"), autoOpenWaveform)
-      .addLabeledComponent(ScaledaBundle.message("settings.generic.notify_waveform_update"), notifyWaveformUpdate)
-      .addLabeledComponent(ScaledaBundle.message("settings.generic.waveform_handler"), waveformHandler)
-      .getPanel
-  )
+  private val mainPanel = FormBuilder
+    .createFormBuilder()
+    // .setAlignLabelOnRight(false)
+    // .setHorizontalGap(UIUtil.DEFAULT_HGAP)
+    // .setVerticalGap(UIUtil.DEFAULT_VGAP)
+    .addLabeledComponent(ScaledaBundle.message("settings.generic.auto_open_waveform"), autoOpenWaveform)
+    .addLabeledComponent(ScaledaBundle.message("settings.generic.notify_waveform_update"), notifyWaveformUpdate)
+    .addLabeledComponent(ScaledaBundle.message("settings.generic.waveform_handler"), waveformHandler)
+    .addComponentFillVertically(new JPanel, 0)
+    .getPanel
 
   override def createComponent(): JComponent = mainPanel
 

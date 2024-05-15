@@ -223,8 +223,8 @@
             <configurable groupId="tools"
                           bundle="bundles.ScaledaBundle"
                           key="settings.lsp.name"
-                          id="top.scaleda.idea.settings.lsp.LspConfig"
-                          instance="top.scaleda.idea.settings.lsp.LspConfig"/>
+                          id="top.scaleda.idea.settings.lsp.LspConfigSetting"
+                          instance="top.scaleda.idea.settings.lsp.LspConfigSetting"/>
         </applicationConfigurable>
     </extensions>
 

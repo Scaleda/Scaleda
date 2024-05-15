@@ -8,17 +8,18 @@ import idea.lsp.LspServers.CustomLspServerDescriptor
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SearchableConfigurable
+import com.intellij.openapi.project.{Project, ProjectManager}
 import com.intellij.openapi.ui.{ComboBox, TextBrowseFolderListener, TextFieldWithBrowseButton}
-import com.intellij.ui.components.JBLabel
-import com.intellij.util.ui.FormBuilder
+import com.intellij.ui.components.{JBLabel, JBPanelWithEmptyText}
+import com.intellij.util.ui.{FormBuilder, JBUI}
 
 import javax.swing.{JComponent, JPanel}
 
-class LspConfig extends SearchableConfigurable {
+class LspConfigSetting extends SearchableConfigurable {
 
   private def configNow: ScaledaLspConfig = ScaledaIdeaConfig.getConfig.lsp
 
-  override def getId: String = LspConfig.SETTINGS_ID
+  override def getId: String = LspConfigSetting.SETTINGS_ID
 
   override def getDisplayName: String = ScaledaBundle.message("settings.lsp.name")
 
@@ -53,19 +54,24 @@ class LspConfig extends SearchableConfigurable {
     )
   })
 
-  private val mainPanel = new JPanel()
-  mainPanel.add(
-    FormBuilder
-      .createFormBuilder()
-      // .setAlignLabelOnRight(false)
-      // .setHorizontalGap(UIUtil.DEFAULT_HGAP)
-      // .setVerticalGap(UIUtil.DEFAULT_VGAP)
-      .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.tool")), tool)
-      .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.path")), path)
-      .getPanel
-  )
-
-  override def createComponent(): JComponent = mainPanel
+  override def createComponent(): JComponent = {
+    val project = ProjectManager.getInstance().getDefaultProject
+    if (LspConfigSetting.isLspSupport(project)) {
+      FormBuilder
+        .createFormBuilder()
+        // .setAlignLabelOnRight(false)
+        // .setHorizontalGap(UIUtil.DEFAULT_HGAP)
+        // .setVerticalGap(UIUtil.DEFAULT_VGAP)
+        .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.tool")), tool)
+        .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.path")), path)
+        .addComponentFillVertically(new JPanel, 0)
+        .getPanel
+    } else {
+      new JBPanelWithEmptyText()
+        .withEmptyText(ScaledaBundle.message("settings.lsp.unsupported"))
+        .withBorder(JBUI.Borders.emptyLeft(6))
+    }
+  }
 
   override def isModified: Boolean = dumpConfig != configNow
 
@@ -85,6 +91,14 @@ class LspConfig extends SearchableConfigurable {
   }
 }
 
-object LspConfig {
+object LspConfigSetting {
   val SETTINGS_ID = "top.scaleda.idea.settings.lsp.LspConfig"
+
+  def isLspSupport(project: Project): Boolean = {
+    try {
+      LspServers.servers.map(_.createDescriptor(project)).forall(_.isDefined)
+    } catch {
+      case _: Throwable => false
+    }
+  }
 }

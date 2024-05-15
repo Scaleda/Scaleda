@@ -4,7 +4,7 @@ package verilog.editor.formatter
 import idea.ScaledaBundle
 import idea.utils.{Notification, ScaledaIdeaLogger}
 import verilog.editor.codeStyle.VerilogCodeStyleSettings
-import verilog.formatter.VeribleFormatterHelper
+import verilog.formatter.VeribleAssetsHelper
 import verilog.{VerilogFileType, VerilogLanguage, VerilogPSIFileRoot}
 
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -29,7 +29,7 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
     val project           = formattingContext.getProject
 
     // Check if Verible is installed
-    if (!VeribleFormatterHelper.veribleFormatter.exists()) {
+    if (!VeribleAssetsHelper.veribleFormatter.exists()) {
       return null
     }
 
@@ -93,7 +93,7 @@ class VerilogExternalFormatter extends AsyncDocumentFormattingService {
     try {
       val cmdLine = new GeneralCommandLine()
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
-        .withExePath(VeribleFormatterHelper.veribleFormatter.getAbsolutePath)
+        .withExePath(VeribleAssetsHelper.veribleFormatter.getAbsolutePath)
         .withParameters(params.asJava)
 
       val handler = new OSProcessHandler(cmdLine.withCharset(StandardCharsets.UTF_8))

@@ -1,7 +1,7 @@
 package top.scaleda.kernel.bin
 
 import top.scaleda.kernel.utils.{KernelLogger, OS, Paths}
-import top.scaleda.verilog.formatter.VeribleFormatterHelper
+import top.scaleda.verilog.formatter.VeribleAssetsHelper
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.Path
@@ -18,7 +18,7 @@ object ExtractZipAssets {
   private val binaryList =
     Array("rvcd", "rvcd.exe") ++
       Array("surfer", "surfer.exe") ++
-      VeribleFormatterHelper.allVeribleAssets
+      VeribleAssetsHelper.allVeribleAssets
 
   def isInstalled: Boolean = {
     // check if version file

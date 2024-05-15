@@ -8,6 +8,7 @@ import verilog.VerilogFileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerSupportProvider
+import top.scaleda.idea.settings.lsp.LspConfigSetting
 
 class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
   override def fileOpened(
@@ -15,6 +16,8 @@ class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
       virtualFile: VirtualFile,
       lspServerStarter: LspServerSupportProvider.LspServerStarter
   ): Unit = {
+    if (!LspConfigSetting.isLspSupport(project))
+      return
     if (ScaledaLspServerSupportProvider.isLspSupportedFile(virtualFile)) {
       val config = ScaledaIdeaConfig.getConfig.lsp
       LspServers.servers.find(server => server.name == config.tool && server.supportedFile(virtualFile)).foreach {
@@ -22,7 +25,12 @@ class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
           if (server.commandLine.getCommandLineString.isEmpty) {
             // TODO: show a dialog to ask user to set the path
           } else {
-            lspServerStarter.ensureServerStarted(server.createDescriptor(project))
+            server.createDescriptor(project) match {
+              case Some(descriptor) =>
+                lspServerStarter.ensureServerStarted(descriptor)
+              case None =>
+              // TODO: maybe in Community Edition
+            }
           }
       }
     }

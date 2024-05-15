@@ -2,7 +2,7 @@ package top.scaleda
 package kernel.bin
 
 import top.scaleda.kernel.utils.{KernelLogger, OS, Paths}
-import top.scaleda.verilog.formatter.VeribleFormatterHelper
+import top.scaleda.verilog.formatter.VeribleAssetsHelper
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.Path
@@ -13,15 +13,15 @@ object ExtractAssets {
   private val ASSET_VERSION   = 5 // Update me when newer assets are loaded
   private val SMALL_FILE_SIZE = 10240
 
-  private val targetDirectory = Paths.getBinaryDir
+  private val targetBinaryDirectory = Paths.getBinaryDir
   private val binaryList =
-    Array("rvcd", "rvcd.exe") ++
-      Array("surfer", "surfer.exe") ++
-      VeribleFormatterHelper.allVeribleAssets
+    Seq("rvcd", "rvcd.exe") ++
+      Seq("surfer", "surfer.exe") ++
+      VeribleAssetsHelper.allVeribleAssets
 
   def isInstalled: Boolean = {
     // check if version file
-    val versionFile = new File(targetDirectory, "version")
+    val versionFile = new File(targetBinaryDirectory, "version")
     if (!versionFile.exists()) return false
 
     // check
@@ -37,7 +37,10 @@ object ExtractAssets {
     installTexts()
 
     // check integrity
-    binaryList.forall(binary => Path.of(targetDirectory.getAbsolutePath, binary.split('/'): _*).toFile.exists())
+    binaryList.forall(binary => {
+      val file = Path.of(targetBinaryDirectory.getAbsolutePath, binary.split('/'): _*).toFile
+      file.exists() && file.isFile && file.canExecute
+    })
   }
 
   private def installFilesFromResource(prefix: String, parent: File, files: Seq[String]): Unit =
@@ -72,9 +75,16 @@ object ExtractAssets {
     installFilesFromResource("install", parent, files)
   }
 
+  private def setBinariesExecutable(): Unit = {
+    binaryList.foreach(binary => {
+      val file = Path.of(targetBinaryDirectory.getAbsolutePath, binary.split('/'): _*).toFile
+      if (file.exists() && !file.canExecute) file.setExecutable(true)
+    })
+  }
+
   private def installBinaries(): Unit = {
-    if (!targetDirectory.exists()) targetDirectory.mkdirs()
-    installFilesFromResource("bin", targetDirectory, binaryList.toSeq :+ "version")
+    if (!targetBinaryDirectory.exists()) targetBinaryDirectory.mkdirs()
+    installFilesFromResource("bin", targetBinaryDirectory, binaryList.toSeq :+ "version")
   }
 
   def run(): Boolean = {
@@ -82,6 +92,7 @@ object ExtractAssets {
     try {
       installTexts()
       installBinaries()
+      setBinariesExecutable()
       true
     } catch {
       case e: Exception =>

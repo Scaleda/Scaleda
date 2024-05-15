@@ -11,6 +11,7 @@ val ideaVersion = "2024.1.1"
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
 ThisBuild / intellijPlatform := IntelliJPlatform.IdeaUltimate
+// ThisBuild / intellijPlatform := IntelliJPlatform.IdeaCommunity
 // ThisBuild / intellijPlatform := IntelliJPlatform.CLion
 ThisBuild / intellijBuild := ideaVersion
 
