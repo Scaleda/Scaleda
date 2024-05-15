@@ -4,12 +4,14 @@ import scala.io.Source
 
 val publicScalaVersion = "2.13.12"
 // val ideaVersion = "2023.1.3"
-val ideaVersion = "241.15989.150"
-// val ideaVersion = "2024.1.1"
+// val ideaVersion = "241.15989.150"
+val ideaVersion = "2024.1.1"
+// val ideaVersion = "241.15989.121"
 
 ThisBuild / scalaVersion := publicScalaVersion
 ThisBuild / intellijPluginName := "Scaleda"
-ThisBuild / intellijPlatform := IntelliJPlatform.IdeaUltimate
+// ThisBuild / intellijPlatform := IntelliJPlatform.IdeaUltimate
+ThisBuild / intellijPlatform := IntelliJPlatform.CLion
 ThisBuild / intellijBuild := ideaVersion
 
 // ThisBuild / githubWorkflowTargetTags += "v*.*.*"
@@ -124,12 +126,12 @@ lazy val scaleda = project
   .settings(
     commonSettings,
     ideBasePackages := Seq("top.scaleda"),
-    intellijPlugins := Seq(
-      "com.intellij.properties",
-      "com.intellij.java",
-      "com.intellij.java-i18n"
-      // "antlr4-intellij-plugin-sample"
-    ).map(_.toPlugin),
+    // intellijPlugins := Seq(
+    //   "com.intellij.properties",
+    //   "com.intellij.java",
+    //   "com.intellij.java-i18n"
+    //   // "antlr4-intellij-plugin-sample"
+    // ).map(_.toPlugin),
     pluginVerifierOptions := pluginVerifierOptions.value.copy(
       version = "1.365", // use a specific verifier version
       offline = true,    // forbid the verifier from reaching the internet
@@ -142,7 +144,7 @@ lazy val scaleda = project
     Compile / unmanagedSourceDirectories += baseDirectory.value / "antlr4-intellij-adaptor/src/main/java",
     patchPluginXml := pluginXmlOptions { xml =>
       xml.version = thisVersion
-      xml.sinceBuild = ideaVersion
+      // xml.sinceBuild = ideaVersion
     }
   )
   .enablePlugins(SbtIdeaPlugin)

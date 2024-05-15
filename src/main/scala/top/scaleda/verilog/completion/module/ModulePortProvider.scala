@@ -1,17 +1,17 @@
 package top.scaleda
 package verilog.completion.module
 
+import idea.utils.Icons
 import verilog.psi.nodes.instantiation.ModuleInstantiationPsiNode
 import verilog.psi.nodes.module.ModuleDeclarationPsiNode
+import verilog.psi.nodes.signal.PortDeclarationPsiNode
 
-import com.intellij.codeInsight.completion.util.{MethodParenthesesHandler, ParenthesesInsertHandler}
+import com.intellij.codeInsight.completion.util.ParenthesesInsertHandler
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionProvider, CompletionResultSet}
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import top.scaleda.idea.utils.Icons
-import top.scaleda.verilog.psi.nodes.signal.PortDeclarationPsiNode
 
 class ModulePortProvider extends CompletionProvider[CompletionParameters] {
   override def addCompletions(
