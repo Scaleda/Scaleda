@@ -1,12 +1,12 @@
 <idea-plugin>
     <id>top.scaleda</id>
     <name>Scaleda</name>
-<!--    <version>0.1.8</version>-->
+    <version>PATCH</version>
     <vendor>Scaleda</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
 
-<!--    <idea-version since-build="241.1"/>-->
+    <idea-version since-build="PATCH"/>
 
     <depends>com.intellij.properties</depends>
     <depends>com.intellij.modules.platform</depends>

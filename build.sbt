@@ -55,10 +55,6 @@ lazy val commonSettings = Seq(
   assembly / mainClass := Some("top.scaleda.kernel.shell.ScaledaShellMain"),
   commands += Command.command("assemblyTrulyFatJar") { state =>
     """set assembly / fullClasspath := (Compile / fullClasspath).value""" :: "assembly" :: state
-  },
-  patchPluginXml := pluginXmlOptions { xml =>
-    xml.version = version.value
-    xml.sinceBuild = ideaVersion
   }
 )
 
@@ -134,20 +130,20 @@ lazy val scaleda = project
       "com.intellij.java-i18n"
       // "antlr4-intellij-plugin-sample"
     ).map(_.toPlugin),
-    patchPluginXml := pluginXmlOptions { xml =>
-      xml.version = version.value
-      xml.sinceBuild = (ThisBuild / intellijBuild).value
-    },
     pluginVerifierOptions := pluginVerifierOptions.value.copy(
       version = "1.365", // use a specific verifier version
       offline = true,    // forbid the verifier from reaching the internet
       // overrideIDEs = Seq("IC", "IU").map(_ + "-" + ideaVersion),  // verify against specific products instead of 'intellijBuild'
-      failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
+      // failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
     ),
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
     // ANTLR IntelliJ Adapter
-    Compile / unmanagedSourceDirectories += baseDirectory.value / "antlr4-intellij-adaptor/src/main/java"
+    Compile / unmanagedSourceDirectories += baseDirectory.value / "antlr4-intellij-adaptor/src/main/java",
+    patchPluginXml := pluginXmlOptions { xml =>
+      xml.version = thisVersion
+      xml.sinceBuild = ideaVersion
+    }
   )
   .enablePlugins(SbtIdeaPlugin)
 
