@@ -25,38 +25,34 @@ object LspServers {
     def supportFormatter: Boolean            = false
     def supportFileLists: Boolean            = false
     private def readConfig: ScaledaLspConfig = ScaledaIdeaConfig.getConfig.lsp
-    def createDescriptor(project: Project): Option[ProjectWideLspServerDescriptor] = {
-      try {
-        Some(new ProjectWideLspServerDescriptor(project, name) {
-          override def isSupportedFile(file: VirtualFile): Boolean = supportedFile(file)
-          override def createCommandLine(): GeneralCommandLine     = commandLine
+    def createDescriptor(project: Project): ProjectWideLspServerDescriptor = {
+      new ProjectWideLspServerDescriptor(project, name) {
+        override def isSupportedFile(file: VirtualFile): Boolean = supportedFile(file)
+        override def createCommandLine(): GeneralCommandLine     = commandLine
 
-          // override def getLspFormattingSupport: LspFormattingSupport = {
-          //   if (supportFormatter) {
-          //     // FIXME: check it
-          //     new LspFormattingSupport {
-          //       override def shouldFormatThisFileExclusivelyByServer(
-          //           file: VirtualFile,
-          //           ideCanFormatThisFileItself: Boolean,
-          //           serverExplicitlyWantsToFormatThisFile: Boolean
-          //       ): Boolean =
-          //         serverExplicitlyWantsToFormatThisFile
-          //     }
-          //   } else {
-          //     super.getLspFormattingSupport
-          //   }
-          // }
+        // override def getLspFormattingSupport: LspFormattingSupport = {
+        //   if (supportFormatter) {
+        //     // FIXME: check it
+        //     new LspFormattingSupport {
+        //       override def shouldFormatThisFileExclusivelyByServer(
+        //           file: VirtualFile,
+        //           ideCanFormatThisFileItself: Boolean,
+        //           serverExplicitlyWantsToFormatThisFile: Boolean
+        //       ): Boolean =
+        //         serverExplicitlyWantsToFormatThisFile
+        //     }
+        //   } else {
+        //     super.getLspFormattingSupport
+        //   }
+        // }
 
-          override def getLspGoToDefinitionSupport: Boolean = supportLinter
-          override def getLspHoverSupport: Boolean          = supportLinter
-        })
-      } catch {
-        case _: Throwable => None
+        override def getLspGoToDefinitionSupport: Boolean = supportLinter
+        override def getLspHoverSupport: Boolean          = supportLinter
       }
     }
   }
 
-  object VeribleLspServerDescriptor extends LspServer {
+  class VeribleLspServerDescriptor extends LspServer {
     override def supportedFile(file: VirtualFile): Boolean =
       file.getFileType.isInstanceOf[VerilogFileType] ||
         file.getFileType.isInstanceOf[SystemVerilogFileType]
@@ -66,7 +62,7 @@ object LspServers {
     override def defaultPath: String = "verible-verilog-ls"
   }
 
-  object SvlsLspServerDescriptor extends LspServer {
+  class SvlsLspServerDescriptor extends LspServer {
     override def supportedFile(file: VirtualFile): Boolean =
       file.getFileType.isInstanceOf[VerilogFileType] ||
         file.getFileType.isInstanceOf[SystemVerilogFileType]
@@ -76,19 +72,22 @@ object LspServers {
     override def defaultPath: String = "svls"
   }
 
-  object CustomLspServerDescriptor extends LspServer {
+  class CustomLspServerDescriptor extends LspServer {
     override def supportedFile(file: VirtualFile): Boolean =
       file.getFileType.isInstanceOf[VerilogFileType] ||
         file.getFileType.isInstanceOf[SystemVerilogFileType]
 
-    override def name: String = "Custom"
+    override def name: String = CustomLspServerDescriptor.name
 
     override def defaultPath: String = ""
   }
+  object CustomLspServerDescriptor {
+    val name = "Custom"
+  }
 
   def servers: Seq[LspServer] = Seq(
-    VeribleLspServerDescriptor,
-    SvlsLspServerDescriptor,
-    CustomLspServerDescriptor
+    new VeribleLspServerDescriptor,
+    new SvlsLspServerDescriptor,
+    new CustomLspServerDescriptor
   )
 }

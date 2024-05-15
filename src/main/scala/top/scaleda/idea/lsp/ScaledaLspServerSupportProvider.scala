@@ -16,7 +16,7 @@ class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
       virtualFile: VirtualFile,
       lspServerStarter: LspServerSupportProvider.LspServerStarter
   ): Unit = {
-    if (!LspConfigSetting.isLspSupport(project))
+    if (!LspConfigSetting.isLspSupport)
       return
     if (ScaledaLspServerSupportProvider.isLspSupportedFile(virtualFile)) {
       val config = ScaledaIdeaConfig.getConfig.lsp
@@ -25,12 +25,7 @@ class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
           if (server.commandLine.getCommandLineString.isEmpty) {
             // TODO: show a dialog to ask user to set the path
           } else {
-            server.createDescriptor(project) match {
-              case Some(descriptor) =>
-                lspServerStarter.ensureServerStarted(descriptor)
-              case None =>
-              // TODO: maybe in Community Edition
-            }
+            lspServerStarter.ensureServerStarted(server.createDescriptor(project))
           }
       }
     }

@@ -8,7 +8,6 @@ import idea.lsp.LspServers.CustomLspServerDescriptor
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SearchableConfigurable
-import com.intellij.openapi.project.{Project, ProjectManager}
 import com.intellij.openapi.ui.{ComboBox, TextBrowseFolderListener, TextFieldWithBrowseButton}
 import com.intellij.ui.components.{JBLabel, JBPanelWithEmptyText}
 import com.intellij.util.ui.{FormBuilder, JBUI}
@@ -55,8 +54,7 @@ class LspConfigSetting extends SearchableConfigurable {
   })
 
   override def createComponent(): JComponent = {
-    val project = ProjectManager.getInstance().getDefaultProject
-    if (LspConfigSetting.isLspSupport(project)) {
+    if (LspConfigSetting.isLspSupport) {
       FormBuilder
         .createFormBuilder()
         // .setAlignLabelOnRight(false)
@@ -94,11 +92,15 @@ class LspConfigSetting extends SearchableConfigurable {
 object LspConfigSetting {
   val SETTINGS_ID = "top.scaleda.idea.settings.lsp.LspConfig"
 
-  def isLspSupport(project: Project): Boolean = {
+  def isLspSupport: Boolean = {
+    // val packageName = "com.intellij.platform.lsp"
+    val packageName = "com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor"
+    // val packageUrl = packageName.replace('.', '/')
+    // getClass.getClassLoader.getResource(packageUrl) != null
     try {
-      LspServers.servers.map(_.createDescriptor(project)).forall(_.isDefined)
+      Class.forName(packageName) != null
     } catch {
-      case _: Throwable => false
+      case _: ClassNotFoundException => false
     }
   }
 }
