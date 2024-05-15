@@ -14,7 +14,14 @@ import java.io.File
 case class ScaledaIdeaConfig(
     autoOpenWaveform: Boolean = true,
     notifyWaveformUpdate: Boolean = true,
-    waveformHandler: String = RvcdHandler.getId
+    waveformHandler: String = RvcdHandler.getId,
+    lsp: ScaledaLspConfig = ScaledaLspConfig()
+)
+
+@JsonInclude(Include.NON_EMPTY)
+case class ScaledaLspConfig(
+    tool: String = "Svls",
+    path: Map[String, String] = Map()
 )
 
 // TODO: use IDEA PersistentStateComponent instead

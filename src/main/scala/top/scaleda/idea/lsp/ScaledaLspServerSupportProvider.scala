@@ -1,6 +1,7 @@
 package top.scaleda
 package idea.lsp
 
+import idea.application.config.ScaledaIdeaConfig
 import systemverilog.SystemVerilogFileType
 import verilog.VerilogFileType
 
@@ -15,12 +16,14 @@ class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
       lspServerStarter: LspServerSupportProvider.LspServerStarter
   ): Unit = {
     if (ScaledaLspServerSupportProvider.isLspSupportedFile(virtualFile)) {
-      var success = false
-      LspServers.servers.foreach { server =>
-        if (!success && server.supportedFile(virtualFile)) {
-          lspServerStarter.ensureServerStarted(server.createDescriptor(project))
-          success = true
-        }
+      val config = ScaledaIdeaConfig.getConfig.lsp
+      LspServers.servers.find(server => server.name == config.tool && server.supportedFile(virtualFile)).foreach {
+        server =>
+          if (server.commandLine.getCommandLineString.isEmpty) {
+            // TODO: show a dialog to ask user to set the path
+          } else {
+            lspServerStarter.ensureServerStarted(server.createDescriptor(project))
+          }
       }
     }
   }

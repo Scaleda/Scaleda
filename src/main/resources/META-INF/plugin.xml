@@ -205,22 +205,26 @@
     <extensions defaultExtensionNs="com.intellij">
         <langCodeStyleSettingsProvider
                 implementation="top.scaleda.verilog.editor.codeStyle.VerilogCodeStyleSettingsProvider"/>
-        <applicationConfigurable groupId="build"
+        <applicationConfigurable parentId="tools"
                                  bundle="bundles.ScaledaBundle"
                                  key="settings.generic"
                                  id="top.scaleda.idea.settings.generic.ScaledaGenericConfigurable"
                                  instance="top.scaleda.idea.settings.generic.ScaledaGenericConfigurable">
-            <configurable groupId="build"
+            <configurable groupId="tools"
                           bundle="bundles.ScaledaBundle"
                           key="settings.toolchains"
                           id="top.scaleda.idea.settings.toolchains.ToolchainsConfigurable"
                           instance="top.scaleda.idea.settings.toolchains.ToolchainsConfigurable"/>
-            <configurable groupId="build"
+            <configurable groupId="tools"
                           bundle="bundles.ScaledaBundle"
                           key="settings.auth.name"
                           id="top.scaleda.idea.settings.auth.AuthorizationEditor"
                           instance="top.scaleda.idea.settings.auth.AuthorizationEditor"/>
-
+            <configurable groupId="tools"
+                          bundle="bundles.ScaledaBundle"
+                          key="settings.lsp.name"
+                          id="top.scaleda.idea.settings.lsp.LspConfig"
+                          instance="top.scaleda.idea.settings.lsp.LspConfig"/>
         </applicationConfigurable>
     </extensions>
 
