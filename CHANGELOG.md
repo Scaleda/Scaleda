@@ -1,3 +1,8 @@
+## v0.2.0: update description
+
+- fix lsp in community edition IDEs
+- update descriptions and change notes
+
 ## v0.1.9: lsp support
 
 - verible, svls support (external)
