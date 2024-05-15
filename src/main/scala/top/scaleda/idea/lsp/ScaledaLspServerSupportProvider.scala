@@ -20,7 +20,7 @@ class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
       return
     if (ScaledaLspServerSupportProvider.isLspSupportedFile(virtualFile)) {
       val config = ScaledaIdeaConfig.getConfig.lsp
-      LspServers.servers.find(server => server.name == config.tool && server.supportedFile(virtualFile)).foreach {
+      LspServerDescriptors.serverDescriptors.find(server => server.name == config.tool && server.supportedFile(virtualFile)).foreach {
         server =>
           if (server.commandLine.getCommandLineString.isEmpty) {
             // TODO: show a dialog to ask user to set the path

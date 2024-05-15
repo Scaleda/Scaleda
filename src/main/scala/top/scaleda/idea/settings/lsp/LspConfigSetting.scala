@@ -4,7 +4,7 @@ package idea.settings.lsp
 import idea.ScaledaBundle
 import idea.application.config.{ScaledaIdeaConfig, ScaledaLspConfig}
 import idea.lsp.LspServers
-import idea.lsp.LspServers.CustomLspServerDescriptor
+import idea.lsp.LspServers.CustomLspServer
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.SearchableConfigurable
@@ -24,7 +24,7 @@ class LspConfigSetting extends SearchableConfigurable {
 
   private val tool = new ComboBox[String]()
   LspServers.servers.foreach(t =>
-    if (t.name == CustomLspServerDescriptor.name) tool.addItem(ScaledaBundle.message("settings.lsp.label.tool.custom"))
+    if (t.name == CustomLspServer.name) tool.addItem(ScaledaBundle.message("settings.lsp.label.tool.custom"))
     else tool.addItem(t.name)
   )
   private val path = new TextFieldWithBrowseButton()
@@ -35,16 +35,16 @@ class LspConfigSetting extends SearchableConfigurable {
     if (server.name == configNow.tool) {
       tool.setSelectedItem(server.name)
       path.setText(configNow.path.getOrElse(server.name, server.defaultPath))
-    } else if (server.name == CustomLspServerDescriptor.name && configNow.tool == CustomLspServerDescriptor.name) {
+    } else if (server.name == CustomLspServer.name && configNow.tool == CustomLspServer.name) {
       tool.setSelectedItem(ScaledaBundle.message("settings.lsp.label.tool.custom"))
-      path.setText(configNow.path.getOrElse(CustomLspServerDescriptor.name, "custom-lsp"))
+      path.setText(configNow.path.getOrElse(CustomLspServer.name, "custom-lsp"))
     }
   )
   tool.addItemListener(_ => {
     val server = LspServers.servers
       .find(s =>
         s.name == tool.getSelectedItem ||
-          (s.name == CustomLspServerDescriptor.name && tool.getSelectedItem == ScaledaBundle
+          (s.name == CustomLspServer.name && tool.getSelectedItem == ScaledaBundle
             .message("settings.lsp.label.tool.custom"))
       )
       .get
@@ -76,7 +76,7 @@ class LspConfigSetting extends SearchableConfigurable {
   private def dumpConfig = {
     val now = configNow
     val toolName =
-      if (tool.getItem == ScaledaBundle.message("settings.lsp.label.tool.custom")) CustomLspServerDescriptor.name
+      if (tool.getItem == ScaledaBundle.message("settings.lsp.label.tool.custom")) CustomLspServer.name
       else tool.getItem
     now.copy(
       tool = toolName,

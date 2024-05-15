@@ -6,14 +6,14 @@ import systemverilog.SystemVerilogFileType
 import verilog.VerilogFileType
 
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
 
 object LspServers {
-
   trait LspServer {
-    def supportedFile(file: VirtualFile): Boolean
+    private def readConfig: ScaledaLspConfig = ScaledaIdeaConfig.getConfig.lsp
+    def supportedFile(file: VirtualFile): Boolean =
+      file.getFileType.isInstanceOf[VerilogFileType] ||
+        file.getFileType.isInstanceOf[SystemVerilogFileType]
     def commandLine: GeneralCommandLine = new GeneralCommandLine({
       val path = readConfig.path.getOrElse(name, defaultPath)
       if (path.isEmpty) defaultPath
@@ -21,73 +21,33 @@ object LspServers {
     })
     def name: String
     def defaultPath: String
-    def supportLinter: Boolean               = false
-    def supportFormatter: Boolean            = false
-    def supportFileLists: Boolean            = false
-    private def readConfig: ScaledaLspConfig = ScaledaIdeaConfig.getConfig.lsp
-    def createDescriptor(project: Project): ProjectWideLspServerDescriptor = {
-      new ProjectWideLspServerDescriptor(project, name) {
-        override def isSupportedFile(file: VirtualFile): Boolean = supportedFile(file)
-        override def createCommandLine(): GeneralCommandLine     = commandLine
-
-        // override def getLspFormattingSupport: LspFormattingSupport = {
-        //   if (supportFormatter) {
-        //     // FIXME: check it
-        //     new LspFormattingSupport {
-        //       override def shouldFormatThisFileExclusivelyByServer(
-        //           file: VirtualFile,
-        //           ideCanFormatThisFileItself: Boolean,
-        //           serverExplicitlyWantsToFormatThisFile: Boolean
-        //       ): Boolean =
-        //         serverExplicitlyWantsToFormatThisFile
-        //     }
-        //   } else {
-        //     super.getLspFormattingSupport
-        //   }
-        // }
-
-        override def getLspGoToDefinitionSupport: Boolean = supportLinter
-        override def getLspHoverSupport: Boolean          = supportLinter
-      }
-    }
+    def supportLinter: Boolean    = false
+    def supportFormatter: Boolean = false
+    def supportFileLists: Boolean = false
   }
 
-  class VeribleLspServerDescriptor extends LspServer {
-    override def supportedFile(file: VirtualFile): Boolean =
-      file.getFileType.isInstanceOf[VerilogFileType] ||
-        file.getFileType.isInstanceOf[SystemVerilogFileType]
-
+  class VeribleLspServer extends LspServer {
     override def name: String = "Verible"
-
     override def defaultPath: String = "verible-verilog-ls"
   }
 
-  class SvlsLspServerDescriptor extends LspServer {
-    override def supportedFile(file: VirtualFile): Boolean =
-      file.getFileType.isInstanceOf[VerilogFileType] ||
-        file.getFileType.isInstanceOf[SystemVerilogFileType]
-
+  class SvlsLspServer extends LspServer {
     override def name: String = "Svls"
-
     override def defaultPath: String = "svls"
   }
 
-  class CustomLspServerDescriptor extends LspServer {
-    override def supportedFile(file: VirtualFile): Boolean =
-      file.getFileType.isInstanceOf[VerilogFileType] ||
-        file.getFileType.isInstanceOf[SystemVerilogFileType]
-
-    override def name: String = CustomLspServerDescriptor.name
-
+  class CustomLspServer extends LspServer {
+    override def name: String = CustomLspServer.name
     override def defaultPath: String = ""
   }
-  object CustomLspServerDescriptor {
+  object CustomLspServer {
     val name = "Custom"
   }
 
-  def servers: Seq[LspServer] = Seq(
-    new VeribleLspServerDescriptor,
-    new SvlsLspServerDescriptor,
-    new CustomLspServerDescriptor
+
+  val servers: Seq[LspServer] = Seq(
+    new VeribleLspServer,
+    new SvlsLspServer,
+    new CustomLspServer
   )
 }
