@@ -60,8 +60,8 @@ class LspConfig extends SearchableConfigurable {
       // .setAlignLabelOnRight(false)
       // .setHorizontalGap(UIUtil.DEFAULT_HGAP)
       // .setVerticalGap(UIUtil.DEFAULT_VGAP)
-      .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.tool")), tool, 10)
-      .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.path")), path, 10)
+      .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.tool")), tool)
+      .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.path")), path)
       .getPanel
   )
 

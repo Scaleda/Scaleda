@@ -10,11 +10,10 @@ import java.util.zip.ZipInputStream
 import scala.io.Source
 
 object ExtractAssets {
-  private val ASSET_VERSION   = 4 // Update me when newer assets are loaded
-  private val ZIP_BUFFER_SIZE = 1024
+  private val ASSET_VERSION   = 5 // Update me when newer assets are loaded
+  private val SMALL_FILE_SIZE = 10240
 
   private val targetDirectory = Paths.getBinaryDir
-  private val resourceFile    = "bin/assets.zip"
   private val binaryList =
     Array("rvcd", "rvcd.exe") ++
       Array("surfer", "surfer.exe") ++
@@ -27,7 +26,7 @@ object ExtractAssets {
 
     // check
     val oldVersion = Source.fromFile(versionFile)
-    val version    = oldVersion.getLines().mkString("").toInt
+    val version    = oldVersion.mkString.trim.toIntOption.getOrElse(0)
     oldVersion.close()
     if (version < ASSET_VERSION) {
       KernelLogger.info(f"Assets version $version found, packed version is $ASSET_VERSION")
@@ -35,86 +34,59 @@ object ExtractAssets {
     }
 
     // copy or extract files from resource
-    install()
+    installTexts()
 
     // check integrity
     binaryList.forall(binary => Path.of(targetDirectory.getAbsolutePath, binary.split('/'): _*).toFile.exists())
   }
 
-  // install resources in resources/install -> .scaleda/*
-  def install(): Unit = {
-    val parent = Paths.getGlobalConfigDir
-    val files = Seq(
-      "scripts/vivado_call.tcl",
-      "ip/scaleda_bram/bram2.v.j2",
-      "ip/scaleda_bram/scaleda.yml",
-      "ip/clocking-wizard/scaleda.yml"
-    )
+  private def installFilesFromResource(prefix: String, parent: File, files: Seq[String]): Unit =
     files.foreach(f => {
       val file = new File(parent, f)
       file.getParentFile.mkdirs()
-      val resourceStream = getClass.getClassLoader.getResourceAsStream("install/" + f)
+      val resourceStream = getClass.getClassLoader.getResourceAsStream(prefix + "/" + f)
       val data           = resourceStream.readAllBytes()
       // tricky: check if file exists and has the same length
-      if (!(file.exists() && file.length() == data.length)) {
+      if (
+        data.length < SMALL_FILE_SIZE ||
+        !(file.exists() && file.length() == data.length) ||
+        (file.exists() && file.length() < SMALL_FILE_SIZE)
+      ) {
         val fileOutputStream = new FileOutputStream(file)
         fileOutputStream.write(data)
         fileOutputStream.close()
         resourceStream.close()
       }
     })
+
+  // install resources in resources/install -> .scaleda/*
+  private def installTexts(): Unit = {
+    val parent = Paths.getGlobalConfigDir
+    if (!parent.exists()) parent.mkdirs()
+    val files = Seq(
+      "scripts/vivado_call.tcl",
+      "ip/scaleda_bram/bram2.v.j2",
+      "ip/scaleda_bram/scaleda.yml",
+      "ip/clocking-wizard/scaleda.yml"
+    )
+    installFilesFromResource("install", parent, files)
+  }
+
+  private def installBinaries(): Unit = {
+    if (!targetDirectory.exists()) targetDirectory.mkdirs()
+    installFilesFromResource("bin", targetDirectory, binaryList.toSeq :+ "version")
   }
 
   def run(): Boolean = {
-    install()
-    if (!targetDirectory.exists()) targetDirectory.mkdirs()
-    val resourceStream = getClass.getClassLoader.getResourceAsStream(resourceFile)
-    if (resourceStream == null) {
-      KernelLogger.warn("Assets not found! Check your", resourceFile)
-      return false
-    }
-
-    try { // TODO: is it ok here?
-      val zipInputStream = new ZipInputStream(resourceStream)
-      var zipEntry       = zipInputStream.getNextEntry
-
-      val buffer = new Array[Byte](ZIP_BUFFER_SIZE)
-
-      while (zipEntry != null) {
-        val fileName = zipEntry.getName
-
-        if (!zipEntry.isDirectory) {
-          val newFile = new File(targetDirectory, fileName)
-          KernelLogger.info(s"Extracting asset file $fileName")
-          new File(newFile.getParent).mkdirs()
-          val fileOutputStream = new FileOutputStream(newFile)
-          var len              = 0
-          while ({
-            len = zipInputStream.read(buffer)
-            len > 0
-          }) {
-            fileOutputStream.write(buffer, 0, len)
-          }
-          fileOutputStream.close()
-
-          // chmod for *nix
-          if (!OS.isWindows && binaryList.contains(fileName)) {
-            import sys.process._
-            s"""chmod +x \"${newFile.getAbsolutePath}\"""".!
-          }
-        }
-        zipInputStream.closeEntry()
-
-        zipEntry = zipInputStream.getNextEntry
-      }
-
-      zipInputStream.closeEntry()
-      zipInputStream.close()
-      resourceStream.close()
-
+    KernelLogger.info(f"Extracting assets, which version is $ASSET_VERSION")
+    try {
+      installTexts()
+      installBinaries()
       true
     } catch {
-      case _: Throwable => false
+      case e: Exception =>
+        KernelLogger.error("Failed to extract assets", e)
+        false
     }
   }
 }

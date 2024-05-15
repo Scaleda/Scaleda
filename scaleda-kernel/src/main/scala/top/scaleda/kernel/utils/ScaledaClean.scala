@@ -1,8 +1,6 @@
 package top.scaleda
 package kernel.utils
 
-import kernel.bin.ExtractAssets
-
 object ScaledaClean {
   def run(): Unit = {
     // remove ~/.scaleda

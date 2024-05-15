@@ -10,10 +10,13 @@ object VeribleFormatterHelper {
   private val WIN64 = "win64"
   private val LINUX64 = "lin64"
   private val FORMATTER = "verible-verilog-format"
+  private val LSP = "verible-verilog-ls"
 
   def allVeribleAssets = Seq(
     VERIBLE + "/" + WIN64 + "/" + FORMATTER + ".exe",
     VERIBLE + "/" + LINUX64 + "/" + FORMATTER,
+    VERIBLE + "/" + WIN64 + "/" + LSP + ".exe",
+    VERIBLE + "/" + LINUX64 + "/" + LSP
   )
 
   private val path = VERIBLE + "/" + (OS.getOSType match {
