@@ -12,6 +12,8 @@ env:
 jobs:
   build:
     name: Publish
+    permissions:
+      contents: write
     strategy:
       matrix:
         os: [ubuntu-latest]
