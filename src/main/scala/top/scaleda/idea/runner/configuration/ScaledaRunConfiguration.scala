@@ -315,21 +315,6 @@ object ScaledaRunConfiguration {
 
   def registerConfigurationChangeListener(project: Project): Unit = {
     val connection = project.getMessageBus.connect(project)
-    connection.subscribe(
-      RunManagerListener.TOPIC,
-      new RunManagerListener {
-        // Only this method is called... have no idea.
-        override def runConfigurationSelected(settings: RunnerAndConfigurationSettings): Unit = {
-          ScaledaIdeaLogger.debug("runConfigurationSelected", settings, "current", getCurrentRunConfiguration(project))
-          // re-generate file lists
-          val lspConfig = ScaledaIdeaConfig.getConfig.lsp
-          LspServers.servers
-            .find(server => server.name == lspConfig.tool)
-            .foreach { server =>
-              server.generateFileLists(project)
-            }
-        }
-      }
-    )
+    connection.subscribe(RunManagerListener.TOPIC, new UpdateFileListsListener(project))
   }
 }

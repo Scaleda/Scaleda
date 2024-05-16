@@ -135,9 +135,9 @@ lazy val scaleda = project
     // ).map(_.toPlugin),
     pluginVerifierOptions := pluginVerifierOptions.value.copy(
       version = "1.365", // use a specific verifier version
-      offline = true     // forbid the verifier from reaching the internet
+      offline = true,    // forbid the verifier from reaching the internet
       // overrideIDEs = Seq("IC", "IU").map(_ + "-" + ideaVersion),  // verify against specific products instead of 'intellijBuild'
-      // failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
+      failureLevels = Set(FailureLevel.DEPRECATED_API_USAGES) // only fail if deprecated APIs are used
     ),
     assembly / assemblyJarName := "scaleda.jar",
     libraryDependencies ++= publicLibraryDependencies,
