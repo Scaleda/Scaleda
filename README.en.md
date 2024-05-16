@@ -1,6 +1,6 @@
 # Scaleda: Transforming IntelliJ IDEA into an FPGA Development Tool
 
-[<img src="README.assets/icon-with-name.svg" alt="Scaleda icon" style="zoom:30%;" />](https://plugins.jetbrains.com/plugin/21863)
+[![Visit marketplace](README.assets/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
 
 ## Overview
 
@@ -18,9 +18,9 @@ Scaleda is an extensible FPGA EDA support tool based on the IntelliJ platform, f
  - Verible, [Svls](https://github.com/dalance/svls), or custom language server (LSP) support;
  - i18n support.
 
-![Verilog Development with Scaleda](docs/source/images/main-screenshot.png)
+![Verilog Development with Scaleda](docs/images/main-screenshot.png)
 
-This [document](./docs/source/_posts/introduction.md) ([online link](https://scaleda.top/introduction)) provides a brief introduction to the development background and basic features of Scaleda.
+User manuals, API documents, etc., can be found at [Online Documentation](https://scaleda.top).
 
 ## Installation
 
@@ -28,13 +28,13 @@ Scaleda currently supports **version 2024.1.1 and above** of the IJ platform, ex
 
 [Visit Plugin Market: ![JetBrains Plugin Downloads](https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff)](https://plugins.jetbrains.com/plugin/21863)
 
-Server-side programs can be found in [Github Release](https://github.com/Scaleda/Scaleda/releases)
+Server-side programs can be found in [GitHub Release](https://github.com/Scaleda/Scaleda/releases)
 
 ### Installing Directly from Zip File
 
 IJ platform plugins are distributed as zip archives. You can download the precompiled plugin zip package and install it in IntelliJ IDEA. In the [Releases](https://github.com/Scaleda/Scaleda/releases) page, you can find the latest plugin zip package named something like `Scaleda-0.1.0.zip`.
 
-After launching IDEA, select `File -> Settings -> Plugins -> Install Plugin from Disk...`, then choose the downloaded zip file and click `OK` to install the plugin. For detailed instructions on installing Scaleda in IDEA, refer to this [document](./docs/source/_posts/installation.md) ([online link](https://scaleda.top/installation)).
+After launching IDEA, select `File -> Settings -> Plugins -> Install Plugin from Disk...`, then choose the downloaded zip file and click `OK` to install the plugin. For detailed instructions on installing Scaleda in IDEA, refer to this [document](docs/installation.md).
 
 ### Compiling from Source
 
@@ -58,11 +58,11 @@ Once packaging is complete, you can find the packaged zip file in the `target/sc
 
 ## User Manual
 
-The PDF version of the user manual can be downloaded [here](./docs/scaleda-manual.pdf).
+The PDF version of the user manual can be downloaded [here](https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf).
 
 ## Project Structure
 
-This section introduces the structure of the Scaleda project, not the structure of FPGA projects developed using Scaleda. For the latter, please refer to this [document](docs/source/_posts/project.md) ([online link](https://scaleda.top/project)).
+This section introduces the structure of the Scaleda project, not the structure of FPGA projects developed using Scaleda. For the latter, please refer to this [document](docs/project.md).
 
 Scaleda is an IDEA plugin developed in Scala and Java. Its source code structure is as follows:
 
@@ -86,7 +86,7 @@ Scaleda references and uses numerous open source projects, including but not lim
 
 ## License and Acknowledgements
 
-Scaleda is open-sourced under the [Mulan PSL v2](https://license.coscl.org.cn/MulanPSL2) license. For details, please refer to the [LICENSE](LICENSE) file.
+Scaleda is open-sourced under the [Mulan PSL v2](https://license.coscl.org.cn/MulanPSL2) license. For details, please refer to the [LICENSE](https://github.com/Scaleda/Scaleda/blob/master/LICENSE) file.
 
 Scaleda's development is guided by Professor Xu Yong from Harbin Institute of Technology (Shenzhen) and originates from the HIT (Shenzhen) - China Micro Semicom co. Artificial Intelligence Chip Joint Laboratory.
 

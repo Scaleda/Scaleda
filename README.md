@@ -1,10 +1,10 @@
 # Scaleda：将 IntelliJ IDEA 打造为 FPGA 开发工具
 
-[<img src="README.assets/icon-with-name.svg" alt="Scaleda icon" style="zoom:30%;" />](https://plugins.jetbrains.com/plugin/21863)
+[![Visit marketplace](README.assets/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
 
 [English](README.en.md)
 
-![使用 Scaleda 进行 Verilog 开发](docs/source/images/main-screenshot.png)
+![使用 Scaleda 进行 Verilog 开发](docs/images/main-screenshot.png)
 
 ## 概述
 
@@ -37,7 +37,7 @@ Scaleda 是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具，具有 HDL
  - Verible、[Svls](https://github.com/dalance/svls)或自定义语言服务器（LSP）支持；
  - 国际化多显示语言支持；
 
-[这篇](https://scaleda.top/introduction) 文档对 Scaleda 的开发背景和基本功能进行了简单的介绍。
+用户手册、API 文档等请访问 [在线文档](https://scaleda.top)。
 
 ## 安装
 
@@ -46,7 +46,7 @@ Scaleda 目前支持 **2024.1.1 及以上版本** 的除了 Gateway 以外的 IJ
 
 [访问插件市场：![JetBrains Plugin Downloads](https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff)](https://plugins.jetbrains.com/plugin/21863)
 
-服务器端程序请访问 [Github Release](https://github.com/Scaleda/Scaleda/releases)。
+服务器端程序请访问 [Github Release](https://github.com/Scaleda/Scaleda/releases) 下载 `scaleda-kernel.jar`。
 
 ### 直接下载 zip 文件来安装
 
@@ -54,7 +54,7 @@ IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载
 在 [Releases](https://github.com/Scaleda/Scaleda/releases) 页面中，您可以找到最新的插件 zip 包，它的名字类似于 `Scaleda-0.1.0.zip`。
 
 启动 IDEA 后，选择 `File -> Settings -> Plugins -> Install Plugin from Disk...`，然后选择下载好的 zip 文件，点击 `OK` 即可安装插件。
-有关在 IDEA 中安装 Scaleda 的详细过程，请参考 [这篇](./docs/source/_posts/installation.md)（[在线链接](https://scaleda.top/installation)） 文档。
+有关在 IDEA 中安装 Scaleda 的详细过程，请参考 [这篇](docs/installation.md) 文档。
 
 ### 从源码编译
 
@@ -80,12 +80,12 @@ $ sbt packageArtifactZip
 
 ## 使用手册
 
-PDF 版本的使用手册可以在 [这里](./docs/scaleda-manual.pdf) 下载。
+PDF 版本的使用手册可以在 [这里](https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf) 下载。
 
 ## 项目结构
 
 这里介绍 Scaleda 这个项目的结构，而不是「使用 Scaleda 开发的 FPGA 项目」的结构。
-对于后者，请参考 [这篇](docs/source/_posts/project.md)（[在线链接](https://scaleda.top/project)） 文档。
+对于后者，请参考 [这篇](docs/project.md) 文档。
 
 Scaleda 是一个使用 Scala 和 Java 开发的 IDEA 插件，其源码的结构如下：
 
@@ -114,7 +114,7 @@ Scaleda 参考和使用了诸多开源项目，包括但不限于：
 
 ## 开源协议与鸣谢
 
-Scaleda 使用[《木兰宽松许可证（第 2 版）》](https://license.coscl.org.cn/MulanPSL2)协议开源，详情请参考 [LICENSE](LICENSE) 文件。
+Scaleda 使用[《木兰宽松许可证（第 2 版）》](https://license.coscl.org.cn/MulanPSL2)协议开源，详情请参考 [LICENSE](https://github.com/Scaleda/Scaleda/blob/master/LICENSE) 文件。
 
 Scaleda 的开发由哈尔滨工业大学（深圳）徐勇教授指导，项目来源于哈工大（深圳）- 中微半导人工智能芯片联合实验室。
 
