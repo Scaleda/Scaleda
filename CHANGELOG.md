@@ -1,3 +1,8 @@
+## v0.2.1: update lsp support
+
+- auto generate file lists for lsp
+- bundle verible and svls
+
 ## v0.2.0: update description
 
 - fix lsp in community edition IDEs
