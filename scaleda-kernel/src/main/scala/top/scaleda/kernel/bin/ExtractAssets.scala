@@ -2,7 +2,6 @@ package top.scaleda
 package kernel.bin
 
 import top.scaleda.kernel.utils.{KernelLogger, OS, Paths}
-import top.scaleda.verilog.formatter.VeribleAssetsHelper
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.Path
@@ -17,7 +16,16 @@ object ExtractAssets {
   private val binaryList =
     Seq("rvcd", "rvcd.exe") ++
       Seq("surfer", "surfer.exe") ++
-      VeribleAssetsHelper.allVeribleAssets
+      VeribleAssetsHelper.allVeribleAssets ++
+      SvlsAssetsHelper.allAssets
+  private val textList = Seq(
+    "scripts/vivado_call.tcl",
+    "ip/scaleda_bram/bram2.v.j2",
+    "ip/scaleda_bram/scaleda.yml",
+    "ip/clocking-wizard/scaleda.yml",
+    "licences/LICENSE-svls.txt",
+    "licences/LICENSE-verible.txt"
+  )
 
   def isInstalled: Boolean = {
     // check if version file
@@ -66,13 +74,7 @@ object ExtractAssets {
   private def installTexts(): Unit = {
     val parent = Paths.getGlobalConfigDir
     if (!parent.exists()) parent.mkdirs()
-    val files = Seq(
-      "scripts/vivado_call.tcl",
-      "ip/scaleda_bram/bram2.v.j2",
-      "ip/scaleda_bram/scaleda.yml",
-      "ip/clocking-wizard/scaleda.yml"
-    )
-    installFilesFromResource("install", parent, files)
+    installFilesFromResource("install", parent, textList)
   }
 
   private def setBinariesExecutable(): Unit = {

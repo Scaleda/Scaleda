@@ -4,7 +4,6 @@ package verilog.editor.formatter
 import idea.ScaledaBundle
 import idea.utils.{Notification, ScaledaIdeaLogger}
 import verilog.editor.codeStyle.VerilogCodeStyleSettings
-import verilog.formatter.VeribleAssetsHelper
 import verilog.{VerilogFileType, VerilogLanguage, VerilogPSIFileRoot}
 
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -14,6 +13,7 @@ import com.intellij.formatting.service.{AsyncDocumentFormattingService, AsyncFor
 import com.intellij.lang.Language
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.psi.PsiFile
+import top.scaleda.kernel.bin.VeribleAssetsHelper
 
 import java.io.{FileReader, LineNumberReader}
 import java.nio.charset.StandardCharsets

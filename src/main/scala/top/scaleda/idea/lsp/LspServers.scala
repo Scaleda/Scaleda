@@ -8,11 +8,11 @@ import idea.utils.ScaledaIdeaLogger
 import kernel.shell.ScaledaRun
 import systemverilog.SystemVerilogFileType
 import verilog.VerilogFileType
-import verilog.formatter.VeribleAssetsHelper
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import top.scaleda.kernel.bin.{SvlsAssetsHelper, VeribleAssetsHelper}
 
 import java.io.File
 import scala.collection.mutable.ArrayBuffer
@@ -102,9 +102,7 @@ object LspServers {
   }
 
   class VeribleLspServer extends LspServer {
-    override def name: String = VeribleLspServer.name
-    // override def defaultPath: String       = "verible-verilog-ls"
-    // default to bundled verible lsp
+    override def name: String              = VeribleLspServer.name
     override def defaultPath: String       = VeribleAssetsHelper.veribleLsp.getAbsolutePath
     override def supportLinter: Boolean    = true
     override def supportFormatter: Boolean = true
@@ -118,7 +116,7 @@ object LspServers {
 
   class SvlsLspServer extends LspServer {
     override def name: String           = "Svls"
-    override def defaultPath: String    = "svls"
+    override def defaultPath: String    = SvlsAssetsHelper.executable.getAbsolutePath
     override def supportLinter: Boolean = true
 
     // `-f` is svlint argument for file lists, not svls...

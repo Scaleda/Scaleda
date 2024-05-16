@@ -1,7 +1,6 @@
 package top.scaleda.kernel.bin
 
 import top.scaleda.kernel.utils.{KernelLogger, OS, Paths}
-import top.scaleda.verilog.formatter.VeribleAssetsHelper
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.Path
