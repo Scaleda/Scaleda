@@ -1,17 +1,21 @@
 package top.scaleda
 package idea.windows.bottomPanel.rvcd
 
+import idea.ScaledaBundle
 import idea.rvcd.{FrameBuffer, Rvcd, RvcdFrameBufferChannel, RvcdService}
 import idea.utils.OutputLogger.StdErrToWarningHandler
 import idea.utils.ScaledaIdeaLogger
 import idea.waveform.RvcdHandler
 import kernel.shell.command.{CommandDeps, CommandRunner}
+import kernel.utils.OS
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem._
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.ui.components.JBPanelWithEmptyText
+import com.intellij.util.ui.JBUI
 import io.grpc.ManagedChannel
 import rvcd.rvcd.{EventType, RvcdInputEvent, RvcdRpcGrpc}
 
@@ -31,7 +35,11 @@ class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) wit
 
   private def initFrameBufferHandler: (Option[RvcdFrameBufferChannel], Option[() => Unit]) = {
     try {
-      val (client, shutdown) = RvcdFrameBufferChannel.unix()
+      val (client, shutdown) = if (OS.isWindows) {
+        RvcdFrameBufferChannel.tcp()
+      } else {
+        RvcdFrameBufferChannel.unix()
+      }
       // val (client, shutdown) = RvcdFrameBufferChannel.tcp()
       (Some(client), Some(shutdown))
     } catch {
@@ -76,6 +84,7 @@ class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) wit
           case e: Exception =>
             ScaledaIdeaLogger.warn("Failed to send event", e)
             fbClient = None
+            updatePanelState()
         }
       }
     }
@@ -167,6 +176,7 @@ class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) wit
               // e.printStackTrace()
               ScaledaIdeaLogger.warn("Error requesting frame", e)
               fbClient = None
+              updatePanelState()
           }
 
           if (!sendEventsThread.isAlive)
@@ -189,8 +199,9 @@ class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) wit
       rpcClient = c
       rpcShutdown = s
     }
+    updatePanelState()
   }
-
+  // FIXME: events work buggy on Windows
   addFocusListener(new java.awt.event.FocusAdapter() {
     override def focusGained(e: java.awt.event.FocusEvent): Unit = {
       reConnect()
@@ -260,12 +271,28 @@ class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) wit
       }
     }
   })
-  setContent(canvas)
+
+  private val emptyPanel = new JBPanelWithEmptyText()
+    .withEmptyText(ScaledaBundle.message("windows.waveform.empty"))
+    .withBorder(JBUI.Borders.emptyLeft(6))
+
+  private def updatePanelState(): Unit = {
+    if (fbClient.isEmpty) {
+      setContent(emptyPanel)
+    } else {
+      setContent(canvas)
+    }
+  }
+  setContent(emptyPanel)
 
   private val launchRvcdRunnable: Runnable = () => {
     CommandRunner.execute(
       Seq(
-        CommandDeps(args = Seq(RvcdService.rvcdFile.getAbsolutePath, "--hidden"), description = "Start RVCD Instance")
+        CommandDeps(
+          args = Seq(RvcdService.rvcdFile.getAbsolutePath) ++
+            // FIXME: rvcd on windows will not update frame buffer if hidden
+            (if (OS.isWindows) Seq() else Seq("--hidden")),
+          description = "Start RVCD Instance")
       ),
       new StdErrToWarningHandler(project, RvcdHandler.getId, "Rvcd", switchTo = false)
     )
@@ -285,6 +312,7 @@ class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) wit
         fbShutdown = None
         fbClient = None
         lastFrame = None
+        updatePanelState()
       } else {
         launchRvcdThread = Some({
           val t = new Thread(launchRvcdRunnable)
@@ -318,19 +346,24 @@ class RvcdPanel(project: Project) extends SimpleToolWindowPanel(false, true) wit
       e.getPresentation.setEnabled(fbClient.isEmpty || rpcClient.isEmpty)
     }
   })
-  group.add(new AnAction(AllIcons.Actions.ToggleVisibility) {
-    override def actionPerformed(e: AnActionEvent): Unit = {
-      windowVisible = !windowVisible
-      fbClient.foreach(
-        _.inputEvent(RvcdInputEvent().withType(EventType.EVENT_TYPE_VISIBLE).withData(if (windowVisible) 1 else 0))
-      )
-    }
-    override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
-    override def update(e: AnActionEvent): Unit = {
-      e.getPresentation.setEnabled(fbClient.isDefined)
-      e.getPresentation.setPerformGroup(windowVisible)
-    }
-  })
+  // FIXME
+  if (!OS.isWindows) {
+    group.add(new AnAction(AllIcons.Actions.ToggleVisibility) {
+      override def actionPerformed(e: AnActionEvent): Unit = {
+        windowVisible = !windowVisible
+        fbClient.foreach(
+          _.inputEvent(RvcdInputEvent().withType(EventType.EVENT_TYPE_VISIBLE).withData(if (windowVisible) 1 else 0))
+        )
+      }
+
+      override def getActionUpdateThread: ActionUpdateThread = ActionUpdateThread.BGT
+
+      override def update(e: AnActionEvent): Unit = {
+        e.getPresentation.setEnabled(fbClient.isDefined)
+        e.getPresentation.setPerformGroup(windowVisible)
+      }
+    })
+  }
   val toolbar: ActionToolbar = {
     ActionManager
       .getInstance()
