@@ -30,8 +30,8 @@ object LspServerDescriptors {
         //   }
         // }
 
-        override def getLspGoToDefinitionSupport: Boolean = supportLinter
-        override def getLspHoverSupport: Boolean          = supportLinter
+        // override def getLspGoToDefinitionSupport: Boolean = supportLinter
+        // override def getLspHoverSupport: Boolean          = supportLinter
       }
     }
   }

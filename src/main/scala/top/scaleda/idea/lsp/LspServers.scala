@@ -5,6 +5,7 @@ import idea.application.config.{ScaledaIdeaConfig, ScaledaLspConfig}
 import idea.project.io.YmlRootManager
 import idea.runner.configuration.ScaledaRunConfiguration
 import idea.utils.ScaledaIdeaLogger
+import kernel.bin.{SvlsAssetsHelper, VeribleAssetsHelper}
 import kernel.shell.ScaledaRun
 import systemverilog.SystemVerilogFileType
 import verilog.VerilogFileType
@@ -12,7 +13,6 @@ import verilog.VerilogFileType
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import top.scaleda.kernel.bin.{SvlsAssetsHelper, VeribleAssetsHelper}
 
 import java.io.File
 import scala.collection.mutable.ArrayBuffer
