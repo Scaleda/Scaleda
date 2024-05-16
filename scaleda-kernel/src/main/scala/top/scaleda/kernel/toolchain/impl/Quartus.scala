@@ -207,7 +207,7 @@ object Quartus extends ToolchainPresetProvider {
     * @param remoteInfo remote information
     * @return
     */
-  override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntime] = {
+  override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo], writeable: Boolean): Option[ScaledaRuntime] = {
     var rt = rtOld
     // implicit val manifest: ScaledaProject     = rt.project
     implicit val replace: ImplicitPathReplace = TemplateContextReplace
@@ -250,8 +250,10 @@ object Quartus extends ToolchainPresetProvider {
     )
 
     val useContext       = Serialization.getCCParams(templateContext)
-    val templateRenderer = new TemplateRenderer(rt)(replace)
-    templateRenderer.render(useContext = useContext)
+    if (writeable) {
+      val templateRenderer = new TemplateRenderer(rt)(replace)
+      templateRenderer.render(useContext = useContext)
+    }
     Some(rt)
   }
 }

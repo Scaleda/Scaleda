@@ -12,7 +12,7 @@ object LspServerDescriptors {
     def createDescriptor(project: Project): ProjectWideLspServerDescriptor = {
       new ProjectWideLspServerDescriptor(project, name) {
         override def isSupportedFile(file: VirtualFile): Boolean = supportedFile(file)
-        override def createCommandLine(): GeneralCommandLine     = commandLine
+        override def createCommandLine(): GeneralCommandLine     = commandLine(project)
 
         // override def getLspFormattingSupport: LspFormattingSupport = {
         //   if (supportFormatter) {

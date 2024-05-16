@@ -13,8 +13,8 @@ import kernel.utils.EnvironmentUtils
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import com.intellij.openapi.wm.ToolWindowManager
 import kotlin.coroutines.Continuation
+import top.scaleda.idea.runner.configuration.ScaledaRunConfiguration
 
 /** This is the startup activity of Scaleda. It will:
   *  - Initialise logger, jinja and other kernel components;
@@ -89,6 +89,9 @@ class ScaledaMain extends ProjectActivity {
           .tryToExecute(new ProfileDetectAction(project), null, null, null, false)
       }
     }
+
+    // register RunConfigurationChangeListener
+    ScaledaRunConfiguration.registerConfigurationChangeListener(project)
     AnyRef
   }
 }

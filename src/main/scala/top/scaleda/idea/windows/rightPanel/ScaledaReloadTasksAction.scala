@@ -7,12 +7,9 @@ import idea.project.io.YmlRootManager
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.{ActionUpdateThread, AnAction, AnActionEvent}
 import com.intellij.openapi.wm.ToolWindowManager
+import top.scaleda.idea.runner.configuration.ScaledaRunConfiguration
 import top.scaleda.idea.utils.{ScaledaIdeaLogger, runInEdt}
-import top.scaleda.idea.windows.rightPanel.treeNodes.{
-  ScaledaTasksRootNode,
-  ScaledaTasksTargetNode,
-  ScaledaTasksTaskNode
-}
+import top.scaleda.idea.windows.rightPanel.treeNodes.{ScaledaTasksRootNode, ScaledaTasksTargetNode, ScaledaTasksTaskNode}
 
 /** Action: Load Scaleda project config, with all its targets and tasks.
   * This action should be performed when

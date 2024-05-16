@@ -288,7 +288,7 @@ object Vivado
   }
   ToolchainProfileDetector.registerDetector(this)
 
-  override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntime] = {
+  override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo], writeable: Boolean): Option[ScaledaRuntime] = {
     var rt                = rtOld
     implicit val manifest = rt.project
     val userTokenBean     = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
@@ -373,8 +373,10 @@ object Vivado
       case TaskType.Programming => "run_program.tcl"
     })))
     val useContext       = Serialization.getCCParams(templateContext)
-    val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
-    templateRenderer.render(useContext = useContext)
+    if (writeable) {
+      val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
+      templateRenderer.render(useContext = useContext)
+    }
     Some(rt)
   }
 

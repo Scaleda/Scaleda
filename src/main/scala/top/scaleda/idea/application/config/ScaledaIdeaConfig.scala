@@ -1,6 +1,7 @@
 package top.scaleda
 package idea.application.config
 
+import idea.lsp.LspServers.VeribleLspServer
 import idea.waveform.RvcdHandler
 import kernel.utils.Paths
 import kernel.utils.serialise.YAMLHelper
@@ -20,7 +21,8 @@ case class ScaledaIdeaConfig(
 
 @JsonInclude(Include.NON_EMPTY)
 case class ScaledaLspConfig(
-    tool: String = "Svls",
+    tool: String = VeribleLspServer.name,
+    generateFileLists: Boolean = true,
     path: Map[String, String] = Map()
 )
 

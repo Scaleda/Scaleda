@@ -2,19 +2,25 @@ package top.scaleda
 package idea.runner.configuration
 
 import idea.ScaledaBundle
+import idea.application.config.ScaledaIdeaConfig
 import idea.project.io.YmlRootManager
+import idea.rvcd.RvcdService
 import idea.utils.notification.CreateTypicalNotification
 import idea.utils.{Notification, ScaledaIdeaLogger}
+import idea.waveform.{RvcdHandler, WaveformHandler}
 import idea.windows.bottomPanel.ConsoleService
 import idea.windows.bottomPanel.console.ConsoleViewReceiver
+import kernel.project.config.TaskType
 import kernel.shell.ScaledaRun
+import kernel.toolchain.executor.SimulationExecutor
 import kernel.toolchain.runner.ScaledaRuntime
 import kernel.utils.LogLevel
 import kernel.utils.serialise.JSONHelper
 
-import com.intellij.execution.Executor
+import com.intellij.execution.{Executor, RunManager, RunManagerEx, RunManagerListener, RunnerAndConfigurationSettings}
 import com.intellij.execution.configurations.{LocatableConfigurationBase, RunProfileState}
 import com.intellij.execution.filters.TextConsoleBuilderFactory
+import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationType
@@ -24,11 +30,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.ExecutionSearchScopes
 import org.jdom.Element
 import org.jetbrains.annotations.Nls
-import top.scaleda.idea.application.config.ScaledaIdeaConfig
-import top.scaleda.idea.rvcd.RvcdService
-import top.scaleda.idea.waveform.{RvcdHandler, WaveformHandler}
-import top.scaleda.kernel.project.config.TaskType
-import top.scaleda.kernel.toolchain.executor.SimulationExecutor
+import top.scaleda.idea.lsp.LspServers
 
 import java.io.File
 import scala.collection.mutable
@@ -164,7 +166,7 @@ class ScaledaRunConfiguration(
       return null
     }
 
-    val runtime = ScaledaRun.preprocess(runtimeOptional.get)
+    val runtime = ScaledaRun.preprocess(runtimeOptional.get, writeable = true)
 
     val console  = myConsoleBuilder.getConsole
     val receiver = new ConsoleViewReceiver(console, runtime.task.name)
@@ -293,5 +295,41 @@ class ScaledaRunConfiguration(
         case _ =>
       }
     }
+  }
+}
+
+object ScaledaRunConfiguration {
+  def getCurrentRunConfiguration(project: Project): Option[ScaledaRunConfiguration] = {
+    val runManager = RunManagerImpl.getInstanceImpl(project)
+    val settings   = runManager.getSelectedConfiguration
+    if (settings == null) None
+    else {
+      val configuration = settings.getConfiguration
+      configuration match {
+        case conf: ScaledaRunConfiguration =>
+          Some(conf)
+        case _ => None
+      }
+    }
+  }
+
+  def registerConfigurationChangeListener(project: Project): Unit = {
+    val connection = project.getMessageBus.connect(project)
+    connection.subscribe(
+      RunManagerListener.TOPIC,
+      new RunManagerListener {
+        // Only this method is called... have no idea.
+        override def runConfigurationSelected(settings: RunnerAndConfigurationSettings): Unit = {
+          ScaledaIdeaLogger.debug("runConfigurationSelected", settings, "current", getCurrentRunConfiguration(project))
+          // re-generate file lists
+          val lspConfig = ScaledaIdeaConfig.getConfig.lsp
+          LspServers.servers
+            .find(server => server.name == lspConfig.tool)
+            .foreach { server =>
+              server.generateFileLists(project)
+            }
+        }
+      }
+    )
   }
 }

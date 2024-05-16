@@ -24,7 +24,7 @@ object ScaledaRun {
     * @param rt runtime
     * @return new runtime
     */
-  def preprocess(rt: ScaledaRuntime): ScaledaRuntime = {
+  def preprocess(rt: ScaledaRuntime, writeable: Boolean): ScaledaRuntime = {
     implicit val manifest: ScaledaProject = rt.project
     if (!rt.executor.workingDir.exists() && !rt.executor.workingDir.mkdirs())
       KernelLogger.warn("Cannot create working directory!")
@@ -39,7 +39,7 @@ object ScaledaRun {
         } else None
       Toolchain.toolchainPresetHandler
         .get(rt.target.toolchain)
-        .flatMap(_.handlePreset(rt, remoteInfo))
+        .flatMap(_.handlePreset(rt, remoteInfo, writeable))
         .getOrElse(rt)
         .copy(stage = ScaledaRunStage.PresetDone)
     } else rt
@@ -115,7 +115,7 @@ object ScaledaRun {
         //   else None
         // })
         val singleFiles = task.getConstraintFiles(project).toSeq
-        KernelLogger.info(
+        KernelLogger.debug(
           "selectedConstraints",
           selectedConstraints,
           "task",

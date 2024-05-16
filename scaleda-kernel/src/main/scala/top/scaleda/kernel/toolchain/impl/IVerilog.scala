@@ -128,7 +128,7 @@ object IVerilog extends ToolchainPresetProvider {
     }
   }
 
-  override def handlePreset(rt: ScaledaRuntime, remoteInfo: Option[RemoteInfo]) = {
+  override def handlePreset(rt: ScaledaRuntime, remoteInfo: Option[RemoteInfo], writeable: Boolean) = {
     require(rt.task.taskType == TaskType.Simulation)
     implicit val manifest = rt.project
     val simExecutor       = rt.executor.asInstanceOf[SimulationExecutor]

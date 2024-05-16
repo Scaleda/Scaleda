@@ -12,7 +12,7 @@ import com.intellij.openapi.ui.{ComboBox, TextBrowseFolderListener, TextFieldWit
 import com.intellij.ui.components.{JBLabel, JBPanelWithEmptyText}
 import com.intellij.util.ui.{FormBuilder, JBUI}
 
-import javax.swing.{JComponent, JPanel}
+import javax.swing.{JCheckBox, JComponent, JPanel}
 
 class LspConfigSetting extends SearchableConfigurable {
 
@@ -27,19 +27,22 @@ class LspConfigSetting extends SearchableConfigurable {
     if (t.name == CustomLspServer.name) tool.addItem(ScaledaBundle.message("settings.lsp.label.tool.custom"))
     else tool.addItem(t.name)
   )
-  private val path = new TextFieldWithBrowseButton()
+  private val generateFileLists = new JCheckBox()
+  private val path              = new TextFieldWithBrowseButton()
   path.addBrowseFolderListener(
     new TextBrowseFolderListener(FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor())
   )
+  private val configInit = configNow
   LspServers.servers.foreach(server =>
-    if (server.name == configNow.tool) {
+    if (server.name == configInit.tool) {
       tool.setSelectedItem(server.name)
-      path.setText(configNow.path.getOrElse(server.name, server.defaultPath))
-    } else if (server.name == CustomLspServer.name && configNow.tool == CustomLspServer.name) {
+      path.setText(configInit.path.getOrElse(server.name, server.defaultPath))
+    } else if (server.name == CustomLspServer.name && configInit.tool == CustomLspServer.name) {
       tool.setSelectedItem(ScaledaBundle.message("settings.lsp.label.tool.custom"))
-      path.setText(configNow.path.getOrElse(CustomLspServer.name, "custom-lsp"))
+      path.setText(configInit.path.getOrElse(CustomLspServer.name, "custom-lsp"))
     }
   )
+  generateFileLists.setSelected(configInit.generateFileLists)
   tool.addItemListener(_ => {
     val server = LspServers.servers
       .find(s =>
@@ -61,6 +64,10 @@ class LspConfigSetting extends SearchableConfigurable {
         // .setHorizontalGap(UIUtil.DEFAULT_HGAP)
         // .setVerticalGap(UIUtil.DEFAULT_VGAP)
         .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.tool")), tool)
+        .addLabeledComponent(
+          new JBLabel(ScaledaBundle.message("settings.lsp.label.generate_file_lists")),
+          generateFileLists
+        )
         .addLabeledComponent(new JBLabel(ScaledaBundle.message("settings.lsp.label.path")), path)
         .addComponentFillVertically(new JPanel, 0)
         .getPanel
@@ -80,6 +87,7 @@ class LspConfigSetting extends SearchableConfigurable {
       else tool.getItem
     now.copy(
       tool = toolName,
+      generateFileLists = generateFileLists.isSelected,
       path = now.path ++ Map(toolName -> path.getText)
     )
   }

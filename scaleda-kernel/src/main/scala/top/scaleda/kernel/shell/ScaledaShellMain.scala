@@ -326,7 +326,7 @@ object ScaledaShellMain {
                   ScaledaRun
                     .generateRuntimeFromName(targetName, taskName, profileName, profileHost)
                     .map(_.copy(extraEnvs = extraEnvs))
-                    .map(ScaledaRun.preprocess)
+                    .map(ScaledaRun.preprocess(_, writeable = true))
                     .map(rt => {
                       ScaledaRun
                         .runTask(

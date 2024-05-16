@@ -11,5 +11,5 @@ trait ToolchainPresetProvider {
     * @param remoteInfo remote information
     * @return
     */
-  def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo]): Option[ScaledaRuntime]
+  def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo], writeable: Boolean): Option[ScaledaRuntime]
 }
