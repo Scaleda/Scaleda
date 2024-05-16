@@ -49,10 +49,13 @@ jobs:
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
       - name: Generate Scaladoc
         run: |
-          sbt doc || echo "generate done"
+          sbt 'project kernel; doc' || echo "generate kernel api done"
+          sbt doc || echo "generate idea api done"
       - name: Copy Scaladoc to static deploy files
         run: |
-          mkdir -p ./docs/_build/html/ && mv ./target/scala-2.13/api ./docs/_build/html/ && echo "move generated files"
+          mkdir -p ./docs/_build/html/
+          mv ./scaleda-kernel/target/scala-2.13/api ./docs/_build/html/api-kernel && echo "move generated kernel files"
+          mv ./target/scala-2.13/api ./docs/_build/html/api-idea && echo "move generated files"
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
