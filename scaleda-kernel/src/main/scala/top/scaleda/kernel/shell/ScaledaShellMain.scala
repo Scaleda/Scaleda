@@ -75,7 +75,7 @@ object ScaledaShellMain {
   def main(args: Array[String]): Unit = {
     // init logger
     KernelLogger.addLogger(ScaledaShellLogger)
-    KernelLogger.info("This is Scaleda-Shell, an EDA tool for FPGAs")
+    KernelLogger.info("This is Scaleda-CLI, an EDA tool for FPGAs")
 
     // default manifest
     implicit val project: ScaledaProject = new ScaledaProject()
@@ -391,8 +391,20 @@ object ScaledaShellMain {
               val parser = Toolchain.targetParser(id)
               parser.parseAsProject(workingDir)
             })
-            val project = projects.head.copy(name = shellConfig.createProjectName)
-            ProjectConfig.saveConfig(project, targetFile = new File(workingDir, "scaleda.yml"))
+            val targetFile = new File(workingDir, "scaleda.yml")
+            projects.headOption.map(_.copy(name = shellConfig.createProjectName)) match {
+              case Some(project) =>
+                KernelLogger.info(
+                  s"Create project ${project.name} with target ${project.targets.headOption.map(_.name).getOrElse("None")}"
+                )
+                ProjectConfig.saveConfig(project, targetFile = targetFile)
+              case None =>
+                if (shellConfig.detectProjectWhenCreate)
+                  KernelLogger.warn("No toolchain detected, create empty project")
+                val project = ProjectConfig(name = shellConfig.createProjectName)
+                ProjectConfig.saveConfig(project, targetFile = targetFile)
+            }
+            KernelLogger.info(f"Project created, config saved to ${targetFile.getAbsolutePath}")
           case ShellRunMode.ParseAST =>
             if (shellConfig.parseFilepath.isEmpty) {
               KernelLogger.error("No file specified")

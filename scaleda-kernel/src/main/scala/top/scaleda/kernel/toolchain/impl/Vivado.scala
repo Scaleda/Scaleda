@@ -203,8 +203,12 @@ object Vivado
         taskConfig.getSourceSet ++ ips.flatMap(c =>
           c._2.getSourceSet(project = ScaledaProject.getTemporalProject(c._1))
         )
-    val topFile =
-      KernelFileUtils.getModuleFileFromSet(sources, module = top).get // TODO / FIXME
+    val topFileOptional = KernelFileUtils.getModuleFileFromSet(sources, module = top)
+    if (topFileOptional.isEmpty) {
+      KernelLogger.warn("cannot find top module file for", top, "in", sources)
+    }
+    // FIXME: not elegant... notify user TBD
+    val topFile         = topFileOptional.getOrElse(new File(sources.headOption.getOrElse("")))
     val testbenchSource = doSeparatorReplace(topFile.getAbsolutePath)
     val vcdFile =
       if (sim) doSeparatorReplace(executor.asInstanceOf[SimulationExecutor].vcdFile.getAbsolutePath) else ""
@@ -288,7 +292,11 @@ object Vivado
   }
   ToolchainProfileDetector.registerDetector(this)
 
-  override def handlePreset(rtOld: ScaledaRuntime, remoteInfo: Option[RemoteInfo], writeable: Boolean): Option[ScaledaRuntime] = {
+  override def handlePreset(
+      rtOld: ScaledaRuntime,
+      remoteInfo: Option[RemoteInfo],
+      writeable: Boolean
+  ): Option[ScaledaRuntime] = {
     var rt                = rtOld
     implicit val manifest = rt.project
     val userTokenBean     = ScaledaAuthorizationProvider.loadByHost(rt.profile.host)
@@ -372,7 +380,7 @@ object Vivado
       case TaskType.Implement   => "run_impl.tcl"
       case TaskType.Programming => "run_program.tcl"
     })))
-    val useContext       = Serialization.getCCParams(templateContext)
+    val useContext = Serialization.getCCParams(templateContext)
     if (writeable) {
       val templateRenderer = new Vivado.TemplateRenderer(rt)(replace)
       templateRenderer.render(useContext = useContext)
