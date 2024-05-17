@@ -103,7 +103,7 @@ IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载
 启动 IDEA 后，选择
 ``File -> Settings -> Plugins -> Install Plugin from Disk...``\ ，然后选择下载好的
 zip 文件，点击 ``OK`` 即可安装插件。 有关在 IDEA 中安装 Scaleda
-的详细过程，请参考 :doc:`docs/installation` 文档。
+的详细过程，请参考 :doc:`installation` 文档。
 
 从源码编译
 ~~~~~~~~~~
@@ -142,7 +142,7 @@ PDF 版本的使用手册可以在
 --------
 
 这里介绍 Scaleda 这个项目的结构，而不是「使用 Scaleda 开发的 FPGA
-项目」的结构。 对于后者，请参考 :doc:`docs/manual/project` 文档。
+项目」的结构。 对于后者，请参考 :doc:`manual/project` 文档。
 
 Scaleda 是一个使用 Scala 和 Java 开发的 IDEA 插件，其源码的结构如下：
 

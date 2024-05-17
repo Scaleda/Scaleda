@@ -7,10 +7,10 @@
 
 ### HDL 文件
 
-HDL 文件是项目的核心。在一个 Scaleda 项目中，HDL 文件（目前仅支持 Verilog）分为两类——源码和测试文件。
-源码指普通的 Verilog 模块，而测试文件对应 testbench。
+HDL 文件是项目的核心。在一个 Scaleda 项目中，HDL 文件分为两类——源码和测试文件。
+源码指普通的 HDL 模块，而测试文件对应 testbench。
 一个项目可以有多个源码文件，也可以有多个测试文件。
-默认情况下，源码放在项目下 src 文件夹中，而测试文件在 test 文件夹里。
+默认情况下，源码放在项目下 `src` 文件夹中，而测试文件在 `test` 文件夹里。
 
 ![HDL 文件](images/hdl.png)
 
@@ -43,7 +43,7 @@ Scaleda Tasks 面板中会以树形结构，展示当前项目中已有的任务
 `scaleda.yml` 文件是一个 YAML 格式的文本文件，可以使用任何文本编辑器打开。
 Scaleda 会自动读取 `scaleda.yml` 文件中的信息，以构建项目系统。
 在 Scaleda 中，可以使用图形化的界面编辑诸如任务、目标平台等信息，不需要直接编辑 `scaleda.yml` 文件。
-`scaleda.yml` 文件也可以被用户直接编辑，以下是其文件结构
+`scaleda.yml` 文件也可以被用户直接编辑，以下是其大致文件结构：
 
 ```yaml
 ---
@@ -51,12 +51,58 @@ name: 项目名称
 description: 项目描述
 version: 项目版本
 author: 项目作者，以上三项非必需
-type: rtl # 项目类型，目前仅支持 rtl
-source: "src/" # 源码文件夹，所有 .v 文件都会被识别为源码文件
-sources: [] # 源码文件列表，与 source 可一起使用，用来记录零散的源码文件
-test: "test/" # 测试文件夹，所有 .v 文件都会被识别为测试文件
-tests: [] # 测试文件列表，与 test 可一起使用，用来记录零散的测试文件
-topModule: "top" # 项目的默认顶层模块，如果某个「目标平台」或者「任务」没有指定顶层模块，就会使用此处的默认值，可以不设置
-constraints: "" # 约束文件目录，所有 .xdc 文件都会被识别为约束文件
-targets: # 目标平台
+type: rtl           # 项目类型，目前仅支持 rtl
+source: "src/"      # 源码文件夹，所有 .v 文件都会被识别为源码文件
+sources: 
+- dir1              # 源码文件列表，与 source 可一起使用，
+- dir2/file.v       # 用来记录零散的源码文件
+test: "test/"       # 测试文件夹，所有 .v 文件都会被识别为测试文件
+tests: 
+- dir3              # 测试文件列表，与 test 可一起使用，用来记录零散的测试文件
+topModule: "top"    # 项目的默认顶层模块，如果某个「目标平台」或者「任务」没有指定顶层模块，就会使用此处的默认值，可以不设置
+constraintPaths: 
+- constraints       # 约束文件目录，按照目标平台筛选约束文件
+targets:            # 目标平台
+- name: IcarusVerilog       # 目标平台标识名字
+  toolchain: iverilog       # 工具链类型
+  topModule: fir_tb         # 此目标平台中的顶层模块
+  tasks:
+  - name: iverilog-sim      # 任务标识名字
+    type: simulation        # 任务类型
+  - name: iverilog-remote
+    type: simulation
+- name: Xilinx
+  toolchain: vivado
+  topModule: top_zynq
+  options:                  # 目标平台的选项
+    part: xc7z010clg400-2   # 在 Vivado 平台上选择器件型号
+  tasks:
+  - name: vivado_sim
+    type: simulation
+    topModule: fir_tb
+  - name: synth
+    type: synthesis
+    constraintPaths:
+    - constraints/vivado
+  - name: prog
+    type: programming
+    constraintPaths:
+    - constraints/vivado
+- name: quartus
+  toolchain: quartus
+  topModule: flow_light_top_altera
+  constraintPaths:
+  - constraints/altera_constraints.sdc
+  - constraints/altera_pins.qsf
+  options:
+    part: 10AXF40AA
+    family: Arria 10
+  tasks:
+  - name: syn
+    type: synthesis
+  - name: prog
+    type: programming
 ```
+
+
+在 项目 - 目标平台 - 任务 的三级结构中，`topModule` 是逐层继承覆盖的，而 `source(s)`、`test(s)`、`constraintPaths` 是逐级加和的。当这些字段中指定了一个文件夹时，会将文件夹下的所有可识别文件加入到对应的列表中。

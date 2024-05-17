@@ -2,7 +2,7 @@
    :align: left
 
 Scaleda: Transforming IntelliJ IDEA into an FPGA Development Tool
-===============================================================
+=================================================================
 
 .. image:: https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff
    :target: https://plugins.jetbrains.com/plugin/21863
@@ -52,7 +52,7 @@ Installing Directly from Zip File
 
 IJ platform plugins are distributed as zip archives. You can download the precompiled plugin zip package and install it in IntelliJ IDEA. In the `Releases <https://github.com/Scaleda/Scaleda/releases>`__ page, you can find the latest plugin zip package named something like ``Scaleda-0.1.0.zip``.
 
-After launching IDEA, select ``File -> Settings -> Plugins -> Install Plugin from Disk...``, then choose the downloaded zip file and click ``OK`` to install the plugin. For detailed instructions on installing Scaleda in IDEA, refer to :doc:`docs/installation`.
+After launching IDEA, select ``File -> Settings -> Plugins -> Install Plugin from Disk...``, then choose the downloaded zip file and click ``OK`` to install the plugin. For detailed instructions on installing Scaleda in IDEA, refer to :doc:`installation`.
 
 Compiling from Source
 ~~~~~~~~~~~~~~~~~~~~~
@@ -87,7 +87,7 @@ Project Structure
 
 This section
 
- introduces the structure of the Scaleda project, not the structure of FPGA projects developed using Scaleda. For the latter, please refer to :doc:`docs/manual/project`.
+ introduces the structure of the Scaleda project, not the structure of FPGA projects developed using Scaleda. For the latter, please refer to :doc:`manual/project`.
 
 Scaleda is an IDEA plugin developed in Scala and Java. Its source code structure is as follows:
 
