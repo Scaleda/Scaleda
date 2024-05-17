@@ -15,8 +15,14 @@ release = 'v0.2.1'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'recommonmark',
+    # 'recommonmark',
     # 'sphinx_markdown_tables'
+    "myst_parser",
+    "sphinx.ext.duration",
+    "sphinx.ext.doctest",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
 ]
 
 
