@@ -9,11 +9,10 @@ Scaleda 文档
 .. toctree::
    :maxdepth: 2
 
-   README
-   README.en
    introduction
    installation
-   project
+   manual/index
+   build
    about
 
 API

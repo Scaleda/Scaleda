@@ -22,7 +22,7 @@ Scaleda is an extensible FPGA EDA support tool based on the IntelliJ platform, f
  - Verible, [Svls](https://github.com/dalance/svls), or custom language server (LSP) support;
  - i18n support.
 
-Scaleda 是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具，具有 HDL 项目管理、HDL 语言支持、FPGA 工具调用等功能，将 IJ 打造成为灵活而强大的 FPGA 开发工具。
+Scaleda（=Scalable + EDA）是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具，具有 HDL 项目管理、HDL 语言支持、FPGA 工具调用等功能，将 IJ 打造成为灵活而强大的 FPGA 开发工具。
 目前，Scaleda 已支持的功能包括：
 
  - Verilog 语言的基本语法功能（语法高亮、代码折叠、代码格式化、代码注释、代码导航等）；
@@ -81,6 +81,7 @@ $ sbt packageArtifactZip
 ## 使用手册
 
 PDF 版本的使用手册可以在 [这里](https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf) 下载。
+（适用于 v0.0.9 版本。）
 
 ## 项目结构
 
