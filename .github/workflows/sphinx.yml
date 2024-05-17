@@ -1,9 +1,9 @@
-name: Pages
+name: Deploy Pages with API docs
 
 on:
   push:
     branches:
-      - sphinx
+      - master
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
