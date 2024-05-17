@@ -80,6 +80,8 @@ $ sbt packageArtifactZip
 
 ## 使用手册
 
+请访问 [在线文档](https://scaleda.top/manual/index.html)。
+
 PDF 版本的使用手册可以在 [这里](https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf) 下载。
 （适用于 v0.0.9 版本。）
 

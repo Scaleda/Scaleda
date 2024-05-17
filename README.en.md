@@ -60,6 +60,8 @@ Once packaging is complete, you can find the packaged zip file in the `target/sc
 
 ## User Manual
 
+Please visit [Online Manual](https://scaleda.top/manual/index.html).
+
 The PDF version of the user manual can be downloaded [here](https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf).
 
 ## Project Structure
