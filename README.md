@@ -1,6 +1,6 @@
 # Scaleda：将 IntelliJ IDEA 打造为 FPGA 开发工具
 
-[![Visit marketplace](README.assets/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
+[![Visit marketplace](docs/images/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
 
 [English](README.en.md)
 

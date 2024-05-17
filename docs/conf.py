@@ -30,4 +30,6 @@ language = 'zh_CN'
 
 # html_theme = 'alabaster'
 html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_material'
+# html_theme = 'stanford_theme'
 html_static_path = ['_static']

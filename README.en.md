@@ -1,6 +1,6 @@
 # Scaleda: Transforming IntelliJ IDEA into an FPGA Development Tool
 
-[![Visit marketplace](README.assets/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
+[![Visit marketplace](docs/images/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
 
 ## Overview
 
