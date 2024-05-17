@@ -1,5 +1,7 @@
 # Scaleda: Transforming IntelliJ IDEA into an FPGA Development Tool
 
+[![Visit marketplace](https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff)](https://plugins.jetbrains.com/plugin/21863) [![ReadTheDocs](https://readthedocs.org/projects/scaleda/badge/?version=latest)](https://scaleda.readthedocs.io/zh-cn/latest/?badge=latest) [![Online Documentation](https://img.shields.io/badge/document-online-blue)](https://scaleda.top)
+
 [![Visit marketplace](docs/images/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
 
 ## Overview
@@ -83,6 +85,7 @@ Scaleda references and uses numerous open source projects, including but not lim
  - [Verilog-HDL/SystemVerilog/Bluespec SystemVerilog](https://github.com/mshr-h/vscode-verilog-hdl-support)
  - [Verible](https://github.com/chipsalliance/verible)
  - [Svls](https://github.com/dalance/svls)
+ - [Digital-IDE](https://github.com/Digital-EDA/Digital-IDE)
 
 ## License and Acknowledgements
 

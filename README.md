@@ -1,8 +1,8 @@
 # Scaleda：将 IntelliJ IDEA 打造为 FPGA 开发工具
 
-[![Visit marketplace](docs/images/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
+[![Visit marketplace](https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff)](https://plugins.jetbrains.com/plugin/21863) [![ReadTheDocs](https://readthedocs.org/projects/scaleda/badge/?version=latest)](https://scaleda.readthedocs.io/zh-cn/latest/?badge=latest) [![Online Documentation](https://img.shields.io/badge/document-online-blue)](https://scaleda.top) [English README](README.en.md)
 
-[English](README.en.md)
+[![Visit marketplace](docs/images/icon-with-name.svg)](https://plugins.jetbrains.com/plugin/21863)
 
 ![使用 Scaleda 进行 Verilog 开发](docs/images/main-screenshot.png)
 
@@ -112,6 +112,7 @@ Scaleda 参考和使用了诸多开源项目，包括但不限于：
  - [Verilog-HDL/SystemVerilog/Bluespec SystemVerilog](https://github.com/mshr-h/vscode-verilog-hdl-support)
  - [Verible](https://github.com/chipsalliance/verible)
  - [Svls](https://github.com/dalance/svls)
+ - [Digital-IDE](https://github.com/Digital-EDA/Digital-IDE)
 
 ## 开源协议与鸣谢
 
