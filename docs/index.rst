@@ -32,7 +32,6 @@ Scaleda 是 IntelliJ 平台上的 ASIC & FPGA 开发扩展，提供多种 HDL �
    build
    about
    README
-   README.en
 
 API
 ==================

@@ -4,8 +4,6 @@
 Scaleda：将 IntelliJ IDEA 打造为 FPGA 开发工具
 ==============================================
 
-`English <README.en>`__
-
 .. image:: https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff
    :target: https://plugins.jetbrains.com/plugin/21863
 .. image:: https://readthedocs.org/projects/scaleda/badge/?version=latest
@@ -21,35 +19,8 @@ Scaleda：将 IntelliJ IDEA 打造为 FPGA 开发工具
 
 .. _概述--overview:
 
-概述 / Overview
+概述
 ---------------
-
-Scaleda is an extensible FPGA EDA support tool based on the IntelliJ
-platform, featuring HDL project management, HDL language support, FPGA
-tool invocation, and more. It aims to transform IntelliJ IDEA into a
-flexible and powerful FPGA development tool. Currently, Scaleda supports
-the following features:
-
--  Basic syntax features for Verilog language (syntax highlighting, code
-   folding, code formatting, code commenting, code navigation, etc.);
--  Simple code completion for Verilog language;
--  Code inspection for Verilog (syntax errors and semantic errors, as
-   well as errors such as missing ports, multiple drivers, etc.);
--  Verilog and SystemVerilog code formatting using
-   `Verible <https://github.com/chipsalliance/verible>`__;
--  Syntax parsing and highlighting for Verilog, SystemVerilog, Tcl,
-   Bluespec SystemVerilog;
--  Proprietary project and IP structure, supporting the invocation of
-   tools like Vivado, Quartus Prime, iverilog, and Yosys for simulation,
-   synthesis, and implementation;
--  Support for loading Vivado projects and invoking synthesis and
-   implementation operations within them;
--  Built-in waveform viewers `Rvcd <https://github.com/Scaleda/rvcd>`__
-   and `Surfer <https://gitlab.com/surfer-project/surfer>`__;
--  Running in server mode to execute remote EDA tasks.
--  Verible, `Svls <https://github.com/dalance/svls>`__, or custom
-   language server (LSP) support;
--  i18n support.
 
 Scaleda（=Scalable + EDA）是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具，
 具有 HDL 项目管理、HDL 语言支持、FPGA 工具调用等功能，将 IJ
