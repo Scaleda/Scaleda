@@ -1,3 +1,9 @@
+## v0.2.2: 2023.3.1 support
+
+- update compatibility to 2023.3.1
+- fix rvcd panel on Windows
+- update docs to Sphinx, and add English version
+
 ## v0.2.1: update lsp support
 
 - auto generate file lists for lsp
