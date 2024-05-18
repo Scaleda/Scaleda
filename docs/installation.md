@@ -8,7 +8,7 @@ Scaleda 目前支持 **2024.1.1 及以上版本** 的除了 Gateway 以外的 IJ
 
 服务器端程序请访问 [Github Release](https://github.com/Scaleda/Scaleda/releases) 下载 `scaleda-kernel.jar`。
 
-### 下载 zip 文件来安装
+## 下载 zip 文件来安装
 
 IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载编译好的插件 zip 包，然后在 IJ 中安装。
 在 [Releases](https://github.com/Scaleda/Scaleda/releases) 页面中，您可以找到最新的插件 zip 包，它的名字类似于 `Scaleda-0.2.0.zip`。
@@ -24,6 +24,6 @@ IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载
 如果您已经使用过 IDEA，可能看不见上面的启动画面。
 您可以选择「File / 文件」菜单，然后选择「Settings / 设置」，在弹出的窗口中选择「Plugins / 插件」，然后点击右侧上方的齿轮按钮，选择「Install Plugin from Disk / 从磁盘安装插件」来安装。
 
-### 从源码编译
+## 从源码编译
 
 参考 [构建](build) 章节。

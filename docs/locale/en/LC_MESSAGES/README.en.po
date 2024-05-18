@@ -1,0 +1,415 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2024, Scaleda
+# This file is distributed under the same license as the Scaleda package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Scaleda\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-18 10:18+0800\n"
+"PO-Revision-Date: 2024-05-18 10:26\n"
+"Last-Translator: potranslator 1.1.5\n"
+"Language-Team: en <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.15.0\n"
+"Translated-By: potranslator 1.1.5\n"
+
+#: ../../README.en.rst:5
+msgid "Scaleda: Transforming IntelliJ IDEA into an FPGA Development Tool"
+msgstr "Scaleda: Transforming IntelliJ IDEA into an FPGA Development Tool"
+
+#: ../../README.en.rst:-1
+msgid "Documentation Status"
+msgstr "Documentation Status"
+
+#: ../../README.en.rst:-1
+msgid "Online Documentation"
+msgstr "Online Documentation"
+
+#: ../../README.en.rst:-1
+msgid "Using Scaleda for Verilog Development"
+msgstr "Using Scaleda for Verilog Development"
+
+#: ../../README.en.rst:20
+msgid "Overview"
+msgstr "Overview"
+
+#: ../../README.en.rst:22
+msgid ""
+"Scaleda (=Scalable + EDA) is an extensible FPGA EDA support tool based on "
+"the IntelliJ platform, featuring HDL project management, HDL language "
+"support, FPGA tool invocation, and more. It aims to transform IntelliJ IDEA "
+"into a flexible and powerful FPGA development tool. Currently, Scaleda "
+"supports the following features:"
+msgstr ""
+"Scaleda (=Scalable + EDA) is an extensible FPGA EDA support tool based on "
+"the IntelliJ platform, featuring HDL project management, HDL language "
+"support, FPGA tool invocation, and more. It aims to transform IntelliJ IDEA "
+"into a flexible and powerful FPGA development tool. Currently, Scaleda "
+"supports the following features:"
+
+#: ../../README.en.rst:24
+msgid ""
+"Basic syntax features for Verilog language (syntax highlighting, code "
+"folding, code formatting, code commenting, code navigation, etc.);"
+msgstr ""
+"Basic syntax features for Verilog language (syntax highlighting, code "
+"folding, code formatting, code commenting, code navigation, etc.);"
+
+#: ../../README.en.rst:25
+msgid "Simple code completion for Verilog language;"
+msgstr "Simple code completion for Verilog language;"
+
+#: ../../README.en.rst:26
+msgid ""
+"Code inspection for Verilog (syntax errors and semantic errors, as well as "
+"errors such as missing ports, multiple drivers, etc.);"
+msgstr ""
+"Code inspection for Verilog (syntax errors and semantic errors, as well as "
+"errors such as missing ports, multiple drivers, etc.);"
+
+#: ../../README.en.rst:27
+msgid ""
+"Verilog and SystemVerilog code formatting using `Verible "
+"<https://github.com/chipsalliance/verible>`__;"
+msgstr ""
+"Verilog and SystemVerilog code formatting using `Verible "
+"<https://github.com/chipsalliance/verible>`__;"
+
+#: ../../README.en.rst:28
+msgid ""
+"Syntax parsing and highlighting for Verilog, SystemVerilog, Tcl, Bluespec "
+"SystemVerilog;"
+msgstr ""
+"Syntax parsing and highlighting for Verilog, SystemVerilog, Tcl, Bluespec "
+"SystemVerilog;"
+
+#: ../../README.en.rst:29
+msgid ""
+"Proprietary project and IP structure, supporting the invocation of tools "
+"like Vivado, Quartus Prime, iverilog, and Yosys for simulation, synthesis, "
+"and implementation;"
+msgstr ""
+"Proprietary project and IP structure, supporting the invocation of tools "
+"like Vivado, Quartus Prime, iverilog, and Yosys for simulation, synthesis, "
+"and implementation;"
+
+#: ../../README.en.rst:30
+msgid ""
+"Support for loading Vivado projects and invoking synthesis and "
+"implementation operations within them;"
+msgstr ""
+"Support for loading Vivado projects and invoking synthesis and "
+"implementation operations within them;"
+
+#: ../../README.en.rst:31
+msgid ""
+"Built-in waveform viewers `Rvcd <https://github.com/Scaleda/rvcd>`__ and "
+"`Surfer <https://gitlab.com/surfer-project/surfer>`__;"
+msgstr ""
+"Built-in waveform viewers `Rvcd <https://github.com/Scaleda/rvcd>`__ and "
+"`Surfer <https://gitlab.com/surfer-project/surfer>`__;"
+
+#: ../../README.en.rst:32
+msgid "Running in server mode to execute remote EDA tasks;"
+msgstr "Running in server mode to execute remote EDA tasks;"
+
+#: ../../README.en.rst:33
+msgid ""
+"Verible, `Svls <https://github.com/dalance/svls>`__, or custom language "
+"server (LSP) support;"
+msgstr ""
+"Verible, `Svls <https://github.com/dalance/svls>`__, or custom language "
+"server (LSP) support;"
+
+#: ../../README.en.rst:34
+msgid "i18n support."
+msgstr "i18n support."
+
+#: ../../README.en.rst:36
+msgid ""
+"For user manuals, API documentation, and more, please visit the `Online "
+"Documentation <https://scaleda.top>`__."
+msgstr ""
+"For user manuals, API documentation, and more, please visit the `Online "
+"Documentation <https://scaleda.top>`__."
+
+#: ../../README.en.rst:39
+msgid "Installation"
+msgstr "Installation"
+
+#: ../../README.en.rst:41
+msgid ""
+"Scaleda currently supports **version 2024.1.1 and above** of all IJ "
+"platforms except Gateway, including IDEA Community Edition and IDEA Ultimate"
+" Edition. You can search for \"Scaleda\" in the plugin marketplace, download"
+" the precompiled plugin zip package, or compile the plugin yourself."
+msgstr ""
+"Scaleda currently supports **version 2024.1.1 and above** of all IJ "
+"platforms except Gateway, including IDEA Community Edition and IDEA Ultimate"
+" Edition. You can search for \"Scaleda\" in the plugin marketplace, download"
+" the precompiled plugin zip package, or compile the plugin yourself."
+
+#: ../../README.en.rst:46
+msgid ""
+"`Visit marketplace <https://plugins.jetbrains.com/plugin/21863>`__ |Visit "
+"marketplace|"
+msgstr ""
+"`Visit marketplace <https://plugins.jetbrains.com/plugin/21863>`__ |Visit "
+"marketplace|"
+
+#: ../../README.en.rst
+msgid "Visit marketplace"
+msgstr "Visit marketplace"
+
+#: ../../README.en.rst:48
+msgid ""
+"For the server-side program, please visit `Github Release "
+"<https://github.com/Scaleda/Scaleda/releases>`__ to download the ``scaleda-"
+"kernel.jar``."
+msgstr ""
+"For the server-side program, please visit `Github Release "
+"<https://github.com/Scaleda/Scaleda/releases>`__ to download the ``scaleda-"
+"kernel.jar``."
+
+#: ../../README.en.rst:51
+msgid "Installing Directly from Zip File"
+msgstr "Installing Directly from Zip File"
+
+#: ../../README.en.rst:53
+msgid ""
+"IJ platform plugins are distributed as zip archives. You can download the "
+"precompiled plugin zip package and install it in IntelliJ IDEA. In the "
+"`Releases <https://github.com/Scaleda/Scaleda/releases>`__ page, you can "
+"find the latest plugin zip package named something like "
+"``Scaleda-0.1.0.zip``."
+msgstr ""
+"IJ platform plugins are distributed as zip archives. You can download the "
+"precompiled plugin zip package and install it in IntelliJ IDEA. In the "
+"`Releases <https://github.com/Scaleda/Scaleda/releases>`__ page, you can "
+"find the latest plugin zip package named something like "
+"``Scaleda-0.1.0.zip``."
+
+#: ../../README.en.rst:55
+msgid ""
+"After launching IDEA, select ``File -> Settings -> Plugins -> Install Plugin"
+" from Disk...``, then choose the downloaded zip file and click ``OK`` to "
+"install the plugin. For detailed instructions on installing Scaleda in IDEA,"
+" refer to :doc:`installation`."
+msgstr ""
+"After launching IDEA, select ``File -> Settings -> Plugins -> Install Plugin"
+" from Disk...``, then choose the downloaded zip file and click ``OK`` to "
+"install the plugin. For detailed instructions on installing Scaleda in IDEA,"
+" refer to :doc:`installation`."
+
+#: ../../README.en.rst:58
+msgid "Compiling from Source"
+msgstr "Compiling from Source"
+
+#: ../../README.en.rst:60
+msgid ""
+"Scaleda is primarily developed in Scala and uses sbt (not Gradle) as the "
+"build tool. Therefore, if you want to compile Scaleda from source, you need "
+"to install Scala and sbt."
+msgstr ""
+"Scaleda is primarily developed in Scala and uses sbt (not Gradle) as the "
+"build tool. Therefore, if you want to compile Scaleda from source, you need "
+"to install Scala and sbt."
+
+#: ../../README.en.rst:62
+msgid "After cloning the repository, compile with sbt:"
+msgstr "After cloning the repository, compile with sbt:"
+
+#: ../../README.en.rst:68
+msgid ""
+"Note that the first time you start sbt in this repository, it may download "
+"dependencies and source code for the IJ platform from the internet, which "
+"may take some time and disk space."
+msgstr ""
+"Note that the first time you start sbt in this repository, it may download "
+"dependencies and source code for the IJ platform from the internet, which "
+"may take some time and disk space."
+
+#: ../../README.en.rst:70
+msgid "After compiling, package with the following command:"
+msgstr "After compiling, package with the following command:"
+
+#: ../../README.en.rst:76
+msgid ""
+"Once packaging is complete, you can find the packaged zip file in the "
+"``target/scala-2.13/`` directory. You can install the plugin using the "
+"method described in the previous section."
+msgstr ""
+"Once packaging is complete, you can find the packaged zip file in the "
+"``target/scala-2.13/`` directory. You can install the plugin using the "
+"method described in the previous section."
+
+#: ../../README.en.rst:79
+msgid "User Manual"
+msgstr "User Manual"
+
+#: ../../README.en.rst:81
+msgid ""
+"Please visit the `Online Documentation "
+"<https://scaleda.top/manual/index.html>`__ to view the user manual."
+msgstr ""
+"Please visit the `Online Documentation "
+"<https://scaleda.top/manual/index.html>`__ to view the user manual."
+
+#: ../../README.en.rst:83
+msgid ""
+"The PDF version of the user manual can be downloaded `here "
+"<https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf>`__."
+" (For version v0.0.9.)"
+msgstr ""
+"The PDF version of the user manual can be downloaded `here "
+"<https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf>`__."
+" (For version v0.0.9.)"
+
+#: ../../README.en.rst:86
+msgid "Project Structure"
+msgstr "Project Structure"
+
+#: ../../README.en.rst:88
+msgid "This section"
+msgstr "This section"
+
+#: ../../README.en.rst:90
+msgid ""
+"introduces the structure of the Scaleda project, not the structure of FPGA "
+"projects developed using Scaleda. For the latter, please refer to "
+":doc:`manual/project`."
+msgstr ""
+"introduces the structure of the Scaleda project, not the structure of FPGA "
+"projects developed using Scaleda. For the latter, please refer to "
+":doc:`manual/project`."
+
+#: ../../README.en.rst:92
+msgid ""
+"Scaleda is an IDEA plugin developed in Scala and Java. Its source code "
+"structure is as follows:"
+msgstr ""
+"Scaleda is an IDEA plugin developed in Scala and Java. Its source code "
+"structure is as follows:"
+
+#: ../../README.en.rst:95
+msgid "Kernel Part"
+msgstr "Kernel Part"
+
+#: ../../README.en.rst:97
+msgid ""
+"The \"kernel\" part of Scaleda includes features such as toolchain (e.g., "
+"Vivado) invocation and project structure definition. The kernel is designed "
+"to run as a standalone command-line program independent of the IJ platform. "
+"The kernel is located in the ``scaleda-kernel`` directory as an sbt "
+"subproject. Run ``sbt 'project kernel; run'`` or execute the compiled ``java"
+" -jar scaleda-kernel.jar --help`` to see the kernel usage help."
+msgstr ""
+"The \"kernel\" part of Scaleda includes features such as toolchain (e.g., "
+"Vivado) invocation and project structure definition. The kernel is designed "
+"to run as a standalone command-line program independent of the IJ platform. "
+"The kernel is located in the ``scaleda-kernel`` directory as an sbt "
+"subproject. Run ``sbt 'project kernel; run'`` or execute the compiled ``java"
+" -jar scaleda-kernel.jar --help`` to see the kernel usage help."
+
+#: ../../README.en.rst:100
+msgid "Plugin Part"
+msgstr "Plugin Part"
+
+#: ../../README.en.rst:102
+msgid ""
+"The \"plugin\" part of Scaleda includes Verilog language support, graphical "
+"project management, and other features interfacing with the IJ platform. The"
+" plugin code is located in the ``src`` directory. The code under the "
+"``top.scaleda.idea`` package is for the IJ platform plugin, and the code "
+"under the ``top.scaleda.verilog`` package provides Verilog language support."
+msgstr ""
+"The \"plugin\" part of Scaleda includes Verilog language support, graphical "
+"project management, and other features interfacing with the IJ platform. The"
+" plugin code is located in the ``src`` directory. The code under the "
+"``top.scaleda.idea`` package is for the IJ platform plugin, and the code "
+"under the ``top.scaleda.verilog`` package provides Verilog language support."
+
+#: ../../README.en.rst:105
+msgid "Open Source Projects Used"
+msgstr "Open Source Projects Used"
+
+#: ../../README.en.rst:107
+msgid ""
+"Scaleda references and uses numerous open source projects, including but not"
+" limited to:"
+msgstr ""
+"Scaleda references and uses numerous open source projects, including but not"
+" limited to:"
+
+#: ../../README.en.rst:109
+msgid ""
+"`ANTLR <https://github.com/antlr/antlr4>`__, `ANTLR IntelliJ Adapter "
+"<https://github.com/antlr/antlr4-intellij-adaptor>`__"
+msgstr ""
+"`ANTLR <https://github.com/antlr/antlr4>`__, `ANTLR IntelliJ Adapter "
+"<https://github.com/antlr/antlr4-intellij-adaptor>`__"
+
+#: ../../README.en.rst:110
+msgid ""
+"`JetBrains Verilog Plugin <https://github.com/MrTsepa/jetbrains-verilog-"
+"plugin/>`__"
+msgstr ""
+"`JetBrains Verilog Plugin <https://github.com/MrTsepa/jetbrains-verilog-"
+"plugin/>`__"
+
+#: ../../README.en.rst:111
+msgid ""
+"`Verilog-HDL/SystemVerilog/Bluespec SystemVerilog "
+"<https://github.com/mshr-h/vscode-verilog-hdl-support>`__"
+msgstr ""
+"`Verilog-HDL/SystemVerilog/Bluespec SystemVerilog "
+"<https://github.com/mshr-h/vscode-verilog-hdl-support>`__"
+
+#: ../../README.en.rst:112
+msgid "`Verible <https://github.com/chipsalliance/verible>`__"
+msgstr "`Verible <https://github.com/chipsalliance/verible>`__"
+
+#: ../../README.en.rst:113
+msgid "`Svls <https://github.com/dalance/svls>`__"
+msgstr "`Svls <https://github.com/dalance/svls>`__"
+
+#: ../../README.en.rst:116
+msgid "License and Acknowledgements"
+msgstr "License and Acknowledgements"
+
+#: ../../README.en.rst:118
+msgid ""
+"Scaleda is open-sourced under the `Mulan PSL v2 "
+"<https://license.coscl.org.cn/MulanPSL2>`__ license. For details, please "
+"refer to the `LICENSE "
+"<https://github.com/Scaleda/Scaleda/blob/master/LICENSE>`__ file."
+msgstr ""
+"Scaleda is open-sourced under the `Mulan PSL v2 "
+"<https://license.coscl.org.cn/MulanPSL2>`__ license. For details, please "
+"refer to the `LICENSE "
+"<https://github.com/Scaleda/Scaleda/blob/master/LICENSE>`__ file."
+
+#: ../../README.en.rst:120
+msgid ""
+"Scaleda's development is guided by Professor Xu Yong from Harbin Institute "
+"of Technology (Shenzhen) and originates from the HIT (Shenzhen) - Zhongwei "
+"Semiconductor Artificial Intelligence Chip Joint Laboratory."
+msgstr ""
+"Scaleda's development is guided by Professor Xu Yong from Harbin Institute "
+"of Technology (Shenzhen) and originates from the HIT (Shenzhen) - Zhongwei "
+"Semiconductor Artificial Intelligence Chip Joint Laboratory."
+
+#: ../../README.en.rst:122
+msgid "Thanks to JetBrains for their tool support."
+msgstr "Thanks to JetBrains for their tool support."
+
+#: ../../README.en.rst:-1
+msgid "JetBrains"
+msgstr "JetBrains"

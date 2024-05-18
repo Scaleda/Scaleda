@@ -1,0 +1,504 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2024, Scaleda
+# This file is distributed under the same license as the Scaleda package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Scaleda\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-18 10:18+0800\n"
+"PO-Revision-Date: 2024-05-18 10:28\n"
+"Last-Translator: potranslator 1.1.5\n"
+"Language-Team: en <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.15.0\n"
+"Translated-By: potranslator 1.1.5\n"
+
+#: ../../introduction.md:1
+msgid "Scaleda 项目综述"
+msgstr "Scaleda project overview"
+
+#: ../../introduction.md:3
+msgid ""
+"Scaleda（=Scalable + EDA）是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具，具有 HDL 项目管理、HDL "
+"语言支持、FPGA 工具调用等功能，是一款用于 FPGA（Verilog）开发的集成开发环境，致力于提供用户友好的开发平台，支持智能化的 Verilog"
+" 代码编写及便捷的仿真调试体验。 目前，Scaleda 已支持的功能包括："
+msgstr ""
+"Scaleda (=Scalable + EDA) is an extensible FPGA EDA auxiliary tool for the "
+"IntelliJ platform. It has functions such as HDL project management, HDL "
+"language support, FPGA tool calling, etc. It is an integrated development "
+"environment for FPGA (Verilog) development, dedicated to It provides a user-"
+"friendly development platform that supports intelligent Verilog code writing"
+" and convenient simulation debugging experience. Currently, functions "
+"supported by Scaleda include:"
+
+#: ../../introduction.md:6
+msgid "Verilog 语言的基本语法功能（语法高亮、代码折叠、代码格式化、代码注释、代码导航等）；"
+msgstr ""
+"Basic syntax functions of Verilog language (syntax highlighting, code "
+"folding, code formatting, code comments, code navigation, etc.);"
+
+#: ../../introduction.md:7
+msgid "Verilog 语言的简单代码补全；"
+msgstr "Simple code completion in Verilog language;"
+
+#: ../../introduction.md:8
+msgid "Verilog 语言的代码检查（语法错误与语义错误，以及诸如端口缺失、多驱动等错误）；"
+msgstr ""
+"Verilog language code inspection (syntax errors and semantic errors, as well"
+" as errors such as missing ports, multiple drivers, etc.);"
+
+#: ../../introduction.md:9
+msgid ""
+"使用 [Verible](https://github.com/chipsalliance/verible) 的 "
+"Verilog、SystemVerilog 代码格式化；"
+msgstr ""
+"Verilog, SystemVerilog code formatting using "
+"[Verible](https://github.com/chipsalliance/verible);"
+
+#: ../../introduction.md:10
+msgid "Verilog、SystemVerilog、Tcl、Bluespec SystemVerilog 语法解析高亮；"
+msgstr ""
+"Verilog, SystemVerilog, Tcl, Bluespec SystemVerilog syntax parsing "
+"highlighting;"
+
+#: ../../introduction.md:11
+msgid "自有项目和 IP 结构，支持调用 Vivado、Quartus Prime、iverilog、Yosys 等工具进行仿真、综合、实现等操作；"
+msgstr ""
+"Own projects and IP structures, supporting the use of Vivado, Quartus Prime,"
+" iverilog, Yosys and other tools for simulation, synthesis, implementation "
+"and other operations;"
+
+#: ../../introduction.md:12
+msgid "支持加载 Vivado 工程并调用其中的综合、实现等操作；"
+msgstr ""
+"Supports loading Vivado projects and calling synthesis, implementation and "
+"other operations;"
+
+#: ../../introduction.md:13
+msgid ""
+"内置波形查看器 "
+"[Rvcd](https://github.com/Scaleda/rvcd)、[Surfer](https://gitlab.com/surfer-"
+"project/surfer)；"
+msgstr ""
+"Built-in waveform viewer [Rvcd](https://github.com/Scaleda/rvcd), "
+"[Surfer](https://gitlab.com/surfer-project/surfer);"
+
+#: ../../introduction.md:14
+msgid "运行服务器模式以执行远程 EDA 任务；"
+msgstr "Run server mode to perform remote EDA tasks;"
+
+#: ../../introduction.md:15
+msgid "Verible、[Svls](https://github.com/dalance/svls)或自定义语言服务器（LSP）支持；"
+msgstr ""
+"Verible, [Svls](https://github.com/dalance/svls) or custom language server "
+"(LSP) support;"
+
+#: ../../introduction.md:16
+msgid "国际化多显示语言支持；"
+msgstr "International multi-display language support;"
+
+#: ../../introduction.md:18
+msgid "![使用 Scaleda 进行 Verilog 开发](images/main-screenshot.png)"
+msgstr "![Verilog development using Scaleda](images/main-screenshot.png)"
+
+#: ../../introduction.md:18
+msgid "使用 Scaleda 进行 Verilog 开发"
+msgstr "Verilog development using Scaleda"
+
+#: ../../introduction.md:20
+msgid ""
+"Scaleda 的开发背景来源于我们对 FPGA 开发教学普及情况的观察。 传统的 FPGA 开发围绕厂商提供的 EDA 软件进行。 然而，这类 EDA"
+" 软件如 Vivado 通常比较笨重，并且实际开发体验较差。 一些用户会选择使用 Visual Studio Code "
+"并配合多个插件进行开发，但这种方式通常配置麻烦，对初学者并不友好，且实际体验参差不齐。 基于对这些问题的考虑，我们希望设计一个灵活、通用的 FPGA "
+"开发平台。Scaleda 的开发愿景便是提供："
+msgstr ""
+"The development background of Scaleda comes from our observation of the "
+"popularity of FPGA development teaching. Traditional FPGA development "
+"revolves around EDA software provided by the manufacturer. However, such EDA"
+" software such as Vivado is often clunky and provides a poor practical "
+"development experience. Some users choose to use Visual Studio Code and "
+"develop with multiple plug-ins, but this method is usually cumbersome to "
+"configure, not friendly to beginners, and the actual experience is uneven. "
+"Based on the consideration of these issues, we hope to design a flexible and"
+" versatile FPGA development platform. Scaleda's development vision is to "
+"provide:"
+
+#: ../../introduction.md:26
+msgid "简便而直观的配置，开箱即用的体验。在需要用户设置软件功能时，提供图形界面与详细介绍。"
+msgstr ""
+"Easy and intuitive configuration for an out-of-the-box experience. When "
+"users need to set software functions, a graphical interface and detailed "
+"introduction are provided."
+
+#: ../../introduction.md:27
+msgid "用户友好的开发体验。用户在编写代码时，应有实时的语法及语义检查，并能针对常见问题给予修正提示。"
+msgstr ""
+"User-friendly development experience. When users write code, they should "
+"have real-time syntax and semantic checks, and be given correction tips for "
+"common problems."
+
+#: ../../introduction.md:28
+msgid "基于文本的项目管理。通过文本格式的项目配置管理和生成其他工具链项目，方便多人协作和版本控制。"
+msgstr ""
+"Text-based project management. Manage and generate other tool chain projects"
+" through project configuration in text format to facilitate multi-person "
+"collaboration and version control."
+
+#: ../../introduction.md:29
+msgid "丰富的功能。除了基本的代码编辑功能外，还应提供仿真、综合、实现等功能，以及波形查看器等辅助功能。"
+msgstr ""
+"Rich features. In addition to basic code editing functions, it should also "
+"provide simulation, synthesis, implementation and other functions, as well "
+"as auxiliary functions such as waveform viewers."
+
+#: ../../introduction.md:30
+msgid "开源工具链支持。充分发挥开源生态的灵活性，在 FPGA 开发中组合使用多种开源工具。"
+msgstr ""
+"Open source toolchain support. Take full advantage of the flexibility of the"
+" open source ecosystem and use a variety of open source tools in combination"
+" in FPGA development."
+
+#: ../../introduction.md:32
+msgid ""
+"Scaleda 是在 IntelliJ 平台上运行的。 尽管 IntelliJ IDEA 是一个被设计用于 Java 开发的 IDE，但其强大的 API"
+" 扩展系统使得我们可以在其之上增加对其他语言的支持，这一点与 Visual Studio Code 是类似的。 与 Visual Studio Code"
+" 相比，IntelliJ IDEA 语言支持开发更规范化，更容易实现为“开箱即用”的开发环境，对用户来说配置更加简单。"
+msgstr ""
+"Scaleda runs on the IntelliJ platform. Although IntelliJ IDEA is an IDE "
+"designed for Java development, its powerful API extension system allows us "
+"to add support for other languages ​​​​on top of it, which is similar to "
+"Visual Studio Code. Compared with Visual Studio Code, IntelliJ IDEA language"
+" supports more standardized development, is easier to implement as an \"out-"
+"of-the-box\" development environment, and is simpler to configure for users."
+
+#: ../../introduction.md:36
+msgid "部分功能简介"
+msgstr "Introduction to some functions"
+
+#: ../../introduction.md:38
+msgid "请点击各部分标题以查看详细介绍。"
+msgstr "Please click on each section title to view detailed descriptions."
+
+#: ../../introduction.md:40
+msgid "[项目管理](manual/project.md)"
+msgstr "[Project Management](manual/project.md)"
+
+#: ../../introduction.md:42
+msgid ""
+"Scaleda 支持创建、打开、保存和管理自有格式的 FPGA 项目。 这套项目系统支持在同一个项目中，为不同的“目标平台”（如 Xilinx "
+"Vivado、Quartus Prime）指定不同的“任务”（如仿真、综合），每个任务可以有不同的顶层模块等配置参数，做到同一套 HDL "
+"代码的跨目标平台开发。 此外，Scaleda 也可以直接打开 Xilinx Vivado 项目，编辑其中的代码，甚至调用 Vivado "
+"的综合、实现等任务。"
+msgstr ""
+"Scaleda supports creating, opening, saving and managing FPGA projects in its"
+" own format. This project system supports specifying different \"tasks\" "
+"(such as simulation, synthesis) for different \"target platforms\" (such as "
+"Xilinx Vivado, Quartus Prime) in the same project. Each task can have "
+"different configurations such as top-level modules. Parameters to achieve "
+"cross-target platform development of the same set of HDL codes. In addition,"
+" Scaleda can also directly open the Xilinx Vivado project, edit the code in "
+"it, and even call Vivado's synthesis, implementation and other tasks."
+
+#: ../../introduction.md:46
+msgid "HDL 语言支持"
+msgstr "HDL language support"
+
+#: ../../introduction.md:48
+msgid "语义级补全"
+msgstr "semantic level completion"
+
+#: ../../introduction.md:50
+msgid "Scaleda 会根据您当前代码的上下文，自动给出合适的候选提示项。 例如："
+msgstr ""
+"Scaleda will automatically give you appropriate candidate prompts based on "
+"the context of your current code. For example:"
+
+#: ../../introduction.md:53
+msgid "当您正在写模块端口列表时，会自动补全 input 或 output 一类的关键词，也能在您想要填写位宽时提示模块级参数。"
+msgstr ""
+"When you are writing a module port list, keywords such as input or output "
+"will be automatically completed, and module-level parameters will also be "
+"prompted when you want to fill in the bit width."
+
+#: ../../introduction.md:54
+msgid "当您正在写表达式时，会自动补全可用的信号列表。"
+msgstr ""
+"When you are writing an expression, the list of available signals is "
+"automatically completed."
+
+#: ../../introduction.md:56
+msgid "![根据代码上下文提示](images/input-hint.png)"
+msgstr "![Hint based on code context](images/input-hint.png)"
+
+#: ../../introduction.md:56
+msgid "根据代码上下文提示"
+msgstr "Hints based on code context"
+
+#: ../../introduction.md:58
+msgid "当前自动补全仅在内部支持了 Verilog 语言，需要更多补全功能请使用支持代码补全的语言服务器。"
+msgstr ""
+"Currently, automatic completion only supports the Verilog language "
+"internally. If you need more completion functions, please use a language "
+"server that supports code completion."
+
+#: ../../introduction.md:60 ../../introduction.md:67
+msgid "信号类型提示"
+msgstr "Signal type hint"
+
+#: ../../introduction.md:62
+msgid ""
+"代码中所有的信号会根据它们的类型使用不同的字体表示。 例如，所有紫色斜体表示“线网”类型，而紫色正体表示“寄存器（reg）”类型。 "
+"您可以将鼠标移动到某个信号上，浮窗会展示此信号的定义。 您也可以按住 Ctrl 点击以跳转到那个信号的定义处。"
+msgstr ""
+"All signals in the code will be represented by different fonts depending on "
+"their type. For example, all purple italic fonts represent the \"line net\" "
+"type, while purple regular fonts represent the \"register (reg)\" type. You "
+"can move the mouse over a signal, and the floating window will display the "
+"definition of the signal. You can also Ctrl-click to jump to that signal's "
+"definition."
+
+#: ../../introduction.md:67
+msgid "![信号类型提示](images/signal-color.png)"
+msgstr "![Signal type prompt](images/signal-color.png)"
+
+#: ../../introduction.md:69
+msgid ""
+"同样的提示也应用于模块的实例化上。 "
+"您可以轻松地通过浮窗查看某个被实例化的模块的原始模块头（即定义了模块参数和模块端口的部分），跳转到模块定义，或是查看某一个端口和参数的属性。"
+msgstr ""
+"The same tip applies to instantiating modules. You can easily view the "
+"original module header of an instantiated module (that is, the part that "
+"defines module parameters and module ports) through the floating window, "
+"jump to the module definition, or view the properties of a certain port and "
+"parameter."
+
+#: ../../introduction.md:72
+msgid "![模块实例化提示](images/module-description.png)"
+msgstr "![Module instantiation prompt](images/module-description.png)"
+
+#: ../../introduction.md:72
+msgid "模块实例化提示"
+msgstr "Module instantiation tips"
+
+#: ../../introduction.md:74
+msgid "问题代码提示"
+msgstr "Problem code tips"
+
+#: ../../introduction.md:76
+msgid "Scaleda 会根据您的代码，给出可能的问题提示，例如多驱动、未使用的信号等。"
+msgstr ""
+"Scaleda will give you possible problem tips based on your code, such as "
+"multiple drivers, unused signals, etc."
+
+#: ../../introduction.md:78
+msgid "![不合适的 assign 语句](images/improper-assign.png)"
+msgstr "![Inappropriate assign statement](images/improper-assign.png)"
+
+#: ../../introduction.md:78
+msgid "不合适的 assign 语句"
+msgstr "Inappropriate assign statement"
+
+#: ../../introduction.md:80
+msgid "![模块实例化时，有端口未连接](images/module-instance.png)"
+msgstr ""
+"![When the module is instantiated, a port is not connected](images/module-"
+"instance.png)"
+
+#: ../../introduction.md:80
+msgid "模块实例化时，有端口未连接"
+msgstr "When the module is instantiated, a port is not connected."
+
+#: ../../introduction.md:82
+msgid "![多驱动问题，即一个信号在多个地方被赋值](images/multi-driven.png)"
+msgstr ""
+"![Multi-driven problem, that is, a signal is assigned in multiple "
+"places](images/multi-driven.png)"
+
+#: ../../introduction.md:82
+msgid "多驱动问题，即一个信号在多个地方被赋值"
+msgstr ""
+"Multi-driver problem, that is, a signal is assigned in multiple places"
+
+#: ../../introduction.md:84
+msgid "除了 Scaleda 内置的代码检查，语言服务器提供的代码检查也会一并显示。"
+msgstr ""
+"In addition to Scaleda's built-in code inspections, code inspections "
+"provided by the language server are also displayed."
+
+#: ../../introduction.md:86
+msgid "代码格式化"
+msgstr "Code formatting"
+
+#: ../../introduction.md:88
+msgid ""
+"目前 Scaleda 的 Verilog 代码格式化功能是通过 [Verible "
+"Formatter](https://github.com/chipsalliance/verible/tree/master/verilog/tools/formatter)"
+" 实现的，支持 Verilog 和 SystemVerilog 代码的格式化，并支持自定义格式化选项。 通过 IDEA PSI 实现的格式化尚在开发中。"
+msgstr ""
+"Currently, Scaleda's Verilog code formatting function is implemented through"
+" [Verible "
+"Formatter](https://github.com/chipsalliance/verible/tree/master/verilog/tools/formatter),"
+" which supports the formatting of Verilog and SystemVerilog codes, and "
+"Supports custom formatting options. Formatting via IDEA PSI is still under "
+"development."
+
+#: ../../introduction.md:91
+msgid "IP 核管理"
+msgstr "IP core management"
+
+#: ../../introduction.md:93
+msgid ""
+"Scaleda 通过项目配置实现了 IP 核管理功能，通过嵌套的项目配置文件，可以将 Scaleda 项目导出为 IP "
+"核，并提供用户界面进行参数编辑，以供其他项目快速导入使用。 同时，Scaleda 也支持添加 FPGA 厂商提供的 IP 核，以供用户在特定平台上使用。"
+msgstr ""
+"Scaleda implements IP core management functions through project "
+"configuration. Through nested project configuration files, Scaleda projects "
+"can be exported as IP cores and provide a user interface for parameter "
+"editing for quick import by other projects. At the same time, Scaleda also "
+"supports adding IP cores provided by FPGA manufacturers for users to use on "
+"specific platforms."
+
+#: ../../introduction.md:96
+msgid "工具链调用"
+msgstr "Tool chain call"
+
+#: ../../introduction.md:98
+msgid ""
+"通过 Scaleda 的项目配置，可以调用 Vivado、Quartus Prime、iverilog、Yosys 等工具链进行仿真、综合、实现等操作。"
+" Scaleda 内置了对这些工具链的预设处理，以快速生成对应平台的项目或仿真文件等，并提供调用过程中的消息解析和错误修正建议。"
+msgstr ""
+"Through Scaleda's project configuration, tool chains such as Vivado, Quartus"
+" Prime, iverilog, and Yosys can be called for simulation, synthesis, "
+"implementation, and other operations. Scaleda has built-in preset processing"
+" for these tool chains to quickly generate projects or simulation files "
+"corresponding to the platform, and provides message parsing and error "
+"correction suggestions during the calling process."
+
+#: ../../introduction.md:101
+msgid "不想使用 Scaleda 项目系统的用户，也可以在 IDEA 中直接打开 Vivado 项目，解析路径引用、直接调用生成任务等。"
+msgstr ""
+"Users who do not want to use the Scaleda project system can also directly "
+"open the Vivado project in IDEA, resolve path references, directly call the "
+"generation task, etc."
+
+#: ../../introduction.md:103
+msgid "远程服务支持"
+msgstr "Remote service support"
+
+#: ../../introduction.md:105
+msgid ""
+"Scaleda 支持在服务器模式下运行，以执行远程 EDA 任务，提供简单的 JWT 认证机制，支持多用户同时使用。 执行远程任务时，Scaleda "
+"会将任务提交到服务器，服务器会调用相应的工具链执行任务，并实时将结果返回给客户端。"
+msgstr ""
+"Scaleda supports running in server mode to perform remote EDA tasks, "
+"provides a simple JWT authentication mechanism, and supports simultaneous "
+"use by multiple users. When executing a remote task, Scaleda will submit the"
+" task to the server, and the server will call the corresponding tool chain "
+"to execute the task and return the results to the client in real time."
+
+#: ../../introduction.md:108
+msgid "命令行工具"
+msgstr "Command line tools"
+
+#: ../../introduction.md:110
+msgid "Scaleda 的大部分核心功能都可以在命令行中使用，如执行本地和远程执行任务、作为服务器运行等。"
+msgstr ""
+"Most of Scaleda's core features are available from the command line, such as"
+" executing tasks locally and remotely, running as a server, etc."
+
+#: ../../introduction.md:112
+msgid "波形工具"
+msgstr "Wave tool"
+
+#: ../../introduction.md:114
+msgid "Scaleda 内置了多个开箱即用的波形查看器，并提供基于语法解析的网表-波形匹配跳转功能。"
+msgstr ""
+"Scaleda has multiple built-in waveform viewers out of the box and provides a"
+" netlist-waveform matching jump function based on syntax parsing."
+
+#: ../../introduction.md:116
+msgid "下一步"
+msgstr "Next step"
+
+#: ../../introduction.md:118
+msgid ""
+"本项目的初步目标，是通过提供良好的用户体验，帮助初学者更好地了解、入门 FPGA 及至数字逻辑的世界。 为实现这一目标，我们在 IntelliJ "
+"IDEA 平台上实现了一些智能化的 Verilog 编辑功能，并支持了基本的项目管理、工具链调用等功能。"
+msgstr ""
+"The initial goal of this project is to help beginners better understand and "
+"get started with FPGA and the world of digital logic by providing a good "
+"user experience. To achieve this goal, we have implemented some intelligent "
+"Verilog editing functions on the IntelliJ IDEA platform, and supported basic"
+" project management, tool chain calling and other functions."
+
+#: ../../introduction.md:121
+msgid "在未来，我们希望 Scaleda 能够支持更多的工具链、更多的功能，以及更好的用户体验。"
+msgstr ""
+"In the future, we hope that Scaleda can support more tool chains, more "
+"functions, and a better user experience."
+
+#: ../../introduction.md:123
+msgid "计划中的功能 <del>大饼</del> 包括："
+msgstr "Planned features <del>pie</del> include:"
+
+#: ../../introduction.md:125
+msgid "Chisel、SpinalHDL 功能增强；"
+msgstr "Chisel, SpinalHDL function enhancements;"
+
+#: ../../introduction.md:126
+msgid "网表查看器；"
+msgstr "Netlist viewer;"
+
+#: ../../introduction.md:127
+msgid "HDL 文档生成；"
+msgstr "HDL document generation;"
+
+#: ../../introduction.md:128
+msgid "HDL 全局索引；"
+msgstr "HDL global index;"
+
+#: ../../introduction.md:129
+msgid "HDL 代码格式转换；"
+msgstr "HDL code format conversion;"
+
+#: ../../introduction.md:130
+msgid "逻辑分析仪；"
+msgstr "logic analyzer;"
+
+#: ../../introduction.md:131
+msgid "……"
+msgstr "……"
+
+#: ../../introduction.md:133
+msgid "计划修正的问题、功能增强等请查看 Issues。"
+msgstr "Please check Issues for planned bug fixes, feature enhancements, etc."
+
+#: ../../introduction.md:135
+msgid ""
+"Scaleda 已完全开源在 [GitHub](https://github.com/Scaleda/Scaleda)，欢迎您参与贡献代码，在 "
+"[Issues](https://github.com/Scaleda/Scaleda/issues) 中提出建议和功能需求、报告问题。"
+msgstr ""
+"Scaleda is fully open source on "
+"[GitHub](https://github.com/Scaleda/Scaleda). You are welcome to contribute "
+"code and make suggestions in "
+"[Issues](https://github.com/Scaleda/Scaleda/issues) and feature requests, "
+"report issues."
+
+#: ../../introduction.md:137
+msgid ""
+"目前 Scaleda 仅有两名开发者，我们希望能够得到更多的用户反馈，以帮助我们更好地改进 Scaleda。 "
+"由于开发者目前都是计算机专业的学生，数字电路设计方面的知识有限。 如果您希望为 Scaleda "
+"贡献代码，我们为您在阅读代码时造成的精神损害提供真挚的歉意。"
+msgstr ""
+"Currently there are only two developers on Scaleda, and we hope to get more "
+"user feedback to help us better improve Scaleda. Since the developers are "
+"currently computer science students, their knowledge of digital circuit "
+"design is limited. If you wish to contribute code to Scaleda, we sincerely "
+"apologize for the mental damage caused while reading the code."

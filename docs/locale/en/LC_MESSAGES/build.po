@@ -1,0 +1,92 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2024, Scaleda
+# This file is distributed under the same license as the Scaleda package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Scaleda\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-18 10:18+0800\n"
+"PO-Revision-Date: 2024-05-18 10:26\n"
+"Last-Translator: potranslator 1.1.5\n"
+"Language-Team: en <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.15.0\n"
+"Translated-By: potranslator 1.1.5\n"
+
+#: ../../build.md:1
+msgid "构建 Scaleda"
+msgstr "Build Scaleda"
+
+#: ../../build.md:3
+msgid "Scaleda 使用 Sbt 进行构建，因此您需要安装 Sbt 或者使用 IDEA 进行构建。"
+msgstr ""
+"Scaleda uses Sbt to build, so you need to install Sbt or build using IDEA."
+
+#: ../../build.md:5
+msgid "Sbt 运行过程中会自动下载依赖和开发中使用的 IntelliJ IDEA，因此需要预留约 5GiB 的磁盘空间。"
+msgstr ""
+"When Sbt is running, it will automatically download dependencies and "
+"IntelliJ IDEA used in development, so approximately 5GiB of disk space needs"
+" to be reserved."
+
+#: ../../build.md:7
+msgid "生成 IDEA 插件"
+msgstr "Generate IDEA plug-in"
+
+#: ../../build.md:13
+msgid "由于 `patchPluginXml` 可能会出现问题，因此最好连续运行两次。"
+msgstr ""
+"Since `patchPluginXml` can cause problems, it's best to run it twice in "
+"succession."
+
+#: ../../build.md:15
+msgid ""
+"生成的插件位于 `target/scaleda-x.x.x.zip`。版本号从 `.version` 文件中读取，并被填入 "
+"`plugin.xml`。插件的描述信息、更新信息从 `docs/plugin-"
+"description.html`、`docs/changelog.html` 中读取。"
+msgstr ""
+"The generated plugin is located in `target/scaleda-x.x.x.zip`. The version "
+"number is read from the `.version` file and populated into `plugin.xml`. "
+"Plug-in description information and update information are read from "
+"`docs/plugin-description.html` and `docs/changelog.html`."
+
+#: ../../build.md:17
+msgid "生成 CLI 工具"
+msgstr "Build CLI tool"
+
+#: ../../build.md:23
+msgid "生成的 CLI 工具位于 `scaleda-kernel/target/scala-2.13/scaleda-kernel.jar`。"
+msgstr ""
+"The generated CLI tool is located in `scaleda-"
+"kernel/target/scala-2.13/scaleda-kernel.jar`."
+
+#: ../../build.md:25
+msgid "清理"
+msgstr "clean up"
+
+#: ../../build.md:27
+msgid "需要分别清理默认 module 和 `kernel` module。"
+msgstr "The default module and `kernel` module need to be cleaned separately."
+
+#: ../../build.md:33
+msgid "在 IDEA 中运行插件"
+msgstr "Run the plug-in in IDEA"
+
+#: ../../build.md:39
+msgid ""
+"[GitHub Actions](https://github.com/Scaleda/Scaleda/actions) "
+"中的构建过程会自动运行上述生成命令，产物会被打包上传到 Actions 或 Release。如果您需要手动构建，可以参考 "
+"CI：`.github/workflows/*.yml`。"
+msgstr ""
+"The build process in [GitHub "
+"Actions](https://github.com/Scaleda/Scaleda/actions) will automatically run "
+"the above build command, and the product will be packaged and uploaded to "
+"Actions or Release. If you need to build manually, you can refer to CI: "
+"`.github/workflows/*.yml`."

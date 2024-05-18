@@ -1,0 +1,114 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2024, Scaleda
+# This file is distributed under the same license as the Scaleda package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Scaleda\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-18 10:18+0800\n"
+"PO-Revision-Date: 2024-05-18 10:26\n"
+"Last-Translator: potranslator 1.1.5\n"
+"Language-Team: en <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.15.0\n"
+"Translated-By: potranslator 1.1.5\n"
+
+#: ../../about.md:1
+msgid "关于"
+msgstr "about"
+
+#: ../../about.md:3
+msgid ""
+"Scaleda 使用[《木兰宽松许可证（第 2 "
+"版）》](https://license.coscl.org.cn/MulanPSL2)协议开源，详情请参考 "
+"[LICENSE](https://github.com/Scaleda/Scaleda/blob/master/LICENSE) 文件。"
+msgstr ""
+"Scaleda is open source using the [\"Mulan Permissive License (Version "
+"2)\"](https://license.coscl.org.cn/MulanPSL2) protocol. For details, please "
+"refer to [LICENSE](https://github.com/Scaleda/ Scaleda/blob/master/LICENSE) "
+"file."
+
+#: ../../about.md:5
+msgid "Scaleda 的开发由哈尔滨工业大学（深圳）徐勇教授指导，项目来源于哈工大（深圳）- 中微半导人工智能芯片联合实验室。"
+msgstr ""
+"The development of Scaleda was directed by Professor Xu Yong of Harbin "
+"Institute of Technology (Shenzhen), and the project originated from the "
+"Harbin Institute of Technology (Shenzhen)-China Micro Semiconductor "
+"Artificial Intelligence Chip Joint Laboratory."
+
+#: ../../about.md:7
+msgid ""
+"本项目目前作为 2024 "
+"年哈尔滨工业大学（深圳）计算机学院本科生毕业设计项目进行开发，[论文链接](https://release-1254016670.cos.ap-"
+"guangzhou.myqcloud.com/scaleda-thesis.pdf)。"
+msgstr ""
+"This project is currently being developed as a graduation project for "
+"undergraduates in the School of Computer Science at Harbin Institute of "
+"Technology (Shenzhen) in 2024, [paper "
+"link](https://release-1254016670.cos.ap-guangzhou.myqcloud.com/scaleda-"
+"thesis.pdf )."
+
+#: ../../about.md:9
+msgid "使用的开源项目"
+msgstr "Open source projects used"
+
+#: ../../about.md:11
+msgid "Scaleda 参考和使用了诸多开源项目，包括但不限于："
+msgstr ""
+"Scaleda references and uses many open source projects, including but not "
+"limited to:"
+
+#: ../../about.md:13
+msgid ""
+"[ANTLR](https://github.com/antlr/antlr4)、[ANTLR IntelliJ "
+"Adapter](https://github.com/antlr/antlr4-intellij-adaptor)"
+msgstr ""
+"[ANTLR](https://github.com/antlr/antlr4)、[ANTLR IntelliJ "
+"Adapter](https://github.com/antlr/antlr4-intellij-adaptor)"
+
+#: ../../about.md:14
+msgid ""
+"[JetBrains Verilog Plugin](https://github.com/MrTsepa/jetbrains-verilog-"
+"plugin/)"
+msgstr ""
+"[JetBrains Verilog Plugin](https://github.com/MrTsepa/jetbrains-verilog-"
+"plugin/)"
+
+#: ../../about.md:15
+msgid ""
+"[Verilog-HDL/SystemVerilog/Bluespec "
+"SystemVerilog](https://github.com/mshr-h/vscode-verilog-hdl-support)"
+msgstr ""
+"[Verilog-HDL/SystemVerilog/Bluespec "
+"SystemVerilog](https://github.com/mshr-h/vscode-verilog-hdl-support)"
+
+#: ../../about.md:16
+msgid "[Verible](https://github.com/chipsalliance/verible)"
+msgstr "[Verible](https://github.com/chipsalliance/verible)"
+
+#: ../../about.md:17
+msgid "[Svls](https://github.com/dalance/svls)"
+msgstr "[savls](https://github.com/dalans/savls)"
+
+#: ../../about.md:18
+msgid "[Digital-IDE](https://github.com/Digital-EDA/Digital-IDE)"
+msgstr "[Digital-IDE](https://github.com/Digital-EDA/Digital-IDE)"
+
+#: ../../about.md:20
+msgid ""
+"被 Scaleda 内置的开源项目，其 LICENSEs 位于 [scaleda-"
+"kernel/src/main/resources/install/licences](https://github.com/Scaleda/Scaleda/blob/master/scaleda-"
+"kernel/src/main/resources/install/licences)，并将会在运行时释放到用户的本地文件系统中。"
+msgstr ""
+"Open source projects built into Scaleda, their LICENSEs are located at "
+"[scaleda-"
+"kernel/src/main/resources/install/licences](https://github.com/Scaleda/Scaleda/blob/master/scaleda-"
+"kernel/src/main/ resources/install/licences) and will be released to the "
+"user's local file system at runtime."
