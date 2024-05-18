@@ -6,27 +6,22 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Scaleda\n"
+"Project-Id-Version:  Scaleda\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-18 10:18+0800\n"
-"PO-Revision-Date: 2024-05-18 10:26\n"
+"POT-Creation-Date: 2024-05-18 11:08+0800\n"
+"PO-Revision-Date: 2024-05-18 10:26+0000\n"
 "Last-Translator: potranslator 1.1.5\n"
-"Language-Team: en <LL@li.org>\n"
 "Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.15.0\n"
-"Translated-By: potranslator 1.1.5\n"
 
 #: ../../README.rst:5
 msgid "Scaleda：将 IntelliJ IDEA 打造为 FPGA 开发工具"
 msgstr "Scaleda: Making IntelliJ IDEA an FPGA development tool"
-
-#: ../../README.rst:7
-msgid "`English <README.en>`__"
-msgstr "`English <README.en>`__"
 
 #: ../../README.rst:-1
 msgid "Documentation Status"
@@ -40,37 +35,39 @@ msgstr "Online Documentation"
 msgid "使用 Scaleda 进行 Verilog 开发"
 msgstr "Verilog development using Scaleda"
 
-#: ../../README.rst:25
+#: ../../README.rst:23
 msgid "概述"
 msgstr "Overview"
 
-#: ../../README.rst:54
+#: ../../README.rst:25
 msgid ""
-"Scaleda（=Scalable + EDA）是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具， 具有 HDL 项目管理、HDL "
-"语言支持、FPGA 工具调用等功能，将 IJ 打造成为灵活而强大的 FPGA 开发工具。 目前，Scaleda 已支持的功能包括："
+"Scaleda（=Scalable + EDA）是一个 IntelliJ 平台的可扩展 FPGA EDA 辅助工具， 具有 HDL "
+"项目管理、HDL 语言支持、FPGA 工具调用等功能，将 IJ 打造成为灵活而强大的 FPGA 开发工具。 目前，Scaleda "
+"已支持的功能包括："
 msgstr ""
-"Scaleda (=Scalable + EDA) is an extensible FPGA EDA auxiliary tool for the "
-"IntelliJ platform. It has functions such as HDL project management, HDL "
-"language support, and FPGA tool calling, making IJ a flexible and powerful "
-"FPGA development tool. Currently, functions supported by Scaleda include:"
+"Scaleda (=Scalable + EDA) is an extensible FPGA EDA auxiliary tool for "
+"the IntelliJ platform. It has functions such as HDL project management, "
+"HDL language support, and FPGA tool calling, making IJ a flexible and "
+"powerful FPGA development tool. Currently, functions supported by Scaleda"
+" include:"
 
-#: ../../README.rst:58
+#: ../../README.rst:29
 msgid "Verilog 语言的基本语法功能（语法高亮、代码折叠、代码格式化、代码注释、代码导航等）；"
 msgstr ""
 "Basic syntax functions of Verilog language (syntax highlighting, code "
 "folding, code formatting, code comments, code navigation, etc.);"
 
-#: ../../README.rst:60
+#: ../../README.rst:31
 msgid "Verilog 语言的简单代码补全；"
 msgstr "Simple code completion in Verilog language;"
 
-#: ../../README.rst:61
+#: ../../README.rst:32
 msgid "Verilog 语言的代码检查 （语法错误与语义错误，以及诸如端口缺失、多驱动等错误）；"
 msgstr ""
-"Verilog language code inspection (syntax errors and semantic errors, as well"
-" as errors such as missing ports, multiple drivers, etc.);"
+"Verilog language code inspection (syntax errors and semantic errors, as "
+"well as errors such as missing ports, multiple drivers, etc.);"
 
-#: ../../README.rst:63
+#: ../../README.rst:34
 msgid ""
 "使用 `Verible <https://github.com/chipsalliance/verible>`__ 的 "
 "Verilog、SystemVerilog 代码格式化；"
@@ -78,243 +75,247 @@ msgstr ""
 "Verilog, SystemVerilog code formatting using `Verible "
 "<https://github.com/chipsalliance/verible>`__;"
 
-#: ../../README.rst:65
+#: ../../README.rst:36
 msgid "Verilog、SystemVerilog、Tcl、Bluespec SystemVerilog 语法解析高亮；"
 msgstr ""
 "Verilog, SystemVerilog, Tcl, Bluespec SystemVerilog syntax parsing "
 "highlighting;"
 
-#: ../../README.rst:66
+#: ../../README.rst:37
 msgid "自有工程和 IP 结构，支持调用 Vivado、Quartus Prime、iverilog、Yosys 等工具进行仿真、综合、实现等操作；"
 msgstr ""
-"It has its own engineering and IP structure, supporting the use of Vivado, "
-"Quartus Prime, iverilog, Yosys and other tools for simulation, synthesis, "
-"implementation and other operations;"
+"It has its own engineering and IP structure, supporting the use of "
+"Vivado, Quartus Prime, iverilog, Yosys and other tools for simulation, "
+"synthesis, implementation and other operations;"
 
-#: ../../README.rst:68
+#: ../../README.rst:39
 msgid "支持加载 Vivado 工程并调用其中的综合、实现等操作；"
 msgstr ""
-"Supports loading Vivado projects and calling synthesis, implementation and "
-"other operations;"
+"Supports loading Vivado projects and calling synthesis, implementation "
+"and other operations;"
 
-#: ../../README.rst:69
+#: ../../README.rst:40
 msgid ""
 "内置波形查看器 `Rvcd <https://github.com/Scaleda/rvcd>`__\\ 、\\ `Surfer "
 "<https://gitlab.com/surfer-project/surfer>`__\\ ；"
 msgstr ""
-"Built-in waveform viewer `Rvcd <https://github.com/Scaleda/rvcd>`__\\ , \\ "
-"`Surfer <https://gitlab.com/surfer-project/surfer>`__\\ ;"
+"Built-in waveform viewer `Rvcd <https://github.com/Scaleda/rvcd>`__\\ , "
+"\\ `Surfer <https://gitlab.com/surfer-project/surfer>`__\\ ;"
 
-#: ../../README.rst:71
+#: ../../README.rst:42
 msgid "运行服务器模式以执行远程 EDA 任务；"
 msgstr "Run server mode to perform remote EDA tasks;"
 
-#: ../../README.rst:72
+#: ../../README.rst:43
 msgid "Verible、\\ `Svls <https://github.com/dalance/svls>`__\\ 或自定义语言服务器（LSP）支持；"
 msgstr ""
-"Verible, \\ `Svls <https://github.com/dalance/svls>`__\\ or custom language "
-"server (LSP) support;"
+"Verible, \\ `Svls <https://github.com/dalance/svls>`__\\ or custom "
+"language server (LSP) support;"
 
-#: ../../README.rst:73
+#: ../../README.rst:44
 msgid "国际化多显示语言支持；"
 msgstr "International multi-display language support;"
 
-#: ../../README.rst:75
+#: ../../README.rst:46
 msgid "用户手册、API 文档等请访问 `在线文档 <https://scaleda.top>`__\\ 。"
 msgstr ""
 "For user manuals, API documentation, etc., please visit `Online "
 "Documentation <https://scaleda.top>`__\\."
 
-#: ../../README.rst:78
+#: ../../README.rst:49
 msgid "安装"
 msgstr "Install"
 
-#: ../../README.rst:80
+#: ../../README.rst:51
 msgid ""
 "Scaleda 目前支持 **2024.1.1 及以上版本** 的除了 Gateway 以外的 IJ 平台，包括 IDEA Community "
 "Edition 和 IDEA Ultimate Edition 等。 您可以选择在插件市场搜索「Scaleda」，或直接下载编译好的插件 zip "
 "包，或者自行编译插件。"
 msgstr ""
-"Scaleda currently supports **2024.1.1 and above** IJ platforms other than "
-"Gateway, including IDEA Community Edition and IDEA Ultimate Edition. You can"
-" choose to search for \"Scaleda\" in the plug-in market, directly download "
-"the compiled plug-in zip package, or compile the plug-in yourself."
+"Scaleda currently supports **2024.1.1 and above** IJ platforms other than"
+" Gateway, including IDEA Community Edition and IDEA Ultimate Edition. You"
+" can choose to search for \"Scaleda\" in the plug-in market, directly "
+"download the compiled plug-in zip package, or compile the plug-in "
+"yourself."
 
-#: ../../README.rst:88
+#: ../../README.rst:59
 msgid ""
-"`访问插件市场 <https://plugins.jetbrains.com/plugin/21863>`__ |Visit marketplace|"
-msgstr ""
-"`Visit marketplace <https://plugins.jetbrains.com/plugin/21863>`__ |Visit "
+"`访问插件市场 <https://plugins.jetbrains.com/plugin/21863>`__ |Visit "
 "marketplace|"
+msgstr ""
+"`Visit marketplace <https://plugins.jetbrains.com/plugin/21863>`__ |Visit"
+" marketplace|"
 
 #: ../../README.rst
 msgid "Visit marketplace"
 msgstr "Visit marketplace"
 
-#: ../../README.rst:90
+#: ../../README.rst:61
 msgid ""
-"服务器端程序请访问 `Github Release <https://github.com/Scaleda/Scaleda/releases>`__ "
-"下载 ``scaleda-kernel.jar``\\ 。"
+"服务器端程序请访问 `Github Release "
+"<https://github.com/Scaleda/Scaleda/releases>`__ 下载 ``scaleda-"
+"kernel.jar``\\ 。"
 msgstr ""
 "For server-side programs, please visit `Github Release "
 "<https://github.com/Scaleda/Scaleda/releases>`__ to download ``scaleda-"
 "kernel.jar``\\."
 
-#: ../../README.rst:95
+#: ../../README.rst:66
 msgid "直接下载 zip 文件来安装"
 msgstr "Directly download the zip file to install"
 
-#: ../../README.rst:97
+#: ../../README.rst:68
 msgid ""
 "IJ 平台的插件以 zip 压缩包的形式进行发布，您可以直接下载编译好的插件 zip 包，然后在 IJ 中安装。 在 `Releases "
 "<https://github.com/Scaleda/Scaleda/releases>`__ 页面中，您可以找到最新的插件 zip "
 "包，它的名字类似于 ``Scaleda-0.1.0.zip``\\ 。"
 msgstr ""
-"The plug-ins of the IJ platform are released in the form of zip compressed "
-"packages. You can directly download the compiled plug-in zip package and "
-"then install it in IJ. In the `Releases "
+"The plug-ins of the IJ platform are released in the form of zip "
+"compressed packages. You can directly download the compiled plug-in zip "
+"package and then install it in IJ. In the `Releases "
 "<https://github.com/Scaleda/Scaleda/releases>`__ page you can find the "
 "latest plugin zip package with a name like ``Scaleda-0.1.0.zip``\\ ."
 
-#: ../../README.rst:103
+#: ../../README.rst:74
 msgid ""
 "启动 IDEA 后，选择 ``File -> Settings -> Plugins -> Install Plugin from "
 "Disk...``\\ ，然后选择下载好的 zip 文件，点击 ``OK`` 即可安装插件。 有关在 IDEA 中安装 Scaleda "
 "的详细过程，请参考 :doc:`installation` 文档。"
 msgstr ""
-"After starting IDEA, select ``File -> Settings -> Plugins -> Install Plugin "
-"from Disk...``\\, then select the downloaded zip file and click ``OK`` to "
-"install the plug-in. For detailed procedures on installing Scaleda in IDEA, "
-"please refer to the :doc:`installation` documentation."
+"After starting IDEA, select ``File -> Settings -> Plugins -> Install "
+"Plugin from Disk...``\\, then select the downloaded zip file and click "
+"``OK`` to install the plug-in. For detailed procedures on installing "
+"Scaleda in IDEA, please refer to the :doc:`installation` documentation."
 
-#: ../../README.rst:109
+#: ../../README.rst:80
 msgid "从源码编译"
 msgstr "Compile from source"
 
-#: ../../README.rst:111
+#: ../../README.rst:82
 msgid ""
-"Scaleda 主要使用 Scala 开发，并使用 sbt（而不是 Gradle）作为构建工具。 因此，如果你想从源码编译 Scaleda，你需要安装 "
-"Scala 和 sbt。"
+"Scaleda 主要使用 Scala 开发，并使用 sbt（而不是 Gradle）作为构建工具。 因此，如果你想从源码编译 "
+"Scaleda，你需要安装 Scala 和 sbt。"
 msgstr ""
-"Scaleda is primarily developed in Scala and uses sbt (instead of Gradle) as "
-"the build tool. Therefore, if you want to compile Scaleda from source, you "
-"need to install Scala and sbt."
+"Scaleda is primarily developed in Scala and uses sbt (instead of Gradle) "
+"as the build tool. Therefore, if you want to compile Scaleda from source,"
+" you need to install Scala and sbt."
 
-#: ../../README.rst:114
+#: ../../README.rst:85
 msgid "克隆本仓库后，使用 sbt 进行编译："
 msgstr "After cloning this repository, use sbt to compile:"
 
-#: ../../README.rst:120
+#: ../../README.rst:91
 msgid "注意，第一次在本仓库下启动 sbt 时，sbt 可能会从网络下载 IJ 平台的依赖和源码，这可能需要一些时间并占用磁盘空间。"
 msgstr ""
-"Note that when you start sbt under this repository for the first time, sbt "
-"may download the dependencies and source code of the IJ platform from the "
-"Internet, which may take some time and occupy disk space."
+"Note that when you start sbt under this repository for the first time, "
+"sbt may download the dependencies and source code of the IJ platform from"
+" the Internet, which may take some time and occupy disk space."
 
-#: ../../README.rst:123
+#: ../../README.rst:94
 msgid "编译完成后，使用下面的命令进行打包："
 msgstr "After compilation is complete, use the following command to package:"
 
-#: ../../README.rst:129
+#: ../../README.rst:100
 msgid "打包完成后，你可以在 ``target/scala-2.13/`` 目录下找到打包好的 zip 文件。 您可以用上节的方法安装插件。"
 msgstr ""
 "After packaging is completed, you can find the packaged zip file in the "
 "``target/scala-2.13/`` directory. You can install the plug-in using the "
 "method in the previous section."
 
-#: ../../README.rst:133
+#: ../../README.rst:104
 msgid "使用手册"
 msgstr "manual"
 
-#: ../../README.rst:135
+#: ../../README.rst:106
 msgid "请访问 `在线文档 <https://scaleda.top/manual/index.html>`__ 查看使用手册。"
 msgstr ""
 "Please visit `Online Documentation "
 "<https://scaleda.top/manual/index.html>`__ to view the manual."
 
-#: ../../README.rst:137
+#: ../../README.rst:108
 msgid ""
-"PDF 版本的使用手册可以在 `这里 "
-"<https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf>`__ "
-"下载。 （适用于 v0.0.9 版本。）"
+"PDF 版本的使用手册可以在 `这里 <https://github.com/Scaleda/Scaleda/blob/master/docs"
+"/scaleda-manual.pdf>`__ 下载。 （适用于 v0.0.9 版本。）"
 msgstr ""
 "The PDF version of the manual can be downloaded here "
-"<https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-manual.pdf>`__."
-" (Applies to v0.0.9.)"
+"<https://github.com/Scaleda/Scaleda/blob/master/docs/scaleda-"
+"manual.pdf>`__. (Applies to v0.0.9.)"
 
-#: ../../README.rst:142
+#: ../../README.rst:113
 msgid "项目结构"
 msgstr "Project structure"
 
-#: ../../README.rst:144
+#: ../../README.rst:115
 msgid ""
 "这里介绍 Scaleda 这个项目的结构，而不是「使用 Scaleda 开发的 FPGA 项目」的结构。 对于后者，请参考 "
 ":doc:`manual/project` 文档。"
 msgstr ""
 "Here we introduce the structure of the Scaleda project, rather than the "
-"structure of the \"FPGA project developed using Scaleda\". For the latter, "
-"please refer to the :doc:`manual/project` documentation."
+"structure of the \"FPGA project developed using Scaleda\". For the "
+"latter, please refer to the :doc:`manual/project` documentation."
 
-#: ../../README.rst:147
+#: ../../README.rst:118
 msgid "Scaleda 是一个使用 Scala 和 Java 开发的 IDEA 插件，其源码的结构如下："
 msgstr ""
-"Scaleda is an IDEA plug-in developed using Scala and Java. The structure of "
-"its source code is as follows:"
+"Scaleda is an IDEA plug-in developed using Scala and Java. The structure "
+"of its source code is as follows:"
 
-#: ../../README.rst:150
+#: ../../README.rst:121
 msgid "内核部分"
 msgstr "Kernel part"
 
-#: ../../README.rst:152
+#: ../../README.rst:123
 msgid ""
-"Scaleda 的「内核」部分包括工具链（如 Vivado）的调用、工程结构的定义等功能。 内核被设计为一个可以独立于 IJ 平台运行的命令行程序。 "
-"内核位于 ``scaleda-kernel`` 目录下，作为一个 sbt 子项目存在。 运行 ``sbt 'project kernel; run'``"
-" 或执行编译好的 ``java -jar scaleda-kernel.jar --help`` 以查看内核使用帮助。"
+"Scaleda 的「内核」部分包括工具链（如 Vivado）的调用、工程结构的定义等功能。 内核被设计为一个可以独立于 IJ "
+"平台运行的命令行程序。 内核位于 ``scaleda-kernel`` 目录下，作为一个 sbt 子项目存在。 运行 ``sbt 'project"
+" kernel; run'`` 或执行编译好的 ``java -jar scaleda-kernel.jar --help`` "
+"以查看内核使用帮助。"
 msgstr ""
 "The \"kernel\" part of Scaleda includes functions such as calling tool "
 "chains (such as Vivado) and defining project structures. The kernel is "
 "designed as a command line program that can run independently of the IJ "
 "platform. The kernel is located in the ``scaleda-kernel`` directory and "
-"exists as an sbt subproject. Run ``sbt 'project kernel; run'`` or execute "
-"the compiled ``java -jar scaleda-kernel.jar --help`` to view kernel usage "
-"help."
+"exists as an sbt subproject. Run ``sbt 'project kernel; run'`` or execute"
+" the compiled ``java -jar scaleda-kernel.jar --help`` to view kernel "
+"usage help."
 
-#: ../../README.rst:159
+#: ../../README.rst:130
 msgid "插件部分"
 msgstr "Plug-in section"
 
-#: ../../README.rst:161
+#: ../../README.rst:132
 msgid ""
-"Scaleda 的「插件」部分包括 Verilog 语言支持、图形化工程管理等与 IJ 平台对接的功能。 插件部分的代码位于 ``src`` 目录下。 "
-"其中，包 ``top.scaleda.idea`` 下的代码为 IJ 平台的插件代码，包 ``top.scaleda.verilog`` 下的代码为提供"
-" Verilog 语言支持功能的代码。"
+"Scaleda 的「插件」部分包括 Verilog 语言支持、图形化工程管理等与 IJ 平台对接的功能。 插件部分的代码位于 ``src`` "
+"目录下。 其中，包 ``top.scaleda.idea`` 下的代码为 IJ 平台的插件代码，包 ``top.scaleda.verilog``"
+" 下的代码为提供 Verilog 语言支持功能的代码。"
 msgstr ""
 "Scaleda's \"plug-in\" part includes Verilog language support, graphical "
-"project management and other functions to interface with the IJ platform. "
-"The code for the plug-in part is located in the ``src`` directory. Among "
-"them, the code under the package ``top.scaleda.idea`` is the plug-in code "
-"for the IJ platform, and the code under the package ``top.scaleda.verilog`` "
-"is the code that provides Verilog language support functions."
+"project management and other functions to interface with the IJ platform."
+" The code for the plug-in part is located in the ``src`` directory. Among"
+" them, the code under the package ``top.scaleda.idea`` is the plug-in "
+"code for the IJ platform, and the code under the package "
+"``top.scaleda.verilog`` is the code that provides Verilog language "
+"support functions."
 
-#: ../../README.rst:167
+#: ../../README.rst:138
 msgid "使用的开源项目"
 msgstr "Open source projects used"
 
-#: ../../README.rst:169
+#: ../../README.rst:140
 msgid "Scaleda 参考和使用了诸多开源项目，包括但不限于："
 msgstr ""
 "Scaleda references and uses many open source projects, including but not "
 "limited to:"
 
-#: ../../README.rst:171
+#: ../../README.rst:142
 msgid ""
-"`ANTLR <https://github.com/antlr/antlr4>`__\\ 、\\ `ANTLR IntelliJ Adapter "
-"<https://github.com/antlr/antlr4-intellij-adaptor>`__"
+"`ANTLR <https://github.com/antlr/antlr4>`__\\ 、\\ `ANTLR IntelliJ Adapter"
+" <https://github.com/antlr/antlr4-intellij-adaptor>`__"
 msgstr ""
-"`ANTLR <https://github.com/antlr/antlr4>`__\\ 、\\ `ANTLR IntelliJ Adapter "
-"<https://github.com/antlr/antlr4-intellij-adaptor>`__"
+"`ANTLR <https://github.com/antlr/antlr4>`__\\ 、\\ `ANTLR IntelliJ Adapter"
+" <https://github.com/antlr/antlr4-intellij-adaptor>`__"
 
-#: ../../README.rst:173
+#: ../../README.rst:144
 msgid ""
 "`JetBrains Verilog Plugin <https://github.com/MrTsepa/jetbrains-verilog-"
 "plugin/>`__"
@@ -322,7 +323,7 @@ msgstr ""
 "`JetBrains Verilog Plugin <https://github.com/MrTsepa/jetbrains-verilog-"
 "plugin/>`__"
 
-#: ../../README.rst:175
+#: ../../README.rst:146
 msgid ""
 "`Verilog-HDL/SystemVerilog/Bluespec SystemVerilog "
 "<https://github.com/mshr-h/vscode-verilog-hdl-support>`__"
@@ -330,22 +331,22 @@ msgstr ""
 "`Verilog-HDL/SystemVerilog/Bluespec SystemVerilog "
 "<https://github.com/mshr-h/vscode-verilog-hdl-support>`__"
 
-#: ../../README.rst:177
+#: ../../README.rst:148
 msgid "`Verible <https://github.com/chipsalliance/verible>`__"
 msgstr "`Verible <https://github.com/chipsalliance/verible>`__"
 
-#: ../../README.rst:178
+#: ../../README.rst:149
 msgid "`Svls <https://github.com/dalance/svls>`__"
 msgstr "`Svls <https://github.com/dalance/svls>`__"
 
-#: ../../README.rst:181
+#: ../../README.rst:152
 msgid "开源协议与鸣谢"
 msgstr "Open Source Agreement and Acknowledgments"
 
-#: ../../README.rst:183
+#: ../../README.rst:154
 msgid ""
-"Scaleda 使用\\ `《木兰宽松许可证（第 2 版）》 <https://license.coscl.org.cn/MulanPSL2>`__ "
-"协议开源，详情请参考 `LICENSE "
+"Scaleda 使用\\ `《木兰宽松许可证（第 2 版）》 "
+"<https://license.coscl.org.cn/MulanPSL2>`__ 协议开源，详情请参考 `LICENSE "
 "<https://github.com/Scaleda/Scaleda/blob/master/LICENSE>`__ 文件。"
 msgstr ""
 "Scaleda is open source using the Mulan Permissive License (Version 2) "
@@ -353,7 +354,7 @@ msgstr ""
 "refer to LICENSE <https://github.com/Scaleda "
 "/Scaleda/blob/master/LICENSE>`__ file."
 
-#: ../../README.rst:186
+#: ../../README.rst:157
 msgid "Scaleda 的开发由哈尔滨工业大学（深圳）徐勇教授指导，项目来源于哈工大（深圳）- 中微半导人工智能芯片联合实验室。"
 msgstr ""
 "The development of Scaleda was directed by Professor Xu Yong of Harbin "
@@ -361,10 +362,14 @@ msgstr ""
 "Harbin Institute of Technology (Shenzhen)-China Micro Semiconductor "
 "Artificial Intelligence Chip Joint Laboratory."
 
-#: ../../README.rst:189
+#: ../../README.rst:160
 msgid "感谢 JetBrains 提供的工具支持。"
 msgstr "Thanks to JetBrains for tool support."
 
 #: ../../README.rst:-1
 msgid "JetBrains"
 msgstr "JetBrains"
+
+#~ msgid "`English <README.en>`__"
+#~ msgstr "`English <README.en>`__"
+

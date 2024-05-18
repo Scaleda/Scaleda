@@ -6,25 +6,24 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Scaleda\n"
+"Project-Id-Version:  Scaleda\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-18 10:18+0800\n"
-"PO-Revision-Date: 2024-05-18 10:27\n"
+"POT-Creation-Date: 2024-05-18 11:08+0800\n"
+"PO-Revision-Date: 2024-05-18 10:27+0000\n"
 "Last-Translator: potranslator 1.1.5\n"
-"Language-Team: en <LL@li.org>\n"
 "Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.15.0\n"
-"Translated-By: potranslator 1.1.5\n"
 
-#: ../../index.rst:25
+#: ../../index.rst:27
 msgid "文档"
 msgstr "document"
 
-#: ../../index.rst:40
+#: ../../index.rst:41
 msgid "API 文档"
 msgstr "API documentation"
 
@@ -33,12 +32,11 @@ msgid "Scaleda 文档"
 msgstr "Scaleda documentation"
 
 #: ../../index.rst:7
-msgid ""
-"Scaleda 是 IntelliJ 平台上的 ASIC & FPGA 开发扩展，提供多种 HDL 语言支持、项目管理、多种工具链组合调用等功能。"
+msgid "Scaleda 是 IntelliJ 平台上的 ASIC & FPGA 开发扩展，提供多种 HDL 语言支持、项目管理、多种工具链组合调用等功能。"
 msgstr ""
-"Scaleda is an ASIC & FPGA development extension on the IntelliJ platform, "
-"providing multiple HDL language support, project management, multiple tool "
-"chain combination calls and other functions."
+"Scaleda is an ASIC & FPGA development extension on the IntelliJ platform,"
+" providing multiple HDL language support, project management, multiple "
+"tool chain combination calls and other functions."
 
 #: ../../index.rst:-1
 msgid "Documentation Status"
@@ -48,20 +46,29 @@ msgstr "Documentation Status"
 msgid "Online Documentation"
 msgstr "Online Documentation"
 
+#: ../../index.rst:18
+msgid ""
+"`English Documentation <https://scaleda.top/en>`_ | `English "
+"Documentation (readthedocs) <https://scaleda.readthedocs.io/en/latest/>`_"
+msgstr ""
+"`中文文档 <https://scaleda.top>`_ | "
+"`中文文档(readthedocs) <https://scaleda.readthedocs.io/zh-cn/latest/>`_"
+
 #: ../../index.rst:-1
 msgid "使用 Scaleda 进行 Verilog 开发"
 msgstr "Verilog development using Scaleda"
 
-#: ../../index.rst:21
+#: ../../index.rst:23
 msgid "主要功能介绍请查看文档 :doc:`introduction`。"
 msgstr ""
-"For the main function introduction, please see the "
-"document :doc:`introduction` ."
+"For the main function introduction, please see the document "
+":doc:`introduction` ."
 
-#: ../../index.rst:23
+#: ../../index.rst:25
 msgid "开始使用请查看 → 💫 :doc:`manual/quick-start` 💫 ←"
 msgstr "To get started, please check → 💫 :doc:`manual/quick-start` 💫 ←"
 
-#: ../../index.rst:38
+#: ../../index.rst:39
 msgid "API"
 msgstr "API"
+

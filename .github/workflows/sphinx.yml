@@ -24,6 +24,9 @@ jobs:
         run: |
           python3 -m pip install -r docs/requirements.txt
           make -C docs html
+          make -C docs html BUILDDIR=_build_en SPHINXOPTS="-D language=en"
+          mkdir -p ./docs/_build/html/
+          mv ./docs/_build_en/html ./docs/_build/html/en
       - name: Setup Java (temurin@11)
         if: matrix.java == 'temurin@11'
         uses: actions/setup-java@v2
@@ -53,7 +56,6 @@ jobs:
           sbt doc || echo "generate idea api done"
       - name: Copy Scaladoc to static deploy files
         run: |
-          mkdir -p ./docs/_build/html/
           mv ./scaleda-kernel/target/scala-2.13/api ./docs/_build/html/api-kernel && echo "move generated kernel files"
           mv ./target/scala-2.13/api ./docs/_build/html/api-idea && echo "move generated files"
       - name: Upload Pages artifact

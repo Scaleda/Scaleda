@@ -15,6 +15,8 @@ Scaleda 是 IntelliJ 平台上的 ASIC & FPGA 开发扩展，提供多种 HDL �
    :target: https://scaleda.top
    :alt: Online Documentation
 
+`English Documentation <https://scaleda.top/en>`_ | `English Documentation (readthedocs) <https://scaleda.readthedocs.io/en/latest/>`_
+
 .. image:: images/main-screenshot.png
    :alt: 使用 Scaleda 进行 Verilog 开发
 
