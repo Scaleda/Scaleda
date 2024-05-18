@@ -10,6 +10,10 @@ assignees: ''
 **Describe the bug / 描述** 
 A clear and concise description of what the bug is.
 
+**Logs / 日志**
+Logs in message panel, and exception details.
+在消息窗口的“输出日志”信息，以及右下角可能出现的 Exception 信息。
+
 **To Reproduce / 复现**
 Steps to reproduce the behavior. / 如何复现
 Screenshots preferred, / 建议贴出问题截图
