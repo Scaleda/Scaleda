@@ -6,6 +6,8 @@ Scaleda 文档
 
 Scaleda 是 IntelliJ 平台上的 ASIC & FPGA 开发扩展，提供多种 HDL 语言支持、项目管理、多种工具链组合调用等功能。
 
+.. image:: https://img.shields.io/github/stars/Scaleda/Scaleda
+   :target: https://github.com/Scaleda/Scaleda
 .. image:: https://img.shields.io/jetbrains/plugin/d/21863?color=%2315559aff
    :target: https://plugins.jetbrains.com/plugin/21863
 .. image:: https://readthedocs.org/projects/scaleda/badge/?version=latest
