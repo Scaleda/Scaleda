@@ -11,9 +11,10 @@ import javax.swing.Icon
 
 /** Module type for Scaleda
   */
-class ScaledaModuleType extends ModuleType[ScaledaModuleBuilder](SCALEDA_MODULE) {
-  override def createModuleBuilder(): ScaledaModuleBuilder =
-    new ScaledaModuleBuilder("src", "test")
+class ScaledaModuleType extends ModuleType[ScaledaModuleBuilderScala](SCALEDA_MODULE) {
+  override def createModuleBuilder(): ScaledaModuleBuilderScala =
+    // new ScaledaModuleBuilderScala("src", "test")
+    new ScaledaModuleBuilderScala
 
   override def getName: String = ScaledaBundle.message("module.name")
 

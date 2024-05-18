@@ -6,6 +6,7 @@ val publicScalaVersion = "2.13.12"
 // val ideaVersion = "2023.1.3"
 // val ideaVersion = "241.15989.150"
 val ideaVersion = "2024.1.1"
+// val ideaVersion = "2023.3.1"
 // val ideaVersion = "241.15989.121"
 
 ThisBuild / scalaVersion := publicScalaVersion

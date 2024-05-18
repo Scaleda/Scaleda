@@ -2,7 +2,7 @@ package top.scaleda
 package idea.project.wizard
 
 import idea.ScaledaBundle
-import idea.project.ScaledaModuleBuilder
+import idea.project.ScaledaModuleBuilderScala
 import kernel.utils.KernelFileUtils
 
 import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardStep}
@@ -75,7 +75,10 @@ class ScaledaNewProjectWizardStep(private val parent: NewProjectWizardStep)
   }
 
   override def setupProject(project: Project): Unit = {
-    val builder = new ScaledaModuleBuilder(sourceDirectoryProperty.get(), testDirectoryProperty.get())
+    // val builder = new ScaledaModuleBuilderScala(sourceDirectoryProperty.get(), testDirectoryProperty.get())
+    val builder = new ScaledaModuleBuilderScala
+    builder.setSrcRoot(sourceDirectoryProperty.get())
+    builder.setTestRoot(testDirectoryProperty.get())
     builder.setName(moduleName)
     builder.setContentEntryPath(s"${projectRoot.toString}/$moduleName")
     builder.commit(project)

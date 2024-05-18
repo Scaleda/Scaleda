@@ -100,6 +100,7 @@ class LspConfigSetting extends SearchableConfigurable {
 object LspConfigSetting {
   val SETTINGS_ID = "top.scaleda.idea.settings.lsp.LspConfig"
 
+  // def isLspSupport: Boolean = !PlatformUtils.isCommunityEdition
   def isLspSupport: Boolean = {
     // val packageName = "com.intellij.platform.lsp"
     val packageName = "com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor"

@@ -1,14 +1,15 @@
 <idea-plugin>
     <id>top.scaleda</id>
     <name><![CDATA[Scaleda: Verilog/SystemVerilog/VCD/Vivado/Quartus]]></name>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <vendor>Scaleda</vendor>
 
     <description>A scalable FPGA EDA framework for IntelliJ platform.</description>
     <change-notes>_</change-notes>
 
 <!--    <idea-version since-build="241.15989.150"/>-->
-    <idea-version since-build="241"/>
+<!--    <idea-version since-build="241"/>-->
+    <idea-version since-build="231"/>
 
 <!--    <depends>com.intellij.properties</depends>-->
     <depends>com.intellij.modules.platform</depends>
@@ -233,7 +234,13 @@
         <postStartupActivity implementation="top.scaleda.idea.project.ProjectOpenActivity" />
         <projectService serviceImplementation="top.scaleda.idea.project.io.YmlRootManager" />
         <moduleType id="SCALEDA_MODULE" implementationClass="top.scaleda.idea.project.ScaledaModuleType"/>
-        <newProjectWizard.languageGenerator implementation="top.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>
+        <moduleBuilder
+            builderClass="top.scaleda.idea.project.ScaledaModuleBuilderScala"
+            id="SCALEDA_MODULE_STEP"
+            order="first"/>
+<!--        <newProjectWizard.languageGenerator implementation="top.scaleda.idea.project.wizard.ScaledaNewProjectWizard"/>-->
+<!--        <newProjectWizard.languageGenerator implementation="top.scaleda.idea.project.wizard.ScaledaOldNewProjectWizard"/>-->
+
 
     </extensions>
 
