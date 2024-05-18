@@ -10,15 +10,24 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServerSupportProvider
 
-class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
-  override def fileOpened(
+// class ScaledaLspServerSupportProvider extends LspServerSupportProvider {}
+
+object ScaledaLspServerSupportProviderHelper {
+  def isLspSupportedFile(file: VirtualFile): Boolean = {
+    val maybeVerilog: Boolean = ("(?i)verilog".r findFirstIn file.getFileType.getName).isDefined
+    maybeVerilog ||
+    file.getFileType.isInstanceOf[VerilogFileType] ||
+    file.getFileType.isInstanceOf[SystemVerilogFileType]
+  }
+
+  def fileOpened(
       project: Project,
       virtualFile: VirtualFile,
       lspServerStarter: LspServerSupportProvider.LspServerStarter
   ): Unit = {
     if (!LspConfigSetting.isLspSupport)
       return
-    if (ScaledaLspServerSupportProvider.isLspSupportedFile(virtualFile)) {
+    if (ScaledaLspServerSupportProviderHelper.isLspSupportedFile(virtualFile)) {
       val config = ScaledaIdeaConfig.getConfig.lsp
       LspServerDescriptors.serverDescriptors
         .find(server => server.name == config.tool && server.supportedFile(virtualFile))
@@ -31,14 +40,5 @@ class ScaledaLspServerSupportProvider extends LspServerSupportProvider {
           }
         }
     }
-  }
-}
-
-object ScaledaLspServerSupportProvider {
-  def isLspSupportedFile(file: VirtualFile): Boolean = {
-    val maybeVerilog: Boolean = ("(?i)verilog".r findFirstIn file.getFileType.getName).isDefined
-    maybeVerilog ||
-    file.getFileType.isInstanceOf[VerilogFileType] ||
-    file.getFileType.isInstanceOf[SystemVerilogFileType]
   }
 }
