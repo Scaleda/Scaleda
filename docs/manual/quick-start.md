@@ -12,9 +12,15 @@
 
 ## 创建项目
 
+### 创建新项目
+
 文件 → 新建 → 项目 → Scaleda。此处两个参数详见 [项目管理](project.md)，此处保持默认即可。
 
 ![创建项目](images/quick-start-new-project.png)
+
+如果在“项目”下没有 Scaleda，可以在 文件 → 新建 → 项目 → 生成器 下的 “Scaleda模块” 中创建项目，也可以使用命令行工具。
+
+![创建生成器项目](images/quick-start-module.png)
 
 此时创建了两个空文件夹以及项目配置文件 `scaleda.yml`，内容如下：
 
@@ -25,6 +31,10 @@ type: rtl
 source: src
 test: test
 ```
+
+### 从已有代码创建项目
+
+如果您已有 HDL 代码，可以直接新建 `scaleda.yml` 文件，按照 [项目管理](project.md) 为项目配置路径参数等。
 
 ## 编写 HDL 代码
 

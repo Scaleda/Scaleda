@@ -1,22 +1,23 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) 2024, Scaleda
 # This file is distributed under the same license as the Scaleda package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Scaleda\n"
+"Project-Id-Version:  Scaleda\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-18 10:37+0800\n"
-"PO-Revision-Date: 2024-05-18 10:38\n"
+"POT-Creation-Date: 2024-05-18 18:12+0800\n"
+"PO-Revision-Date: 2024-05-18 10:38+0000\n"
 "Last-Translator: potranslator 1.1.5\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Translated-By: potranslator 1.1.5\n"
+"Generated-By: Babel 2.15.0\n"
 
 #: ../../manual/quick-start.md:1
 msgid "快速开始"
@@ -46,513 +47,556 @@ msgstr "JetBrains Plugin Downloads"
 msgid "**💥注意**：目前 Scaleda 还未与其他支持 HDL 语言的插件验证兼容性，暂时不要同时安装使用其他 HDL 语言支持插件。"
 msgstr ""
 "**💥Note**: Currently, Scaleda has not verified compatibility with other "
-"plug-ins that support HDL language. Please do not install and use other HDL "
-"language support plug-ins at the same time."
+"plug-ins that support HDL language. Please do not install and use other "
+"HDL language support plug-ins at the same time."
 
 #: ../../manual/quick-start.md:11
 msgid "参考文档 [安装 Scaleda](../installation.md)。"
 msgstr "Refer to the document [Installing Scaleda](../installation.md)."
 
-#: ../../manual/quick-start.md:13 ../../manual/quick-start.md:17
+#: ../../manual/quick-start.md:13 ../../manual/quick-start.md:19
 msgid "创建项目"
 msgstr "Create project"
 
 #: ../../manual/quick-start.md:15
+#, fuzzy
+msgid "创建新项目"
+msgstr "Create empty project"
+
+#: ../../manual/quick-start.md:17
 msgid "文件 → 新建 → 项目 → Scaleda。此处两个参数详见 [项目管理](project.md)，此处保持默认即可。"
 msgstr ""
 "File → New → Project → Scaleda. Please refer to [Project "
-"Management](project.md) for details of the two parameters here. Just keep "
-"the defaults here."
+"Management](project.md) for details of the two parameters here. Just keep"
+" the defaults here."
 
-#: ../../manual/quick-start.md:17
+#: ../../manual/quick-start.md:19
 msgid "![创建项目](images/quick-start-new-project.png)"
 msgstr "![Create project](images/quick-start-new-project.png)"
 
-#: ../../manual/quick-start.md:19
+#: ../../manual/quick-start.md:21
+msgid "如果在“项目”下没有 Scaleda，可以在 文件 → 新建 → 项目 → 生成器 下的 “Scaleda模块” 中创建项目，也可以使用命令行工具。"
+msgstr ""
+"If there is no Scaleda under \"Project\", you can create a project in "
+"\"File → New → Project → Generator → Scaleda Module\", or use the CLI "
+"tool."
+
+#: ../../manual/quick-start.md:23
+#, fuzzy
+msgid "![创建生成器项目](images/quick-start-module.png)"
+msgstr "![Create project](images/quick-start-new-project.png)"
+
+#: ../../manual/quick-start.md:23
+#, fuzzy
+msgid "创建生成器项目"
+msgstr "Create project"
+
+#: ../../manual/quick-start.md:25
 msgid "此时创建了两个空文件夹以及项目配置文件 `scaleda.yml`，内容如下："
 msgstr ""
 "At this time, two empty folders and the project configuration file "
 "`scaleda.yml` are created, with the following contents:"
 
-#: ../../manual/quick-start.md:29
+#: ../../manual/quick-start.md:35
+#, fuzzy
+msgid "从已有代码创建项目"
+msgstr "Create a new project from existing code"
+
+#: ../../manual/quick-start.md:37
+msgid "如果您已有 HDL 代码，可以直接新建 `scaleda.yml` 文件，按照 [项目管理](project.md) 为项目配置路径参数等。"
+msgstr ""
+"If you already have HDL code, you can directly create a `scaleda.yml` "
+"file and configure the project path parameters according to [Project "
+"Management](project.md)."
+
+#: ../../manual/quick-start.md:39
 msgid "编写 HDL 代码"
 msgstr "Writing HDL code"
 
-#: ../../manual/quick-start.md:31
+#: ../../manual/quick-start.md:41
 msgid ""
-"在 `src` 文件夹右击 → 新建 → Verilog 文件。输入模块名称 `fir` 以创建 `fir.v` 文件。 在 `test` 文件夹右击 "
-"→ 新建 → Verilog 文件。输入测试文件名称 `fir_tb` 以创建对应的仿真 testbench。"
+"在 `src` 文件夹右击 → 新建 → Verilog 文件。输入模块名称 `fir` 以创建 `fir.v` 文件。 在 `test` "
+"文件夹右击 → 新建 → Verilog 文件。输入测试文件名称 `fir_tb` 以创建对应的仿真 testbench。"
 msgstr ""
-"Right-click on the `src` folder → New → Verilog file. Enter the module name "
-"`fir` to create the `fir.v` file. Right-click on the `test` folder → New → "
-"Verilog file. Enter the test file name `fir_tb` to create the corresponding "
-"simulation testbench."
+"Right-click on the `src` folder → New → Verilog file. Enter the module "
+"name `fir` to create the `fir.v` file. Right-click on the `test` folder →"
+" New → Verilog file. Enter the test file name `fir_tb` to create the "
+"corresponding simulation testbench."
 
-#: ../../manual/quick-start.md:34
+#: ../../manual/quick-start.md:44
 msgid "![示例代码](images/quick-start-code-example.png)"
 msgstr "![Example code](images/quick-start-code-example.png)"
 
-#: ../../manual/quick-start.md:34
+#: ../../manual/quick-start.md:44
 msgid "示例代码"
 msgstr "Sample code"
 
-#: ../../manual/quick-start.md:36
+#: ../../manual/quick-start.md:46
 msgid ""
 "打开支持的文件时，如果您使用的是付费版本的 "
 "IDEA，语言服务器将会启动。点击右下角可以查看语言服务器的状态，或重新启动语言服务器。当切换运行配置时，语言服务器会自动重新加载文件列表等信息。"
 msgstr ""
-"When opening a supported file, if you are using the paid version of IDEA, "
-"the language server will be started. Click the lower right corner to view "
-"the status of the language server or restart the language server. When "
-"switching running configurations, the language server automatically reloads "
-"file lists and other information."
+"When opening a supported file, if you are using the paid version of IDEA,"
+" the language server will be started. Click the lower right corner to "
+"view the status of the language server or restart the language server. "
+"When switching running configurations, the language server automatically "
+"reloads file lists and other information."
 
-#: ../../manual/quick-start.md:38
+#: ../../manual/quick-start.md:48
 msgid "![语言服务器状态](images/quick-start-ls.png)"
 msgstr "![Language server status](images/quick-start-ls.png)"
 
-#: ../../manual/quick-start.md:38
+#: ../../manual/quick-start.md:48
 msgid "语言服务器状态"
 msgstr "Language server status"
 
-#: ../../manual/quick-start.md:40
+#: ../../manual/quick-start.md:50
 msgid "在 设置 → 工具 → Scaleda → Scaleda 语言服务器 中，您可以调整或切换内置的语言服务器，或设置自定义的语言服务器。"
 msgstr ""
-"In Settings → Tools → Scaleda → Scaleda Language Server, you can adjust or "
-"switch the built-in language server, or set up a custom language server."
+"In Settings → Tools → Scaleda → Scaleda Language Server, you can adjust "
+"or switch the built-in language server, or set up a custom language "
+"server."
 
-#: ../../manual/quick-start.md:42
+#: ../../manual/quick-start.md:52
 msgid "![语言服务器设置](images/quick-start-ls-settings.png)"
 msgstr "![Language server settings](images/quick-start-ls-settings.png)"
 
-#: ../../manual/quick-start.md:42
+#: ../../manual/quick-start.md:52
 msgid "语言服务器设置"
 msgstr "Language server settings"
 
-#: ../../manual/quick-start.md:44
+#: ../../manual/quick-start.md:54
 msgid "编辑 HDL 代码时，可以使用由语言服务器和 Scaleda 内置逻辑提供的代码补全、语法检查等功能。"
 msgstr ""
 "When editing HDL code, you can use code completion, syntax checking, and "
 "other functions provided by the language server and Scaleda's built-in "
 "logic."
 
-#: ../../manual/quick-start.md:46
+#: ../../manual/quick-start.md:56
 msgid ""
 "目前内置的 HDL 语言支持尚有不完善之处，如果遇到了语法解析错误或代码检查错误的情况，欢迎您在 [GitHub "
 "Issues](https://github.com/Scaleda/Scaleda/issues) 中提出。"
 msgstr ""
 "The current built-in HDL language support is still imperfect. If you "
-"encounter syntax parsing errors or code checking errors, you are welcome to "
-"raise them in [GitHub Issues](https://github.com/Scaleda/Scaleda/issues) ."
+"encounter syntax parsing errors or code checking errors, you are welcome "
+"to raise them in [GitHub "
+"Issues](https://github.com/Scaleda/Scaleda/issues) ."
 
-#: ../../manual/quick-start.md:48
+#: ../../manual/quick-start.md:58
 msgid "![代码检查错误](images/quick-start-linter-error.png)"
 msgstr "![Code check error](images/quick-start-linter-error.png)"
 
-#: ../../manual/quick-start.md:48
+#: ../../manual/quick-start.md:58
 msgid "代码检查错误"
 msgstr "code inspection errors"
 
-#: ../../manual/quick-start.md:50
+#: ../../manual/quick-start.md:60
 msgid "Scaleda 通过 Verible 提供了 Verilog / SystemVerilog 代码格式化功能，并可以在设置中调整格式化选项。"
 msgstr ""
 "Scaleda provides Verilog / SystemVerilog code formatting capabilities "
 "through Verible, and formatting options can be adjusted in settings."
 
-#: ../../manual/quick-start.md:52
+#: ../../manual/quick-start.md:62
 msgid "![代码格式化](images/quick-start-format-settings.png)"
 msgstr "![Code formatting](images/quick-start-format-settings.png)"
 
-#: ../../manual/quick-start.md:52
+#: ../../manual/quick-start.md:62
 msgid "代码格式化"
 msgstr "Code formatting"
 
-#: ../../manual/quick-start.md:54
+#: ../../manual/quick-start.md:64
 msgid "添加工具链"
 msgstr "Add toolchain"
 
-#: ../../manual/quick-start.md:56
+#: ../../manual/quick-start.md:66
 msgid ""
 "在运行实际的任务之前，需要在全局设置中添加工具链设置。打开 设置 → 工具 → Scaleda → Scaleda "
 "工具链，点击加号以添加工具链。此处添加的两个 Icarus Verilog 和 Vivado 工具链如图。如果支持的工具链在 PATH "
 "中，Scaleda *可能*会自动识别并填上路径。完成后可以检查工具链的版本和路径是否正确。"
 msgstr ""
-"Before running the actual task, the toolchain settings need to be added in "
-"the global settings. Open Settings → Tools → Scaleda → Scaleda Toolchains "
-"and click the plus sign to add a toolchain. The two Icarus Verilog and "
-"Vivado toolchains added here are shown in the figure. If the supported "
-"toolchain is in PATH, Scaleda *might* automatically recognize and fill in "
-"the path. After completion, you can check whether the version and path of "
-"the tool chain are correct."
+"Before running the actual task, the toolchain settings need to be added "
+"in the global settings. Open Settings → Tools → Scaleda → Scaleda "
+"Toolchains and click the plus sign to add a toolchain. The two Icarus "
+"Verilog and Vivado toolchains added here are shown in the figure. If the "
+"supported toolchain is in PATH, Scaleda *might* automatically recognize "
+"and fill in the path. After completion, you can check whether the version"
+" and path of the tool chain are correct."
 
-#: ../../manual/quick-start.md:58
+#: ../../manual/quick-start.md:68
 msgid "![添加工具链1](images/quick-start-toolchain-iverilog.png)"
 msgstr "![Add toolchain 1](images/quick-start-toolchain-iverilog.png)"
 
-#: ../../manual/quick-start.md:58
+#: ../../manual/quick-start.md:68
 msgid "添加工具链1"
 msgstr "Add toolchain 1"
 
-#: ../../manual/quick-start.md:60
+#: ../../manual/quick-start.md:70
 msgid "![添加工具链2](images/quick-start-toolchain-vivado.png)"
 msgstr "![Add toolchain 2](images/quick-start-toolchain-vivado.png)"
 
-#: ../../manual/quick-start.md:60
+#: ../../manual/quick-start.md:70
 msgid "添加工具链2"
 msgstr "Add toolchain 2"
 
-#: ../../manual/quick-start.md:62
+#: ../../manual/quick-start.md:72
 msgid "添加目标平台和任务"
 msgstr "Add target platforms and tasks"
 
-#: ../../manual/quick-start.md:64
+#: ../../manual/quick-start.md:74
 msgid "在右上角的 Scaleda 任务视图中，点击编辑项目以打开项目编辑器添加工具链和任务。"
 msgstr ""
-"In the Scaleda task view in the upper right corner, click Edit Project to "
-"open the project editor to add toolchains and tasks."
+"In the Scaleda task view in the upper right corner, click Edit Project to"
+" open the project editor to add toolchains and tasks."
 
-#: ../../manual/quick-start.md:66
+#: ../../manual/quick-start.md:76
 msgid "![编辑项目](images/quick-start-edit-project.png)"
 msgstr "![Edit project](images/quick-start-edit-project.png)"
 
-#: ../../manual/quick-start.md:66
+#: ../../manual/quick-start.md:76
 msgid "编辑项目"
 msgstr "Edit project"
 
-#: ../../manual/quick-start.md:68
+#: ../../manual/quick-start.md:78
 msgid ""
 "点击项目树根节点，然后点击左上角的加号以添加目标平台。此处选择 Icarus Verilog "
 "作为目标平台以进行仿真，并输入平台名称，然后输入或点击选择设定顶层模块。"
 msgstr ""
-"Click the project tree root node, then click the plus sign in the upper left"
-" corner to add a target platform. Here select Icarus Verilog as the target "
-"platform for simulation and enter the platform name, then enter or click "
-"Select to set the top-level module."
+"Click the project tree root node, then click the plus sign in the upper "
+"left corner to add a target platform. Here select Icarus Verilog as the "
+"target platform for simulation and enter the platform name, then enter or"
+" click Select to set the top-level module."
 
-#: ../../manual/quick-start.md:70
+#: ../../manual/quick-start.md:80
 msgid "![添加目标平台](images/quick-start-add-target-iverilog.png)"
 msgstr "![Add target platform](images/quick-start-add-target-iverilog.png)"
 
-#: ../../manual/quick-start.md:70
+#: ../../manual/quick-start.md:80
 msgid "添加目标平台"
 msgstr "Add target platform"
 
-#: ../../manual/quick-start.md:72
+#: ../../manual/quick-start.md:82
 msgid ""
 "再点击目标平台节点，然后点击左上角的加号以添加任务。此处选择仿真任务。 "
 "可以看到，由于上层的目标平台已经选择了顶层模块，因此这里的顶层模块会继承上层的设置。如果此处更改了顶层模块，那么这个任务会覆盖此设置。"
 msgstr ""
-"Click the target platform node again, then click the plus sign in the upper "
-"left corner to add a task. Select a simulation task here. It can be seen "
-"that since the upper-level target platform has selected the top-level "
-"module, the top-level module here will inherit the upper-level settings. If "
-"top-level modules are changed here, this task will override this setting."
+"Click the target platform node again, then click the plus sign in the "
+"upper left corner to add a task. Select a simulation task here. It can be"
+" seen that since the upper-level target platform has selected the top-"
+"level module, the top-level module here will inherit the upper-level "
+"settings. If top-level modules are changed here, this task will override "
+"this setting."
 
-#: ../../manual/quick-start.md:75
+#: ../../manual/quick-start.md:85
 msgid "![添加仿真任务](images/quick-start-add-task-iverilog.png)"
 msgstr "![Add simulation task](images/quick-start-add-task-iverilog.png)"
 
-#: ../../manual/quick-start.md:75
+#: ../../manual/quick-start.md:85
 msgid "添加仿真任务"
 msgstr "Add simulation task"
 
-#: ../../manual/quick-start.md:77
+#: ../../manual/quick-start.md:87
 msgid "点击确定保存当前项目配置，刷新项目树后，可以看到新添加的目标平台和任务。"
 msgstr ""
 "Click OK to save the current project configuration. After refreshing the "
 "project tree, you can see the newly added target platform and tasks."
 
-#: ../../manual/quick-start.md:79
+#: ../../manual/quick-start.md:89
 msgid "![项目树](images/quick-start-project-tree.png)"
 msgstr "![Project tree](images/quick-start-project-tree.png)"
 
-#: ../../manual/quick-start.md:79
+#: ../../manual/quick-start.md:89
 msgid "项目树"
 msgstr "Project tree"
 
-#: ../../manual/quick-start.md:81
+#: ../../manual/quick-start.md:91
 msgid "运行 Icarus Verilog 仿真任务"
 msgstr "Running an Icarus Verilog simulation task"
 
-#: ../../manual/quick-start.md:83
+#: ../../manual/quick-start.md:93
 msgid "此时双击刚刚添加的仿真任务，Scaleda 会自动运行此仿真任务，并在左下角的任务输出中显示仿真结果。"
 msgstr ""
 "At this time, double-click the simulation task just added. Scaleda will "
-"automatically run the simulation task and display the simulation results in "
-"the task output in the lower left corner."
+"automatically run the simulation task and display the simulation results "
+"in the task output in the lower left corner."
 
-#: ../../manual/quick-start.md:85
+#: ../../manual/quick-start.md:95
 msgid "![任务输出](images/quick-start-messages-iverilog.png)"
 msgstr "![Task output](images/quick-start-messages-iverilog.png)"
 
-#: ../../manual/quick-start.md:85
+#: ../../manual/quick-start.md:95
 msgid "任务输出"
 msgstr "Task output"
 
-#: ../../manual/quick-start.md:87
+#: ../../manual/quick-start.md:97
 msgid ""
-"由于在设置中设置了自动打开波形查看器，Scaleda 会在仿真 Icarus Verilog 时自动插入波形导出代码，并在仿真完成后自动打开波形查看器。"
+"由于在设置中设置了自动打开波形查看器，Scaleda 会在仿真 Icarus Verilog "
+"时自动插入波形导出代码，并在仿真完成后自动打开波形查看器。"
 msgstr ""
-"Since the automatic opening of the waveform viewer is set in the settings, "
-"Scaleda will automatically insert the waveform export code when simulating "
-"Icarus Verilog and automatically open the waveform viewer after the "
-"simulation is completed."
+"Since the automatic opening of the waveform viewer is set in the "
+"settings, Scaleda will automatically insert the waveform export code when"
+" simulating Icarus Verilog and automatically open the waveform viewer "
+"after the simulation is completed."
 
-#: ../../manual/quick-start.md:89
+#: ../../manual/quick-start.md:99
 msgid "被插入后的 `fir_tb_generated.v` 文件如下："
 msgstr "The inserted `fir_tb_generated.v` file is as follows:"
 
-#: ../../manual/quick-start.md:105
+#: ../../manual/quick-start.md:115
 msgid "此仿真任务产生的临时文件会被保存在项目根目录下的 `.sim/{目标平台}-{任务名称}` 文件夹中。"
 msgstr ""
-"The temporary files generated by this simulation task will be saved in the "
-"`.sim/{target platform}-{task name}` folder in the project root directory."
+"The temporary files generated by this simulation task will be saved in "
+"the `.sim/{target platform}-{task name}` folder in the project root "
+"directory."
 
-#: ../../manual/quick-start.md:107
+#: ../../manual/quick-start.md:117
 msgid "在波形查看器中，添加信号并设置显示格式，即可查看波形图。"
 msgstr ""
-"In the waveform viewer, add signals and set the display format to view the "
-"waveform graph."
+"In the waveform viewer, add signals and set the display format to view "
+"the waveform graph."
 
-#: ../../manual/quick-start.md:109
+#: ../../manual/quick-start.md:119
 msgid "![波形查看器](images/quick-start-waveform.png)"
 msgstr "![Waveform Viewer](images/quick-start-waveform.png)"
 
-#: ../../manual/quick-start.md:109 ../../manual/quick-start.md:114
+#: ../../manual/quick-start.md:119 ../../manual/quick-start.md:124
 msgid "波形查看器"
 msgstr "Waveform viewer"
 
-#: ../../manual/quick-start.md:111
+#: ../../manual/quick-start.md:121
 msgid ""
 "鼠标滚轮、拖动、缩放、右键拖动选择查看范围等，仔细观察波形，查看仿真结果。 "
 "如果在嵌入的波形窗口中查看遇到问题，也可以点击左侧工具栏第三个按钮，切换为独立的波形查看器窗口。"
 msgstr ""
-"Use the mouse wheel, drag, zoom, right-click to drag to select the viewing "
-"range, etc., carefully observe the waveform and view the simulation results."
-" If you encounter problems viewing in the embedded waveform window, you can "
-"also click the third button on the left toolbar to switch to an independent "
-"waveform viewer window."
+"Use the mouse wheel, drag, zoom, right-click to drag to select the "
+"viewing range, etc., carefully observe the waveform and view the "
+"simulation results. If you encounter problems viewing in the embedded "
+"waveform window, you can also click the third button on the left toolbar "
+"to switch to an independent waveform viewer window."
 
-#: ../../manual/quick-start.md:114
+#: ../../manual/quick-start.md:124
 msgid "![波形查看器](images/quick-start-waveform-zoom.png)"
 msgstr "![Waveform Viewer](images/quick-start-waveform-zoom.png)"
 
-#: ../../manual/quick-start.md:116
+#: ../../manual/quick-start.md:126
 msgid "运行 Vivado 任务"
 msgstr "Run Vivado tasks"
 
-#: ../../manual/quick-start.md:118
+#: ../../manual/quick-start.md:128
 msgid "💥**注意**：目前仅测试了 Vivado 2019.2 版本，其余版本暂未测试！"
 msgstr ""
-"💥**Note**: Currently only the Vivado 2019.2 version has been tested, and the"
-" other versions have not yet been tested!"
-
-#: ../../manual/quick-start.md:120
-msgid "既然仿真通过了，该综合和上板试试了。"
-msgstr ""
-"Now that the simulation has passed, it’s time to synthesize and try it on "
-"the board."
-
-#: ../../manual/quick-start.md:122
-msgid ""
-"在项目编辑器中添加 Vivado 目标平台，然后添加仿真、综合任务和烧写任务，设置器件参数、约束文件、IP 核路径等。添加后的项目结构、约束文件如下："
-msgstr ""
-"Add the Vivado target platform in the project editor, then add simulation, "
-"synthesis tasks and programming tasks, set device parameters, constraint "
-"files, IP core paths, etc. The added project structure and constraint files "
-"are as follows:"
-
-#: ../../manual/quick-start.md:124
-msgid "![添加 Vivado 目标平台](images/quick-start-vivado-project.png)"
-msgstr "![Add Vivado target platform](images/quick-start-vivado-project.png)"
-
-#: ../../manual/quick-start.md:124
-msgid "添加 Vivado 目标平台"
-msgstr "Add Vivado target platform"
-
-#: ../../manual/quick-start.md:126
-msgid "双击 Vivado 仿真任务，调用 Vivado Simulator 进行仿真，查看仿真结果。"
-msgstr ""
-"Double-click the Vivado simulation task to call Vivado Simulator to simulate"
-" and view the simulation results."
-
-#: ../../manual/quick-start.md:128
-msgid "![Vivado 仿真](images/quick-start-vivado-sim.png)"
-msgstr "![Vivado Simulation](images/quick-start-vivado-sim.png)"
-
-#: ../../manual/quick-start.md:128
-msgid "Vivado 仿真"
-msgstr "Vivado simulation"
+"💥**Note**: Currently only the Vivado 2019.2 version has been tested, and "
+"the other versions have not yet been tested!"
 
 #: ../../manual/quick-start.md:130
-msgid "可以看到，Vivado Simulator 仿真结果与 Icarus Verilog 仿真结果一致。"
+msgid "既然仿真通过了，该综合和上板试试了。"
 msgstr ""
-"It can be seen that the Vivado Simulator simulation results are consistent "
-"with the Icarus Verilog simulation results."
+"Now that the simulation has passed, it’s time to synthesize and try it on"
+" the board."
 
 #: ../../manual/quick-start.md:132
 msgid ""
-"由于这里使用的示例器件是 Zynq7010，且 PL 端没有时钟引脚，于是这里添加了一个 `processing_system7_0.xci` IP "
-"核，用于提供时钟信号。此 IP 核可以在 Vivado 生成后导出。"
+"在项目编辑器中添加 Vivado 目标平台，然后添加仿真、综合任务和烧写任务，设置器件参数、约束文件、IP "
+"核路径等。添加后的项目结构、约束文件如下："
 msgstr ""
-"Since the example device used here is Zynq7010 and there is no clock pin on "
-"the PL side, a `processing_system7_0.xci` IP ​​core is added here to provide"
-" the clock signal. This IP core can be exported after Vivado generation."
+"Add the Vivado target platform in the project editor, then add "
+"simulation, synthesis tasks and programming tasks, set device parameters,"
+" constraint files, IP core paths, etc. The added project structure and "
+"constraint files are as follows:"
 
 #: ../../manual/quick-start.md:134
+msgid "![添加 Vivado 目标平台](images/quick-start-vivado-project.png)"
+msgstr "![Add Vivado target platform](images/quick-start-vivado-project.png)"
+
+#: ../../manual/quick-start.md:134
+msgid "添加 Vivado 目标平台"
+msgstr "Add Vivado target platform"
+
+#: ../../manual/quick-start.md:136
+msgid "双击 Vivado 仿真任务，调用 Vivado Simulator 进行仿真，查看仿真结果。"
+msgstr ""
+"Double-click the Vivado simulation task to call Vivado Simulator to "
+"simulate and view the simulation results."
+
+#: ../../manual/quick-start.md:138
+msgid "![Vivado 仿真](images/quick-start-vivado-sim.png)"
+msgstr "![Vivado Simulation](images/quick-start-vivado-sim.png)"
+
+#: ../../manual/quick-start.md:138
+msgid "Vivado 仿真"
+msgstr "Vivado simulation"
+
+#: ../../manual/quick-start.md:140
+msgid "可以看到，Vivado Simulator 仿真结果与 Icarus Verilog 仿真结果一致。"
+msgstr ""
+"It can be seen that the Vivado Simulator simulation results are "
+"consistent with the Icarus Verilog simulation results."
+
+#: ../../manual/quick-start.md:142
+msgid ""
+"由于这里使用的示例器件是 Zynq7010，且 PL 端没有时钟引脚，于是这里添加了一个 `processing_system7_0.xci` "
+"IP 核，用于提供时钟信号。此 IP 核可以在 Vivado 生成后导出。"
+msgstr ""
+"Since the example device used here is Zynq7010 and there is no clock pin "
+"on the PL side, a `processing_system7_0.xci` IP ​​core is added here to "
+"provide the clock signal. This IP core can be exported after Vivado "
+"generation."
+
+#: ../../manual/quick-start.md:144
 msgid "添加的用于 Vivado 综合的顶层模块："
 msgstr "Added top-level modules for Vivado synthesis:"
 
-#: ../../manual/quick-start.md:159
+#: ../../manual/quick-start.md:169
 msgid ""
-"双击运行综合、烧写任务后，会在 `.synth`、`.impl` 文件夹中生成独立的 Vivado 项目。在等待综合和实现完成时，您可以查看生成的 "
-"Tcl 脚本、运行日志等。"
+"双击运行综合、烧写任务后，会在 `.synth`、`.impl` 文件夹中生成独立的 Vivado 项目。在等待综合和实现完成时，您可以查看生成的"
+" Tcl 脚本、运行日志等。"
 msgstr ""
 "After double-clicking to run the synthesis and programming tasks, "
-"independent Vivado projects will be generated in the `.synth` and `.impl` "
-"folders. While you wait for synthesis and implementation to complete, you "
-"can view the generated Tcl scripts, run logs, and more."
+"independent Vivado projects will be generated in the `.synth` and `.impl`"
+" folders. While you wait for synthesis and implementation to complete, "
+"you can view the generated Tcl scripts, run logs, and more."
 
-#: ../../manual/quick-start.md:161
+#: ../../manual/quick-start.md:171
 msgid "![Vivado 生成项目](images/quick-start-vivado-generated.png)"
 msgstr "![Vivado generated project](images/quick-start-vivado-generated.png)"
 
-#: ../../manual/quick-start.md:161
+#: ../../manual/quick-start.md:171
 msgid "Vivado 生成项目"
 msgstr "Vivado build project"
 
-#: ../../manual/quick-start.md:163
+#: ../../manual/quick-start.md:173
 msgid ""
 "综合和烧写任务的输出结果如下，可以在成功后看到简要的时序报告。烧写任务会走完完整综合、实现流程后直接将比特流下载到连接的开发板上。如果出现无法直接解决的问题，也可以使用"
 " Vivado 打开项目中对应的 `.syth/{目标平台}-{任务名称}` 或 `.impl/{目标平台}-{任务名称}` "
 "文件夹查看详细的综合或实现报告。需要注意的是，每次运行任务都会新建 Vivado 项目，于是如果需要修改并测试，可以将其中的 Vivado "
 "项目先拷贝出来。"
 msgstr ""
-"The output results of the synthesis and programming tasks are as follows. "
-"You can see a brief timing report after success. The programming task will "
-"complete the complete synthesis and implementation process and directly "
-"download the bit stream to the connected development board. If there is a "
-"problem that cannot be solved directly, you can also use Vivado to open the "
-"corresponding `.syth/{target platform}-{task name}` or `.impl/{target "
-"platform}-{task name}` folder in the project to view details. Comprehensive "
-"or implementation report. It should be noted that each time the task is run,"
-" a new Vivado project will be created, so if you need to modify and test, "
-"you can copy the Vivado project first."
+"The output results of the synthesis and programming tasks are as follows."
+" You can see a brief timing report after success. The programming task "
+"will complete the complete synthesis and implementation process and "
+"directly download the bit stream to the connected development board. If "
+"there is a problem that cannot be solved directly, you can also use "
+"Vivado to open the corresponding `.syth/{target platform}-{task name}` or"
+" `.impl/{target platform}-{task name}` folder in the project to view "
+"details. Comprehensive or implementation report. It should be noted that "
+"each time the task is run, a new Vivado project will be created, so if "
+"you need to modify and test, you can copy the Vivado project first."
 
-#: ../../manual/quick-start.md:165
+#: ../../manual/quick-start.md:175
 msgid "![Vivado 综合](images/quick-start-vivado-synth.png)"
 msgstr "![Vivado 综合](images/quick-start-vivado-synth.png)"
 
-#: ../../manual/quick-start.md:165
+#: ../../manual/quick-start.md:175
 msgid "Vivado 综合"
 msgstr "Vivado Comprehensive"
 
-#: ../../manual/quick-start.md:167
+#: ../../manual/quick-start.md:177
 msgid "![Vivado 实现并烧写](images/quick-start-vivado-prog.png)"
 msgstr ""
-"![Vivado implementation and programming](images/quick-start-vivado-prog.png)"
+"![Vivado implementation and programming](images/quick-start-vivado-"
+"prog.png)"
 
-#: ../../manual/quick-start.md:167
+#: ../../manual/quick-start.md:177
 msgid "Vivado 实现并烧写"
 msgstr "Vivado implementation and programming"
 
-#: ../../manual/quick-start.md:169
+#: ../../manual/quick-start.md:179
 msgid "运行其他任务"
 msgstr "Run other tasks"
 
-#: ../../manual/quick-start.md:171
+#: ../../manual/quick-start.md:181
 msgid ""
 "Scaleda 当前还支持 Yosys、Quartus Prime、Bluespec Compiler 等工具链，使用方式与 Vivado "
 "类似，您可以尝试添加这些工具链并运行任务。一个使用 Bluespec Compiler 的示例项目如下图："
 msgstr ""
-"Scaleda currently also supports tool chains such as Yosys, Quartus Prime, "
-"Bluespec Compiler, etc. The usage is similar to Vivado. You can try to add "
-"these tool chains and run tasks. A sample project using Bluespec Compiler is"
-" shown below:"
+"Scaleda currently also supports tool chains such as Yosys, Quartus Prime,"
+" Bluespec Compiler, etc. The usage is similar to Vivado. You can try to "
+"add these tool chains and run tasks. A sample project using Bluespec "
+"Compiler is shown below:"
 
-#: ../../manual/quick-start.md:173
+#: ../../manual/quick-start.md:183
 msgid "![Bluespec 项目](images/quick-start-bsv.png)"
 msgstr "![Bluespec project](images/quick-start-bsv.png)"
 
-#: ../../manual/quick-start.md:173
+#: ../../manual/quick-start.md:183
 msgid "Bluespec 项目"
 msgstr "Bluespec project"
 
-#: ../../manual/quick-start.md:175
+#: ../../manual/quick-start.md:185
 msgid "运行远程任务"
 msgstr "Run remote tasks"
 
-#: ../../manual/quick-start.md:177
+#: ../../manual/quick-start.md:187
 msgid "如果您的电脑性能不足，或者本地没有工具链而需要在远程服务器上运行任务，可以使用 Scaleda 的服务器模式。"
 msgstr ""
 "If your computer performance is insufficient, or you do not have a local "
-"tool chain and need to run tasks on a remote server, you can use Scaleda's "
-"server mode."
+"tool chain and need to run tasks on a remote server, you can use "
+"Scaleda's server mode."
 
-#: ../../manual/quick-start.md:179
+#: ../../manual/quick-start.md:189
 msgid "💥**注意**：目前此功能仍在测试中！目前的实现方案在运行时可能出现各种性能、兼容性问题。"
 msgstr ""
-"💥**NOTE**: This feature is still under testing! The current implementation "
-"may have various performance and compatibility issues during runtime."
+"💥**NOTE**: This feature is still under testing! The current "
+"implementation may have various performance and compatibility issues "
+"during runtime."
 
-#: ../../manual/quick-start.md:181
+#: ../../manual/quick-start.md:191
 msgid "（可选）在服务器上生成并设置 JWT 参数："
 msgstr "(Optional) Generate and set JWT parameters on the server:"
 
-#: ../../manual/quick-start.md:192
+#: ../../manual/quick-start.md:202
 msgid "然后启动服务器："
 msgstr "Then start the server:"
 
-#: ../../manual/quick-start.md:205
+#: ../../manual/quick-start.md:215
 msgid ""
 "在客户端的 IDEA 设置中，进入 工具 → Scaleda → Scaleda "
 "用户，点击加号创建新的凭据，然后在登录窗口中登录和注册。用户的登录凭据被保存在服务器的数据库中，客户端只保存了一个 token，用于验证用户身份。"
 msgstr ""
-"In the client's IDEA settings, go to Tools → Scaleda → Scaleda Users, click "
-"the plus sign to create new credentials, then log in and register in the "
-"login window. The user's login credentials are saved in the server's "
-"database, and the client only saves a token, which is used to verify the "
-"user's identity."
+"In the client's IDEA settings, go to Tools → Scaleda → Scaleda Users, "
+"click the plus sign to create new credentials, then log in and register "
+"in the login window. The user's login credentials are saved in the "
+"server's database, and the client only saves a token, which is used to "
+"verify the user's identity."
 
-#: ../../manual/quick-start.md:207
+#: ../../manual/quick-start.md:217
 msgid "![登录窗口](images/quick-start-login.png)"
 msgstr "![Login window](images/quick-start-login.png)"
 
-#: ../../manual/quick-start.md:207
+#: ../../manual/quick-start.md:217
 msgid "登录窗口"
 msgstr "Login window"
 
-#: ../../manual/quick-start.md:209
-msgid ""
-"首先新建一个新的任务（或是复用之前的任务），双击以创建一个 IDEA 格式的运行配置，编辑此运行配置，指定服务器和远程工具链，然后运行此任务。"
+#: ../../manual/quick-start.md:219
+msgid "首先新建一个新的任务（或是复用之前的任务），双击以创建一个 IDEA 格式的运行配置，编辑此运行配置，指定服务器和远程工具链，然后运行此任务。"
 msgstr ""
-"First create a new task (or reuse a previous task), double-click to create a"
-" run configuration in IDEA format, edit the run configuration, specify the "
-"server and remote tool chain, and then run the task."
+"First create a new task (or reuse a previous task), double-click to "
+"create a run configuration in IDEA format, edit the run configuration, "
+"specify the server and remote tool chain, and then run the task."
 
-#: ../../manual/quick-start.md:211
+#: ../../manual/quick-start.md:221
 msgid "![远程任务](images/quick-start-remote-configuration.png)"
 msgstr "![Remote task](images/quick-start-remote-configuration.png)"
 
-#: ../../manual/quick-start.md:211
+#: ../../manual/quick-start.md:221
 msgid "远程任务"
 msgstr "remote tasks"
 
-#: ../../manual/quick-start.md:213
+#: ../../manual/quick-start.md:223
 msgid ""
 "其原理大致为服务器端通过 gRPC "
 "网络信道挂载一个客户端的文件系统，对配置进行路径、文件内容、输出数据等进行文本替换，即可实现不上传整个项目到服务器上且运行远程任务，而表现与本地执行基本一致。"
 msgstr ""
 "The principle is roughly that the server mounts a client's file system "
-"through the gRPC network channel, and replaces the text of the configuration"
-" path, file content, output data, etc., so that the entire project can be "
-"run without uploading to the server and the remote task can be performed. "
-"Basically the same as local execution."
+"through the gRPC network channel, and replaces the text of the "
+"configuration path, file content, output data, etc., so that the entire "
+"project can be run without uploading to the server and the remote task "
+"can be performed. Basically the same as local execution."
 
-#: ../../manual/quick-start.md:215
+#: ../../manual/quick-start.md:225
 msgid "![远程逻辑](images/scaleda-remote-fs.png)"
 msgstr "![Remote logic](images/scaleda-remote-fs.png)"
 
-#: ../../manual/quick-start.md:215
+#: ../../manual/quick-start.md:225
 msgid "远程逻辑"
 msgstr "remote logic"
+
