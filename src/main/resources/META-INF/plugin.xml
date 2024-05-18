@@ -9,7 +9,7 @@
 
 <!--    <idea-version since-build="241.15989.150"/>-->
 <!--    <idea-version since-build="241"/>-->
-    <idea-version since-build="231"/>
+    <idea-version since-build="233"/>
 
 <!--    <depends>com.intellij.properties</depends>-->
     <depends>com.intellij.modules.platform</depends>
