@@ -116,11 +116,11 @@ Scaleda 参考和使用了诸多开源项目，包括但不限于：
  - [Svls](https://github.com/dalance/svls)
  - [Digital-IDE](https://github.com/Digital-EDA/Digital-IDE)
 
-## 开源协议与鸣谢
+## 作者、许可与鸣谢
+
+Scaleda 项目由哈尔滨工业大学（深圳）中微半导—哈工大（深圳）人工智能芯片联合实验室开发。
 
 Scaleda 使用[《木兰宽松许可证（第 2 版）》](https://license.coscl.org.cn/MulanPSL2)协议开源，详情请参考 [LICENSE](https://github.com/Scaleda/Scaleda/blob/master/LICENSE) 文件。
-
-Scaleda 项目的开发单位是哈尔滨工业大学（深圳）中微半导—哈工大（深圳）人工智能芯片联合实验室。
 
 感谢 JetBrains 提供的工具支持。
 
